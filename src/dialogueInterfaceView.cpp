@@ -40,6 +40,7 @@ DialogueInterfaceView::DialogueInterfaceView() {
 	testDialogue.lines.push_back(diagLine);
 
 	DialogueArea *diagArea = new DialogueArea(normalDiagAreaRect);
+	diagArea->setRect(normalDiagAreaRect);
 	diagArea->setDialogue(testDialogue);
 
 	addElement("dialogueArea", diagArea, 1);
@@ -72,6 +73,10 @@ DialogueInterfaceView::DialogueInterfaceView() {
 	optionButton->setTextSize(13 * 3);
 
 	addElement("optionButton", optionButton, 1);
+
+	auto dump = dumpJson();
+	auto str = dump.dump();
+	SaveFileText("dump.json", str.c_str());
 }
 
 DialogueInterfaceView::DialogueInterfaceView(const std::string &filePath) : InterfaceView(filePath) {}

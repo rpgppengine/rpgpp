@@ -26,7 +26,7 @@ void InterfaceViewView::setElementAtMouse() {
 			auto mouse = getMouseWorldPos();
 			if (CheckCollisionPointRec(mouse, element->getRect())) {
 				selection = element.get();
-				canvasBox->updateRec(selection->rect);
+				canvasBox->updateRec(selection->getRect());
 
 				break;
 			}
@@ -127,7 +127,7 @@ void InterfaceViewView::selectElement(const std::string &elementName) {
 	for (auto &[layer, element] : ptr->getElements()) {
 		if (element->getName() == elementName) {
 			activeElement = element.get();
-			canvasBox->updateRec(element->rect);
+			canvasBox->updateRec(element->getRect());
 			break;
 		}
 	}

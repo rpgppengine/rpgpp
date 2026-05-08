@@ -23,7 +23,7 @@ Label::Label(Rectangle rect) : UIElement(INTERFACE_LABEL) {
 	if (Game::isUsingBin()) {
 		this->font = Game::getResources().getFont(fontName);
 	} else {
-		this->font = LoadFontEx(fontName.c_str(), fontSize, nullptr, 256);
+		this->font = LoadFontEx(TextFormat("fonts/%s.ttf", fontName.c_str()), fontSize, nullptr, 256);
 	}
 }
 
@@ -86,8 +86,6 @@ void Label::setText(const std::string &text) { this->text = text; }
 void Label::update() {}
 
 void Label::draw() {
-	printf("%i \n", textColor.r);
-
 	Vector2 textSize = MeasureTextEx(font, text.c_str(), static_cast<float>(fontSize), 1);
 
 	Vector2 textPos =

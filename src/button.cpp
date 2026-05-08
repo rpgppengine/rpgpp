@@ -23,6 +23,7 @@ Button::Button(Rectangle rect) : UIElement(INTERFACE_BUTTON) {
 
 void Button::fromJson(const nlohmann::json &json) {
 	UIElement::fromJson(json);
+	UIElement::fromNavigationJson(json);
 	colorRect.fromJson(json.at("colorRect"));
 	label.fromJson(json.at("label"));
 	normalTextColor = label.textColor;
@@ -31,25 +32,31 @@ void Button::fromJson(const nlohmann::json &json) {
 }
 
 nlohmann::json Button::dumpJson() {
-	auto j = UIElement::dumpJson();
+	rect = label.rect;
+
+	auto j = UIElement::dumpNavigationJson();
+	j["rect"] = rect;
 	auto colorRectDump = colorRect.dumpJson();
 	j["colorRect"] = colorRectDump;
 	auto labelDump = label.dumpJson();
 	j["label"] = labelDump;
 	j["focusedTextColor"] = focusedTextColor;
-	printf("%s \n", j["label"]["textColor"].dump().c_str());
 	return j;
 }
 
 void Button::fromBin(UIElementBin &bin) {
 	UIElement::fromBin(bin);
+	UIElement::fromNavigationBin(bin);
 	colorRect.fromBin(bin);
 	label.fromBin(bin);
 	focusedTextColor = std::get<Color>(bin.props["focusedTextColor"]);
 }
 
 UIElementBin Button::dumpBin() {
-	auto bin = UIElement::dumpBin();
+	rect = label.rect;
+
+	auto bin = UIElement::dumpNavigationBin();
+	bin.props["rect"] = rect;
 	bin.props.merge(colorRect.dumpBin().props);
 	bin.props.merge(label.dumpBin().props);
 	bin.props["focusedTextColor"] = focusedTextColor;
@@ -61,6 +68,7 @@ std::map<std::string, xxx::any_ptr> Button::getProps() {
 	map.merge(colorRect.getProps());
 	map.merge(label.getProps());
 	map["focusedTextColor"] = &focusedTextColor;
+	map["rect"] = &rect;
 	return map;
 }
 

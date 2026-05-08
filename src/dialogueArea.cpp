@@ -16,30 +16,36 @@ DialogueArea::DialogueArea(Rectangle rect) : UIElement(INTERFACE_DIALOGUEAREA) {
 }
 
 void DialogueArea::fromJson(const nlohmann::json &json) {
+	rect = json.at("rect");
 	text = json.at("text");
 	textColor = json.at("textColor");
 }
 
 nlohmann::json DialogueArea::dumpJson() {
 	auto j = nlohmann::json::object();
+	j["rect"] = rect;
 	j["text"] = text;
 	j["textColor"] = textColor;
 	return j;
 }
 
 void DialogueArea::fromBin(UIElementBin &bin) {
+	rect = std::get<Rectangle>(bin.props["rect"]);
 	text = std::get<std::string>(bin.props["text"]);
 	textColor = std::get<Color>(bin.props["textColor"]);
 }
 
 UIElementBin DialogueArea::dumpBin() {
 	UIElementBin bin;
+	bin.props["rect"] = rect;
 	bin.props["text"] = text;
 	bin.props["textColor"] = textColor;
 	return bin;
 }
 
-std::map<std::string, xxx::any_ptr> DialogueArea::getProps() { return {{"text", &text}, {"textColor", &textColor}}; }
+std::map<std::string, xxx::any_ptr> DialogueArea::getProps() {
+	return {{"rect", &rect}, {"text", &text}, {"textColor", &textColor}};
+}
 
 void DialogueArea::update() {
 	line = &dialogue.lines.at(lineIndex);
