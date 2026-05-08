@@ -8,7 +8,7 @@
 #include "nlohmann/json_fwd.hpp"
 #include "uiElement.hpp"
 
-ImageRect::ImageRect() : rect(Rectangle{}), texture() {}
+ImageRect::ImageRect() : ImageRect(Rectangle{}) {}
 
 ImageRect::ImageRect(Rectangle rect) : UIElement(INTERFACE_IMAGERECT) {
 	this->rect = rect;
@@ -26,12 +26,12 @@ void ImageRect::loadTexture() {
 		}
 	} else {
 		if (scale > 1) {
-			Image image = LoadImage(source.c_str());
-			ImageResize(&image, image.width * scale, image.height * scale);
+			Image image = LoadImage(TextFormat("images/%s", source.c_str()));
+			ImageResizeNN(&image, image.width * scale, image.height * scale);
 			texture = LoadTextureFromImage(image);
 			UnloadImage(image);
 		} else {
-			texture = LoadTexture(source.c_str());
+			texture = LoadTexture(TextFormat("images/%s", source.c_str()));
 		}
 	}
 }

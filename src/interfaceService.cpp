@@ -21,7 +21,6 @@
 InterfaceService::InterfaceService() {
 	fpsVisible = false;
 
-	// this->font = LoadFontEx("fonts/LanaPixel.ttf", 13, nullptr, 250);
 	this->font = Game::getResources().getFont("LanaPixel");
 
 	Image img = LoadImage("images/ui-npatch.png");

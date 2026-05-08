@@ -28,11 +28,6 @@ void Button::fromJson(const nlohmann::json &json) {
 	normalTextColor = label.textColor;
 	shownTextColor = label.textColor;
 	focusedTextColor = json["focusedTextColor"];
-
-	for (auto &i : json.items()) {
-		printf("%s : %s \n", i.key().c_str(), i.value().dump().c_str());
-	}
-	printf("============\n");
 }
 
 nlohmann::json Button::dumpJson() {

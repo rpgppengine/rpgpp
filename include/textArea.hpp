@@ -12,7 +12,6 @@ private:
 	void putChar(int i, Vector2 *charPos, Vector2 *charMeasure) const;
 
 public:
-	Rectangle rect;
 	std::string content;
 
 	TextArea();

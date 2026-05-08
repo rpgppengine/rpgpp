@@ -9,7 +9,6 @@ class Label : public UIElement {
 public:
 	Font font;
 
-	Rectangle rect;
 	std::string text;
 	Color textColor;
 	TextAlignment horizontalAlignment;

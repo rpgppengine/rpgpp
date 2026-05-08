@@ -8,7 +8,6 @@
 
 class ColorRect : public UIElement {
 public:
-	Rectangle rect;
 	Color color;
 	Color borderColor;
 	int borderWidth;

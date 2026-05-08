@@ -25,12 +25,12 @@ void NinePatchImageRect::loadTexture() {
 		}
 	} else {
 		if (scale > 1) {
-			Image image = LoadImage(source.c_str());
+			Image image = LoadImage(TextFormat("images/%s", source.c_str()));
 			ImageResizeNN(&image, image.width * scale, image.height * scale);
 			texture = LoadTextureFromImage(image);
 			UnloadImage(image);
 		} else {
-			texture = LoadTexture(source.c_str());
+			texture = LoadTexture(TextFormat("images/%s", source.c_str()));
 		}
 	}
 }
@@ -40,6 +40,8 @@ void NinePatchImageRect::fromJson(const nlohmann::json &json) {
 	this->scale = json.at("scale");
 	this->source = json.at("source");
 	this->npatchInfo = json.at("npatchinfo");
+
+	loadTexture();
 }
 
 nlohmann::json NinePatchImageRect::dumpJson() {

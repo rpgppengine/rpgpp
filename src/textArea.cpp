@@ -7,7 +7,7 @@
 #include "nlohmann/json_fwd.hpp"
 #include "uiElement.hpp"
 
-TextArea::TextArea() : rect(Rectangle{}) {}
+TextArea::TextArea() : TextArea(Rectangle{}) {}
 
 TextArea::TextArea(Rectangle rect) : UIElement(INTERFACE_TEXTAREA) {
 	this->rect = rect;

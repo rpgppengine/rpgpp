@@ -55,6 +55,10 @@ bool UIElement::isVisible() { return visible; }
 
 void UIElement::setVisible(bool value) { this->visible = value; }
 
+Rectangle UIElement::getRect() { return rect; }
+
+void UIElement::setRect(const Rectangle &rect) { this->rect = rect; }
+
 void UIElement::invokeCallback(CallbackType type) { callbacks[type](); }
 
 void UIElement::setCallback(CallbackType type, std::function<void()> callback) { callbacks[type] = callback; }
@@ -69,35 +73,19 @@ void UIElement::setRightElement(const std::string &title) { rightButton.title = 
 
 nlohmann::json UIElement::dumpJson() {
 	auto j = nlohmann::json::object();
-	j["upButton"] = upButton;
-	j["downButton"] = downButton;
-	j["leftButton"] = leftButton;
-	j["rightButton"] = rightButton;
+	j["rect"] = rect;
 	return j;
 }
 
-void UIElement::fromJson(const nlohmann::json &json) {
-	upButton = json.at("upButton");
-	downButton = json.at("downButton");
-	leftButton = json.at("leftButton");
-	rightButton = json.at("rightButton");
-}
+void UIElement::fromJson(const nlohmann::json &json) { rect = json.at("rect"); }
 
 UIElementBin UIElement::dumpBin() {
 	UIElementBin bin;
-	bin.props["upButton"] = upButton;
-	bin.props["downButton"] = downButton;
-	bin.props["leftButton"] = leftButton;
-	bin.props["rightButton"] = rightButton;
+	bin.props["rect"] = rect;
 	return bin;
 }
 
-void UIElement::fromBin(UIElementBin &bin) {
-	upButton = std::get<UIElementRef>(bin.props["upButton"]);
-	downButton = std::get<UIElementRef>(bin.props["downButton"]);
-	leftButton = std::get<UIElementRef>(bin.props["leftButton"]);
-	rightButton = std::get<UIElementRef>(bin.props["rightButton"]);
-}
+void UIElement::fromBin(UIElementBin &bin) { rect = std::get<Rectangle>(bin.props["rect"]); }
 
 std::map<std::string, xxx::any_ptr> UIElement::getProps() {
 	auto map = std::map<std::string, xxx::any_ptr>{};
@@ -106,4 +94,36 @@ std::map<std::string, xxx::any_ptr> UIElement::getProps() {
 	map["leftButton"] = &leftButton;
 	map["rightButton"] = &rightButton;
 	return map;
+}
+
+nlohmann::json UIElement::dumpNavigationJson() {
+	auto j = nlohmann::json::object();
+	j["upButton"] = upButton;
+	j["downButton"] = downButton;
+	j["leftButton"] = leftButton;
+	j["rightButton"] = rightButton;
+	return j;
+}
+
+void UIElement::fromNavigationJson(const nlohmann::json &json) {
+	upButton = json.at("upButton");
+	downButton = json.at("downButton");
+	leftButton = json.at("leftButton");
+	rightButton = json.at("rightButton");
+}
+
+UIElementBin UIElement::dumpNavigationBin() {
+	UIElementBin bin;
+	bin.props["upButton"] = upButton;
+	bin.props["downButton"] = downButton;
+	bin.props["leftButton"] = leftButton;
+	bin.props["rightButton"] = rightButton;
+	return bin;
+}
+
+void UIElement::fromNavigationBin(UIElementBin &bin) {
+	upButton = std::get<UIElementRef>(bin.props["upButton"]);
+	downButton = std::get<UIElementRef>(bin.props["downButton"]);
+	leftButton = std::get<UIElementRef>(bin.props["leftButton"]);
+	rightButton = std::get<UIElementRef>(bin.props["rightButton"]);
 }

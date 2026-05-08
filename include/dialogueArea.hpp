@@ -31,7 +31,6 @@ private:
 	bool dialogueFinished = false;
 
 public:
-	Rectangle rect;
 	std::string text;
 	Color textColor;
 	std::string defaultFont;
@@ -49,7 +48,6 @@ public:
 	UIElementBin dumpBin() override;
 	std::map<std::string, xxx::any_ptr> getProps() override;
 
-	void setRect(const Rectangle &rect);
 	void setText(const std::string &text);
 	void setTextColor(const Color &color);
 	void setDialogue(const DialogueBin &dialogue);

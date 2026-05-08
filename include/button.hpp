@@ -24,8 +24,8 @@ public:
 	UIElementBin dumpBin() override;
 	std::map<std::string, xxx::any_ptr> getProps() override;
 
-	void setRect(const Rectangle &rect);
-	Rectangle getRect();
+	void setRect(const Rectangle &rect) override;
+	Rectangle getRect() override;
 	void setText(const std::string &text);
 	void setTextSize(int size);
 	void setBackgroundColor(Color color);

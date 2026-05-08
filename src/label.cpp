@@ -23,7 +23,7 @@ Label::Label(Rectangle rect) : UIElement(INTERFACE_LABEL) {
 	if (Game::isUsingBin()) {
 		this->font = Game::getResources().getFont(fontName);
 	} else {
-		this->font = LoadFontEx(fontName.c_str(), fontSize, nullptr, 0);
+		this->font = LoadFontEx(fontName.c_str(), fontSize, nullptr, 256);
 	}
 }
 

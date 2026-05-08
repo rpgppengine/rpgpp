@@ -235,8 +235,6 @@ void DialogueArea::setDialogue(const DialogueBin &dialogue) {
 	this->charIndex = 0;
 }
 
-void DialogueArea::setRect(const Rectangle &rect) { this->rect = rect; }
-
 void DialogueArea::setText(const std::string &text) { this->text = text; }
 
 void DialogueArea::setTextColor(const Color &color) { this->textColor = color; }

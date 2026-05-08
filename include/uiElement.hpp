@@ -34,6 +34,8 @@ protected:
 public:
 	InterfaceElementType elementType;
 
+	Rectangle rect;
+
 	UIElementRef upButton;
 	UIElementRef downButton;
 	UIElementRef leftButton;
@@ -51,8 +53,12 @@ public:
 	void setLayer(int layer);
 	std::string getName();
 	void setName(const std::string &name);
+
 	bool isVisible();
 	void setVisible(bool value);
+
+	virtual Rectangle getRect();
+	virtual void setRect(const Rectangle &rect);
 
 	void invokeCallback(CallbackType type);
 	void setCallback(CallbackType type, std::function<void()> callback);
@@ -70,6 +76,11 @@ public:
 	virtual UIElementBin dumpBin();
 	virtual void fromBin(UIElementBin &bin);
 	virtual std::map<std::string, xxx::any_ptr> getProps();
+
+	nlohmann::json dumpNavigationJson();
+	void fromNavigationJson(const nlohmann::json &json);
+	UIElementBin dumpNavigationBin();
+	void fromNavigationBin(UIElementBin &bin);
 };
 
 #endif

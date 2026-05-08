@@ -13,7 +13,6 @@ private:
 	void loadTexture();
 
 public:
-	Rectangle rect;
 	std::string source;
 	int scale;
 

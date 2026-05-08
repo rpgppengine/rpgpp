@@ -20,6 +20,8 @@ constexpr int ACTION_BUTTON_SIZE = 16;
 
 class EditorGuiService {
 private:
+	Font font;
+
 	std::vector<std::weak_ptr<IUpdatable>> updatableWidgets;
 	std::unique_ptr<ChildWindowSubService> childWindowService;
 	PerformanceOverlay perfOverlay;
@@ -34,9 +36,6 @@ public:
 	bool isResettingUI = false;
 	EditorGuiService();
 	~EditorGuiService() = default;
-
-	// I have no fucking clue what this is.
-	// int setScreen(int _cpp_par_);
 
 	std::unique_ptr<tgui::Gui> gui;
 	std::unique_ptr<UIScreen> currentScreen;
@@ -64,6 +63,9 @@ public:
 	void alert(tgui::String title, tgui::String content);
 	static void createLogoCenter(const tgui::GrowVerticalLayout::Ptr &layout);
 	static void centerWidget(tgui::Widget::Ptr widget);
+
+	Font getFont();
+	void unload();
 };
 
 #endif

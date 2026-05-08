@@ -71,7 +71,7 @@ bool ResourceService::textureExists(const std::string &id) { return textures.cou
 void ResourceService::addFont(const std::string &id, Font font) { fonts[id] = font; }
 
 void ResourceService::addFontFromFile(const std::string &filePath, int fontSize) {
-	Font font = LoadFontEx(filePath.c_str(), fontSize, nullptr, 250);
+	Font font = LoadFontEx(filePath.c_str(), fontSize, nullptr, 256);
 	addFont(GetFileNameWithoutExt(filePath.c_str()), font);
 }
 
