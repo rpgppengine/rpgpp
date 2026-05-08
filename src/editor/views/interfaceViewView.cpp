@@ -132,3 +132,5 @@ void InterfaceViewView::selectElement(const std::string &elementName) {
 		}
 	}
 }
+
+UIElement *InterfaceViewView::getActiveElement() { return activeElement; }

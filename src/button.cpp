@@ -24,8 +24,8 @@ Button::Button(Rectangle rect) : UIElement(INTERFACE_BUTTON) {
 void Button::fromJson(const nlohmann::json &json) {
 	UIElement::fromJson(json);
 	UIElement::fromNavigationJson(json);
-	colorRect.fromJson(json.at("colorRect"));
-	label.fromJson(json.at("label"));
+	colorRect.fromJson(json);
+	label.fromJson(json);
 	normalTextColor = label.textColor;
 	shownTextColor = label.textColor;
 	focusedTextColor = json["focusedTextColor"];
@@ -37,9 +37,15 @@ nlohmann::json Button::dumpJson() {
 	auto j = UIElement::dumpNavigationJson();
 	j["rect"] = rect;
 	auto colorRectDump = colorRect.dumpJson();
-	j["colorRect"] = colorRectDump;
+	colorRectDump.erase("rect");
+	for (auto &item : colorRectDump.items()) {
+		j[item.key()] = item.value();
+	}
 	auto labelDump = label.dumpJson();
-	j["label"] = labelDump;
+	labelDump.erase("rect");
+	for (auto &item : labelDump.items()) {
+		j[item.key()] = item.value();
+	}
 	j["focusedTextColor"] = focusedTextColor;
 	return j;
 }

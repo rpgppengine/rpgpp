@@ -4,11 +4,13 @@
 #include <functional>
 #include <nlohmann/json_fwd.hpp>
 
+#include "TGUI/Signal.hpp"
 #include "TGUI/String.hpp"
 #include "TGUI/Widget.hpp"
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Widgets/ChildWindow.hpp"
 #include "TGUI/Widgets/GrowVerticalLayout.hpp"
+#include "any_ptr/any_ptr.h"
 #include "interactable.hpp"
 #include "widgets/propertyFields/boolField.hpp"
 #include "widgets/propertyFields/fileField.hpp"
@@ -30,7 +32,11 @@ public:
 	typedef std::shared_ptr<PropertiesBox> Ptr;
 	typedef std::shared_ptr<const PropertiesBox> ConstPtr;
 
+	tgui::SignalTyped<nlohmann::json> onJsonChanged = {"JsonChanged"};
+
 	Interactable *interactable = nullptr;
+
+	std::map<std::string, xxx::any_ptr> anyProps = {};
 
 	PropertiesBox(const char *typeName = "PropertiesBox", bool initRenderer = true);
 

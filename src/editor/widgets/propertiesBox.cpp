@@ -129,9 +129,10 @@ void PropertiesBox::addPropsJson(nlohmann::json &j, bool clear, bool editable) {
 				auto textField = TextField::create();
 				textField->label->setText(item.key());
 				textField->value->setText(item.value().get<std::string>());
-				textField->value->onTextChange([&j, item](const tgui::String &text) {
+				textField->value->onTextChange([&j, item, this](const tgui::String &text) {
 					std::string st = text.toStdString();
 					j.at(item.key()) = st;
+					onJsonChanged.emit(this, j);
 				});
 				addTextField(textField);
 			}
@@ -139,14 +140,20 @@ void PropertiesBox::addPropsJson(nlohmann::json &j, bool clear, bool editable) {
 				auto intField = IntField::create();
 				intField->label->setText(item.key());
 				intField->value->setValue(item.value().get<float>());
-				intField->value->onValueChange([&j, item](float value) { j.at(item.key()) = value; });
+				intField->value->onValueChange([&j, item, this](float value) {
+					j.at(item.key()) = value;
+					onJsonChanged.emit(this, j);
+				});
 				addIntField(intField);
 			}
 			if (item.value().is_boolean()) {
 				auto boolField = BoolField::create();
 				boolField->label->setText(item.key());
 				boolField->value->setChecked(item.value().get<bool>());
-				boolField->value->onChange([&j, item](bool checked) { j.at(item.key()) = checked; });
+				boolField->value->onChange([&j, item, this](bool checked) {
+					j.at(item.key()) = checked;
+					onJsonChanged.emit(this, j);
+				});
 				addBooleanField(boolField);
 			}
 			if (item.value().is_object()) {
@@ -162,6 +169,8 @@ void PropertiesBox::addPropsJson(nlohmann::json &j, bool clear, bool editable) {
 						auto &ref = j.at(item.key());
 
 						ref.at("value") = GetFileNameWithoutExt(filePath.toStdString().c_str());
+
+						onJsonChanged.emit(this, j);
 					};
 
 					if (propType == "dialogue") {

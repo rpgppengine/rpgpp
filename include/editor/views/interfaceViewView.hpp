@@ -38,6 +38,7 @@ public:
 	void mouseMoved(tgui::Vector2f pos) override;
 
 	void selectElement(const std::string &elementName);
+	UIElement *getActiveElement();
 };
 
 #endif
