@@ -7,6 +7,7 @@
 #include "TGUI/Signal.hpp"
 #include "components/resizableCanvasBox.hpp"
 #include "interfaceView.hpp"
+#include "sol/state.hpp"
 #include "uiElement.hpp"
 #include "views/worldView.hpp"
 

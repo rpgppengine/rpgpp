@@ -1,20 +1,37 @@
 #include "fileViews/interfaceViewFileView.hpp"
 
+#include <cstdio>
 #include <memory>
+#include <vector>
 
 #include "TGUI/String.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
+#include "button.hpp"
 #include "editor.hpp"
+#include "gamedata.hpp"
 #include "interfaceView.hpp"
+#include "lua/reflect.hpp"
+#include "lua/uiTypesApi.hpp"
 #include "nlohmann/json_fwd.hpp"
 #include "raylib.h"
+#include "rttr/type.h"
+#include "rttr/variant.h"
+#include "sol/forward.hpp"
+#include "sol/types.hpp"
+#include "textArea.hpp"
 #include "uiElement.hpp"
 #include "views/interfaceViewView.hpp"
 #include "views/worldView.hpp"
 #include "widgets/anyPropertyVisitor.hpp"
 #include "widgets/propertiesBox.hpp"
 
+bool startsWith(const std::string &key, const std::string &prefix) {
+	return (key.size() >= prefix.size()) && (key.compare(0, prefix.size(), prefix) == 0);
+}
+
 InterfaceViewFileView::InterfaceViewFileView() {
+	lua_ui_types_set(luaState);
+
 	treeView = tgui::TreeView::create();
 	treeView->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), 0});
 	treeView->setSize({RIGHT_PANEL_W, "50%"});
@@ -52,9 +69,27 @@ InterfaceViewFileView::InterfaceViewFileView() {
 				elementProps = std::make_unique<nlohmann::json>(sharedView->getActiveElement()->dumpJson());
 
 				if (auto sharedProps = weakProps.lock()) {
-					sharedProps->addPropsJson(*elementProps);
-					// auto props = sharedView->getActiveElement()->getProps();
-					// AnyPropertyVisitor::addAnyProps(sharedProps.get(), props);
+					// sharedProps->addPropsJson(*elementProps);
+					//  auto props = sharedView->getActiveElement()->getProps();
+					//  AnyPropertyVisitor::addAnyProps(sharedProps.get(), props);
+					auto elementLua = luaState[elementName];
+					if (!elementLua.valid()) return;
+
+					printf("%s: \n", elementName.c_str());
+
+					sol::table meta = elementLua[sol::metatable_key];
+					for (auto &j : meta) {
+						const std::string key = j.first.as<std::string>();
+						sol::object val = j.second;
+
+						std::vector<sol::object> props;
+
+						if (!startsWith(key, "__") && !startsWith(key, "class_")) {
+							if (key != "new") {
+								printf("%s \n", key.c_str());
+							}
+						}
+					}
 				}
 			}
 		}
@@ -77,6 +112,29 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 	if (variant != nullptr) {
 		const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
 		const auto interface = ptr->get();
+
+		for (auto &item : interface->getElements()) {
+			/*
+			auto type = item.second->getType();
+			switch (type) {
+				case INTERFACE_TEXTAREA:
+					luaState[item.second->getName()] = static_cast<TextArea *>(item.second.get());
+					break;
+				case INTERFACE_BUTTON:
+					luaState[item.second->getName()] = static_cast<Button *>(item.second.get());
+					break;
+				default:
+					luaState[item.second->getName()] = item.second.get();
+					break;
+			}
+					*/
+			// auto variant = rttr::variant(item.second);
+			printf("%s \n",
+				   rttr::type::get(item.second).get_wrapped_type().get_raw_type().get_name().to_string().c_str());
+			for (auto &prop : rttr::type::get(item.second).get_wrapped_type().get_raw_type().get_properties()) {
+				printf("%s \n", prop.get_name().to_string().c_str());
+			}
+		}
 
 		view->setInterfaceView(interface);
 

@@ -87,6 +87,8 @@ void Button::setRect(const Rectangle &rect) {
 
 void Button::setText(const std::string &text) { this->label.setText(text); }
 
+std::string Button::getText() { return label.text; }
+
 void Button::setTextSize(int size) { label.fontSize = size; }
 
 void Button::setBackgroundColor(Color color) { colorRect.setColor(color); }

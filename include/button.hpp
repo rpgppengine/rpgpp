@@ -27,6 +27,7 @@ public:
 	void setRect(const Rectangle &rect) override;
 	Rectangle getRect() override;
 	void setText(const std::string &text);
+	std::string getText();
 	void setTextSize(int size);
 	void setBackgroundColor(Color color);
 	void setNormalTextColor(Color color);

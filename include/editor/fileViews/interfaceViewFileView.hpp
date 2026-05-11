@@ -19,6 +19,8 @@ private:
 
 	std::unique_ptr<nlohmann::json> elementProps;
 
+	sol::state luaState;
+
 public:
 	InterfaceViewFileView();
 	void init(tgui::Group::Ptr layout, VariantWrapper *variant) override;
