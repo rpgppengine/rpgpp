@@ -22,7 +22,7 @@ static const Rectangle portraitDiagAreaRect =
 static const Rectangle optionsRect =
 	Rectangle{diagImageRect.x + (diagImageRect.width - 180), diagImageRect.y - 8 - 180, 180, 180};
 
-DialogueInterfaceView::DialogueInterfaceView() {
+DialogueInterfaceView::DialogueInterfaceView() : InterfaceView(Rectangle{}) {
 	NinePatchImageRect *diagImage = new NinePatchImageRect(diagImageRect);
 	diagImage->npatchInfo.top = 3;
 	diagImage->npatchInfo.left = 3;

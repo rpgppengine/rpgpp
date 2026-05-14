@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "actor.hpp"
+#include "component.hpp"
 #include "gamedata.hpp"
 #include "interfaceElementFactory.hpp"
 #include "raylib.h"
@@ -18,9 +19,21 @@ InterfaceView::InterfaceView() : rect(Rectangle{}) {}
 InterfaceView::InterfaceView(Rectangle rect) {
 	this->rect = rect;
 	this->elements = std::multimap<int, std::unique_ptr<UIElement>, std::less<int>>{};
+
+	ecs.init();
+
+	ecs.registerComponent<Rectangle>();
+	ecs.registerComponent<ColorRectComponent>();
+
+	auto entity = ecs.createEntity();
+	Rectangle entityRect = {0, 0, 50, 50};
+	ColorRectComponent colorRect = {GRAY};
+
+	ecs.addComponent(entity, entityRect);
+	ecs.addComponent(entity, colorRect);
 }
 
-InterfaceView::InterfaceView(const std::string &filePath) {
+InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectangle{}) {
 	std::string fileText = LoadFileText(filePath.c_str());
 
 	auto j = json::parse(fileText);
@@ -34,7 +47,7 @@ InterfaceView::InterfaceView(const std::string &filePath) {
 	}
 }
 
-InterfaceView::InterfaceView(InterfaceViewBin &bin) {
+InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{}) {
 	for (auto &[title, elementBin] : bin.elements) {
 		auto element = constructElement(elementBin.type);
 		element->fromBin(elementBin);
@@ -156,4 +169,6 @@ void InterfaceView::draw() {
 			item.second->draw();
 		}
 	}
+
+	ecs.draw();
 }

@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include "coordinator.hpp"
 #include "gamedata.hpp"
 #include "saveable.hpp"
 #include "uiElement.hpp"
@@ -16,6 +17,8 @@ class InterfaceView : public ISaveable {
 private:
 	Rectangle rect;
 	std::multimap<int, std::unique_ptr<UIElement>, std::less<int>> elements;
+
+	Coordinator ecs;
 
 protected:
 	UIElement *focused = nullptr;
