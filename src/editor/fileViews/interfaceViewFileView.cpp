@@ -10,6 +10,7 @@
 #include "editor.hpp"
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
+#include "lua.h"
 #include "lua/reflect.hpp"
 #include "lua/uiTypesApi.hpp"
 #include "nlohmann/json_fwd.hpp"
@@ -30,6 +31,7 @@ bool startsWith(const std::string &key, const std::string &prefix) {
 }
 
 InterfaceViewFileView::InterfaceViewFileView() {
+	luaState.open_libraries(sol::lib::base);
 	lua_ui_types_set(luaState);
 
 	treeView = tgui::TreeView::create();
@@ -76,20 +78,6 @@ InterfaceViewFileView::InterfaceViewFileView() {
 					if (!elementLua.valid()) return;
 
 					printf("%s: \n", elementName.c_str());
-
-					sol::table meta = elementLua[sol::metatable_key];
-					for (auto &j : meta) {
-						const std::string key = j.first.as<std::string>();
-						sol::object val = j.second;
-
-						std::vector<sol::object> props;
-
-						if (!startsWith(key, "__") && !startsWith(key, "class_")) {
-							if (key != "new") {
-								printf("%s \n", key.c_str());
-							}
-						}
-					}
 				}
 			}
 		}
@@ -113,26 +101,84 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 		const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
 		const auto interface = ptr->get();
 
-		for (auto &item : interface->getElements()) {
-			/*
-			auto type = item.second->getType();
-			switch (type) {
-				case INTERFACE_TEXTAREA:
-					luaState[item.second->getName()] = static_cast<TextArea *>(item.second.get());
-					break;
-				case INTERFACE_BUTTON:
-					luaState[item.second->getName()] = static_cast<Button *>(item.second.get());
-					break;
-				default:
-					luaState[item.second->getName()] = item.second.get();
-					break;
+		auto &ecs = interface->getCoordinator();
+
+		// register in lua
+		for (auto &entity : interface->getEntities()) {
+			sol::table tbl = luaState.create_named_table(TextFormat("Entity_%i", entity));
+
+			auto set = ecs.getEntityComponents(entity);
+			for (auto &name : set) {
+				tbl[name] = ecs.getLuaObject(entity, name, luaState.lua_state());
 			}
-					*/
-			// auto variant = rttr::variant(item.second);
-			printf("%s \n",
-				   rttr::type::get(item.second).get_wrapped_type().get_raw_type().get_name().to_string().c_str());
-			for (auto &prop : rttr::type::get(item.second).get_wrapped_type().get_raw_type().get_properties()) {
-				printf("%s \n", prop.get_name().to_string().c_str());
+		}
+
+		// test with script string
+		std::string testCode = R"(
+			print('hello, let me test Entity_0.Rectangle')
+			print(Entity_0.Rectangle.x)
+			print(Entity_0.Rectangle.y)
+			print(Entity_0.Rectangle.width)
+			print(Entity_0.Rectangle.height)
+
+			print('the entity has a gray color')
+			print(Entity_0.ColorRectComponent.color.r)
+			print(Entity_0.ColorRectComponent.color.g)
+			print(Entity_0.ColorRectComponent.color.b)
+			print(Entity_0.ColorRectComponent.color.a)
+		)";
+		luaState.script(testCode);
+
+		// add to propertiesBox
+		for (auto &entity : interface->getEntities()) {
+			auto set = ecs.getEntityComponents(entity);
+			for (auto &name : set) {
+				auto variant = ecs.getComponentVariant(entity, name);
+				visitor.visit(name, variant, propertiesBox.get());
+			}
+		}
+
+		// testing lua
+		for (auto &entity : interface->getEntities()) {
+			printf("Entity #%i: \n", entity);
+			sol::table tbl = luaState[TextFormat("Entity_%i", entity)];
+
+			for (auto &item : tbl) {
+				if (item.first.is<std::string>()) {
+					printf("%s: %i, %i\n", item.first.as<std::string>().c_str(), item.second.get_type(),
+						   item.second.valid());
+				}
+
+				if (item.second.valid()) {
+					sol::table meta = item.second.as<sol::userdata>()[sol::metatable_key];
+					for (auto &j : meta) {
+						auto key = j.first.as<std::string>();
+						auto value = j.second;
+						if (!startsWith(key, "__") && !startsWith(key, "class_")) {
+							if (key != "new") {
+								// print the property
+								printf("%s: %i \n", key.c_str(), value.get_type());
+								if (value.is<float>()) {
+									printf("%f \n", value.as<float>());
+								}
+								/*
+								if (value.get_type() == sol::type::function) {
+									printf("function \n");
+									sol::function f = value;
+									auto res = f();
+									if (res.valid()) {
+										for (auto r : res) {
+											printf("%i", r.get_type());
+										}
+									} else {
+										printf("not valid.. \n");
+									}
+								}
+									*/
+							}
+						}
+					}
+				}
 			}
 		}
 

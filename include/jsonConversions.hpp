@@ -3,6 +3,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "component.hpp"
 #include "gamedata.hpp"
 #include "raylib.h"
 
@@ -21,5 +22,8 @@ void from_json(const json &j, NPatchInfo &info);
 
 void to_json(json &j, const UIElementRef &info);
 void from_json(const json &j, UIElementRef &info);
+
+void to_json(json &j, const ColorRectComponent &color);
+void from_json(const json &j, ColorRectComponent &color);
 
 #endif

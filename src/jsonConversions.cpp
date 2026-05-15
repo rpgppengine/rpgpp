@@ -37,3 +37,15 @@ void from_json(const json &j, NPatchInfo &info) {
 void to_json(json &j, const UIElementRef &info) { j = info.title; }
 
 void from_json(const json &j, UIElementRef &info) { info = {j}; }
+
+void to_json(json &j, const ColorRectComponent &color) {
+	std::array<unsigned char, 4> arr = {color.color.r, color.color.g, color.color.b, color.color.a};
+	j = arr;
+}
+
+void from_json(const json &j, ColorRectComponent &color) {
+	j.at(0).get_to(color.color.r);
+	j.at(1).get_to(color.color.g);
+	j.at(2).get_to(color.color.b);
+	j.at(3).get_to(color.color.a);
+}

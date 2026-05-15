@@ -2,11 +2,15 @@
 #define _RPGPP_COORDINATOR_H
 
 #include <memory>
+#include <set>
+#include <string>
 
 #include "component.hpp"
 #include "componentManager.hpp"
 #include "entity.hpp"
 #include "entityManager.hpp"
+#include "rttr/variant.h"
+#include "sol/forward.hpp"
 #include "system.hpp"
 
 class Coordinator {
@@ -77,6 +81,38 @@ public:
 	}
 
 	void draw() { system->draw(); }
+
+	const std::set<EntityID> &getEntities() { return system->entities; }
+
+	std::set<std::string> getEntityComponents(EntityID entity) const {
+		std::set<std::string> set = {};
+		for (int i = 0; i < MAX_COMPONENTS; i++) {
+			if (entities->getSignature(entity).test(i)) {
+				auto name = components->getComponentName(i);
+				set.insert(name);
+			}
+		}
+		return set;
+	};
+
+	rttr::variant getComponentVariant(EntityID entity, std::string componentName) const {
+		return components->getComponentVariant(entity, componentName);
+	}
+
+	nlohmann::json getComponentJson(EntityID entity, std::string componentName) const {
+		return components->getComponentJson(entity, componentName);
+	}
+
+	void insertComponentFromJson(EntityID entity, std::string componentName, nlohmann::json json) const {
+		auto signature = entities->getSignature(entity);
+		signature.set(components->getComponentType(componentName), true);
+		entities->setSignature(entity, signature);
+		components->insertComponentFromJson(entity, componentName, json);
+	}
+
+	sol::object getLuaObject(EntityID entity, std::string componentName, lua_State *L) const {
+		return components->getLua(entity, componentName, L);
+	}
 };
 
 #endif

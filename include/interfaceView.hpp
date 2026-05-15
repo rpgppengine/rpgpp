@@ -5,10 +5,12 @@
 
 #include <functional>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
 #include "coordinator.hpp"
+#include "entity.hpp"
 #include "gamedata.hpp"
 #include "saveable.hpp"
 #include "uiElement.hpp"
@@ -46,6 +48,9 @@ public:
 
 	virtual void update();
 	virtual void draw();
+
+	const Coordinator &getCoordinator();
+	const std::set<EntityID> &getEntities();
 };
 
 #endif

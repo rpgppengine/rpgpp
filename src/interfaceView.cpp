@@ -9,6 +9,8 @@
 
 #include "actor.hpp"
 #include "component.hpp"
+#include "coordinator.hpp"
+#include "entity.hpp"
 #include "gamedata.hpp"
 #include "interfaceElementFactory.hpp"
 #include "raylib.h"
@@ -25,12 +27,14 @@ InterfaceView::InterfaceView(Rectangle rect) {
 	ecs.registerComponent<Rectangle>();
 	ecs.registerComponent<ColorRectComponent>();
 
+	/*
 	auto entity = ecs.createEntity();
 	Rectangle entityRect = {0, 0, 50, 50};
 	ColorRectComponent colorRect = {GRAY};
 
 	ecs.addComponent(entity, entityRect);
 	ecs.addComponent(entity, colorRect);
+	*/
 }
 
 InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectangle{}) {
@@ -44,6 +48,14 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 		element->fromJson(obj.at("props"));
 		int layer = obj.at("layer");
 		addElement(item.key(), std::move(element), layer);
+	}
+
+	for (auto &item : j.at("entities").items()) {
+		auto obj = item.value();
+		auto entity = ecs.createEntity();
+		for (auto &componentJson : item.value().items()) {
+			ecs.insertComponentFromJson(entity, componentJson.key(), componentJson.value());
+		}
 	}
 }
 
@@ -65,6 +77,16 @@ nlohmann::json InterfaceView::dumpJson() {
 		obj["props"] = element->dumpJson();
 
 		j["elements"][element->getName()] = obj;
+	}
+
+	for (auto &entity : ecs.getEntities()) {
+		j["entities"][entity] = json::object();
+
+		auto set = ecs.getEntityComponents(entity);
+		for (auto &componentName : set) {
+			auto componentJson = ecs.getComponentJson(entity, componentName);
+			j["entities"][entity][componentName] = componentJson;
+		}
 	}
 
 	return j;
@@ -172,3 +194,7 @@ void InterfaceView::draw() {
 
 	ecs.draw();
 }
+
+const Coordinator &InterfaceView::getCoordinator() { return ecs; }
+
+const std::set<EntityID> &InterfaceView::getEntities() { return ecs.getEntities(); }

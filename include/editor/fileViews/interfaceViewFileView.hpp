@@ -6,6 +6,7 @@
 #include "TGUI/Widgets/TreeView.hpp"
 #include "fileViews/fileView.hpp"
 #include "nlohmann/json_fwd.hpp"
+#include "rttrVariantPropVisitor.hpp"
 #include "views/interfaceViewView.hpp"
 #include "widgets/propertiesBox.hpp"
 
@@ -20,6 +21,8 @@ private:
 	std::unique_ptr<nlohmann::json> elementProps;
 
 	sol::state luaState;
+
+	VariantPropVisitor visitor;
 
 public:
 	InterfaceViewFileView();

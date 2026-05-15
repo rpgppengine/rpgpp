@@ -1,6 +1,8 @@
 #ifndef _RPGPP_COMPONENTMANAGER_H
 #define _RPGPP_COMPONENTMANAGER_H
 
+#include <rttr/type.h>
+
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
@@ -8,16 +10,20 @@
 #include "component.hpp"
 #include "componentArray.hpp"
 #include "entity.hpp"
+#include "lua.h"
+#include "rttr/variant.h"
+#include "sol/forward.hpp"
 
 class ComponentManager {
 private:
-	std::unordered_map<const char *, ComponentType> componentTypes;
-	std::unordered_map<const char *, std::shared_ptr<IComponentArray>> arrays;
+	std::unordered_map<std::string, ComponentType> componentTypes;
+	std::unordered_map<std::string, std::shared_ptr<IComponentArray>> arrays;
+	std::unordered_map<ComponentType, std::string> componentNames;
 	ComponentType nextType;
 
 	template <typename T>
 	std::shared_ptr<ComponentArray<T>> getComponentArray() {
-		const char *typeName = typeid(T).name();
+		auto typeName = rttr::type::get<T>().get_name().to_string();
 
 		if (componentTypes.find(typeName) == componentTypes.end()) {
 			throw std::runtime_error("Component not registered.");
@@ -35,13 +41,14 @@ public:
 
 	template <typename T>
 	void registerComponent() {
-		const char *typeName = typeid(T).name();
+		auto typeName = rttr::type::get<T>().get_name().to_string();
 
 		if (componentTypes.find(typeName) != componentTypes.end()) {
 			throw std::runtime_error("Component already registered.");
 		}
 
 		componentTypes.insert({typeName, nextType});
+		componentNames.insert({nextType, typeName});
 
 		arrays.insert({typeName, std::make_shared<ComponentArray<T>>()});
 
@@ -50,8 +57,16 @@ public:
 
 	template <typename T>
 	ComponentType getComponentType() {
-		const char *typeName = typeid(T).name();
+		auto typeName = rttr::type::get<T>().get_name().to_string();
 
+		if (componentTypes.find(typeName) == componentTypes.end()) {
+			throw std::runtime_error("Component not registered.");
+		}
+
+		return componentTypes[typeName];
+	}
+
+	ComponentType getComponentType(const std::string &typeName) {
 		if (componentTypes.find(typeName) == componentTypes.end()) {
 			throw std::runtime_error("Component not registered.");
 		}
@@ -73,6 +88,24 @@ public:
 	T getComponent(EntityID entity) {
 		return getComponentArray<T>()->getData(entity);
 	}
+
+	rttr::variant getComponentVariant(EntityID entity, std::string componentName) {
+		return arrays[componentName]->getDataVariant(entity);
+	}
+
+	nlohmann::json getComponentJson(EntityID entity, std::string componentName) {
+		return arrays[componentName]->getDataJson(entity);
+	}
+
+	void insertComponentFromJson(EntityID entity, std::string componentName, nlohmann::json json) {
+		arrays[componentName]->insertFromJson(entity, json);
+	}
+
+	sol::object getLua(EntityID entity, std::string componentName, lua_State *L) {
+		return arrays[componentName]->getLua(entity, L);
+	}
+
+	const std::string &getComponentName(ComponentType type) { return componentNames[type]; }
 
 	void entityDestroyed(EntityID entity) {
 		for (const auto &pair : arrays) {

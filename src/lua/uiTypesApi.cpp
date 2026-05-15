@@ -1,6 +1,7 @@
 #include "lua/uiTypesApi.hpp"
 
 #include "button.hpp"
+#include "component.hpp"
 #include "lua.h"
 #include "raylib.h"
 #include "rttr/type.h"
@@ -30,6 +31,12 @@ void lua_ui_types_set(sol::state_view lua) {
 	auto uiElement = lua.new_usertype<UIElement>(sol::no_construction());
 	*/
 
+	lua.new_usertype<Rectangle>("Rectangle", "x", &Rectangle::x, "y", &Rectangle::y, "width", &Rectangle::width,
+								"height", &Rectangle::height);
+	lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
+	lua.new_usertype<ColorRectComponent>("ColorRectComponent", "color", &ColorRectComponent::color);
+
+	/*
 	auto *L = lua.lua_state();
 	for (auto &rType : rttr::type::get_types()) {
 		if (rType.is_class()) {
@@ -38,4 +45,5 @@ void lua_ui_types_set(sol::state_view lua) {
 			sol::stack::push_userdata(L, t);
 		}
 	}
+	*/
 }

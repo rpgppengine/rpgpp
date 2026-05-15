@@ -3,14 +3,26 @@
 
 #include <array>
 #include <cstddef>
+#include <nlohmann/json.hpp>
+#include <sol/object.hpp>
+#include <sol/userdata.hpp>
 #include <stdexcept>
 #include <unordered_map>
 
 #include "entity.hpp"
+#include "lua.h"
+#include "nlohmann/json_fwd.hpp"
+#include "rttr/variant.h"
+#include "sol/forward.hpp"
+
 class IComponentArray {
 public:
 	virtual ~IComponentArray() = default;
 	virtual void entityDestroyed(EntityID id) = 0;
+	virtual rttr::variant getDataVariant(EntityID entity) = 0;
+	virtual nlohmann::json getDataJson(EntityID entity) = 0;
+	virtual void insertFromJson(EntityID entity, nlohmann::json json) = 0;
+	virtual sol::object getLua(EntityID entity, lua_State *L) = 0;
 };
 
 template <typename T>
@@ -60,6 +72,32 @@ public:
 		}
 
 		return components[entityToIndex[entity]];
+	}
+
+	rttr::variant getDataVariant(EntityID entity) {
+		T *component = &components[entityToIndex[entity]];
+		rttr::variant variant = component;
+		return variant;
+	}
+
+	nlohmann::json getDataJson(EntityID entity) {
+		T component = components[entityToIndex[entity]];
+		nlohmann::json j = component;
+		return j;
+	}
+
+	void insertFromJson(EntityID entity, nlohmann::json json) {
+		T component = json;
+		insertData(entity, component);
+	}
+
+	sol::object getLua(EntityID entity, lua_State *L) {
+		if (entityToIndex.find(entity) == entityToIndex.end()) {
+			throw std::runtime_error("Cannot get non-existing component.");
+		}
+
+		sol::object obj = sol::make_object(L, &components[entityToIndex[entity]]);
+		return obj;
 	}
 
 	void entityDestroyed(EntityID entity) {
