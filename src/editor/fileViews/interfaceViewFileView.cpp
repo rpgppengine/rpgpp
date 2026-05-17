@@ -161,20 +161,6 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 								if (value.is<float>()) {
 									printf("%f \n", value.as<float>());
 								}
-								/*
-								if (value.get_type() == sol::type::function) {
-									printf("function \n");
-									sol::function f = value;
-									auto res = f();
-									if (res.valid()) {
-										for (auto r : res) {
-											printf("%i", r.get_type());
-										}
-									} else {
-										printf("not valid.. \n");
-									}
-								}
-									*/
 							}
 						}
 					}

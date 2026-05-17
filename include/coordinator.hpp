@@ -80,6 +80,8 @@ public:
 		return components->getComponentType<T>();
 	}
 
+	void update() { system->update(); }
+
 	void draw() { system->draw(); }
 
 	const std::set<EntityID> &getEntities() { return system->entities; }

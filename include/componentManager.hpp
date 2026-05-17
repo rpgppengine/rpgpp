@@ -85,7 +85,7 @@ public:
 	}
 
 	template <typename T>
-	T getComponent(EntityID entity) {
+	T &getComponent(EntityID entity) {
 		return getComponentArray<T>()->getData(entity);
 	}
 

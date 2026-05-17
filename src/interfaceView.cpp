@@ -183,6 +183,8 @@ void InterfaceView::update() {
 			item.second->update();
 		}
 	}
+
+	ecs.update();
 }
 
 void InterfaceView::draw() {

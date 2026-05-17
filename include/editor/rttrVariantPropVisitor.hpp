@@ -10,12 +10,20 @@
 
 class VariantPropVisitor {
 public:
-	std::unordered_map<std::string, std::function<void(std::string, rttr::variant, PropertiesBox *)>> funcs;
+	static PropertiesBox *box;
+
+	std::unordered_map<std::string, std::function<void(std::string, rttr::variant)>> funcs;
 
 	VariantPropVisitor();
 	void visit(std::string name, rttr::variant var, PropertiesBox *box);
 
-	static void Rect(std::string name, rttr::variant var, PropertiesBox *box);
+	static void Rect(std::string name, rttr::variant var);
+	static void LabelComponent(std::string name, rttr::variant var);
+	static void TextAreaComponent(std::string name, rttr::variant var);
+	static void ColorRectComponent(std::string name, rttr::variant var);
+	static void ImageRectComponent(std::string name, rttr::variant var);
+	static void NinePatchImageRectComponent(std::string name, rttr::variant var);
+	static void DialogueComponent(std::string name, rttr::variant var);
 };
 
 #endif

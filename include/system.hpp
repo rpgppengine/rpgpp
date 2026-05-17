@@ -21,6 +21,7 @@ public:
 
 	std::set<EntityID> entities;
 	System() = default;
+	void update();
 	void draw();
 };
 
