@@ -80,7 +80,7 @@ inline void EditListFieldWindow<std::string>::addItem(int index) {
 		auto &newItem = list->emplace_back();
 		auto newField = TextField::create();
 		newField->setSize({"100%", 24});
-		newField->label->setText(TextFormat("[%i]", list->size() - 1));
+		newField->label->setText(TextFormat("[%lu]", list->size() - 1));
 		newField->value->onTextChange([&newItem, this](const tgui::String &text) {
 			newItem = text.toStdString();
 			field->value->setText(VecToString(*list));
