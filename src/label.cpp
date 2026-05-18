@@ -88,9 +88,9 @@ void Label::update() {}
 void Label::draw() {
 	Vector2 textSize = MeasureTextEx(font, text.c_str(), static_cast<float>(fontSize), 1);
 
-	Vector2 textPos =
-		(Vector2){rect.x + Lerp(0.0f, rect.width - textSize.x, (static_cast<float>(horizontalAlignment) * 0.5f)),
-				  rect.y + Lerp(0.0f, rect.height - textSize.y, (static_cast<float>(verticalAlignment) * 0.5f))};
+	Vector2 textPos;
+	textPos.x = rect.x + Lerp(0.0f, rect.width - textSize.x, (static_cast<float>(horizontalAlignment) * 0.5f));
+	textPos.y = rect.y + Lerp(0.0f, rect.height - textSize.y, (static_cast<float>(verticalAlignment) * 0.5f));
 
 	DrawTextEx(font, text.c_str(), textPos, static_cast<float>(fontSize), 1, textColor);
 }
