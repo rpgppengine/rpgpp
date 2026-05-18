@@ -15,13 +15,19 @@ EntityManager::EntityManager() {
 	}
 }
 
-EntityID EntityManager::newEntity() {
+EntityID EntityManager::newEntity(const std::string &name) {
 	if (livingEntities >= MAX_ENTITIES) {
 		throw std::runtime_error("Too many entities");
 	}
 
+	if (findName(name) != MAX_ENTITIES) {
+		throw std::runtime_error("This name is taken.");
+	}
+
 	EntityID id = availableIds.front();
 	availableIds.pop();
+
+	names[id] = name;
 
 	livingEntities++;
 	return id;
@@ -34,6 +40,8 @@ void EntityManager::destroyEntity(EntityID id) {
 
 	signatures[id].reset();
 	availableIds.push(id);
+
+	names[id].erase();
 
 	livingEntities--;
 }
@@ -53,3 +61,15 @@ Signature EntityManager::getSignature(EntityID id) {
 
 	return signatures[id];
 }
+
+EntityID EntityManager::findName(const std::string &name) {
+	EntityID res = MAX_ENTITIES;
+	for (int i = 0; i < MAX_ENTITIES; i++) {
+		if (names[i] == name) {
+			res = i;
+		}
+	}
+	return res;
+}
+
+const std::string &EntityManager::getName(EntityID id) { return names[id]; }

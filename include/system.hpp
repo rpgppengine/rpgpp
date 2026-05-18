@@ -23,6 +23,7 @@ public:
 	System() = default;
 	void update();
 	void draw();
+	void drawEntity(EntityID entity);
 };
 
 #endif

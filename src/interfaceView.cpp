@@ -25,16 +25,20 @@ InterfaceView::InterfaceView(Rectangle rect) {
 	ecs.init();
 
 	ecs.registerComponent<Rectangle>();
+	ecs.registerComponent<LabelComponent>();
+	ecs.registerComponent<TextAreaComponent>();
 	ecs.registerComponent<ColorRectComponent>();
+	ecs.registerComponent<ImageRectComponent>();
+	ecs.registerComponent<NinePatchImageRectComponent>();
+	ecs.registerComponent<DialogueComponent>();
+	ecs.registerComponent<InputComponent>();
 
-	/*
-	auto entity = ecs.createEntity();
+	auto entity = ecs.createEntity("name");
 	Rectangle entityRect = {0, 0, 50, 50};
 	ColorRectComponent colorRect = {GRAY};
 
 	ecs.addComponent(entity, entityRect);
 	ecs.addComponent(entity, colorRect);
-	*/
 }
 
 InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectangle{}) {
@@ -52,7 +56,7 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 
 	for (auto &item : j.at("entities").items()) {
 		auto obj = item.value();
-		auto entity = ecs.createEntity();
+		auto entity = ecs.createEntity(item.key());
 		for (auto &componentJson : item.value().items()) {
 			ecs.insertComponentFromJson(entity, componentJson.key(), componentJson.value());
 		}
@@ -80,12 +84,14 @@ nlohmann::json InterfaceView::dumpJson() {
 	}
 
 	for (auto &entity : ecs.getEntities()) {
-		j["entities"][entity] = json::object();
+		auto &name = ecs.getEntityName(entity);
+
+		j["entities"][name] = json::object();
 
 		auto set = ecs.getEntityComponents(entity);
 		for (auto &componentName : set) {
 			auto componentJson = ecs.getComponentJson(entity, componentName);
-			j["entities"][entity][componentName] = componentJson;
+			j["entities"][name][componentName] = componentJson;
 		}
 	}
 
@@ -197,6 +203,6 @@ void InterfaceView::draw() {
 	ecs.draw();
 }
 
-const Coordinator &InterfaceView::getCoordinator() { return ecs; }
+Coordinator &InterfaceView::getCoordinator() { return ecs; }
 
 const std::set<EntityID> &InterfaceView::getEntities() { return ecs.getEntities(); }

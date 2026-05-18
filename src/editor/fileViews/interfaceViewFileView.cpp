@@ -122,10 +122,10 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 			print(Entity_0.Rectangle.height)
 
 			print('the entity has a gray color')
-			print(Entity_0.ColorRectComponent.color.r)
-			print(Entity_0.ColorRectComponent.color.g)
-			print(Entity_0.ColorRectComponent.color.b)
-			print(Entity_0.ColorRectComponent.color.a)
+			print(Entity_0.ColorRectComponent.Color.r)
+			print(Entity_0.ColorRectComponent.Color.g)
+			print(Entity_0.ColorRectComponent.Color.b)
+			print(Entity_0.ColorRectComponent.Color.a)
 		)";
 		luaState.script(testCode);
 

@@ -49,7 +49,7 @@ public:
 	virtual void update();
 	virtual void draw();
 
-	const Coordinator &getCoordinator();
+	Coordinator &getCoordinator();
 	const std::set<EntityID> &getEntities();
 };
 

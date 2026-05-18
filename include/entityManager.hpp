@@ -12,13 +12,16 @@ private:
 	std::queue<EntityID> availableIds;
 	std::array<Signature, MAX_ENTITIES> signatures;
 	uint16_t livingEntities;
+	std::array<std::string, MAX_ENTITIES> names;
 
 public:
 	EntityManager();
-	EntityID newEntity();
+	EntityID newEntity(const std::string &name);
 	void destroyEntity(EntityID id);
 	void setSignature(EntityID id, Signature signature);
 	Signature getSignature(EntityID id);
+	EntityID findName(const std::string &name);
+	const std::string &getName(EntityID id);
 };
 
 #endif

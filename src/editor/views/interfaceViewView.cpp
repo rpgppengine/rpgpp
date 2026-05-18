@@ -73,6 +73,28 @@ void InterfaceViewView::drawCanvas() {
 				   nameSpacing, WHITE);
 	}
 
+	// entities
+	auto &ecs = ptr->getCoordinator();
+	System &system = ecs.getSystem();
+	for (auto &entity : ptr->getEntities()) {
+		auto &name = ecs.getEntityName(entity);
+
+		if (ecs.hasComponent<Rectangle>(entity)) {
+			system.drawEntity(entity);
+
+			Rectangle rect = ecs.getComponent<Rectangle>(entity);
+
+			DrawRectangleLines(static_cast<int>(rect.x), static_cast<int>(rect.y), static_cast<int>(rect.width),
+							   static_cast<int>(rect.height), Fade(DARKGRAY, 0.7f));
+
+			// draw entity name
+			auto measureText = MeasureTextEx(editorFont, name.c_str(), nameFontSize, nameSpacing);
+			Rectangle nameRect = {rect.x, rect.y, measureText.x + 4, measureText.y + 4};
+			DrawRectangleRec(nameRect, Fade(DARKGRAY, 0.7f));
+			DrawTextEx(editorFont, name.c_str(), {nameRect.x + 2, nameRect.y + 2}, nameFontSize, nameSpacing, WHITE);
+		}
+	}
+
 	// draw window borders
 	auto windowSize = Editor::instance->getProject()->getProgramSettings().windowSize;
 

@@ -30,8 +30,10 @@ public:
 		system->components = components.get();
 	}
 
-	EntityID createEntity() {
-		auto entity = entities->newEntity();
+	System &getSystem() { return *system; }
+
+	EntityID createEntity(const std::string &name) {
+		auto entity = entities->newEntity(name);
 		system->entities.insert(entity);
 		return entity;
 	}
@@ -40,6 +42,8 @@ public:
 		entities->destroyEntity(entity);
 		system->entities.erase(entity);
 	}
+
+	const std::string &getEntityName(EntityID entity) { return entities->getName(entity); }
 
 	template <typename T>
 	void registerComponent() {
