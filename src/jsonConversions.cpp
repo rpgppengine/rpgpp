@@ -34,9 +34,12 @@ void from_json(const json &j, NPatchInfo &info) {
 	j.at(5).get_to(info.layout);
 }
 
-void to_json(json &j, const UIElementRef &info) { j = info.title; }
+void to_json(json &j, const UIElementRef &info) { j = json{info.title, info.entityId}; }
 
-void from_json(const json &j, UIElementRef &info) { info = {j}; }
+void from_json(const json &j, UIElementRef &info) {
+	j.at(0).get_to(info.title);
+	j.at(1).get_to(info.entityId);
+}
 
 // components
 

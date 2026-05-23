@@ -1,20 +1,28 @@
 #include "rttrVariantPropVisitor.hpp"
 
+#include <cstdio>
+
 #include "TGUI/String.hpp"
 #include "component.hpp"
+#include "entity.hpp"
 #include "gamedata.hpp"
+#include "interfaceView.hpp"
 #include "raylib.h"
 #include "widgets/propertiesBox.hpp"
+#include "widgets/propertyFields/colorField.hpp"
 #include "widgets/propertyFields/fileField.hpp"
 #include "widgets/propertyFields/intField.hpp"
 #include "widgets/propertyFields/rectangleField.hpp"
 #include "widgets/propertyFields/selectField.hpp"
 #include "widgets/propertyFields/textField.hpp"
+#include "widgets/propertyFields/uiElementRefField.hpp"
 
 PropertiesBox *VariantPropVisitor::box = nullptr;
+InterfaceView *VariantPropVisitor::view = nullptr;
 
 VariantPropVisitor::VariantPropVisitor() {
 	funcs["Rectangle"] = Rect;
+	funcs["InputComponent"] = InputComponent;
 	funcs["LabelComponent"] = LabelComponent;
 	funcs["TextAreaComponent"] = TextAreaComponent;
 	funcs["ColorRectComponent"] = ColorRectComponent;
@@ -43,6 +51,48 @@ void VariantPropVisitor::Rect(std::string name, rttr::variant var) {
 	field->setValue(*ptr);
 	field->onChange([ptr](Rectangle newRect) { *ptr = newRect; });
 	box->addRectangleField(field);
+}
+
+void VariantPropVisitor::InputComponent(std::string name, rttr::variant var) {
+	auto &ecs = view->getCoordinator();
+
+	struct InputComponent *ptr = var.get_value<struct InputComponent *>();
+
+	auto up = UIElementRefField::create();
+	up->view = view;
+	up->ref = &ptr->upButton;
+	up->label->setText("Up");
+	if (ptr->upButton.entityId < MAX_ENTITIES) {
+		up->value->setText(ecs.getEntityName(ptr->upButton.entityId));
+	}
+	box->addRefField(up);
+
+	auto down = UIElementRefField::create();
+	down->view = view;
+	down->ref = &ptr->downButton;
+	down->label->setText("Down");
+	if (ptr->downButton.entityId < MAX_ENTITIES) {
+		down->value->setText(ecs.getEntityName(ptr->downButton.entityId));
+	}
+	box->addRefField(down);
+
+	auto left = UIElementRefField::create();
+	left->view = view;
+	left->ref = &ptr->leftButton;
+	left->label->setText("Left");
+	if (ptr->leftButton.entityId < MAX_ENTITIES) {
+		left->value->setText(ecs.getEntityName(ptr->leftButton.entityId));
+	}
+	box->addRefField(left);
+
+	auto right = UIElementRefField::create();
+	right->view = view;
+	right->ref = &ptr->rightButton;
+	right->label->setText("Right");
+	if (ptr->rightButton.entityId < MAX_ENTITIES) {
+		right->value->setText(ecs.getEntityName(ptr->rightButton.entityId));
+	}
+	box->addRefField(right);
 }
 
 void VariantPropVisitor::LabelComponent(std::string name, rttr::variant var) {
@@ -122,9 +172,11 @@ void VariantPropVisitor::TextAreaComponent(std::string name, rttr::variant var) 
 void VariantPropVisitor::ColorRectComponent(std::string name, rttr::variant var) {
 	struct ColorRectComponent *ptr = var.get_value<struct ColorRectComponent *>();
 
-	auto field = RectangleField::create();
+	auto field = ColorField::create();
 	field->label->setText("Color");
-	box->addRectangleField(field);
+	field->setColor(ptr->color);
+	field->onColorChanged([ptr](Color color) { ptr->color = color; });
+	box->addColorField(field);
 }
 
 void VariantPropVisitor::ImageRectComponent(std::string name, rttr::variant var) {

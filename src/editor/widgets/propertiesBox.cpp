@@ -16,6 +16,7 @@
 #include "childWindows/newPropWindow.hpp"
 #include "editor.hpp"
 #include "widgets/propertyFields/boolField.hpp"
+#include "widgets/propertyFields/colorField.hpp"
 #include "widgets/propertyFields/fieldConfig.hpp"
 #include "widgets/propertyFields/fileField.hpp"
 #include "widgets/propertyFields/intField.hpp"
@@ -23,6 +24,7 @@
 #include "widgets/propertyFields/rectangleField.hpp"
 #include "widgets/propertyFields/selectField.hpp"
 #include "widgets/propertyFields/textField.hpp"
+#include "widgets/propertyFields/uiElementRefField.hpp"
 
 PropertiesBox::PropertiesBox(const char *typeName, bool initRenderer) : tgui::ChildWindow(typeName, initRenderer) {
 	this->setTitle("Props");
@@ -239,6 +241,16 @@ void PropertiesBox::addBooleanField(BoolField::Ptr field) {
 }
 
 void PropertiesBox::addSelectField(SelectField::Ptr field) {
+	field->setSize({"100%", 24});
+	layout->add(field);
+}
+
+void PropertiesBox::addColorField(ColorField::Ptr field) {
+	field->setSize({"100%", 24});
+	layout->add(field);
+}
+
+void PropertiesBox::addRefField(UIElementRefField::Ptr field) {
 	field->setSize({"100%", 24});
 	layout->add(field);
 }

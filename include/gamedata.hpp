@@ -42,6 +42,7 @@ struct IRect {
 
 struct UIElementRef {
 	std::string title = "";
+	uint16_t entityId = 256;
 };
 
 enum TextAlignment {

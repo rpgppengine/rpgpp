@@ -33,12 +33,14 @@ InterfaceView::InterfaceView(Rectangle rect) {
 	ecs.registerComponent<DialogueComponent>();
 	ecs.registerComponent<InputComponent>();
 
+	/*
 	auto entity = ecs.createEntity("name");
 	Rectangle entityRect = {0, 0, 50, 50};
 	ColorRectComponent colorRect = {GRAY};
 
 	ecs.addComponent(entity, entityRect);
 	ecs.addComponent(entity, colorRect);
+	*/
 }
 
 InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectangle{}) {

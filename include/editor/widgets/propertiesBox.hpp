@@ -13,12 +13,14 @@
 #include "any_ptr/any_ptr.h"
 #include "interactable.hpp"
 #include "widgets/propertyFields/boolField.hpp"
+#include "widgets/propertyFields/colorField.hpp"
 #include "widgets/propertyFields/fileField.hpp"
 #include "widgets/propertyFields/intField.hpp"
 #include "widgets/propertyFields/interPropField.hpp"
 #include "widgets/propertyFields/rectangleField.hpp"
 #include "widgets/propertyFields/selectField.hpp"
 #include "widgets/propertyFields/textField.hpp"
+#include "widgets/propertyFields/uiElementRefField.hpp"
 
 class PropertiesBox : public tgui::ChildWindow {
 protected:
@@ -53,6 +55,8 @@ public:
 	void addBooleanField(BoolField::Ptr field);
 	void addRectangleField(RectangleField::Ptr field);
 	void addSelectField(SelectField::Ptr field);
+	void addColorField(ColorField::Ptr field);
+	void addRefField(UIElementRefField::Ptr field);
 	void addButton(const tgui::String &title, std::function<void()> callback);
 	void addInterPropField(InterPropField::Ptr field);
 	void addPropertiesBox(PropertiesBox::Ptr box);

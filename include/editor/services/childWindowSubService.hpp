@@ -7,7 +7,7 @@
 
 class ChildWindowSubService {
 private:
-	std::map<std::string, std::unique_ptr<PopupWindow>> childWindows = {};
+	std::unordered_map<std::string, std::unique_ptr<PopupWindow>> childWindows = {};
 
 public:
 	ChildWindowSubService();

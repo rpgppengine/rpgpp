@@ -12,6 +12,7 @@
 #include "childWindows/popupWindow.hpp"
 #include "childWindows/projectSettingsWindow.hpp"
 #include "childWindows/settingsWindow.hpp"
+#include "childWindows/uiElementRefWindow.hpp"
 
 ChildWindowSubService::ChildWindowSubService() { this->createWindows(); }
 
@@ -35,6 +36,8 @@ void ChildWindowSubService::createWindows() {
 	this->childWindows.try_emplace("add_dialogue_option", std::make_unique<AddDialogueOptionWindow>());
 
 	this->childWindows.try_emplace("edit_dialogue_option", std::make_unique<EditDialogueOptionWindow>());
+
+	this->childWindows.try_emplace("element_ref", std::make_unique<UIElementRefWindow>());
 }
 
 void ChildWindowSubService::openWindow(const std::string &windowName) {

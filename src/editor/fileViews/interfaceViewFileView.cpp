@@ -103,6 +103,9 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 
 		auto &ecs = interface->getCoordinator();
 
+		visitor.view = interface;
+
+		/*
 		// register in lua
 		for (auto &entity : interface->getEntities()) {
 			sol::table tbl = luaState.create_named_table(TextFormat("Entity_%i", entity));
@@ -128,6 +131,7 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 			print(Entity_0.ColorRectComponent.Color.a)
 		)";
 		luaState.script(testCode);
+		*/
 
 		// add to propertiesBox
 		for (auto &entity : interface->getEntities()) {
@@ -139,6 +143,7 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 		}
 
 		// testing lua
+		/*
 		for (auto &entity : interface->getEntities()) {
 			printf("Entity #%i: \n", entity);
 			sol::table tbl = luaState[TextFormat("Entity_%i", entity)];
@@ -167,6 +172,7 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 				}
 			}
 		}
+			*/
 
 		view->setInterfaceView(interface);
 
