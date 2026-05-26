@@ -80,14 +80,15 @@ void System::drawEntity(EntityID entity) {
 	if (hasComponent<LabelComponent>(entity)) {
 		auto &label = components->getComponent<LabelComponent>(entity);
 
-		Vector2 textSize = MeasureTextEx(label.font, label.text.c_str(), static_cast<float>(label.fontSize), 1);
+		Vector2 textSize = MeasureTextEx(label.font.font, label.text.c_str(), static_cast<float>(label.fontSize), 1);
 
 		Vector2 textPos;
 		textPos.x =
 			rect.x + Lerp(0.0f, rect.width - textSize.x, (static_cast<float>(label.horizontalAlignment) * 0.5f));
 		textPos.y = rect.y + Lerp(0.0f, rect.height - textSize.y, (static_cast<float>(label.verticalAlignment) * 0.5f));
 
-		DrawTextEx(label.font, label.text.c_str(), textPos, static_cast<float>(label.fontSize), 1, label.textColor);
+		DrawTextEx(label.font.font, label.text.c_str(), textPos, static_cast<float>(label.fontSize), 1,
+				   label.textColor);
 	}
 
 	if (hasComponent<TextAreaComponent>(entity)) {
@@ -98,10 +99,10 @@ void System::drawEntity(EntityID entity) {
 		for (int i = 0; i < textArea.text.size(); i++) {
 			charPos.x += charMeasure.x;
 
-			DrawTextPro(Game::getUi().getFont(), TextSubtext(textArea.text.c_str(), i, 1), charPos, Vector2{0, 0}, 0.0f,
+			DrawTextPro(textArea.font.font, TextSubtext(textArea.text.c_str(), i, 1), charPos, Vector2{0, 0}, 0.0f,
 						13 * 3, 1, BLACK);
 
-			charMeasure = MeasureTextEx(Game::getUi().getFont(), TextSubtext(textArea.text.c_str(), i, 1),
+			charMeasure = MeasureTextEx(textArea.font.font, TextSubtext(textArea.text.c_str(), i, 1),
 										textArea.fontSize * 3, 1.0f);
 		}
 	}
@@ -115,10 +116,10 @@ void System::drawEntity(EntityID entity) {
 	if (hasComponent<ImageRectComponent>(entity)) {
 		auto &imageRect = components->getComponent<ImageRectComponent>(entity);
 
-		DrawTexturePro(
-			imageRect.texture,
-			Rectangle{0, 0, static_cast<float>(imageRect.texture.width), static_cast<float>(imageRect.texture.height)},
-			rect, Vector2{0, 0}, 0.0f, WHITE);
+		DrawTexturePro(imageRect.image.texture,
+					   Rectangle{0, 0, static_cast<float>(imageRect.image.texture.width),
+								 static_cast<float>(imageRect.image.texture.height)},
+					   rect, Vector2{0, 0}, 0.0f, WHITE);
 	}
 
 	if (hasComponent<NinePatchImageRectComponent>(entity)) {
@@ -132,7 +133,7 @@ void System::drawEntity(EntityID entity) {
 		info.right *= ninePatch.scale;
 		info.bottom *= ninePatch.scale;
 
-		DrawTextureNPatch(ninePatch.texture, info, rect, origin, 0.0f, WHITE);
+		DrawTextureNPatch(ninePatch.image.texture, info, rect, origin, 0.0f, WHITE);
 	}
 
 	if (hasComponent<DialogueComponent>(entity)) {
@@ -148,9 +149,9 @@ void System::drawEntity(EntityID entity) {
 				dialogue.maxLineHeight = charMeasure.y;
 			}
 
-			if (dialogue.fontName != dialogue.section->font) {
-				dialogue.font = Game::getResources().getFont(dialogue.section->font);
-				dialogue.fontName = dialogue.section->font;
+			if (dialogue.font.path != dialogue.section->font) {
+				dialogue.font.font = Game::getResources().getFont(dialogue.section->font);
+				dialogue.font.path = dialogue.section->font;
 			}
 
 			if (dialogue.section->key == "delay" || dialogue.section->delay > 0) {

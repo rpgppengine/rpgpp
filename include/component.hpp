@@ -28,7 +28,7 @@ struct LabelComponent {
 	std::string fontName;
 	int fontSize;
 
-	Font font;
+	FontRef font;
 };
 
 struct TextAreaComponent {
@@ -37,7 +37,7 @@ struct TextAreaComponent {
 	std::string fontName;
 	int fontSize;
 
-	Font font;
+	FontRef font;
 };
 
 struct ColorRectComponent {
@@ -48,7 +48,7 @@ struct ImageRectComponent {
 	std::string source;
 	int scale;
 
-	Texture2D texture;
+	ImageRef image;
 };
 
 struct NinePatchImageRectComponent {
@@ -56,13 +56,13 @@ struct NinePatchImageRectComponent {
 	int scale;
 	NPatchInfo npatchInfo;
 
-	Texture2D texture;
+	ImageRef image;
 };
 
 struct DialogueComponent {
 	std::string text;
 	Color textColor;
-	std::string defaultFont;
+	FontRef defaultFont;
 
 	DialogueBin dialogue;
 	DialogueLine *line = nullptr;
@@ -83,8 +83,7 @@ struct DialogueComponent {
 	float delayDuration = 0.0f;
 	float padding = 0.0f;
 
-	Font font;
-	std::string fontName;
+	FontRef font;
 
 	bool dialogueFinished = false;
 

@@ -8,6 +8,7 @@
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
 #include "raylib.h"
+#include "rttr/variant.h"
 #include "widgets/propertiesBox.hpp"
 #include "widgets/propertyFields/colorField.hpp"
 #include "widgets/propertyFields/fileField.hpp"
@@ -19,31 +20,16 @@
 
 PropertiesBox *VariantPropVisitor::box = nullptr;
 InterfaceView *VariantPropVisitor::view = nullptr;
+rttr::variant VariantPropVisitor::component = {};
 
 VariantPropVisitor::VariantPropVisitor() {
-	funcs["Rectangle"] = Rect;
-	funcs["InputComponent"] = InputComponent;
-	funcs["LabelComponent"] = LabelComponent;
-	funcs["TextAreaComponent"] = TextAreaComponent;
-	funcs["ColorRectComponent"] = ColorRectComponent;
-	funcs["ImageRectComponent"] = ImageRectComponent;
-	funcs["NinePatchImageRectComponent"] = NinePatchImageRectComponent;
-	funcs["DialogueComponent"] = DialogueComponent;
-}
-
-void VariantPropVisitor::visit(std::string name, rttr::variant var, PropertiesBox *box) {
-	VariantPropVisitor::box = box;
-
-	if (box == nullptr) return;
-
-	if (funcs[name] != nullptr) {
-		funcs[name](name, var);
-	}
+	map["int"] = p_int;
+	map["string"] = p_string;
+	map["Color"] = p_Color;
+	map["UIElementRef"] = p_UIElementRef;
 }
 
 void VariantPropVisitor::Rect(std::string name, rttr::variant var) {
-	printf("%s \n", var.get_type().get_name().to_string().c_str());
-
 	Rectangle *ptr = var.get_value<Rectangle *>();
 
 	auto field = RectangleField::create();
@@ -53,182 +39,100 @@ void VariantPropVisitor::Rect(std::string name, rttr::variant var) {
 	box->addRectangleField(field);
 }
 
-void VariantPropVisitor::InputComponent(std::string name, rttr::variant var) {
-	auto &ecs = view->getCoordinator();
-
-	struct InputComponent *ptr = var.get_value<struct InputComponent *>();
-
-	auto up = UIElementRefField::create();
-	up->view = view;
-	up->ref = &ptr->upButton;
-	up->label->setText("Up");
-	if (ptr->upButton.entityId < MAX_ENTITIES) {
-		up->value->setText(ecs.getEntityName(ptr->upButton.entityId));
+void VariantPropVisitor::componentVisit(rttr::variant component, PropertiesBox *box) {
+	this->component = component;
+	if (!component.get_type().is_pointer()) {
+		return;
 	}
-	box->addRefField(up);
 
-	auto down = UIElementRefField::create();
-	down->view = view;
-	down->ref = &ptr->downButton;
-	down->label->setText("Down");
-	if (ptr->downButton.entityId < MAX_ENTITIES) {
-		down->value->setText(ecs.getEntityName(ptr->downButton.entityId));
-	}
-	box->addRefField(down);
+	VariantPropVisitor::box = box;
 
-	auto left = UIElementRefField::create();
-	left->view = view;
-	left->ref = &ptr->leftButton;
-	left->label->setText("Left");
-	if (ptr->leftButton.entityId < MAX_ENTITIES) {
-		left->value->setText(ecs.getEntityName(ptr->leftButton.entityId));
-	}
-	box->addRefField(left);
+	if (box == nullptr) return;
 
-	auto right = UIElementRefField::create();
-	right->view = view;
-	right->ref = &ptr->rightButton;
-	right->label->setText("Right");
-	if (ptr->rightButton.entityId < MAX_ENTITIES) {
-		right->value->setText(ecs.getEntityName(ptr->rightButton.entityId));
+	if (component.is_type<Rectangle *>()) {
+		Rect("Rectangle", component);
+		return;
 	}
-	box->addRefField(right);
+
+	for (auto &prop : component.get_type().get_properties()) {
+		std::string name = prop.get_type().get_raw_type().get_name().to_string();
+		if (map[name] != nullptr) {
+			map[name](prop);
+		}
+	}
 }
 
-void VariantPropVisitor::LabelComponent(std::string name, rttr::variant var) {
-	struct LabelComponent *ptr = var.get_value<struct LabelComponent *>();
+void VariantPropVisitor::p_int(rttr::property prop) {
+	auto *propVal = prop.get_value(component).get_value<int *>();
+
+	auto scale = IntField::create();
+	scale->value->setMinimum(1);
+	scale->value->setMaximum(5);
+	scale->label->setText(prop.get_name().to_string());
+	scale->value->setValue(*propVal);
+	scale->value->onValueChange([propVal](int newValue) { *propVal = newValue; });
+	box->addIntField(scale);
+}
+
+void VariantPropVisitor::p_string(rttr::property prop) {
+	auto *string = prop.get_value(component).get_value<std::string *>();
 
 	auto textField = TextField::create();
-	textField->label->setText("Text");
-	textField->value->setText(ptr->text);
-	textField->value->onTextChange([ptr](const tgui::String &newText) { ptr->text = newText.toStdString(); });
+	textField->label->setText(prop.get_name().to_string());
+	textField->value->setText(*string);
+	textField->value->onTextChange([string](const tgui::String &newText) { *string = newText.toStdString(); });
 	box->addTextField(textField);
-
-	auto horizontalAlignment = SelectField::create();
-	horizontalAlignment->value->addMultipleItems({"Left", "Center", "Right"});
-	horizontalAlignment->label->setText("Horizontal Al.");
-	horizontalAlignment->value->onItemSelect([ptr](int index) {
-		TextAlignment val = static_cast<TextAlignment>(index);
-		ptr->horizontalAlignment = val;
-	});
-	box->addSelectField(horizontalAlignment);
-
-	auto verticalAlignment = SelectField::create();
-	verticalAlignment->value->addMultipleItems({"Top", "Middle", "Bottom"});
-	verticalAlignment->label->setText("Vertical Al.");
-	verticalAlignment->value->onItemSelect([ptr](int index) {
-		TextAlignment val = static_cast<TextAlignment>(index);
-		ptr->verticalAlignment = val;
-	});
-	box->addSelectField(verticalAlignment);
-
-	auto fontField = FileField::create();
-	fontField->pathFilters = {{"Font", {"*.ttf"}}};
-	fontField->label->setText(ptr->fontName);
-	fontField->value->setText(ptr->fontName);
-	fontField->callback = [ptr](const tgui::String &path) {
-		std::string newFontName = GetFileNameWithoutExt(path.toStdString().c_str());
-		ptr->fontName = newFontName;
-	};
-	box->addFileField(fontField);
-
-	auto fontSize = IntField::create();
-	fontSize->value->setMinimum(8);
-	fontSize->value->setMaximum(144);
-	fontSize->label->setText("Font Size");
-	fontSize->value->setValue(ptr->fontSize);
-	fontSize->value->onValueChange([ptr](int val) { ptr->fontSize = val; });
-	box->addIntField(fontSize);
 }
 
-void VariantPropVisitor::TextAreaComponent(std::string name, rttr::variant var) {
-	struct TextAreaComponent *ptr = var.get_value<struct TextAreaComponent *>();
-
-	auto textField = TextField::create();
-	textField->label->setText("Text");
-	textField->value->setText(ptr->text);
-	textField->value->onTextChange([ptr](const tgui::String &newText) { ptr->text = newText.toStdString(); });
-	box->addTextField(textField);
-
-	auto fontField = FileField::create();
-	fontField->pathFilters = {{"Font", {"*.ttf"}}};
-	fontField->label->setText(ptr->fontName);
-	fontField->value->setText(ptr->fontName);
-	fontField->callback = [ptr](const tgui::String &path) {
-		std::string newFontName = GetFileNameWithoutExt(path.toStdString().c_str());
-		ptr->fontName = newFontName;
-	};
-	box->addFileField(fontField);
-
-	auto fontSize = IntField::create();
-	fontSize->value->setMinimum(8);
-	fontSize->value->setMaximum(144);
-	fontSize->label->setText("Font Size");
-	fontSize->value->setValue(ptr->fontSize);
-	fontSize->value->onValueChange([ptr](int val) { ptr->fontSize = val; });
-	box->addIntField(fontSize);
-}
-
-void VariantPropVisitor::ColorRectComponent(std::string name, rttr::variant var) {
-	struct ColorRectComponent *ptr = var.get_value<struct ColorRectComponent *>();
+void VariantPropVisitor::p_Color(rttr::property prop) {
+	auto *color = prop.get_value(component).get_value<struct Color *>();
 
 	auto field = ColorField::create();
-	field->label->setText("Color");
-	field->setColor(ptr->color);
-	field->onColorChanged([ptr](Color color) { ptr->color = color; });
+	field->label->setText(prop.get_name().to_string());
+	field->setColor(*color);
+	field->onColorChanged([color](struct Color newColor) { *color = newColor; });
 	box->addColorField(field);
 }
 
-void VariantPropVisitor::ImageRectComponent(std::string name, rttr::variant var) {
-	struct ImageRectComponent *ptr = var.get_value<struct ImageRectComponent *>();
+void VariantPropVisitor::p_UIElementRef(rttr::property prop) {
+	auto &ecs = view->getCoordinator();
 
-	auto source = FileField::create();
-	source->pathFilters = {{"Image", {"*.png", "*.jpg"}}};
-	source->label->setText("Image");
-	source->value->setText(ptr->source);
-	source->callback = [ptr](const tgui::String &path) {
-		std::string newFontName = GetFileNameWithoutExt(path.toStdString().c_str());
-		ptr->source = newFontName;
-	};
-	box->addFileField(source);
+	struct UIElementRef *ref = prop.get_value(component).get_value<struct UIElementRef *>();
 
-	auto scale = IntField::create();
-	scale->value->setMinimum(1);
-	scale->value->setMaximum(5);
-	scale->label->setText("Scale");
-	scale->value->setValue(ptr->scale);
-	scale->value->onValueChange([ptr](int val) { ptr->scale = val; });
-	box->addIntField(scale);
+	auto field = UIElementRefField::create();
+	field->view = view;
+	field->ref = ref;
+	field->label->setText(prop.get_name().to_string().c_str());
+	if (ref->entityId < MAX_ENTITIES) {
+		field->value->setText(ecs.getEntityName(ref->entityId));
+	}
+	box->addRefField(field);
 }
 
-void VariantPropVisitor::NinePatchImageRectComponent(std::string name, rttr::variant var) {
-	struct NinePatchImageRectComponent *ptr = var.get_value<struct NinePatchImageRectComponent *>();
+void VariantPropVisitor::p_FontRef(rttr::property prop) {
+	struct FontRef *font = prop.get_value(component).get_value<struct FontRef *>();
 
-	auto source = FileField::create();
-	source->pathFilters = {{"Image", {"*.png", "*.jpg"}}};
-	source->label->setText("Image");
-	source->value->setText(ptr->source);
-	source->callback = [ptr](const tgui::String &path) {
+	auto fontField = FileField::create();
+	fontField->pathFilters = {{"Font", {"*.ttf"}}};
+	fontField->label->setText(prop.get_name().to_string());
+	fontField->value->setText(font->path);
+	fontField->callback = [font](const tgui::String &path) {
 		std::string newFontName = GetFileNameWithoutExt(path.toStdString().c_str());
-		ptr->source = newFontName;
+		font->path = newFontName;
 	};
-	box->addFileField(source);
-
-	auto scale = IntField::create();
-	scale->value->setMinimum(1);
-	scale->value->setMaximum(5);
-	scale->label->setText("Scale");
-	scale->value->setValue(ptr->scale);
-	scale->value->onValueChange([ptr](int val) { ptr->scale = val; });
-	box->addIntField(scale);
+	box->addFileField(fontField);
 }
 
-void VariantPropVisitor::DialogueComponent(std::string name, rttr::variant var) {
-	struct DialogueComponent *ptr = var.get_value<struct DialogueComponent *>();
+void VariantPropVisitor::p_ImageRef(rttr::property prop) {
+	struct ImageRef *image = prop.get_value(component).get_value<struct ImageRef *>();
 
-	auto textField = TextField::create();
-	textField->label->setText("Text");
-	textField->value->setText(ptr->text);
-	textField->value->onTextChange([ptr](const tgui::String &newText) { ptr->text = newText.toStdString(); });
-	box->addTextField(textField);
+	auto imageField = FileField::create();
+	imageField->pathFilters = {{"Image", {"*.png", "*.jpg"}}};
+	imageField->label->setText(prop.get_name().to_string());
+	imageField->value->setText(image->path);
+	imageField->callback = [image](const tgui::String &path) {
+		std::string newFontName = GetFileNameWithoutExt(path.toStdString().c_str());
+		image->path = newFontName;
+	};
+	box->addFileField(imageField);
 }

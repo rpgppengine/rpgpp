@@ -45,6 +45,16 @@ struct UIElementRef {
 	uint16_t entityId = 256;
 };
 
+struct FontRef {
+	std::string path = "";
+	Font font;
+};
+
+struct ImageRef {
+	std::string path = "";
+	Texture texture;
+};
+
 enum TextAlignment {
 	TEXT_ALIGN_LEFT = 0,
 	TEXT_ALIGN_TOP = 0,

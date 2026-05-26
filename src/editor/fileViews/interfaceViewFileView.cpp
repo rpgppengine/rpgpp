@@ -138,7 +138,8 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 			auto set = ecs.getEntityComponents(entity);
 			for (auto &name : set) {
 				auto variant = ecs.getComponentVariant(entity, name);
-				visitor.visit(name, variant, propertiesBox.get());
+				// visitor.visit(name, variant, propertiesBox.get());
+				visitor.componentVisit(variant, propertiesBox.get());
 			}
 		}
 

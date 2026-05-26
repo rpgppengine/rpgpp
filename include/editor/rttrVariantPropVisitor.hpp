@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "interfaceView.hpp"
+#include "rttr/property.h"
 #include "rttr/variant.h"
 #include "widgets/propertiesBox.hpp"
 
@@ -13,20 +14,21 @@ class VariantPropVisitor {
 public:
 	static PropertiesBox *box;
 	static InterfaceView *view;
-
-	std::unordered_map<std::string, std::function<void(std::string, rttr::variant)>> funcs;
+	static rttr::variant component;
 
 	VariantPropVisitor();
-	void visit(std::string name, rttr::variant var, PropertiesBox *box);
+
+	std::unordered_map<std::string, std::function<void(rttr::property)>> map;
+	void componentVisit(rttr::variant component, PropertiesBox *box);
 
 	static void Rect(std::string name, rttr::variant var);
-	static void InputComponent(std::string name, rttr::variant var);
-	static void LabelComponent(std::string name, rttr::variant var);
-	static void TextAreaComponent(std::string name, rttr::variant var);
-	static void ColorRectComponent(std::string name, rttr::variant var);
-	static void ImageRectComponent(std::string name, rttr::variant var);
-	static void NinePatchImageRectComponent(std::string name, rttr::variant var);
-	static void DialogueComponent(std::string name, rttr::variant var);
+
+	static void p_int(rttr::property prop);
+	static void p_string(rttr::property prop);
+	static void p_Color(rttr::property prop);
+	static void p_UIElementRef(rttr::property prop);
+	static void p_FontRef(rttr::property prop);
+	static void p_ImageRef(rttr::property prop);
 };
 
 #endif
