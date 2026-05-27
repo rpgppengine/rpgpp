@@ -7,6 +7,7 @@
 #include "TGUI/String.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "button.hpp"
+#include "component.hpp"
 #include "editor.hpp"
 #include "entity.hpp"
 #include "gamedata.hpp"
@@ -63,6 +64,8 @@ InterfaceViewFileView::InterfaceViewFileView() {
 
 		EntityID entity = ecs.getEntityManager().findName(item.toStdString());
 
+		if (entity >= MAX_ENTITIES) return;
+
 		if (auto ptr = weakView.lock()) {
 			ptr->selectElement(item.toStdString());
 
@@ -85,7 +88,7 @@ InterfaceViewFileView::InterfaceViewFileView() {
 
 		if (auto ptr = weakTree.lock()) {
 			auto sharedView = weakView.lock();
-			if (entity == MAX_ENTITIES) {
+			if (entity >= MAX_ENTITIES) {
 				ptr->deselectItem();
 				if (auto sharedProps = weakProps.lock()) {
 					sharedProps->clear();
@@ -106,6 +109,9 @@ InterfaceViewFileView::InterfaceViewFileView() {
 			}
 		}
 	});
+
+	view->propBox = propertiesBox.get();
+	view->visitor = &visitor;
 
 	widgetContainer.push_back(view);
 }

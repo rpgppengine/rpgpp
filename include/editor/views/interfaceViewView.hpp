@@ -8,9 +8,11 @@
 #include "components/resizableCanvasBox.hpp"
 #include "entity.hpp"
 #include "interfaceView.hpp"
+#include "rttrVariantPropVisitor.hpp"
 #include "sol/state.hpp"
 #include "uiElement.hpp"
 #include "views/worldView.hpp"
+#include "widgets/propertiesBox.hpp"
 
 class InterfaceViewView : public WorldView {
 private:
@@ -29,6 +31,8 @@ public:
 	InterfaceViewView();
 
 	InterfaceView *ptr{nullptr};
+	PropertiesBox *propBox{nullptr};
+	VariantPropVisitor *visitor{nullptr};
 
 	void drawCanvas() override;
 	void drawOverlay() override;

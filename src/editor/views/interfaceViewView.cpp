@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "TGUI/Vector2.hpp"
+#include "component.hpp"
 #include "components/resizableCanvasBox.hpp"
 #include "editor.hpp"
 #include "entity.hpp"
@@ -118,6 +119,18 @@ void InterfaceViewView::leftMouseReleased(tgui::Vector2f pos) {
 			auto &rect = ptr->getCoordinator().getComponent<Rectangle>(activeEntity);
 			rect = canvasBox->getRectangle();
 			canvasBox->focused = false;
+
+			if (propBox != nullptr && visitor != nullptr) {
+				propBox->clear();
+
+				auto &ecs = ptr->getCoordinator();
+
+				auto set = ecs.getEntityComponents(activeEntity);
+				for (auto &name : set) {
+					auto componentVariant = ecs.getComponentVariant(activeEntity, name);
+					visitor->componentVisit(componentVariant, propBox);
+				}
+			}
 		}
 	}
 

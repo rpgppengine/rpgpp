@@ -31,7 +31,7 @@ private:
 	std::array<T, MAX_ENTITIES> components;
 	std::unordered_map<EntityID, std::size_t> entityToIndex;
 	std::unordered_map<std::size_t, EntityID> indexToEntity;
-	std::size_t size;
+	std::size_t size = 0;
 
 public:
 	void insertData(EntityID entity, T component) {
@@ -75,12 +75,20 @@ public:
 	}
 
 	rttr::variant getDataVariant(EntityID entity) {
+		if (entityToIndex.find(entity) == entityToIndex.end()) {
+			throw std::runtime_error("Cannot get non-existing component.");
+		}
+
 		T *component = &components[entityToIndex[entity]];
 		rttr::variant variant = component;
 		return variant;
 	}
 
 	nlohmann::json getDataJson(EntityID entity) {
+		if (entityToIndex.find(entity) == entityToIndex.end()) {
+			throw std::runtime_error("Cannot get non-existing component.");
+		}
+
 		T component = components[entityToIndex[entity]];
 		nlohmann::json j = component;
 		return j;

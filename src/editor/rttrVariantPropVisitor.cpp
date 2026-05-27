@@ -27,6 +27,8 @@ VariantPropVisitor::VariantPropVisitor() {
 	map["string"] = p_string;
 	map["Color"] = p_Color;
 	map["UIElementRef"] = p_UIElementRef;
+	map["FontRef"] = p_FontRef;
+	map["ImageRef"] = p_ImageRef;
 }
 
 void VariantPropVisitor::Rect(std::string name, rttr::variant var) {
@@ -97,14 +99,7 @@ void VariantPropVisitor::p_Color(rttr::property prop) {
 void VariantPropVisitor::p_UIElementRef(rttr::property prop) {
 	auto &ecs = view->getCoordinator();
 
-	struct UIElementRef *ref = prop.get_value(component).get_value<struct UIElementRef *>();
-
-	if (ref->entityId < MAX_ENTITIES) {
-		printf("%s: %s (%i) \n", prop.get_name().to_string().c_str(), ecs.getEntityName(ref->entityId).c_str(),
-			   ref->entityId);
-	} else {
-		printf("%s: no entity.. (%i) \n", prop.get_name().to_string().c_str(), ref->entityId);
-	}
+	auto *ref = prop.get_value(component).get_value<struct UIElementRef *>();
 
 	auto field = UIElementRefField::create();
 	field->view = view;

@@ -51,6 +51,7 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 
 	auto j = json::parse(fileText);
 	this->rect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+	/*
 	for (auto &item : j.at("elements").items()) {
 		auto obj = item.value();
 		auto element = constructElement(obj.at("type"));
@@ -58,6 +59,7 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 		int layer = obj.at("layer");
 		addElement(item.key(), std::move(element), layer);
 	}
+	*/
 
 	for (auto &item : j.at("entities").items()) {
 		auto obj = item.value();
