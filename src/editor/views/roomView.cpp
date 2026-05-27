@@ -128,7 +128,7 @@ void RoomView::drawCanvas() {
 			}
 
 			// Draw tile border
-			DrawRectangleLinesEx(destRect, 1.0f, Fade(GRAY, 0.5f));
+			DrawRectangleLines(destRect.x, destRect.y, destRect.width, destRect.height, Fade(GRAY, 0.5f));
 			if (CheckCollisionPointRec(mouseWorldPos, destRect)) {
 				overlayRect = destRect;
 			}

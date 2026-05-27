@@ -13,7 +13,9 @@
 #include "entity.hpp"
 #include "gamedata.hpp"
 #include "interfaceElementFactory.hpp"
+#include "lua.h"
 #include "raylib.h"
+#include "sol/state_view.hpp"
 #include "uiElement.hpp"
 
 InterfaceView::InterfaceView() : rect(Rectangle{}) {}
@@ -31,6 +33,7 @@ InterfaceView::InterfaceView(Rectangle rect) {
 	ecs.registerComponent<ImageRectComponent>();
 	ecs.registerComponent<NinePatchImageRectComponent>();
 	ecs.registerComponent<DialogueComponent>();
+	ecs.registerComponent<ButtonComponent>();
 	ecs.registerComponent<InputComponent>();
 
 	/*
@@ -208,3 +211,58 @@ void InterfaceView::draw() {
 Coordinator &InterfaceView::getCoordinator() { return ecs; }
 
 const std::set<EntityID> &InterfaceView::getEntities() { return ecs.getEntities(); }
+
+void InterfaceView::registerLua(lua_State *L) {
+	sol::state_view state{L};
+
+	for (auto &entity : getEntities()) {
+		sol::table tbl = state.create_named_table(TextFormat("Entity_%i", entity));
+
+		auto set = ecs.getEntityComponents(entity);
+		for (auto &name : set) {
+			tbl[name] = ecs.getLuaObject(entity, name, state.lua_state());
+		}
+	}
+
+	/*
+	std::string testCode = R"(
+			print('hello, let me test Entity_0.Rectangle')
+			print(Entity_0.Rectangle.x)
+			print(Entity_0.Rectangle.y)
+			print(Entity_0.Rectangle.width)
+			print(Entity_0.Rectangle.height)
+
+			print('the entity has a gray color')
+			print(Entity_0.ColorRectComponent.Color.r)
+			print(Entity_0.ColorRectComponent.Color.g)
+			print(Entity_0.ColorRectComponent.Color.b)
+			print(Entity_0.ColorRectComponent.Color.a)
+		)";
+		luaState.script(testCode);
+		*/
+}
+
+void InterfaceView::changeFocusedElement(EntityID entity) {
+	if (entity < MAX_ENTITIES) {
+		if (ecs.hasComponent<InputComponent>(entity)) {
+			auto &previousInput = ecs.getComponent<InputComponent>(current);
+			previousInput.callbacks[CALLBACK_UNFOCUSED]();
+
+			auto &input = ecs.getComponent<InputComponent>(entity);
+			input.callbacks[CALLBACK_FOCUSED]();
+			current = entity;
+		}
+	}
+}
+
+nlohmann::json InterfaceView::dumpEntityJson(EntityID entity) {
+	nlohmann::json j = json::object();
+
+	auto set = ecs.getEntityComponents(entity);
+	for (auto &componentName : set) {
+		auto componentJson = ecs.getComponentJson(entity, componentName);
+		j[componentName] = componentJson;
+	}
+
+	return j;
+}

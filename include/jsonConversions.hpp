@@ -18,6 +18,12 @@ void from_json(const json &j, Rectangle &rect);
 void to_json(json &j, const Color &color);
 void from_json(const json &j, Color &color);
 
+void to_json(json &j, const ImageRef &image);
+void from_json(const json &j, ImageRef &image);
+
+void to_json(json &j, const FontRef &font);
+void from_json(const json &j, FontRef &font);
+
 void to_json(json &j, const NPatchInfo &info);
 void from_json(const json &j, NPatchInfo &info);
 
@@ -45,5 +51,8 @@ void from_json(const json &j, NinePatchImageRectComponent &ninePatch);
 
 void to_json(json &j, const DialogueComponent &dialogue);
 void from_json(const json &j, DialogueComponent &dialogue);
+
+void to_json(json &j, const ButtonComponent &button);
+void from_json(const json &j, ButtonComponent &button);
 
 #endif

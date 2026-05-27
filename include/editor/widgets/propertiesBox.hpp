@@ -62,6 +62,8 @@ public:
 	void addPropertiesBox(PropertiesBox::Ptr box);
 	void addWidget(tgui::Widget::Ptr widget);
 	tgui::Button::Ptr constructButton(const tgui::String &title, std::function<void()> callback);
+
+	void clear();
 };
 
 #endif

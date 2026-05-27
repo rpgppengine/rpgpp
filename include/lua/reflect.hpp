@@ -4,17 +4,11 @@
 #include <rttr/registration.h>
 
 #include "component.hpp"
-#include "dialogueArea.hpp"
-#include "imageRect.hpp"
 #include "raylib.h"
 #include "rttr/detail/registration/registration_impl.h"
 #include "rttr/policy.h"
-#include "uiElement.hpp"
 
 RTTR_REGISTRATION {
-	rttr::registration::class_<UIElement>("UIElement").constructor<>().property("rect", &UIElement::rect);
-	rttr::registration::class_<ImageRect>("ImageRect").constructor<>().property("source", &ImageRect::source);
-
 	rttr::registration::class_<Rectangle>("Rectangle").constructor<>();
 	rttr::registration::class_<InputComponent>("InputComponent")
 		.constructor<>()
@@ -42,17 +36,21 @@ RTTR_REGISTRATION {
 	rttr::registration::class_<ImageRectComponent>("ImageRectComponent")
 		.constructor<>()
 		.property("source", &ImageRectComponent::source)
-		.property("scale", &ImageRectComponent::scale);
+		.property("scale", &ImageRectComponent::scale)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<NinePatchImageRectComponent>("NinePatchImageRectComponent")
 		.constructor<>()
 		.property("source", &NinePatchImageRectComponent::source)
 		.property("scale", &NinePatchImageRectComponent::scale)
-		.property("npatchinfo", &NinePatchImageRectComponent::npatchInfo);
+		.property("npatchinfo", &NinePatchImageRectComponent::npatchInfo)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<DialogueComponent>("DialogueComponent")
 		.constructor<>()
 		.property("text", &DialogueComponent::text)
 		.property("textColor", &DialogueComponent::textColor)
-		.property("defaultFont", &DialogueComponent::defaultFont);
+		.property("defaultFont", &DialogueComponent::defaultFont)(rttr::policy::prop::bind_as_ptr);
+	rttr::registration::class_<ButtonComponent>("ButtonComponent")
+		.constructor<>()
+		.property("normalTextColor", &ButtonComponent::normalTextColor)
+		.property("focusedTextColor", &ButtonComponent::focusedTextColor)(rttr::policy::prop::bind_as_ptr);
 }
 
 #endif

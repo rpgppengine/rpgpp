@@ -55,6 +55,8 @@ struct ImageRef {
 	Texture texture;
 };
 
+enum CallbackType { CALLBACK_TRIGGER, CALLBACK_FOCUSED, CALLBACK_UNFOCUSED };
+
 enum TextAlignment {
 	TEXT_ALIGN_LEFT = 0,
 	TEXT_ALIGN_TOP = 0,

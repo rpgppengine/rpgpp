@@ -32,6 +32,8 @@ public:
 
 	System &getSystem() { return *system; }
 
+	EntityManager &getEntityManager() { return *entities; }
+
 	EntityID createEntity(const std::string &name) {
 		auto entity = entities->newEntity(name);
 		system->entities.insert(entity);

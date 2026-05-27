@@ -6,6 +6,7 @@
 #include "componentManager.hpp"
 #include "entity.hpp"
 #include "entityManager.hpp"
+#include "uiElement.hpp"
 
 class System {
 private:
@@ -24,6 +25,7 @@ public:
 	void update();
 	void draw();
 	void drawEntity(EntityID entity);
+	void onNotify(Event event);
 };
 
 #endif

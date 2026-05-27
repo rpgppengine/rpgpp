@@ -21,6 +21,20 @@ void from_json(const json &j, Color &color) {
 	j.at(3).get_to(color.a);
 }
 
+void to_json(json &j, const ImageRef &image) {
+	j = json::object();
+	j["image"] = image.path;
+}
+
+void from_json(const json &j, ImageRef &image) { j.at("image").get_to(image.path); }
+
+void to_json(json &j, const FontRef &font) {
+	j = json::object();
+	j["font"] = font.path;
+}
+
+void from_json(const json &j, FontRef &font) { j.at("font").get_to(font.path); }
+
 void to_json(json &j, const NPatchInfo &info) {
 	j = json{info.source, info.left, info.top, info.right, info.bottom, info.layout};
 }
@@ -131,4 +145,14 @@ void to_json(json &j, const DialogueComponent &dialogue) {
 void from_json(const json &j, DialogueComponent &dialogue) {
 	j.at("text").get_to(dialogue.text);
 	j.at("textColor").get_to(dialogue.textColor);
+}
+
+void to_json(json &j, const ButtonComponent &button) {
+	j["normalTextColor"] = button.normalTextColor;
+	j["focusedTextColor"] = button.focusedTextColor;
+}
+
+void from_json(const json &j, ButtonComponent &button) {
+	j.at("normalTextColor").get_to(button.normalTextColor);
+	j.at("focusedTextColor").get_to(button.focusedTextColor);
 }

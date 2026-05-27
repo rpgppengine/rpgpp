@@ -6,6 +6,7 @@
 
 #include "TGUI/Signal.hpp"
 #include "components/resizableCanvasBox.hpp"
+#include "entity.hpp"
 #include "interfaceView.hpp"
 #include "sol/state.hpp"
 #include "uiElement.hpp"
@@ -16,12 +17,14 @@ private:
 	std::unique_ptr<ResizableCanvasBox> canvasBox;
 	bool hasActiveElement = false;
 	UIElement *activeElement = nullptr;
+	EntityID activeEntity = MAX_ENTITIES;
 	void setElementAtMouse();
 
 public:
 	typedef std::shared_ptr<InterfaceViewView> Ptr;
 
 	tgui::SignalTyped<std::string> onActiveElementChanged = {"ActiveElementChanged"};
+	tgui::SignalTyped<EntityID> onActiveEntityChanged = {"ActiveEntityChanged"};
 
 	InterfaceViewView();
 
@@ -39,7 +42,6 @@ public:
 	void mouseMoved(tgui::Vector2f pos) override;
 
 	void selectElement(const std::string &elementName);
-	UIElement *getActiveElement();
 };
 
 #endif

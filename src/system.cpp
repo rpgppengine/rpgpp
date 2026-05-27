@@ -7,6 +7,7 @@
 #include "game.hpp"
 #include "raylib.h"
 #include "raymath.h"
+#include "uiElement.hpp"
 
 void System::update() {
 	if (components == nullptr || entitiesManager == nullptr) return;
@@ -87,8 +88,15 @@ void System::drawEntity(EntityID entity) {
 			rect.x + Lerp(0.0f, rect.width - textSize.x, (static_cast<float>(label.horizontalAlignment) * 0.5f));
 		textPos.y = rect.y + Lerp(0.0f, rect.height - textSize.y, (static_cast<float>(label.verticalAlignment) * 0.5f));
 
-		DrawTextEx(label.font.font, label.text.c_str(), textPos, static_cast<float>(label.fontSize), 1,
-				   label.textColor);
+		if (hasComponent<ButtonComponent>(entity)) {
+			auto &button = components->getComponent<ButtonComponent>(entity);
+
+			DrawTextEx(label.font.font, label.text.c_str(), textPos, static_cast<float>(label.fontSize), 1,
+					   button.shownTextColor);
+		} else {
+			DrawTextEx(label.font.font, label.text.c_str(), textPos, static_cast<float>(label.fontSize), 1,
+					   label.textColor);
+		}
 	}
 
 	if (hasComponent<TextAreaComponent>(entity)) {
@@ -176,6 +184,28 @@ void System::drawEntity(EntityID entity) {
 				MeasureTextEx(Game::getResources().getFont(dialogue.section->font),
 							  TextSubtext(dialogue.text.c_str(), i, 1), dialogue.section->textSize * 3, 1.0f);
 			charMeasure = newMeasure;
+		}
+	}
+}
+
+void System::onNotify(Event event) {
+	for (auto &entity : entities) {
+		auto &input = components->getComponent<InputComponent>(entity);
+
+		if (event.key == KEY_UP) {
+			Game::getUi().getCurrentView()->changeFocusedElement(input.upButton.entityId);
+		}
+		if (event.key == KEY_DOWN) {
+			Game::getUi().getCurrentView()->changeFocusedElement(input.downButton.entityId);
+		}
+		if (event.key == KEY_LEFT) {
+			Game::getUi().getCurrentView()->changeFocusedElement(input.leftButton.entityId);
+		}
+		if (event.key == KEY_RIGHT) {
+			Game::getUi().getCurrentView()->changeFocusedElement(input.rightButton.entityId);
+		}
+		if (event.key == KEY_Z) {
+			input.callbacks[CALLBACK_TRIGGER]();
 		}
 	}
 }

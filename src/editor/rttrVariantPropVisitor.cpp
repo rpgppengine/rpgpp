@@ -99,6 +99,13 @@ void VariantPropVisitor::p_UIElementRef(rttr::property prop) {
 
 	struct UIElementRef *ref = prop.get_value(component).get_value<struct UIElementRef *>();
 
+	if (ref->entityId < MAX_ENTITIES) {
+		printf("%s: %s (%i) \n", prop.get_name().to_string().c_str(), ecs.getEntityName(ref->entityId).c_str(),
+			   ref->entityId);
+	} else {
+		printf("%s: no entity.. (%i) \n", prop.get_name().to_string().c_str(), ref->entityId);
+	}
+
 	auto field = UIElementRefField::create();
 	field->view = view;
 	field->ref = ref;

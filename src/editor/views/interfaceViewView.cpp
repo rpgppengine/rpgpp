@@ -5,6 +5,7 @@
 #include "TGUI/Vector2.hpp"
 #include "components/resizableCanvasBox.hpp"
 #include "editor.hpp"
+#include "entity.hpp"
 #include "interfaceView.hpp"
 #include "project.hpp"
 #include "raylib.h"
@@ -21,23 +22,28 @@ void InterfaceViewView::setInterfaceView(InterfaceView *ptr) { this->ptr = ptr; 
 
 void InterfaceViewView::setElementAtMouse() {
 	if (ptr != nullptr) {
-		UIElement *selection = nullptr;
-		for (auto &[layer, element] : ptr->getElements()) {
-			auto mouse = getMouseWorldPos();
-			if (CheckCollisionPointRec(mouse, element->getRect())) {
-				selection = element.get();
-				canvasBox->updateRec(selection->getRect());
+		EntityID selection = MAX_ENTITIES;
+		auto mouse = getMouseWorldPos();
+		for (auto &entity : ptr->getEntities()) {
+			if (ptr->getCoordinator().hasComponent<Rectangle>(entity)) {
+				auto &rect = ptr->getCoordinator().getComponent<Rectangle>(entity);
+				if (CheckCollisionPointRec(mouse, rect)) {
+					selection = entity;
+					canvasBox->updateRec(rect);
 
-				break;
+					break;
+				}
 			}
 		}
 
-		this->activeElement = selection;
-		if (activeElement == nullptr) {
+		this->activeEntity = selection;
+		if (selection == MAX_ENTITIES) {
 			canvasBox->updateRec({0, 0, 1, 1});
 			onActiveElementChanged.emit(this, "");
+			onActiveEntityChanged.emit(this, MAX_ENTITIES);
 		} else {
-			onActiveElementChanged.emit(this, activeElement->getName());
+			onActiveElementChanged.emit(this, ptr->getCoordinator().getEntityName(activeEntity));
+			onActiveEntityChanged.emit(this, activeEntity);
 		}
 	}
 }
@@ -54,24 +60,6 @@ void InterfaceViewView::drawCanvas() {
 	// draw the UI elements
 	const float nameFontSize = 7;
 	const float nameSpacing = 0.5f;
-
-	for (auto &item : ptr->getElements()) {
-		if (item.second->isVisible()) {
-			item.second->draw();
-		}
-
-		// outline for element's rect
-		auto itemRect = item.second->getRect();
-		DrawRectangleLines(static_cast<int>(itemRect.x), static_cast<int>(itemRect.y), static_cast<int>(itemRect.width),
-						   static_cast<int>(itemRect.height), Fade(DARKGRAY, 0.7f));
-
-		// draw the name of the element
-		auto measureText = MeasureTextEx(editorFont, item.second->getName().c_str(), nameFontSize, nameSpacing);
-		Rectangle nameRect = {itemRect.x, itemRect.y, measureText.x + 4, measureText.y + 4};
-		DrawRectangleRec(nameRect, Fade(DARKGRAY, 0.7f));
-		DrawTextEx(editorFont, item.second->getName().c_str(), {nameRect.x + 2, nameRect.y + 2}, nameFontSize,
-				   nameSpacing, WHITE);
-	}
 
 	// entities
 	auto &ecs = ptr->getCoordinator();
@@ -107,7 +95,7 @@ void InterfaceViewView::drawCanvas() {
 	// draw origin
 	drawOrigin();
 
-	if (activeElement != nullptr) {
+	if (activeEntity != MAX_ENTITIES) {
 		canvasBox->draw();
 	}
 }
@@ -117,7 +105,7 @@ bool InterfaceViewView::leftMousePressed(tgui::Vector2f pos) {
 
 	const auto &mousePos = getMouseWorldPos();
 
-	if (canvasBox->leftMousePressed(mousePos) && activeElement != nullptr) {
+	if (canvasBox->leftMousePressed(mousePos) && activeEntity != MAX_ENTITIES) {
 		canvasBox->focused = true;
 	}
 
@@ -125,9 +113,12 @@ bool InterfaceViewView::leftMousePressed(tgui::Vector2f pos) {
 }
 
 void InterfaceViewView::leftMouseReleased(tgui::Vector2f pos) {
-	if (activeElement != nullptr) {
-		activeElement->setRect(canvasBox->getRectangle());
-		canvasBox->focused = false;
+	if (activeEntity != MAX_ENTITIES) {
+		if (ptr->getCoordinator().hasComponent<Rectangle>(activeEntity)) {
+			auto &rect = ptr->getCoordinator().getComponent<Rectangle>(activeEntity);
+			rect = canvasBox->getRectangle();
+			canvasBox->focused = false;
+		}
 	}
 
 	WorldView::leftMouseReleased(pos);
@@ -136,7 +127,7 @@ void InterfaceViewView::leftMouseReleased(tgui::Vector2f pos) {
 void InterfaceViewView::mouseMoved(tgui::Vector2f pos) {
 	const auto &mousePos = getMouseWorldPos();
 
-	if (activeElement != nullptr) {
+	if (activeEntity != MAX_ENTITIES) {
 		canvasBox->mouseMoved(mousePos);
 	}
 
@@ -146,13 +137,12 @@ void InterfaceViewView::mouseMoved(tgui::Vector2f pos) {
 void InterfaceViewView::selectElement(const std::string &elementName) {
 	if (ptr == nullptr) return;
 
-	for (auto &[layer, element] : ptr->getElements()) {
-		if (element->getName() == elementName) {
-			activeElement = element.get();
-			canvasBox->updateRec(element->getRect());
-			break;
+	auto &entityManager = ptr->getCoordinator().getEntityManager();
+	auto entity = entityManager.findName(elementName);
+	if (entity != MAX_ENTITIES) {
+		if (ptr->getCoordinator().hasComponent<Rectangle>(entity)) {
+			activeEntity = entity;
+			canvasBox->updateRec(ptr->getCoordinator().getComponent<Rectangle>(entity));
 		}
 	}
 }
-
-UIElement *InterfaceViewView::getActiveElement() { return activeElement; }

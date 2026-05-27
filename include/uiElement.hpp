@@ -20,8 +20,6 @@ struct Event {
 	KeyboardKey key;
 };
 
-enum CallbackType { CALLBACK_TRIGGER, CALLBACK_FOCUSED, CALLBACK_UNFOCUSED };
-
 #define RPGPP_CALLBACK_TYPE_MAX (3)
 
 class UIElement : public ISaveable {

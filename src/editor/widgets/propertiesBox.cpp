@@ -271,3 +271,5 @@ void PropertiesBox::addPropertiesBox(PropertiesBox::Ptr box) {
 }
 
 void PropertiesBox::addWidget(tgui::Widget::Ptr widget) { layout->add(widget); }
+
+void PropertiesBox::clear() { layout->removeAllWidgets(); }

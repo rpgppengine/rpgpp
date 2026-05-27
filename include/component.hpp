@@ -3,6 +3,7 @@
 
 #include <bitset>
 #include <cstdint>
+#include <functional>
 
 #include "gamedata.hpp"
 #include "raylib.h"
@@ -18,6 +19,8 @@ struct InputComponent {
 	UIElementRef downButton;
 	UIElementRef leftButton;
 	UIElementRef rightButton;
+
+	std::map<CallbackType, std::function<void()>> callbacks = {};
 };
 
 struct LabelComponent {
@@ -90,6 +93,13 @@ struct DialogueComponent {
 	void putChar(Vector2 charMeasure, const char *c, Rectangle rect);
 	void chooseSection(int i, Rectangle rect);
 	void advanceToNextLine();
+};
+
+struct ButtonComponent {
+	Color normalTextColor;
+	Color focusedTextColor;
+
+	Color shownTextColor;
 };
 
 #endif

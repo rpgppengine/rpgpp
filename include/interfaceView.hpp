@@ -12,6 +12,7 @@
 #include "coordinator.hpp"
 #include "entity.hpp"
 #include "gamedata.hpp"
+#include "lua.h"
 #include "saveable.hpp"
 #include "uiElement.hpp"
 
@@ -25,6 +26,7 @@ private:
 protected:
 	UIElement *focused = nullptr;
 	std::string focusedElementName = "";
+	EntityID current = MAX_ENTITIES;
 
 public:
 	InterfaceView();
@@ -35,8 +37,6 @@ public:
 
 	nlohmann::json dumpJson();
 
-	virtual void onNotify(Event event);
-
 	bool elementExists(const std::string &title);
 	void addElement(const std::string &title, UIElement *element, int layer);
 	void addElement(const std::string &title, std::unique_ptr<UIElement> element, int layer);
@@ -46,11 +46,16 @@ public:
 	void changeFocusedElement(const std::string &title);
 	const std::multimap<int, std::unique_ptr<UIElement>, std::less<int>> &getElements();
 
+	virtual void onNotify(Event event);
 	virtual void update();
 	virtual void draw();
 
 	Coordinator &getCoordinator();
 	const std::set<EntityID> &getEntities();
+
+	void registerLua(lua_State *L);
+	void changeFocusedElement(EntityID entity);
+	nlohmann::json dumpEntityJson(EntityID entity);
 };
 
 #endif
