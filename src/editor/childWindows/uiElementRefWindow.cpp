@@ -1,7 +1,5 @@
 #include "childWindows/uiElementRefWindow.hpp"
 
-#include <unistd.h>
-
 #include <cstdint>
 
 #include "TGUI/Widgets/Button.hpp"
