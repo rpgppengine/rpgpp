@@ -81,7 +81,8 @@ void System::drawEntity(EntityID entity) {
 	if (hasComponent<LabelComponent>(entity)) {
 		auto &label = components->getComponent<LabelComponent>(entity);
 
-		Vector2 textSize = MeasureTextEx(label.font.font, label.text.c_str(), static_cast<float>(label.fontSize), 1);
+		Vector2 textSize =
+			MeasureTextEx(label.font.font, label.text.c_str(), static_cast<float>(label.font.fontSize), 1);
 
 		Vector2 textPos;
 		textPos.x =
@@ -91,10 +92,10 @@ void System::drawEntity(EntityID entity) {
 		if (hasComponent<ButtonComponent>(entity)) {
 			auto &button = components->getComponent<ButtonComponent>(entity);
 
-			DrawTextEx(label.font.font, label.text.c_str(), textPos, static_cast<float>(label.fontSize), 1,
+			DrawTextEx(label.font.font, label.text.c_str(), textPos, static_cast<float>(label.font.fontSize), 1,
 					   button.shownTextColor);
 		} else {
-			DrawTextEx(label.font.font, label.text.c_str(), textPos, static_cast<float>(label.fontSize), 1,
+			DrawTextEx(label.font.font, label.text.c_str(), textPos, static_cast<float>(label.font.fontSize), 1,
 					   label.textColor);
 		}
 	}
@@ -111,7 +112,7 @@ void System::drawEntity(EntityID entity) {
 						13 * 3, 1, BLACK);
 
 			charMeasure = MeasureTextEx(textArea.font.font, TextSubtext(textArea.text.c_str(), i, 1),
-										textArea.fontSize * 3, 1.0f);
+										textArea.font.fontSize * 3, 1.0f);
 		}
 	}
 
@@ -136,10 +137,10 @@ void System::drawEntity(EntityID entity) {
 		Vector2 origin = {0.0f, 0.0f};
 
 		NPatchInfo info = ninePatch.npatchInfo;
-		info.left *= ninePatch.scale;
-		info.top *= ninePatch.scale;
-		info.right *= ninePatch.scale;
-		info.bottom *= ninePatch.scale;
+		info.left *= ninePatch.image.scale;
+		info.top *= ninePatch.image.scale;
+		info.right *= ninePatch.image.scale;
+		info.bottom *= ninePatch.image.scale;
 
 		DrawTextureNPatch(ninePatch.image.texture, info, rect, origin, 0.0f, WHITE);
 	}

@@ -22,25 +22,21 @@ RTTR_REGISTRATION {
 		.property("textColor", &LabelComponent::textColor)(rttr::policy::prop::bind_as_ptr)
 		.property("horizontalAlignment", &LabelComponent::horizontalAlignment)(rttr::policy::prop::bind_as_ptr)
 		.property("verticalAlignment", &LabelComponent::verticalAlignment)(rttr::policy::prop::bind_as_ptr)
-		.property("fontName", &LabelComponent::fontName)(rttr::policy::prop::bind_as_ptr)
-		.property("fontSize", &LabelComponent::fontSize)(rttr::policy::prop::bind_as_ptr);
+		.property("font", &LabelComponent::font)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<TextAreaComponent>("TextAreaComponent")
 		.constructor<>()
 		.property("text", &TextAreaComponent::text)(rttr::policy::prop::bind_as_ptr)
 		.property("textColor", &TextAreaComponent::textColor)(rttr::policy::prop::bind_as_ptr)
-		.property("fontName", &TextAreaComponent::fontName)(rttr::policy::prop::bind_as_ptr)
-		.property("fontSize", &TextAreaComponent::fontSize)(rttr::policy::prop::bind_as_ptr);
+		.property("font", &TextAreaComponent::font)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<ColorRectComponent>("ColorRectComponent")
 		.constructor<>()
 		.property("color", &ColorRectComponent::color)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<ImageRectComponent>("ImageRectComponent")
 		.constructor<>()
-		.property("source", &ImageRectComponent::source)(rttr::policy::prop::bind_as_ptr)
-		.property("scale", &ImageRectComponent::scale)(rttr::policy::prop::bind_as_ptr);
+		.property("source", &ImageRectComponent::image)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<NinePatchImageRectComponent>("NinePatchImageRectComponent")
 		.constructor<>()
-		.property("source", &NinePatchImageRectComponent::source)(rttr::policy::prop::bind_as_ptr)
-		.property("scale", &NinePatchImageRectComponent::scale)(rttr::policy::prop::bind_as_ptr)
+		.property("source", &NinePatchImageRectComponent::image)(rttr::policy::prop::bind_as_ptr)
 		.property("npatchinfo", &NinePatchImageRectComponent::npatchInfo)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<DialogueComponent>("DialogueComponent")
 		.constructor<>()

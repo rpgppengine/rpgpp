@@ -1,5 +1,7 @@
 #include "jsonConversions.hpp"
 
+#include "raylib.h"
+
 void to_json(json &j, const Rectangle &rect) { j = json{rect.x, rect.y, rect.width, rect.height}; }
 
 void from_json(const json &j, Rectangle &rect) {
@@ -24,9 +26,13 @@ void from_json(const json &j, Color &color) {
 void to_json(json &j, const ImageRef &image) {
 	j = json::object();
 	j["image"] = image.path;
+	j["scale"] = image.scale;
 }
 
-void from_json(const json &j, ImageRef &image) { j.at("image").get_to(image.path); }
+void from_json(const json &j, ImageRef &image) {
+	j.at("image").get_to(image.path);
+	j.at("scale").get_to(image.scale);
+}
 
 void to_json(json &j, const FontRef &font) {
 	j = json::object();
@@ -76,8 +82,8 @@ void to_json(json &j, const LabelComponent &label) {
 	j["textColor"] = label.textColor;
 	j["horizontalAlignment"] = label.horizontalAlignment;
 	j["verticalAlignment"] = label.verticalAlignment;
-	j["fontName"] = label.fontName;
-	j["fontSize"] = label.fontSize;
+	j["fontName"] = label.font.path;
+	j["fontSize"] = label.font.fontSize;
 }
 
 void from_json(const json &j, LabelComponent &label) {
@@ -85,15 +91,15 @@ void from_json(const json &j, LabelComponent &label) {
 	j.at("textColor").get_to(label.textColor);
 	j.at("horizontalAlignment").get_to(label.horizontalAlignment);
 	j.at("verticalAlignment").get_to(label.verticalAlignment);
-	j.at("fontName").get_to(label.fontName);
-	j.at("fontSize").get_to(label.fontSize);
+	j.at("fontName").get_to(label.font.path);
+	j.at("fontSize").get_to(label.font.fontSize);
 }
 
 void to_json(json &j, const TextAreaComponent &textArea) {
 	j["text"] = textArea.text;
 	j["textColor"] = textArea.textColor;
-	j["fontName"] = textArea.fontName;
-	j["fontSize"] = textArea.fontSize;
+	j["fontName"] = textArea.font.path;
+	j["fontSize"] = textArea.font.fontSize;
 }
 
 void to_json(json &j, const ColorRectComponent &color) {
@@ -111,29 +117,21 @@ void from_json(const json &j, ColorRectComponent &color) {
 void from_json(const json &j, TextAreaComponent &textArea) {
 	j.at("text").get_to(textArea.text);
 	j.at("textColor").get_to(textArea.textColor);
-	j.at("fontName").get_to(textArea.fontName);
-	j.at("fontSize").get_to(textArea.fontSize);
+	j.at("fontName").get_to(textArea.font.path);
+	j.at("fontSize").get_to(textArea.font.fontSize);
 }
 
-void to_json(json &j, const ImageRectComponent &image) {
-	j["source"] = image.source;
-	j["scale"] = image.scale;
-}
+void to_json(json &j, const ImageRectComponent &image) { j["source"] = image.image; }
 
-void from_json(const json &j, ImageRectComponent &image) {
-	j.at("source").get_to(image.source);
-	j.at("scale").get_to(image.scale);
-}
+void from_json(const json &j, ImageRectComponent &image) { j.at("source").get_to(image.image); }
 
 void to_json(json &j, const NinePatchImageRectComponent &ninePatch) {
-	j["source"] = ninePatch.source;
-	j["scale"] = ninePatch.scale;
+	j["source"] = ninePatch.image;
 	j["npatchinfo"] = ninePatch.npatchInfo;
 }
 
 void from_json(const json &j, NinePatchImageRectComponent &ninePatch) {
-	j.at("source").get_to(ninePatch.source);
-	j.at("scale").get_to(ninePatch.scale);
+	j.at("source").get_to(ninePatch.image);
 	j.at("npatchinfo").get_to(ninePatch.npatchInfo);
 }
 

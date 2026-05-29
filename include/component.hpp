@@ -28,8 +28,6 @@ struct LabelComponent {
 	Color textColor;
 	TextAlignment horizontalAlignment;
 	TextAlignment verticalAlignment;
-	std::string fontName;
-	int fontSize;
 
 	FontRef font;
 };
@@ -37,8 +35,6 @@ struct LabelComponent {
 struct TextAreaComponent {
 	std::string text;
 	Color textColor;
-	std::string fontName;
-	int fontSize;
 
 	FontRef font;
 };
@@ -48,17 +44,11 @@ struct ColorRectComponent {
 };
 
 struct ImageRectComponent {
-	std::string source;
-	int scale;
-
 	ImageRef image;
 };
 
 struct NinePatchImageRectComponent {
-	std::string source;
-	int scale;
 	NPatchInfo npatchInfo;
-
 	ImageRef image;
 };
 

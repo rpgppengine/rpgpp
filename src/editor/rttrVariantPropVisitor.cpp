@@ -4,6 +4,7 @@
 
 #include "TGUI/String.hpp"
 #include "component.hpp"
+#include "editor.hpp"
 #include "entity.hpp"
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
@@ -121,8 +122,19 @@ void VariantPropVisitor::p_FontRef(rttr::property prop) {
 	fontField->callback = [font](const tgui::String &path) {
 		std::string newFontName = GetFileNameWithoutExt(path.toStdString().c_str());
 		font->path = newFontName;
+		std::string fullPath =
+			TextFormat("%s/fonts/%s", Editor::instance->project->getBasePath().c_str(), newFontName.c_str());
+		font->font = LoadFontEx(fullPath.c_str(), 13, nullptr, 256);
 	};
 	box->addFileField(fontField);
+
+	auto fontSize = IntField::create();
+	fontSize->value->setMinimum(8);
+	fontSize->value->setMaximum(64);
+	fontSize->label->setText(prop.get_name().to_string() + " font size");
+	fontSize->value->setValue(font->fontSize);
+	fontSize->value->onValueChange([font](int newValue) { font->fontSize = newValue; });
+	box->addIntField(fontSize);
 }
 
 void VariantPropVisitor::p_ImageRef(rttr::property prop) {
@@ -133,8 +145,18 @@ void VariantPropVisitor::p_ImageRef(rttr::property prop) {
 	imageField->label->setText(prop.get_name().to_string());
 	imageField->value->setText(image->path);
 	imageField->callback = [image](const tgui::String &path) {
-		std::string newFontName = GetFileNameWithoutExt(path.toStdString().c_str());
-		image->path = newFontName;
+		std::string newImageName = GetFileName(path.toStdString().c_str());
+		image->path = newImageName;
+		image->texture = LoadTexture(
+			TextFormat("%s/images/%s", Editor::instance->project->getBasePath().c_str(), newImageName.c_str()));
 	};
 	box->addFileField(imageField);
+
+	auto scale = IntField::create();
+	scale->value->setMinimum(1);
+	scale->value->setMaximum(5);
+	scale->label->setText(prop.get_name().to_string() + " scale");
+	scale->value->setValue(image->scale);
+	scale->value->onValueChange([image](int newValue) { image->scale = newValue; });
+	box->addIntField(scale);
 }

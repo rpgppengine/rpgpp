@@ -210,16 +210,6 @@ std::vector<std::string> Project::getPropsNames() {
 }
 
 GameData Project::generateStruct() {
-	pugi::xml_document xmlDoc;
-	auto result = xmlDoc.load_string("<text>Hello <red>RED!</red></text>");
-	if (result) {
-		for (auto item : xmlDoc.child("text").children()) {
-			std::cout << item.name() << " : ";
-			std::cout << item.text().as_string();
-			std::cout << std::endl;
-		}
-	}
-
 	GameData data;
 	data.title = programSet.projectTitle;
 	data.programSet = programSet;

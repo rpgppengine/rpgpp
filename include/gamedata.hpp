@@ -48,11 +48,13 @@ struct UIElementRef {
 struct FontRef {
 	std::string path = "";
 	Font font;
+	int fontSize = 16;
 };
 
 struct ImageRef {
 	std::string path = "";
 	Texture texture;
+	int scale = 1;
 };
 
 enum CallbackType { CALLBACK_TRIGGER, CALLBACK_FOCUSED, CALLBACK_UNFOCUSED };

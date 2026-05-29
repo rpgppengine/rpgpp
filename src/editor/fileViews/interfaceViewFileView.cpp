@@ -125,6 +125,36 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 
 		auto &ecs = interface->getCoordinator();
 
+		for (auto &entity : interface->getEntities()) {
+			if (ecs.hasComponent<LabelComponent>(entity)) {
+				auto &component = ecs.getComponent<LabelComponent>(entity);
+				std::string fullPath = TextFormat("%s/fonts/%s", Editor::instance->getProject()->getBasePath().c_str(),
+												  component.font.path.c_str());
+				component.font.font = LoadFontEx(fullPath.c_str(), component.font.fontSize, nullptr, 256);
+			}
+
+			if (ecs.hasComponent<TextAreaComponent>(entity)) {
+				auto &component = ecs.getComponent<TextAreaComponent>(entity);
+				std::string fullPath = TextFormat("%s/fonts/%s", Editor::instance->getProject()->getBasePath().c_str(),
+												  component.font.path.c_str());
+				component.font.font = LoadFontEx(fullPath.c_str(), component.font.fontSize, nullptr, 256);
+			}
+
+			if (ecs.hasComponent<ImageRectComponent>(entity)) {
+				auto &component = ecs.getComponent<ImageRectComponent>(entity);
+				component.image.texture =
+					LoadTexture(TextFormat("%s/images/%s", Editor::instance->getProject()->getBasePath().c_str(),
+										   component.image.path.c_str()));
+			}
+
+			if (ecs.hasComponent<NinePatchImageRectComponent>(entity)) {
+				auto &component = ecs.getComponent<NinePatchImageRectComponent>(entity);
+				component.image.texture =
+					LoadTexture(TextFormat("%s/images/%s", Editor::instance->getProject()->getBasePath().c_str(),
+										   component.image.path.c_str()));
+			}
+		}
+
 		visitor.view = interface;
 
 		view->setInterfaceView(interface);
