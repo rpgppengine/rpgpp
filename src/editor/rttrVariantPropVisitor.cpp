@@ -14,6 +14,7 @@
 #include "widgets/propertyFields/colorField.hpp"
 #include "widgets/propertyFields/fileField.hpp"
 #include "widgets/propertyFields/intField.hpp"
+#include "widgets/propertyFields/nPatchInfoField.hpp"
 #include "widgets/propertyFields/rectangleField.hpp"
 #include "widgets/propertyFields/selectField.hpp"
 #include "widgets/propertyFields/textField.hpp"
@@ -30,6 +31,7 @@ VariantPropVisitor::VariantPropVisitor() {
 	map["UIElementRef"] = p_UIElementRef;
 	map["FontRef"] = p_FontRef;
 	map["ImageRef"] = p_ImageRef;
+	map["NPatchInfo"] = p_NPatchInfo;
 }
 
 void VariantPropVisitor::Rect(std::string name, rttr::variant var) {
@@ -159,4 +161,20 @@ void VariantPropVisitor::p_ImageRef(rttr::property prop) {
 	scale->value->setValue(image->scale);
 	scale->value->onValueChange([image](int newValue) { image->scale = newValue; });
 	box->addIntField(scale);
+}
+
+void VariantPropVisitor::p_NPatchInfo(rttr::property prop) {
+	struct NPatchInfo *info = prop.get_value(component).get_value<struct NPatchInfo *>();
+
+	auto field = NPatchInfoField::create();
+	field->label->setText(prop.get_name().to_string());
+	field->info = info;
+
+	if (component.is_type<NinePatchImageRectComponent *>()) {
+		NinePatchImageRectComponent *nPatchComponent = component.get_value<NinePatchImageRectComponent *>();
+		field->texture = nPatchComponent->image.texture;
+		field->scale = nPatchComponent->image.scale;
+	}
+
+	box->addNPatchFIeld(field);
 }

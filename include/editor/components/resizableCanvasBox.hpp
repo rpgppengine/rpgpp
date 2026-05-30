@@ -2,9 +2,8 @@
 #define RPGPP_RESIZABLECANVASBOX_H
 #include <string>
 
+#include "components/resizeDirection.hpp"
 #include "raylib.h"
-
-enum ResizeDirection { NONE = 0, MOVE = 1 << 0, TOP = 1 << 1, BOTTOM = 1 << 2, LEFT = 1 << 3, RIGHT = 1 << 4 };
 
 class ResizableCanvasBox {
 public:

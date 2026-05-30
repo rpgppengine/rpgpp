@@ -17,6 +17,7 @@
 #include "widgets/propertyFields/fileField.hpp"
 #include "widgets/propertyFields/intField.hpp"
 #include "widgets/propertyFields/interPropField.hpp"
+#include "widgets/propertyFields/nPatchInfoField.hpp"
 #include "widgets/propertyFields/rectangleField.hpp"
 #include "widgets/propertyFields/selectField.hpp"
 #include "widgets/propertyFields/textField.hpp"
@@ -57,6 +58,7 @@ public:
 	void addSelectField(SelectField::Ptr field);
 	void addColorField(ColorField::Ptr field);
 	void addRefField(UIElementRefField::Ptr field);
+	void addNPatchFIeld(NPatchInfoField::Ptr field);
 	void addButton(const tgui::String &title, std::function<void()> callback);
 	void addInterPropField(InterPropField::Ptr field);
 	void addPropertiesBox(PropertiesBox::Ptr box);

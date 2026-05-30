@@ -21,6 +21,7 @@
 #include "widgets/propertyFields/fileField.hpp"
 #include "widgets/propertyFields/intField.hpp"
 #include "widgets/propertyFields/interPropField.hpp"
+#include "widgets/propertyFields/nPatchInfoField.hpp"
 #include "widgets/propertyFields/rectangleField.hpp"
 #include "widgets/propertyFields/selectField.hpp"
 #include "widgets/propertyFields/textField.hpp"
@@ -251,6 +252,11 @@ void PropertiesBox::addColorField(ColorField::Ptr field) {
 }
 
 void PropertiesBox::addRefField(UIElementRefField::Ptr field) {
+	field->setSize({"100%", 24});
+	layout->add(field);
+}
+
+void PropertiesBox::addNPatchFIeld(NPatchInfoField::Ptr field) {
 	field->setSize({"100%", 24});
 	layout->add(field);
 }

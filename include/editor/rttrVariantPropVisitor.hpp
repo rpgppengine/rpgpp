@@ -29,6 +29,7 @@ public:
 	static void p_UIElementRef(rttr::property prop);
 	static void p_FontRef(rttr::property prop);
 	static void p_ImageRef(rttr::property prop);
+	static void p_NPatchInfo(rttr::property prop);
 };
 
 #endif
