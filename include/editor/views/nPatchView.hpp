@@ -13,6 +13,8 @@ public:
 
 	NPatchView();
 
+	tgui::SignalTyped<NPatchInfo *> onInfoChanged = {"InfoChanged"};
+
 	Texture texture;
 	NPatchInfo *info;
 	int scale = 1;

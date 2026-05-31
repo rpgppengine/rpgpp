@@ -55,6 +55,7 @@ void NPatchView::leftMouseReleased(tgui::Vector2f pos) {
 	const auto &mousePos = getMouseWorldPos();
 
 	lines.leftMouseReleased(mousePos);
+	onInfoChanged.emit(this, info);
 
 	WorldView::leftMouseReleased(pos);
 }

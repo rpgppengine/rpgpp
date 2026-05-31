@@ -18,6 +18,7 @@ NPatchInfoField::NPatchInfoField(const char *typeName, bool initRenderer)
 		NPatchInfoWindow *window = static_cast<NPatchInfoWindow *>(ptr);
 
 		window->view->setup(info, texture, scale);
+		window->init(info, texture);
 		window->open();
 	});
 

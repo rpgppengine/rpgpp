@@ -9,12 +9,20 @@ enum BoxCorners { CORNER_NONE, CORNER_TOPLEFT, CORNER_TOPRIGHT, CORNER_BOTTOMLEF
 class NPatchLines {
 private:
 	const float HANDLE_RADIUS = 3.0f;
-	const float HALF_RADIUS = HANDLE_RADIUS / 2;
+
+	Vector2 topLeft;
+	Vector2 topRight;
+	Vector2 bottomLeft;
+	Vector2 bottomRight;
 
 	bool isResizing = false;
 	Vector2 startMousePos = {0, 0};
-	ResizeDirection direction;
 	BoxCorners corner;
+	BoxCorners heldCorner;
+
+	bool isInRect(Vector2 mousePos);
+	void calcCorners();
+	void detectCorner(Vector2 mousePos);
 
 public:
 	Texture texture;

@@ -5,6 +5,7 @@
 
 #include "components/resizeDirection.hpp"
 #include "raylib.h"
+#include "raymath.h"
 
 NPatchLines::NPatchLines() {}
 
@@ -12,91 +13,124 @@ void NPatchLines::draw() {
 	if (info == nullptr) return;
 	if (!IsTextureValid(texture)) return;
 
+	calcCorners();
+
 	// top and bottom
 	DrawLine(0, info->top * scale, texture.width, info->top * scale, RED);
-	DrawLine(0, info->bottom * scale, texture.width, info->bottom * scale, RED);
+	DrawLine(0, texture.height - (info->bottom * scale), texture.width, texture.height - (info->bottom * scale), RED);
 
 	// left and right
 	DrawLine(info->left * scale, 0, info->left * scale, texture.height, RED);
-	DrawLine(info->right * scale, 0, info->right * scale, texture.height, RED);
+	DrawLine(texture.width - (info->right * scale), 0, texture.width - (info->right * scale), texture.height, RED);
 
-	DrawCircleV({static_cast<float>(info->left * scale), static_cast<float>(info->top * scale)}, 3.0f, MAROON);
-	DrawCircleV({static_cast<float>(info->right * scale), static_cast<float>(info->top * scale)}, 3.0f, MAROON);
+	// draw handles
+	DrawCircleV(topLeft, HANDLE_RADIUS, MAROON);
+	DrawCircleV(topRight, HANDLE_RADIUS, MAROON);
 
-	DrawCircleV({static_cast<float>(info->left * scale), static_cast<float>(info->bottom * scale)}, 3.0f, MAROON);
-	DrawCircleV({static_cast<float>(info->right * scale), static_cast<float>(info->bottom * scale)}, 3.0f, MAROON);
+	DrawCircleV(bottomLeft, HANDLE_RADIUS, MAROON);
+	DrawCircleV(bottomRight, HANDLE_RADIUS, MAROON);
+
+	const Color hoverColor = {90, 33, 55, 255};
+
+	// draw hovered
+	switch (corner) {
+		case CORNER_NONE:
+			break;
+		case CORNER_TOPLEFT:
+			DrawCircleV(topLeft, 3.0f, hoverColor);
+			break;
+		case CORNER_TOPRIGHT:
+			DrawCircleV(topRight, 3.0f, hoverColor);
+			break;
+		case CORNER_BOTTOMLEFT:
+			DrawCircleV(bottomLeft, 3.0f, hoverColor);
+			break;
+		case CORNER_BOTTOMRIGHT:
+			DrawCircleV(bottomRight, 3.0f, hoverColor);
+			break;
+	}
+}
+
+bool NPatchLines::isInRect(Vector2 mousePos) {
+	if (mousePos.x >= 0 && mousePos.x <= texture.width && mousePos.y >= 0 && mousePos.y <= texture.height) {
+		return true;
+	}
+	return false;
+}
+
+void NPatchLines::calcCorners() {
+	topLeft = {static_cast<float>(info->left * scale), static_cast<float>(info->top * scale)};
+	topRight = {texture.width - static_cast<float>(info->right * scale), static_cast<float>(info->top * scale)};
+	bottomLeft = {static_cast<float>(info->left * scale), texture.height - static_cast<float>(info->bottom * scale)};
+	bottomRight = {texture.width - static_cast<float>(info->right * scale),
+				   texture.height - static_cast<float>(info->bottom * scale)};
+}
+
+void NPatchLines::detectCorner(Vector2 mousePos) {
+	corner = CORNER_NONE;
+
+	if (mousePos.x >= (topLeft.x - HANDLE_RADIUS) && mousePos.x <= (topLeft.x + HANDLE_RADIUS) &&
+		mousePos.y >= (topLeft.y - HANDLE_RADIUS) && mousePos.y <= (topLeft.y + HANDLE_RADIUS)) {
+		corner = CORNER_TOPLEFT;
+	} else if (mousePos.x >= (topRight.x - HANDLE_RADIUS) && mousePos.x <= (topRight.x + HANDLE_RADIUS) &&
+			   mousePos.y >= (topRight.y - HANDLE_RADIUS) && mousePos.y <= (topRight.y + HANDLE_RADIUS)) {
+		corner = CORNER_TOPRIGHT;
+	} else if (mousePos.x >= (bottomLeft.x - HANDLE_RADIUS) && mousePos.x <= (bottomLeft.x + HANDLE_RADIUS) &&
+			   mousePos.y >= (bottomLeft.y - HANDLE_RADIUS) && mousePos.y <= (bottomLeft.y + HANDLE_RADIUS)) {
+		corner = CORNER_BOTTOMLEFT;
+	} else if (mousePos.x >= (bottomRight.x - HANDLE_RADIUS) && mousePos.x <= (bottomRight.x + HANDLE_RADIUS) &&
+			   mousePos.y >= (bottomRight.y - HANDLE_RADIUS) && mousePos.y <= (bottomRight.y + HANDLE_RADIUS)) {
+		corner = CORNER_BOTTOMRIGHT;
+	}
 }
 
 bool NPatchLines::leftMousePressed(Vector2 mousePos) {
-	direction = NONE;
-	corner = CORNER_NONE;
-
-	Vector2 topLeft = {static_cast<float>(info->left * scale), static_cast<float>(info->top * scale)};
-	Vector2 topRight = {static_cast<float>(info->right * scale), static_cast<float>(info->top * scale)};
-	Vector2 bottomLeft = {static_cast<float>(info->left * scale), static_cast<float>(info->bottom * scale)};
-	Vector2 bottomRight = {static_cast<float>(info->right * scale), static_cast<float>(info->bottom * scale)};
-
 	bool res = false;
 
-	if (mousePos.x >= (topLeft.x - HALF_RADIUS) && mousePos.x <= (topLeft.x + HALF_RADIUS) &&
-		mousePos.y >= (topLeft.y - HALF_RADIUS) && mousePos.y <= (topLeft.y + HALF_RADIUS)) {
-		corner = CORNER_TOPLEFT;
-		res = true;
-	} else if (mousePos.x >= (topRight.x - HALF_RADIUS) && mousePos.x <= (topRight.x + HALF_RADIUS) &&
-			   mousePos.y >= (topRight.y - HALF_RADIUS) && mousePos.y <= (topRight.y + HALF_RADIUS)) {
-		corner = CORNER_TOPRIGHT;
-		res = true;
-	} else if (mousePos.x >= (bottomLeft.x - HALF_RADIUS) && mousePos.x <= (bottomLeft.x + HALF_RADIUS) &&
-			   mousePos.y >= (bottomLeft.y - HALF_RADIUS) && mousePos.y <= (bottomLeft.y + HALF_RADIUS)) {
-		corner = CORNER_BOTTOMLEFT;
-		res = true;
-	} else if (mousePos.x >= (bottomRight.x - HALF_RADIUS) && mousePos.x <= (bottomRight.x + HALF_RADIUS) &&
-			   mousePos.y >= (bottomRight.y - HALF_RADIUS) && mousePos.y <= (bottomRight.y + HALF_RADIUS)) {
-		corner = CORNER_BOTTOMRIGHT;
-		res = true;
-	}
+	if (corner != CORNER_NONE) res = true;
 
 	if (res) {
 		isResizing = true;
 		startMousePos = mousePos;
+		heldCorner = corner;
 	}
 
 	return res;
 }
 
 void NPatchLines::mouseMoved(Vector2 mousePos, int snapWidth, int snapHeight) {
+	detectCorner(mousePos);
+
+	if (!isInRect(mousePos)) return;
 	if (!isResizing) return;
 
-	int dx = std::round((mousePos.x - startMousePos.x) / snapWidth) * snapWidth;
-	int dy = std::round((mousePos.y - startMousePos.y) / snapHeight) * snapHeight;
+	Vector2 scaledPos = {mousePos.x / scale, mousePos.y / scale};
+	Vector2 scaledTextureSize = {static_cast<float>(texture.width) / scale, static_cast<float>(texture.height) / scale};
 
-	dx /= scale;
-	dy /= scale;
-
-	switch (corner) {
+	switch (heldCorner) {
 		case CORNER_NONE:
 			break;
 		case CORNER_TOPLEFT:
-			printf("topleft \n");
-			info->left = mousePos.x / scale;
-			info->top = mousePos.y / scale;
+			info->left = scaledPos.x;
+			info->top = scaledPos.y;
 			break;
 		case CORNER_TOPRIGHT:
-			printf("topright.. \n");
-			info->right = mousePos.x / scale;
-			info->top = mousePos.y / scale;
+			info->right = scaledTextureSize.x - scaledPos.x;
+			info->top = scaledPos.y;
 			break;
 		case CORNER_BOTTOMLEFT:
-			printf("bottomleft \n");
-			info->left = mousePos.x / scale;
-			info->bottom = mousePos.y / scale;
+			info->left = scaledPos.x;
+			info->bottom = scaledTextureSize.y - scaledPos.y;
 			break;
 		case CORNER_BOTTOMRIGHT:
-			printf("bottomright \n");
-			info->right = mousePos.x / scale;
-			info->bottom = mousePos.y / scale;
+			info->right = scaledTextureSize.x - scaledPos.x;
+			info->bottom = scaledTextureSize.y - scaledPos.y;
 			break;
 	}
 }
 
-void NPatchLines::leftMouseReleased(Vector2 mousePos) { corner = CORNER_NONE; }
+void NPatchLines::leftMouseReleased(Vector2 mousePos) {
+	isResizing = false;
+	corner = CORNER_NONE;
+	heldCorner = CORNER_NONE;
+}
