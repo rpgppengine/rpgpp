@@ -10,6 +10,7 @@
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Widgets/ChildWindow.hpp"
 #include "TGUI/Widgets/GrowVerticalLayout.hpp"
+#include "TGUI/Widgets/ScrollablePanel.hpp"
 #include "any_ptr/any_ptr.h"
 #include "interactable.hpp"
 #include "widgets/propertyFields/boolField.hpp"
@@ -23,7 +24,7 @@
 #include "widgets/propertyFields/textField.hpp"
 #include "widgets/propertyFields/uiElementRefField.hpp"
 
-class PropertiesBox : public tgui::ChildWindow {
+class PropertiesBox : public tgui::ScrollablePanel {
 protected:
 	static const int GAP = 4;
 
@@ -64,6 +65,7 @@ public:
 	void addPropertiesBox(PropertiesBox::Ptr box);
 	void addWidget(tgui::Widget::Ptr widget);
 	tgui::Button::Ptr constructButton(const tgui::String &title, std::function<void()> callback);
+	void addSection(const tgui::String &title);
 
 	void clear();
 };

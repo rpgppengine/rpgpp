@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "TGUI/String.hpp"
+#include "TGUI/Widgets/ScrollablePanel.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "button.hpp"
 #include "component.hpp"
@@ -19,6 +20,7 @@
 #include "raylib.h"
 #include "rttr/type.h"
 #include "rttr/variant.h"
+#include "services/fileSystemService.hpp"
 #include "sol/forward.hpp"
 #include "sol/types.hpp"
 #include "textArea.hpp"
@@ -47,9 +49,13 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	view->setSize({TextFormat("100%% - %d", RIGHT_PANEL_W), "100%"});
 	Editor::instance->getGui().addUpdate(WorldView::asUpdatable(view));
 
+	auto scrollable = tgui::ScrollablePanel::create();
+
 	propertiesBox = PropertiesBox::create();
 	propertiesBox->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), "50%"});
 	propertiesBox->setSize({RIGHT_PANEL_W, "50%"});
+
+	// scrollable->add(propertiesBox);
 
 	widgetContainer.push_back(propertiesBox);
 
@@ -130,6 +136,14 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 				auto &component = ecs.getComponent<LabelComponent>(entity);
 				std::string fullPath = TextFormat("%s/fonts/%s", Editor::instance->getProject()->getBasePath().c_str(),
 												  component.font.path.c_str());
+
+				if (component.font.path.empty()) {
+					auto fontPaths = Editor::instance->getProject()->getPaths(EngineFileType::FILE_FONT);
+					if (!fontPaths.empty()) {
+						auto fontPath = fontPaths[0];
+						fullPath = fontPath;
+					}
+				}
 				component.font.font = LoadFontEx(fullPath.c_str(), component.font.fontSize, nullptr, 256);
 			}
 
@@ -137,6 +151,13 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 				auto &component = ecs.getComponent<TextAreaComponent>(entity);
 				std::string fullPath = TextFormat("%s/fonts/%s", Editor::instance->getProject()->getBasePath().c_str(),
 												  component.font.path.c_str());
+				if (component.font.path.empty()) {
+					auto fontPaths = Editor::instance->getProject()->getPaths(EngineFileType::FILE_FONT);
+					if (!fontPaths.empty()) {
+						auto fontPath = fontPaths[0];
+						fullPath = fontPath;
+					}
+				}
 				component.font.font = LoadFontEx(fullPath.c_str(), component.font.fontSize, nullptr, 256);
 			}
 

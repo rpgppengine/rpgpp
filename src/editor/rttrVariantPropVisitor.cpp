@@ -26,12 +26,13 @@ rttr::variant VariantPropVisitor::component = {};
 
 VariantPropVisitor::VariantPropVisitor() {
 	map["int"] = p_int;
-	map["string"] = p_string;
+	map["std::string"] = p_string;
 	map["Color"] = p_Color;
 	map["UIElementRef"] = p_UIElementRef;
 	map["FontRef"] = p_FontRef;
 	map["ImageRef"] = p_ImageRef;
 	map["NPatchInfo"] = p_NPatchInfo;
+	map["TextAlignment"] = p_TextAlignment;
 }
 
 void VariantPropVisitor::Rect(std::string name, rttr::variant var) {
@@ -55,10 +56,12 @@ void VariantPropVisitor::componentVisit(rttr::variant component, PropertiesBox *
 	if (box == nullptr) return;
 
 	if (component.is_type<Rectangle *>()) {
+		box->addSection("Rectangle");
 		Rect("Rectangle", component);
 		return;
 	}
 
+	box->addSection(component.get_type().get_raw_type().get_name().to_string());
 	for (auto &prop : component.get_type().get_properties()) {
 		std::string name = prop.get_type().get_raw_type().get_name().to_string();
 		if (map[name] != nullptr) {
@@ -177,4 +180,20 @@ void VariantPropVisitor::p_NPatchInfo(rttr::property prop) {
 	}
 
 	box->addNPatchFIeld(field);
+}
+
+void VariantPropVisitor::p_TextAlignment(rttr::property prop) {
+	TextAlignment *alignment = prop.get_value(component).get_value<TextAlignment *>();
+
+	auto field = SelectField::create();
+	field->label->setText(prop.get_name().to_string());
+	if (TextFindIndex(prop.get_name().to_string().c_str(), "vertical") != -1) {
+		field->value->addMultipleItems({"Top", "Center", "Bottom"});
+	} else {
+		field->value->addMultipleItems({"Left", "Middle", "Right"});
+	}
+	field->value->setSelectedItemByIndex(*alignment);
+	field->value->onItemSelect([alignment](int index) { *alignment = static_cast<TextAlignment>(index); });
+
+	box->addSelectField(field);
 }

@@ -26,25 +26,25 @@ NPatchInfoWindow::NPatchInfoWindow() : PopupWindow("NPatchInfoWindow") {
 	currentWindow->add(topPanel);
 
 	top = IntField::create();
-	top->setSize({120, "100%"});
+	top->setSize({FIELD_WIDTH, "100%"});
 	top->label->setText("Top");
 	top->value->onValueChange([this](int value) { view->info->top = value; });
 	layout->add(top);
 
 	left = IntField::create();
-	left->setSize({120, "100%"});
+	left->setSize({FIELD_WIDTH, "100%"});
 	left->label->setText("Left");
 	left->value->onValueChange([this](int value) { view->info->left = value; });
 	layout->add(left);
 
 	bottom = IntField::create();
-	bottom->setSize({120, "100%"});
+	bottom->setSize({FIELD_WIDTH, "100%"});
 	bottom->label->setText("Bottom");
 	bottom->value->onValueChange([this](int value) { view->info->bottom = value; });
 	layout->add(bottom);
 
 	right = IntField::create();
-	right->setSize({120, "100%"});
+	right->setSize({FIELD_WIDTH, "100%"});
 	right->label->setText("Right");
 	right->value->onValueChange([this](int value) { view->info->right = value; });
 	layout->add(right);

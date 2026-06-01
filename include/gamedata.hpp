@@ -48,7 +48,7 @@ struct UIElementRef {
 struct FontRef {
 	std::string path = "";
 	Font font;
-	int fontSize = 16;
+	int fontSize = 13;
 };
 
 struct ImageRef {

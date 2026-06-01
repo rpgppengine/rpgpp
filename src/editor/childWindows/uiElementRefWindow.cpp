@@ -2,9 +2,11 @@
 
 #include <cstdint>
 
+#include "TGUI/String.hpp"
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Widgets/GrowVerticalLayout.hpp"
 #include "TGUI/Widgets/ScrollablePanel.hpp"
+#include "TGUI/Widgets/TreeView.hpp"
 #include "childWindows/popupWindow.hpp"
 #include "entity.hpp"
 #include "gamedata.hpp"
@@ -13,12 +15,6 @@
 UIElementRefWindow::UIElementRefWindow() : PopupWindow("Select an Element..") {
 	view = nullptr;
 	currentWindow->setSize(280, 340);
-
-	panel = tgui::ScrollablePanel::create({"100%", "100% - 36"});
-	currentWindow->add(panel);
-
-	layout = tgui::GrowVerticalLayout::create();
-	panel->add(layout);
 
 	auto none = tgui::Button::create("None");
 	none->setPosition({0, "100% - 32"});
@@ -32,24 +28,25 @@ UIElementRefWindow::UIElementRefWindow() : PopupWindow("Select an Element..") {
 		}
 	});
 	currentWindow->add(none);
-}
 
-void UIElementRefWindow::addButton(const std::string &title, uint8_t entityId) {
-	auto newButton = tgui::Button::create(title);
-	newButton->setSize("100%", 24);
-	newButton->onClick([this, entityId] {
-		ref->entityId = entityId;
+	list = tgui::TreeView::create();
+	list->setSize({"100%", "100% - 32"});
+	list->onItemSelect([this](const tgui::String &item) {
+		auto entity = view->getCoordinator().getEntityManager().findName(item.toStdString());
+		ref->entityId = entity;
 		close();
 
-		if (field != nullptr) {
-			field->value->setText(view->getCoordinator().getEntityName(entityId));
+		if (field != nullptr && entity < MAX_ENTITIES) {
+			field->value->setText(item.toStdString());
 		}
 	});
-	layout->add(newButton);
+	currentWindow->add(list);
 }
 
 void UIElementRefWindow::init() {
 	if (ref == nullptr || view == nullptr) return;
+
+	list->removeAllItems();
 
 	auto &ecs = view->getCoordinator();
 	int count = 0;
@@ -59,7 +56,7 @@ void UIElementRefWindow::init() {
 			name = ecs.getEntityName(entity);
 		}
 
-		addButton(name, entity);
+		list->addItem({name});
 
 		count++;
 	}

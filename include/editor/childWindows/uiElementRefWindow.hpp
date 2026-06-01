@@ -5,6 +5,7 @@
 
 #include "TGUI/Widgets/GrowVerticalLayout.hpp"
 #include "TGUI/Widgets/ScrollablePanel.hpp"
+#include "TGUI/Widgets/TreeView.hpp"
 #include "childWindows/popupWindow.hpp"
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
@@ -14,7 +15,7 @@ class UIElementRefWindow : public PopupWindow {
 private:
 	tgui::ScrollablePanel::Ptr panel;
 	tgui::GrowVerticalLayout::Ptr layout;
-	void addButton(const std::string &title, uint8_t entityId);
+	tgui::TreeView::Ptr list;
 
 public:
 	InterfaceView *view = nullptr;

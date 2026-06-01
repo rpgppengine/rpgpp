@@ -27,10 +27,7 @@
 #include "widgets/propertyFields/textField.hpp"
 #include "widgets/propertyFields/uiElementRefField.hpp"
 
-PropertiesBox::PropertiesBox(const char *typeName, bool initRenderer) : tgui::ChildWindow(typeName, initRenderer) {
-	this->setTitle("Props");
-	this->setTitleButtons(tgui::ChildWindow::TitleButton::None);
-
+PropertiesBox::PropertiesBox(const char *typeName, bool initRenderer) : tgui::ScrollablePanel(typeName, initRenderer) {
 	auto vertLayout = tgui::GrowVerticalLayout::create();
 	vertLayout->getRenderer()->setSpaceBetweenWidgets(GAP);
 
@@ -39,6 +36,7 @@ PropertiesBox::PropertiesBox(const char *typeName, bool initRenderer) : tgui::Ch
 
 	add(vertLayout);
 	this->layout = vertLayout;
+	getRenderer()->setPadding({0, 8, 0, 8});
 }
 
 PropertiesBox::Ptr PropertiesBox::create() { return std::make_shared<PropertiesBox>(); }
@@ -54,7 +52,7 @@ PropertiesBox::Ptr PropertiesBox::copy(PropertiesBox::ConstPtr widget) {
 tgui::Widget::Ptr PropertiesBox::clone() const { return std::make_shared<PropertiesBox>(*this); }
 
 void PropertiesBox::draw(tgui::BackendRenderTarget &target, tgui::RenderStates states) const {
-	tgui::ChildWindow::draw(target, states);
+	tgui::ScrollablePanel::draw(target, states);
 }
 
 void PropertiesBox::addPropsJson(nlohmann::json &j, bool clear, bool editable) {
@@ -269,6 +267,13 @@ void PropertiesBox::addRectangleField(RectangleField::Ptr field) {
 void PropertiesBox::addInterPropField(InterPropField::Ptr field) {
 	field->setSize({"100%", 24});
 	layout->add(field);
+}
+
+void PropertiesBox::addSection(const tgui::String &title) {
+	auto label = tgui::Label::create(title);
+	label->setVerticalAlignment(tgui::VerticalAlignment::Center);
+	label->setSize({"100%", 24});
+	layout->add(label);
 }
 
 void PropertiesBox::addPropertiesBox(PropertiesBox::Ptr box) {

@@ -8,6 +8,9 @@
 #include "widgets/propertyFields/intField.hpp"
 
 class NPatchInfoWindow : public PopupWindow {
+private:
+	const float FIELD_WIDTH = 130.0f;
+
 public:
 	NPatchInfoWindow();
 
