@@ -105,6 +105,10 @@ public:
 		return arrays[componentName]->getLua(entity, L);
 	}
 
+	void insertEmptyData(EntityID entity, const std::string &componentName) {
+		arrays[componentName]->insertEmptyData(entity);
+	}
+
 	const std::string &getComponentName(ComponentType type) { return componentNames[type]; }
 
 	void entityDestroyed(EntityID entity) {

@@ -8,6 +8,7 @@
 #include "childWindows/colorSelectWindow.hpp"
 #include "childWindows/editDialogueOptionWindow.hpp"
 #include "childWindows/editPropWindow.hpp"
+#include "childWindows/elementInitWindow.hpp"
 #include "childWindows/nPatchInfoWindow.hpp"
 #include "childWindows/newPropWindow.hpp"
 #include "childWindows/popupWindow.hpp"
@@ -41,6 +42,8 @@ void ChildWindowSubService::createWindows() {
 	this->childWindows.try_emplace("element_ref", std::make_unique<UIElementRefWindow>());
 
 	this->childWindows.try_emplace("edit_npatch", std::make_unique<NPatchInfoWindow>());
+
+	this->childWindows.try_emplace("create_ui_element", std::make_unique<ElementInitWindow>());
 }
 
 void ChildWindowSubService::openWindow(const std::string &windowName) {

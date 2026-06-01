@@ -24,23 +24,23 @@ struct InputComponent {
 };
 
 struct LabelComponent {
-	std::string text;
-	Color textColor;
-	TextAlignment horizontalAlignment;
-	TextAlignment verticalAlignment;
+	std::string text = "";
+	Color textColor = BLACK;
+	TextAlignment horizontalAlignment = TEXT_ALIGN_TOP;
+	TextAlignment verticalAlignment = TEXT_ALIGN_LEFT;
 
 	FontRef font;
 };
 
 struct TextAreaComponent {
-	std::string text;
-	Color textColor;
+	std::string text = "";
+	Color textColor = BLACK;
 
 	FontRef font;
 };
 
 struct ColorRectComponent {
-	Color color;
+	Color color = RAYWHITE;
 };
 
 struct ImageRectComponent {
@@ -53,8 +53,8 @@ struct NinePatchImageRectComponent {
 };
 
 struct DialogueComponent {
-	std::string text;
-	Color textColor;
+	std::string text = "";
+	Color textColor = BLACK;
 	FontRef defaultFont;
 
 	DialogueBin dialogue;
@@ -86,10 +86,10 @@ struct DialogueComponent {
 };
 
 struct ButtonComponent {
-	Color normalTextColor;
-	Color focusedTextColor;
+	Color normalTextColor = BLACK;
+	Color focusedTextColor = GRAY;
 
-	Color shownTextColor;
+	Color shownTextColor = BLACK;
 };
 
 #endif

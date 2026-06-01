@@ -268,3 +268,42 @@ nlohmann::json InterfaceView::dumpEntityJson(EntityID entity) {
 
 	return j;
 }
+
+void InterfaceView::initEntityComponents(EntityID entity) {
+	if (ecs.hasComponent<LabelComponent>(entity)) {
+		auto &component = ecs.getComponent<LabelComponent>(entity);
+		std::string fullPath = TextFormat("fonts/%s", component.font.path.c_str());
+
+		if (component.font.path.empty()) {
+			auto fontPaths = LoadDirectoryFiles("fonts/");
+			if (fontPaths.count > 0) {
+				auto fontPath = fontPaths.paths[0];
+				fullPath = fontPath;
+			}
+		}
+		component.font.font = LoadFontEx(fullPath.c_str(), component.font.fontSize, nullptr, 256);
+	}
+
+	if (ecs.hasComponent<TextAreaComponent>(entity)) {
+		auto &component = ecs.getComponent<TextAreaComponent>(entity);
+		std::string fullPath = TextFormat("fonts/%s", component.font.path.c_str());
+		if (component.font.path.empty()) {
+			auto fontPaths = LoadDirectoryFiles("fonts/");
+			if (fontPaths.count > 0) {
+				auto fontPath = fontPaths.paths[0];
+				fullPath = fontPath;
+			}
+		}
+		component.font.font = LoadFontEx(fullPath.c_str(), component.font.fontSize, nullptr, 256);
+	}
+
+	if (ecs.hasComponent<ImageRectComponent>(entity)) {
+		auto &component = ecs.getComponent<ImageRectComponent>(entity);
+		component.image.texture = LoadTexture(TextFormat("images/%s", component.image.path.c_str()));
+	}
+
+	if (ecs.hasComponent<NinePatchImageRectComponent>(entity)) {
+		auto &component = ecs.getComponent<NinePatchImageRectComponent>(entity);
+		component.image.texture = LoadTexture(TextFormat("images/%s", component.image.path.c_str()));
+	}
+}

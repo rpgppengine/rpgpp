@@ -95,10 +95,17 @@ void VariantPropVisitor::p_string(rttr::property prop) {
 void VariantPropVisitor::p_Color(rttr::property prop) {
 	auto *color = prop.get_value(component).get_value<struct Color *>();
 
+	rttr::variant componentVar = component;
+
 	auto field = ColorField::create();
 	field->label->setText(prop.get_name().to_string());
 	field->setColor(*color);
-	field->onColorChanged([color](struct Color newColor) { *color = newColor; });
+	field->onColorChanged([color, prop, componentVar](struct Color newColor) {
+		*color = newColor;
+		if (componentVar.is_type<ButtonComponent *>()) {
+			componentVar.get_value<ButtonComponent *>()->shownTextColor = newColor;
+		}
+	});
 	box->addColorField(field);
 }
 

@@ -121,6 +121,14 @@ public:
 	sol::object getLuaObject(EntityID entity, std::string componentName, lua_State *L) const {
 		return components->getLua(entity, componentName, L);
 	}
+
+	void insertEmptyComponent(EntityID entity, const std::string &componentName) {
+		components->insertEmptyData(entity, componentName);
+
+		auto signature = entities->getSignature(entity);
+		signature.set(components->getComponentType(componentName), true);
+		entities->setSignature(entity, signature);
+	}
 };
 
 #endif

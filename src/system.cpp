@@ -78,6 +78,12 @@ void System::drawEntity(EntityID entity) {
 
 	auto &rect = components->getComponent<Rectangle>(entity);
 
+	if (hasComponent<ColorRectComponent>(entity)) {
+		auto &colorRect = components->getComponent<ColorRectComponent>(entity);
+
+		DrawRectangleRec(rect, colorRect.color);
+	}
+
 	if (hasComponent<LabelComponent>(entity)) {
 		auto &label = components->getComponent<LabelComponent>(entity);
 
@@ -114,12 +120,6 @@ void System::drawEntity(EntityID entity) {
 			charMeasure = MeasureTextEx(textArea.font.font, TextSubtext(textArea.text.c_str(), i, 1),
 										textArea.font.fontSize * 3, 1.0f);
 		}
-	}
-
-	if (hasComponent<ColorRectComponent>(entity)) {
-		auto &colorRect = components->getComponent<ColorRectComponent>(entity);
-
-		DrawRectangleRec(rect, colorRect.color);
 	}
 
 	if (hasComponent<ImageRectComponent>(entity)) {

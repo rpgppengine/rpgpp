@@ -23,6 +23,7 @@ public:
 	virtual nlohmann::json getDataJson(EntityID entity) = 0;
 	virtual void insertFromJson(EntityID entity, nlohmann::json json) = 0;
 	virtual sol::object getLua(EntityID entity, lua_State *L) = 0;
+	virtual void insertEmptyData(EntityID entity) = 0;
 };
 
 template <typename T>
@@ -45,6 +46,11 @@ public:
 		entityToIndex[entity] = newIndex;
 		indexToEntity[newIndex] = entity;
 		size++;
+	}
+
+	void insertEmptyData(EntityID entity) {
+		T component;
+		insertData(entity, component);
 	}
 
 	void removeData(EntityID entity) {

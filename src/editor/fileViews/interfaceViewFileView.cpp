@@ -5,13 +5,16 @@
 #include <vector>
 
 #include "TGUI/String.hpp"
+#include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Widgets/ScrollablePanel.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "button.hpp"
+#include "childWindows/elementInitWindow.hpp"
 #include "component.hpp"
 #include "editor.hpp"
 #include "entity.hpp"
 #include "gamedata.hpp"
+#include "interfaceElementFactory.hpp"
 #include "interfaceView.hpp"
 #include "lua.h"
 #include "lua/reflect.hpp"
@@ -38,9 +41,22 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	luaState.open_libraries(sol::lib::base);
 	lua_ui_types_set(luaState);
 
+	auto createButton = tgui::Button::create("Create..");
+	createButton->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), 0});
+	createButton->setSize({RIGHT_PANEL_W, 32});
+	createButton->onClick([this] {
+		auto *ptr = Editor::instance->getGui().getChildWindowSubService()->getWindow("create_ui_element");
+		ElementInitWindow *window = static_cast<ElementInitWindow *>(ptr);
+		window->view = view->ptr;
+		window->tree = treeView.get();
+		window->init();
+		window->open();
+	});
+	widgetContainer.push_back(createButton);
+
 	treeView = tgui::TreeView::create();
-	treeView->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), 0});
-	treeView->setSize({RIGHT_PANEL_W, "50%"});
+	treeView->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), 32});
+	treeView->setSize({RIGHT_PANEL_W, "50% - 32"});
 
 	widgetContainer.push_back(treeView);
 
@@ -49,13 +65,9 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	view->setSize({TextFormat("100%% - %d", RIGHT_PANEL_W), "100%"});
 	Editor::instance->getGui().addUpdate(WorldView::asUpdatable(view));
 
-	auto scrollable = tgui::ScrollablePanel::create();
-
 	propertiesBox = PropertiesBox::create();
 	propertiesBox->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), "50%"});
 	propertiesBox->setSize({RIGHT_PANEL_W, "50%"});
-
-	// scrollable->add(propertiesBox);
 
 	widgetContainer.push_back(propertiesBox);
 
@@ -134,8 +146,7 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 		for (auto &entity : interface->getEntities()) {
 			if (ecs.hasComponent<LabelComponent>(entity)) {
 				auto &component = ecs.getComponent<LabelComponent>(entity);
-				std::string fullPath = TextFormat("%s/fonts/%s", Editor::instance->getProject()->getBasePath().c_str(),
-												  component.font.path.c_str());
+				std::string fullPath = TextFormat("fonts/%s", component.font.path.c_str());
 
 				if (component.font.path.empty()) {
 					auto fontPaths = Editor::instance->getProject()->getPaths(EngineFileType::FILE_FONT);
@@ -149,8 +160,7 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 
 			if (ecs.hasComponent<TextAreaComponent>(entity)) {
 				auto &component = ecs.getComponent<TextAreaComponent>(entity);
-				std::string fullPath = TextFormat("%s/fonts/%s", Editor::instance->getProject()->getBasePath().c_str(),
-												  component.font.path.c_str());
+				std::string fullPath = TextFormat("fonts/%s", component.font.path.c_str());
 				if (component.font.path.empty()) {
 					auto fontPaths = Editor::instance->getProject()->getPaths(EngineFileType::FILE_FONT);
 					if (!fontPaths.empty()) {
@@ -163,16 +173,12 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 
 			if (ecs.hasComponent<ImageRectComponent>(entity)) {
 				auto &component = ecs.getComponent<ImageRectComponent>(entity);
-				component.image.texture =
-					LoadTexture(TextFormat("%s/images/%s", Editor::instance->getProject()->getBasePath().c_str(),
-										   component.image.path.c_str()));
+				component.image.texture = LoadTexture(TextFormat("images/%s", component.image.path.c_str()));
 			}
 
 			if (ecs.hasComponent<NinePatchImageRectComponent>(entity)) {
 				auto &component = ecs.getComponent<NinePatchImageRectComponent>(entity);
-				component.image.texture =
-					LoadTexture(TextFormat("%s/images/%s", Editor::instance->getProject()->getBasePath().c_str(),
-										   component.image.path.c_str()));
+				component.image.texture = LoadTexture(TextFormat("images/%s", component.image.path.c_str()));
 			}
 		}
 

@@ -56,6 +56,7 @@ public:
 	void registerLua(lua_State *L);
 	void changeFocusedElement(EntityID entity);
 	nlohmann::json dumpEntityJson(EntityID entity);
+	void initEntityComponents(EntityID entity);
 };
 
 #endif
