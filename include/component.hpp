@@ -48,7 +48,7 @@ struct ImageRectComponent {
 };
 
 struct NinePatchImageRectComponent {
-	NPatchInfo npatchInfo;
+	NPatchInfo npatchInfo = {{0, 0, 0, 0}, 0, 0, 0, 0, NPATCH_NINE_PATCH};
 	ImageRef image;
 };
 

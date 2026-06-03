@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "TGUI/Widgets/ContextMenu.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "fileViews/fileView.hpp"
 #include "nlohmann/json_fwd.hpp"
@@ -13,14 +14,13 @@
 class InterfaceViewFileView : public FileView {
 private:
 	static const int RIGHT_PANEL_W = 300;
+
 	tgui::TreeView::Ptr treeView;
 	PropertiesBox::Ptr propertiesBox;
-
 	InterfaceViewView::Ptr view;
 
-	std::unique_ptr<nlohmann::json> elementProps;
-
-	sol::state luaState;
+	tgui::ContextMenu::Ptr elementContextMenu;
+	std::string selectedElement;
 
 	VariantPropVisitor visitor;
 

@@ -5,7 +5,9 @@
 #include <vector>
 
 #include "TGUI/String.hpp"
+#include "TGUI/ToolTip.hpp"
 #include "TGUI/Widgets/Button.hpp"
+#include "TGUI/Widgets/ContextMenu.hpp"
 #include "TGUI/Widgets/ScrollablePanel.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "button.hpp"
@@ -38,9 +40,6 @@ bool startsWith(const std::string &key, const std::string &prefix) {
 }
 
 InterfaceViewFileView::InterfaceViewFileView() {
-	luaState.open_libraries(sol::lib::base);
-	lua_ui_types_set(luaState);
-
 	auto createButton = tgui::Button::create("Create..");
 	createButton->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), 0});
 	createButton->setSize({RIGHT_PANEL_W, 32});
@@ -127,6 +126,37 @@ InterfaceViewFileView::InterfaceViewFileView() {
 			}
 		}
 	});
+
+	treeView->onRightClick([this](const tgui::String &item) {
+		selectedElement = item.toStdString();
+		elementContextMenu->setPosition(GetMousePosition().x, GetMousePosition().y);
+		elementContextMenu->openMenu();
+	});
+
+	elementContextMenu = tgui::ContextMenu::create();
+	elementContextMenu->addMenuItem("Delete");
+	elementContextMenu->onMenuItemClick([this, weakTree](const std::vector<tgui::String> &hierarchy) {
+		if (hierarchy.empty()) return;
+
+		auto item = hierarchy[0];
+
+		if (item == "Delete") {
+			const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
+			const auto interface = ptr->get();
+
+			auto &ecs = interface->getCoordinator();
+
+			EntityID entity = ecs.getEntityManager().findName(selectedElement);
+
+			if (entity < MAX_ENTITIES) {
+				ecs.destroyEntity(entity);
+				if (auto sharedTree = weakTree.lock()) {
+					sharedTree->removeItem({selectedElement});
+				}
+			}
+		}
+	});
+	Editor::instance->getGui().gui->add(elementContextMenu);
 
 	view->propBox = propertiesBox.get();
 	view->visitor = &visitor;

@@ -109,13 +109,13 @@ void System::drawEntity(EntityID entity) {
 	if (hasComponent<TextAreaComponent>(entity)) {
 		auto &textArea = components->getComponent<TextAreaComponent>(entity);
 
-		auto charPos = Vector2{0, 0};
+		auto charPos = Vector2{rect.x, rect.y};
 		auto charMeasure = Vector2{0, 0};
 		for (int i = 0; i < textArea.text.size(); i++) {
 			charPos.x += charMeasure.x;
 
 			DrawTextPro(textArea.font.font, TextSubtext(textArea.text.c_str(), i, 1), charPos, Vector2{0, 0}, 0.0f,
-						13 * 3, 1, BLACK);
+						textArea.font.fontSize * 3, 1, BLACK);
 
 			charMeasure = MeasureTextEx(textArea.font.font, TextSubtext(textArea.text.c_str(), i, 1),
 										textArea.font.fontSize * 3, 1.0f);
@@ -137,6 +137,8 @@ void System::drawEntity(EntityID entity) {
 		Vector2 origin = {0.0f, 0.0f};
 
 		NPatchInfo info = ninePatch.npatchInfo;
+		info.source = {0, 0, static_cast<float>(ninePatch.image.texture.width),
+					   static_cast<float>(ninePatch.image.texture.height)};
 		info.left *= ninePatch.image.scale;
 		info.top *= ninePatch.image.scale;
 		info.right *= ninePatch.image.scale;

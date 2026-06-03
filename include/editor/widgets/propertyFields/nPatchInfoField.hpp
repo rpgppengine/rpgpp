@@ -4,6 +4,7 @@
 #include "TGUI/SubwidgetContainer.hpp"
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Widgets/Label.hpp"
+#include "component.hpp"
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
 #include "raylib.h"
@@ -30,9 +31,7 @@ public:
 
 	void setSize(const tgui::Layout2d &size) override;
 
-	Texture texture;
-	NPatchInfo *info;
-	int scale = 1;
+	NinePatchImageRectComponent *component = nullptr;
 };
 
 #endif

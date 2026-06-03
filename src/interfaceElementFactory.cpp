@@ -27,8 +27,8 @@ static std::unordered_map<std::string, std::list<std::string>> elements = {
 	{"ColorRect", {"ColorRectComponent"}},
 	{"Label", {"LabelComponent"}},
 	{"TextArea", {"TextAreaComponent"}},
-	{"Image", {"ImageComponent"}},
-	{"NPatchImage", {"NinePatchImageComponent"}},
+	{"Image", {"ImageRectComponent"}},
+	{"NPatchImage", {"NinePatchImageRectComponent"}},
 	{"Button", {"ColorRectComponent", "LabelComponent", "InputComponent", "ButtonComponent"}},
 	{"Dialogue", {"DialogueComponent"}}};
 

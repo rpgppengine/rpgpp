@@ -169,21 +169,26 @@ void VariantPropVisitor::p_ImageRef(rttr::property prop) {
 	scale->value->setMaximum(5);
 	scale->label->setText(prop.get_name().to_string() + " scale");
 	scale->value->setValue(image->scale);
-	scale->value->onValueChange([image](int newValue) { image->scale = newValue; });
+	scale->value->onValueChange([image](int newValue) {
+		image->scale = newValue;
+		auto loadedImage = LoadImage(TextFormat("images/%s", image->path.c_str()));
+		ImageResizeNN(&loadedImage, loadedImage.width * image->scale, loadedImage.height * image->scale);
+		image->texture = LoadTextureFromImage(loadedImage);
+		UnloadImage(loadedImage);
+	});
 	box->addIntField(scale);
 }
 
 void VariantPropVisitor::p_NPatchInfo(rttr::property prop) {
 	struct NPatchInfo *info = prop.get_value(component).get_value<struct NPatchInfo *>();
 
+	rttr::variant var = component;
+
 	auto field = NPatchInfoField::create();
 	field->label->setText(prop.get_name().to_string());
-	field->info = info;
-
-	if (component.is_type<NinePatchImageRectComponent *>()) {
-		NinePatchImageRectComponent *nPatchComponent = component.get_value<NinePatchImageRectComponent *>();
-		field->texture = nPatchComponent->image.texture;
-		field->scale = nPatchComponent->image.scale;
+	if (var.is_type<NinePatchImageRectComponent *>()) {
+		NinePatchImageRectComponent *nPatchComponent = var.get_value<NinePatchImageRectComponent *>();
+		field->component = nPatchComponent;
 	}
 
 	box->addNPatchFIeld(field);
