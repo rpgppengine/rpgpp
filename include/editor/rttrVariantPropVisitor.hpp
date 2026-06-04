@@ -25,6 +25,7 @@ public:
 
 	static void p_int(rttr::property prop);
 	static void p_string(rttr::property prop);
+	static void p_bool(rttr::property prop);
 	static void p_Color(rttr::property prop);
 	static void p_UIElementRef(rttr::property prop);
 	static void p_FontRef(rttr::property prop);

@@ -23,12 +23,14 @@ void NPatchLines::draw() {
 	DrawLine(info->left * scale, 0, info->left * scale, texture.height, RED);
 	DrawLine(texture.width - (info->right * scale), 0, texture.width - (info->right * scale), texture.height, RED);
 
-	// draw handles
-	DrawCircleV(topLeft, HANDLE_RADIUS, MAROON);
-	DrawCircleV(topRight, HANDLE_RADIUS, MAROON);
+	float handleRadius = HANDLE_RADIUS * scale;
 
-	DrawCircleV(bottomLeft, HANDLE_RADIUS, MAROON);
-	DrawCircleV(bottomRight, HANDLE_RADIUS, MAROON);
+	// draw handles
+	DrawCircleV(topLeft, handleRadius, MAROON);
+	DrawCircleV(topRight, handleRadius, MAROON);
+
+	DrawCircleV(bottomLeft, handleRadius, MAROON);
+	DrawCircleV(bottomRight, handleRadius, MAROON);
 
 	const Color hoverColor = {90, 33, 55, 255};
 
@@ -37,16 +39,16 @@ void NPatchLines::draw() {
 		case CORNER_NONE:
 			break;
 		case CORNER_TOPLEFT:
-			DrawCircleV(topLeft, 3.0f, hoverColor);
+			DrawCircleV(topLeft, handleRadius, hoverColor);
 			break;
 		case CORNER_TOPRIGHT:
-			DrawCircleV(topRight, 3.0f, hoverColor);
+			DrawCircleV(topRight, handleRadius, hoverColor);
 			break;
 		case CORNER_BOTTOMLEFT:
-			DrawCircleV(bottomLeft, 3.0f, hoverColor);
+			DrawCircleV(bottomLeft, handleRadius, hoverColor);
 			break;
 		case CORNER_BOTTOMRIGHT:
-			DrawCircleV(bottomRight, 3.0f, hoverColor);
+			DrawCircleV(bottomRight, handleRadius, hoverColor);
 			break;
 	}
 }
@@ -68,18 +70,19 @@ void NPatchLines::calcCorners() {
 
 void NPatchLines::detectCorner(Vector2 mousePos) {
 	corner = CORNER_NONE;
+	float handleRadius = HANDLE_RADIUS * scale;
 
-	if (mousePos.x >= (topLeft.x - HANDLE_RADIUS) && mousePos.x <= (topLeft.x + HANDLE_RADIUS) &&
-		mousePos.y >= (topLeft.y - HANDLE_RADIUS) && mousePos.y <= (topLeft.y + HANDLE_RADIUS)) {
+	if (mousePos.x >= (topLeft.x - handleRadius) && mousePos.x <= (topLeft.x + handleRadius) &&
+		mousePos.y >= (topLeft.y - handleRadius) && mousePos.y <= (topLeft.y + handleRadius)) {
 		corner = CORNER_TOPLEFT;
-	} else if (mousePos.x >= (topRight.x - HANDLE_RADIUS) && mousePos.x <= (topRight.x + HANDLE_RADIUS) &&
-			   mousePos.y >= (topRight.y - HANDLE_RADIUS) && mousePos.y <= (topRight.y + HANDLE_RADIUS)) {
+	} else if (mousePos.x >= (topRight.x - handleRadius) && mousePos.x <= (topRight.x + handleRadius) &&
+			   mousePos.y >= (topRight.y - handleRadius) && mousePos.y <= (topRight.y + handleRadius)) {
 		corner = CORNER_TOPRIGHT;
-	} else if (mousePos.x >= (bottomLeft.x - HANDLE_RADIUS) && mousePos.x <= (bottomLeft.x + HANDLE_RADIUS) &&
-			   mousePos.y >= (bottomLeft.y - HANDLE_RADIUS) && mousePos.y <= (bottomLeft.y + HANDLE_RADIUS)) {
+	} else if (mousePos.x >= (bottomLeft.x - handleRadius) && mousePos.x <= (bottomLeft.x + handleRadius) &&
+			   mousePos.y >= (bottomLeft.y - handleRadius) && mousePos.y <= (bottomLeft.y + handleRadius)) {
 		corner = CORNER_BOTTOMLEFT;
-	} else if (mousePos.x >= (bottomRight.x - HANDLE_RADIUS) && mousePos.x <= (bottomRight.x + HANDLE_RADIUS) &&
-			   mousePos.y >= (bottomRight.y - HANDLE_RADIUS) && mousePos.y <= (bottomRight.y + HANDLE_RADIUS)) {
+	} else if (mousePos.x >= (bottomRight.x - handleRadius) && mousePos.x <= (bottomRight.x + handleRadius) &&
+			   mousePos.y >= (bottomRight.y - handleRadius) && mousePos.y <= (bottomRight.y + handleRadius)) {
 		corner = CORNER_BOTTOMRIGHT;
 	}
 }

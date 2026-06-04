@@ -29,6 +29,7 @@ void lua_ui_types_set(sol::state_view lua) {
 				 "Left", TEXT_ALIGN_LEFT, "Middle", TEXT_ALIGN_MIDDLE, "Right", TEXT_ALIGN_RIGHT);
 	lua.new_usertype<UIElementRef>("UIElementRef", "Id", &UIElementRef::entityId);
 
+	lua.new_usertype<VisibilityComponent>("VisibilityComponent", "IsVisible", &VisibilityComponent::isVisible);
 	lua.new_usertype<InputComponent>("InputComponent", "up", &InputComponent::upButton, "down",
 									 &InputComponent::downButton, "left", &InputComponent::leftButton, "right",
 									 &InputComponent::rightButton);

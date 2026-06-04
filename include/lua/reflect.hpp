@@ -10,6 +10,9 @@
 
 RTTR_REGISTRATION {
 	rttr::registration::class_<Rectangle>("Rectangle").constructor<>();
+	rttr::registration::class_<VisibilityComponent>("VisibilityComponent")
+		.constructor<>()
+		.property("is_visible", &VisibilityComponent::isVisible)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<InputComponent>("InputComponent")
 		.constructor<>()
 		.property("upButton", &InputComponent::upButton)(rttr::policy::prop::bind_as_ptr)

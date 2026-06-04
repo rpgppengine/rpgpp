@@ -34,6 +34,9 @@ void from_json(const json &j, UIElementRef &info);
 void to_json(json &j, const InputComponent &input);
 void from_json(const json &j, InputComponent &input);
 
+void to_json(json &j, const VisibilityComponent &visibility);
+void from_json(const json &j, VisibilityComponent &visibility);
+
 void to_json(json &j, const LabelComponent &label);
 void from_json(const json &j, LabelComponent &label);
 

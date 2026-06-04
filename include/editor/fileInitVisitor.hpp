@@ -22,6 +22,7 @@ public:
 	static void prop(NewFileDialog::Ptr dialog);
 	static void dialogue(NewFileDialog::Ptr dialog);
 	static void interactable(NewFileDialog::Ptr dialog);
+	static void interface(NewFileDialog::Ptr dialog);
 };
 
 #endif

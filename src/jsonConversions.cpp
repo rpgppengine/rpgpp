@@ -77,6 +77,10 @@ void from_json(const json &j, InputComponent &input) {
 	j.at("right").get_to(input.rightButton);
 }
 
+void to_json(json &j, const VisibilityComponent &visibility) { j = visibility.isVisible; }
+
+void from_json(const json &j, VisibilityComponent &visibility) { visibility = {j}; }
+
 void to_json(json &j, const LabelComponent &label) {
 	j["text"] = label.text;
 	j["textColor"] = label.textColor;

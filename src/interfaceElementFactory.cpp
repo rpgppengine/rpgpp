@@ -7,6 +7,7 @@
 
 #include "button.hpp"
 #include "colorRect.hpp"
+#include "component.hpp"
 #include "dialogueArea.hpp"
 #include "entity.hpp"
 #include "imageRect.hpp"
@@ -37,6 +38,7 @@ EntityID construct(const std::string &title, const std::string &element, Coordin
 	if (elements.count(element) > 0) {
 		auto &list = elements[element];
 		entity = ecs.createEntity(title);
+		ecs.addComponent(entity, VisibilityComponent{});
 		ecs.addComponent(entity, Rectangle{0, 0, 50, 50});
 		for (auto &componentName : list) {
 			ecs.insertEmptyComponent(entity, componentName);

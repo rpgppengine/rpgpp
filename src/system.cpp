@@ -74,7 +74,11 @@ void System::draw() {
 }
 
 void System::drawEntity(EntityID entity) {
+	if (!hasComponent<VisibilityComponent>(entity)) return;
 	if (!hasComponent<Rectangle>(entity)) return;
+
+	auto &visibility = components->getComponent<VisibilityComponent>(entity);
+	if (!visibility.isVisible) return;
 
 	auto &rect = components->getComponent<Rectangle>(entity);
 

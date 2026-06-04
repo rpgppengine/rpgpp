@@ -18,7 +18,7 @@
 #include "sol/state_view.hpp"
 #include "uiElement.hpp"
 
-InterfaceView::InterfaceView() : rect(Rectangle{}) {}
+InterfaceView::InterfaceView() : InterfaceView(Rectangle{}) {}
 
 InterfaceView::InterfaceView(Rectangle rect) {
 	this->rect = rect;
@@ -26,6 +26,7 @@ InterfaceView::InterfaceView(Rectangle rect) {
 
 	ecs.init();
 
+	ecs.registerComponent<VisibilityComponent>();
 	ecs.registerComponent<Rectangle>();
 	ecs.registerComponent<LabelComponent>();
 	ecs.registerComponent<TextAreaComponent>();
@@ -51,15 +52,6 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 
 	auto j = json::parse(fileText);
 	this->rect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
-	/*
-	for (auto &item : j.at("elements").items()) {
-		auto obj = item.value();
-		auto element = constructElement(obj.at("type"));
-		element->fromJson(obj.at("props"));
-		int layer = obj.at("layer");
-		addElement(item.key(), std::move(element), layer);
-	}
-	*/
 
 	for (auto &item : j.at("entities").items()) {
 		auto obj = item.value();
@@ -80,16 +72,8 @@ InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{})
 
 nlohmann::json InterfaceView::dumpJson() {
 	auto j = json::object();
-	j["elements"] = json::object();
-	for (auto &&[layer, element] : elements) {
-		auto obj = json::object();
-		obj["type"] = element->getType();
-		obj["layer"] = element->getLayer();
-		obj["props"] = element->dumpJson();
 
-		j["elements"][element->getName()] = obj;
-	}
-
+	j["entities"] = json::object();
 	for (auto &entity : ecs.getEntities()) {
 		auto &name = ecs.getEntityName(entity);
 
@@ -299,11 +283,19 @@ void InterfaceView::initEntityComponents(EntityID entity) {
 
 	if (ecs.hasComponent<ImageRectComponent>(entity)) {
 		auto &component = ecs.getComponent<ImageRectComponent>(entity);
-		component.image.texture = LoadTexture(TextFormat("images/%s", component.image.path.c_str()));
+		Image image = LoadImage(TextFormat("images/%s", component.image.path.c_str()));
+		component.image.scale = (component.image.scale < 1) ? 1 : component.image.scale;
+		ImageResizeNN(&image, image.width * component.image.scale, image.height * component.image.scale);
+		component.image.texture = LoadTextureFromImage(image);
+		UnloadImage(image);
 	}
 
 	if (ecs.hasComponent<NinePatchImageRectComponent>(entity)) {
 		auto &component = ecs.getComponent<NinePatchImageRectComponent>(entity);
-		component.image.texture = LoadTexture(TextFormat("images/%s", component.image.path.c_str()));
+		Image image = LoadImage(TextFormat("images/%s", component.image.path.c_str()));
+		component.image.scale = (component.image.scale < 1) ? 1 : component.image.scale;
+		ImageResizeNN(&image, image.width * component.image.scale, image.height * component.image.scale);
+		component.image.texture = LoadTextureFromImage(image);
+		UnloadImage(image);
 	}
 }

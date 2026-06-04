@@ -14,6 +14,10 @@ const ComponentType MAX_COMPONENTS = 32;
 
 typedef std::bitset<MAX_COMPONENTS> Signature;
 
+struct VisibilityComponent {
+	bool isVisible = true;
+};
+
 struct InputComponent {
 	UIElementRef upButton;
 	UIElementRef downButton;

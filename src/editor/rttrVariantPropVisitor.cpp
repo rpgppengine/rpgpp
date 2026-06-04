@@ -11,6 +11,7 @@
 #include "raylib.h"
 #include "rttr/variant.h"
 #include "widgets/propertiesBox.hpp"
+#include "widgets/propertyFields/boolField.hpp"
 #include "widgets/propertyFields/colorField.hpp"
 #include "widgets/propertyFields/fileField.hpp"
 #include "widgets/propertyFields/intField.hpp"
@@ -27,6 +28,7 @@ rttr::variant VariantPropVisitor::component = {};
 VariantPropVisitor::VariantPropVisitor() {
 	map["int"] = p_int;
 	map["std::string"] = p_string;
+	map["bool"] = p_bool;
 	map["Color"] = p_Color;
 	map["UIElementRef"] = p_UIElementRef;
 	map["FontRef"] = p_FontRef;
@@ -90,6 +92,16 @@ void VariantPropVisitor::p_string(rttr::property prop) {
 	textField->value->setText(*string);
 	textField->value->onTextChange([string](const tgui::String &newText) { *string = newText.toStdString(); });
 	box->addTextField(textField);
+}
+
+void VariantPropVisitor::p_bool(rttr::property prop) {
+	auto *boolean = prop.get_value(component).get_value<bool *>();
+
+	auto boolField = BoolField::create();
+	boolField->label->setText(prop.get_name().to_string());
+	boolField->value->setChecked(*boolean);
+	boolField->value->onChange([boolean](bool val) { *boolean = val; });
+	box->addBooleanField(boolField);
 }
 
 void VariantPropVisitor::p_Color(rttr::property prop) {

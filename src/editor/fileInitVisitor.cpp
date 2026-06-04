@@ -10,6 +10,7 @@
 #include "editor.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"
+#include "interfaceView.hpp"
 #include "prop.hpp"
 #include "raylib.h"
 #include "room.hpp"
@@ -26,6 +27,7 @@ FileInitVisitor::FileInitVisitor() {
 	funcs[static_cast<int>(EngineFileType::FILE_PROP)] = prop;
 	funcs[static_cast<int>(EngineFileType::FILE_DIALOGUE)] = dialogue;
 	funcs[static_cast<int>(EngineFileType::FILE_INTERACTABLE)] = interactable;
+	funcs[static_cast<int>(EngineFileType::FILE_INTERFACEVIEW)] = interface;
 }
 
 bool FileInitVisitor::funcIsEmpty(EngineFileType fileType) { return funcs[static_cast<int>(fileType)] == nullptr; }
@@ -197,6 +199,28 @@ void FileInitVisitor::interactable(NewFileDialog::Ptr dialog) {
 			auto ptr = aurora::downcast<screens::ProjectScreen *>(Editor::instance->getGui().currentScreen.get());
 			ptr->addFileView(EngineFileType::FILE_INTERACTABLE, newFilePath);
 			ptr->addResourceButtons(EngineFileType::FILE_INTERACTABLE);
+
+			dialog->window->close();
+		}
+	});
+}
+
+void FileInitVisitor::interface(NewFileDialog::Ptr dialog) {
+	dialog->hideFileField();
+
+	dialog->confirmButton->onPress([dialog] {
+		std::string title = dialog->titleField->getText().toStdString();
+
+		if (!title.empty()) {
+			std::unique_ptr<InterfaceView> interfaceView = std::make_unique<InterfaceView>();
+
+			std::string newFilePath = TextFormat("views/%s.rui", title.c_str());
+			nlohmann::json fileJson = interfaceView->dumpJson();
+			SaveFileText(newFilePath.c_str(), fileJson.dump().c_str());
+
+			auto ptr = aurora::downcast<screens::ProjectScreen *>(Editor::instance->getGui().currentScreen.get());
+			ptr->addFileView(EngineFileType::FILE_INTERFACEVIEW, newFilePath);
+			ptr->addResourceButtons(EngineFileType::FILE_INTERFACEVIEW);
 
 			dialog->window->close();
 		}

@@ -8,7 +8,7 @@ enum BoxCorners { CORNER_NONE, CORNER_TOPLEFT, CORNER_TOPRIGHT, CORNER_BOTTOMLEF
 
 class NPatchLines {
 private:
-	const float HANDLE_RADIUS = 3.0f;
+	const float HANDLE_RADIUS = 1.0f;
 
 	Vector2 topLeft;
 	Vector2 topRight;

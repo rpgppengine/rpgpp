@@ -6,7 +6,7 @@
 #include "raylib.h"
 #include "views/worldView.hpp"
 
-NPatchView::NPatchView() {}
+NPatchView::NPatchView() { cameraMaxZoom = 15.0f; }
 
 NPatchView::Ptr NPatchView::create() {
 	auto ptr = std::make_shared<NPatchView>();
@@ -16,9 +16,7 @@ NPatchView::Ptr NPatchView::create() {
 void NPatchView::setup(NPatchInfo *info, Texture texture, int scale) {
 	this->info = info;
 
-	Image image = LoadImageFromTexture(texture);
-	ImageResizeNN(&image, texture.width * scale, texture.height * scale);
-	this->texture = LoadTextureFromImage(image);
+	this->texture = texture;
 	this->scale = scale;
 
 	lines.info = info;
