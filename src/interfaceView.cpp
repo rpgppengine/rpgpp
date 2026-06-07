@@ -16,6 +16,7 @@
 #include "lua.h"
 #include "raylib.h"
 #include "sol/state_view.hpp"
+#include "system.hpp"
 #include "uiElement.hpp"
 
 InterfaceView::InterfaceView() : InterfaceView(Rectangle{}) {}
@@ -36,15 +37,6 @@ InterfaceView::InterfaceView(Rectangle rect) {
 	ecs.registerComponent<DialogueComponent>();
 	ecs.registerComponent<ButtonComponent>();
 	ecs.registerComponent<InputComponent>();
-
-	/*
-	auto entity = ecs.createEntity("name");
-	Rectangle entityRect = {0, 0, 50, 50};
-	ColorRectComponent colorRect = {GRAY};
-
-	ecs.addComponent(entity, entityRect);
-	ecs.addComponent(entity, colorRect);
-	*/
 }
 
 InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectangle{}) {
@@ -150,6 +142,7 @@ void InterfaceView::renameElement(const std::string &title, const std::string &n
 }
 
 void InterfaceView::changeFocusedElement(const std::string &title) {
+	/*
 	if (elementExists(title)) {
 		auto *element = getElement(title);
 		if (element->isFocusable()) {
@@ -160,6 +153,12 @@ void InterfaceView::changeFocusedElement(const std::string &title) {
 			focused = element;
 			focused->invokeCallback(CALLBACK_FOCUSED);
 		}
+	}
+		*/
+
+	auto entity = ecs.getEntityManager().findName(title);
+	if (entity <= MAX_ENTITIES) {
+		changeFocusedElement(entity);
 	}
 }
 
@@ -172,24 +171,32 @@ void InterfaceView::onNotify(Event event) {
 	if (focused != nullptr) {
 		focused->onNotify(event);
 	}
+
+	if (current < MAX_ENTITIES) {
+		ecs.getSystem().onNotify(event, current);
+	}
 }
 
 void InterfaceView::update() {
+	/*
 	for (auto &item : elements) {
 		if (item.second->isVisible()) {
 			item.second->update();
 		}
 	}
+	*/
 
 	ecs.update();
 }
 
 void InterfaceView::draw() {
+	/*
 	for (auto &item : elements) {
 		if (item.second->isVisible()) {
 			item.second->draw();
 		}
 	}
+	*/
 
 	ecs.draw();
 }
@@ -231,11 +238,17 @@ void InterfaceView::registerLua(lua_State *L) {
 void InterfaceView::changeFocusedElement(EntityID entity) {
 	if (entity < MAX_ENTITIES) {
 		if (ecs.hasComponent<InputComponent>(entity)) {
-			auto &previousInput = ecs.getComponent<InputComponent>(current);
-			previousInput.callbacks[CALLBACK_UNFOCUSED]();
+			if (current < MAX_ENTITIES) {
+				auto &previousInput = ecs.getComponent<InputComponent>(current);
+				if (previousInput.callbacks[CALLBACK_UNFOCUSED] != nullptr) {
+					previousInput.callbacks[CALLBACK_UNFOCUSED]();
+				}
+			}
 
 			auto &input = ecs.getComponent<InputComponent>(entity);
-			input.callbacks[CALLBACK_FOCUSED]();
+			if (input.callbacks[CALLBACK_FOCUSED] != nullptr) {
+				input.callbacks[CALLBACK_FOCUSED]();
+			}
 			current = entity;
 		}
 	}
@@ -256,46 +269,34 @@ nlohmann::json InterfaceView::dumpEntityJson(EntityID entity) {
 void InterfaceView::initEntityComponents(EntityID entity) {
 	if (ecs.hasComponent<LabelComponent>(entity)) {
 		auto &component = ecs.getComponent<LabelComponent>(entity);
-		std::string fullPath = TextFormat("fonts/%s", component.font.path.c_str());
-
-		if (component.font.path.empty()) {
-			auto fontPaths = LoadDirectoryFiles("fonts/");
-			if (fontPaths.count > 0) {
-				auto fontPath = fontPaths.paths[0];
-				fullPath = fontPath;
-			}
-		}
-		component.font.font = LoadFontEx(fullPath.c_str(), component.font.fontSize, nullptr, 256);
+		component.loadFont(component.font.path);
 	}
 
 	if (ecs.hasComponent<TextAreaComponent>(entity)) {
 		auto &component = ecs.getComponent<TextAreaComponent>(entity);
-		std::string fullPath = TextFormat("fonts/%s", component.font.path.c_str());
-		if (component.font.path.empty()) {
-			auto fontPaths = LoadDirectoryFiles("fonts/");
-			if (fontPaths.count > 0) {
-				auto fontPath = fontPaths.paths[0];
-				fullPath = fontPath;
-			}
-		}
-		component.font.font = LoadFontEx(fullPath.c_str(), component.font.fontSize, nullptr, 256);
+		component.loadFont(component.font.path);
 	}
 
 	if (ecs.hasComponent<ImageRectComponent>(entity)) {
 		auto &component = ecs.getComponent<ImageRectComponent>(entity);
-		Image image = LoadImage(TextFormat("images/%s", component.image.path.c_str()));
-		component.image.scale = (component.image.scale < 1) ? 1 : component.image.scale;
-		ImageResizeNN(&image, image.width * component.image.scale, image.height * component.image.scale);
-		component.image.texture = LoadTextureFromImage(image);
-		UnloadImage(image);
+		component.scaleImage(component.image.scale);
 	}
 
 	if (ecs.hasComponent<NinePatchImageRectComponent>(entity)) {
 		auto &component = ecs.getComponent<NinePatchImageRectComponent>(entity);
-		Image image = LoadImage(TextFormat("images/%s", component.image.path.c_str()));
-		component.image.scale = (component.image.scale < 1) ? 1 : component.image.scale;
-		ImageResizeNN(&image, image.width * component.image.scale, image.height * component.image.scale);
-		component.image.texture = LoadTextureFromImage(image);
-		UnloadImage(image);
+		component.scaleImage(component.image.scale);
+	}
+
+	if (ecs.hasComponent<ButtonComponent>(entity) && ecs.hasComponent<InputComponent>(entity)) {
+		auto &input = ecs.getComponent<InputComponent>(entity);
+		input.callbacks[CALLBACK_FOCUSED] = [this, entity] {
+			auto &button = ecs.getComponent<ButtonComponent>(entity);
+			button.shownTextColor = button.focusedTextColor;
+			printf("focused..\n");
+		};
+		input.callbacks[CALLBACK_UNFOCUSED] = [this, entity] {
+			auto &button = ecs.getComponent<ButtonComponent>(entity);
+			button.shownTextColor = button.normalTextColor;
+		};
 	}
 }

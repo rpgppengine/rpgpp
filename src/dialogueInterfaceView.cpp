@@ -5,10 +5,14 @@
 #include <vector>
 
 #include "button.hpp"
+#include "component.hpp"
 #include "dialogueArea.hpp"
 #include "dialogueBalloon.hpp"
+#include "entity.hpp"
 #include "game.hpp"
+#include "gamedata.hpp"
 #include "imageRect.hpp"
+#include "interfaceElementFactory.hpp"
 #include "interfaceView.hpp"
 #include "ninePatchImageRect.hpp"
 #include "raylib.h"
@@ -23,60 +27,55 @@ static const Rectangle optionsRect =
 	Rectangle{diagImageRect.x + (diagImageRect.width - 180), diagImageRect.y - 8 - 180, 180, 180};
 
 DialogueInterfaceView::DialogueInterfaceView() : InterfaceView(Rectangle{}) {
-	NinePatchImageRect *diagImage = new NinePatchImageRect(diagImageRect);
-	diagImage->npatchInfo.top = 3;
-	diagImage->npatchInfo.left = 3;
-	diagImage->npatchInfo.bottom = 3;
-	diagImage->npatchInfo.right = 3;
-	diagImage->npatchInfo.layout = NPATCH_NINE_PATCH;
-	diagImage->setScale(3);
-	diagImage->setSource("ui-npatch.png");
+	auto diagImage = construct("diagImage", "NPatchImage", ecs);
+	ecs.getComponent<Rectangle>(diagImage) = diagImageRect;
+	auto &diagImageComponent = ecs.getComponent<NinePatchImageRectComponent>(diagImage);
+	diagImageComponent.npatchInfo.top = 3;
+	diagImageComponent.npatchInfo.left = 3;
+	diagImageComponent.npatchInfo.bottom = 3;
+	diagImageComponent.npatchInfo.right = 3;
+	diagImageComponent.npatchInfo.layout = NPATCH_NINE_PATCH;
+	diagImageComponent.scaleImage(3);
+	diagImageComponent.loadImage("ui-npatch.png");
 
-	addElement("diagImage", diagImage, 0);
+	auto diagArea = construct("dialogueArea", "Dialogue", ecs);
+	ecs.getComponent<Rectangle>(diagArea) = normalDiagAreaRect;
 
+	auto portrait = construct("portrait", "Image", ecs);
+	ecs.getComponent<VisibilityComponent>(portrait).isVisible = false;
+	ecs.getComponent<Rectangle>(portrait) = {diagImageRect.x + 9, diagImageRect.y + 9, diagImageRect.height - (9 * 2),
+											 diagImageRect.height - (9 * 2)};
+
+	auto optionsImage = construct("optionsImage", "NPatchImage", ecs);
+	ecs.getComponent<VisibilityComponent>(optionsImage).isVisible = false;
+	ecs.getComponent<Rectangle>(optionsImage) = optionsRect;
+	auto &optionsImageComponent = ecs.getComponent<NinePatchImageRectComponent>(optionsImage);
+	optionsImageComponent.npatchInfo.top = 3;
+	optionsImageComponent.npatchInfo.left = 3;
+	optionsImageComponent.npatchInfo.bottom = 3;
+	optionsImageComponent.npatchInfo.right = 3;
+	optionsImageComponent.npatchInfo.layout = NPATCH_NINE_PATCH;
+	optionsImageComponent.scaleImage(3);
+	optionsImageComponent.loadImage("ui-npatch.png");
+
+	auto optionButton = construct("optionButton", "Button", ecs);
+	ecs.getComponent<VisibilityComponent>(optionButton).isVisible = false;
+	ecs.getComponent<Rectangle>(optionButton) = {optionsRect.x + 9, optionsRect.y + 9, optionsRect.width - (9 * 2), 51};
+	ecs.getComponent<ButtonComponent>(optionButton).setNormalTextColor(WHITE);
+	ecs.getComponent<ButtonComponent>(optionButton).focusedTextColor = YELLOW;
+	ecs.getComponent<ColorRectComponent>(optionButton).color = BLANK;
+	ecs.getComponent<LabelComponent>(optionButton).text = "Test.";
+	ecs.getComponent<LabelComponent>(optionButton).horizontalAlignment = TEXT_ALIGN_CENTRE;
+	ecs.getComponent<LabelComponent>(optionButton).verticalAlignment = TEXT_ALIGN_MIDDLE;
+	ecs.getComponent<LabelComponent>(optionButton).font.fontSize = 13 * 3;
+	initEntityComponents(optionButton);
+
+	// test dialogue
 	DialogueBin testDialogue;
 	DialogueLine diagLine;
 	diagLine.sections.push_back({"", "Hello!"});
 	testDialogue.lines.push_back(diagLine);
-
-	DialogueArea *diagArea = new DialogueArea(normalDiagAreaRect);
-	diagArea->setRect(normalDiagAreaRect);
-	diagArea->setDialogue(testDialogue);
-
-	addElement("dialogueArea", diagArea, 1);
-
-	ImageRect *portraitRect = new ImageRect(Rectangle{diagImageRect.x + 9, diagImageRect.y + 9,
-													  diagImageRect.height - (9 * 2), diagImageRect.height - (9 * 2)});
-	portraitRect->setVisible(false);
-	addElement("portrait", portraitRect, 1);
-
-	// options
-
-	NinePatchImageRect *optionsImage = new NinePatchImageRect(optionsRect);
-	optionsImage->npatchInfo.top = 3;
-	optionsImage->npatchInfo.left = 3;
-	optionsImage->npatchInfo.bottom = 3;
-	optionsImage->npatchInfo.right = 3;
-	optionsImage->npatchInfo.layout = NPATCH_NINE_PATCH;
-	optionsImage->setScale(3);
-	optionsImage->setSource("ui-npatch.png");
-
-	optionsImage->setVisible(false);
-
-	addElement("optionsImage", optionsImage, 0);
-
-	Button *optionButton = new Button(Rectangle{optionsRect.x + 9, optionsRect.y + 9, optionsRect.width - (9 * 2), 51});
-	optionButton->setVisible(false);
-	optionButton->setBackgroundColor(BLANK);
-	optionButton->setNormalTextColor(WHITE);
-	optionButton->setFocusedTextColor(YELLOW);
-	optionButton->setTextSize(13 * 3);
-
-	addElement("optionButton", optionButton, 1);
-
-	auto dump = dumpJson();
-	auto str = dump.dump();
-	SaveFileText("dump.json", str.c_str());
+	ecs.getComponent<DialogueComponent>(diagArea).setDialogue(testDialogue);
 }
 
 DialogueInterfaceView::DialogueInterfaceView(const std::string &filePath) : InterfaceView(filePath) {}
@@ -85,107 +84,112 @@ DialogueInterfaceView::DialogueInterfaceView(InterfaceViewBin &bin) : InterfaceV
 
 void DialogueInterfaceView::setDialogue(DialogueBin dialogue) {
 	this->dialogue = dialogue;
-	if (elementExists("dialogueArea")) {
-		auto *diagArea = static_cast<DialogueArea *>(getElement("dialogueArea"));
-		diagArea->setDialogue(dialogue);
+
+	auto diagArea = ecs.getEntityManager().findName("dialogueArea");
+	if (diagArea != MAX_ENTITIES) {
+		ecs.getComponent<DialogueComponent>(diagArea).setDialogue(dialogue);
 	}
 }
 
 void DialogueInterfaceView::onNotify(Event event) {
 	InterfaceView::onNotify(event);
 
-	if (elementExists(focusedElementName)) return;
-
 	if (event.key == KEY_Z) {
-		if (elementExists("dialogueArea")) {
-			printf("a \n");
-			auto *diagArea = static_cast<DialogueArea *>(getElement("dialogueArea"));
+		auto diagArea = ecs.getEntityManager().findName("dialogueArea");
+		if (diagArea != MAX_ENTITIES) {
+			auto &diagComponent = ecs.getComponent<DialogueComponent>(diagArea);
 			if (!Game::getUi().getNotifyLock()) {
-				diagArea->advanceToNextLine();
+				diagComponent.advanceToNextLine();
 			}
 
-			if (diagArea->isDialogueFinished()) return;
+			if (diagComponent.dialogueFinished) return;
 
-			if (diagArea->line->hasPortrait) {
-				auto *portrait = static_cast<ImageRect *>(getElement("portrait"));
-				portrait->setSource(diagArea->line->imageId);
-				portrait->setVisible(true);
-				diagArea->setRect(portraitDiagAreaRect);
+			auto portrait = ecs.getEntityManager().findName("portrait");
+			if (diagComponent.line->hasPortrait) {
+				ecs.getComponent<ImageRectComponent>(portrait).loadImage(diagComponent.line->imageId);
+				ecs.getComponent<VisibilityComponent>(portrait).isVisible = true;
+				ecs.getComponent<Rectangle>(diagArea) = portraitDiagAreaRect;
 			} else {
-				getElement("portrait")->setVisible(false);
-				diagArea->setRect(normalDiagAreaRect);
+				ecs.getComponent<VisibilityComponent>(portrait).isVisible = false;
+				ecs.getComponent<Rectangle>(diagArea) = normalDiagAreaRect;
 			}
 
-			if (diagArea->line->hasOptions && elementExists("optionButton")) {
-				Button *baseButton = static_cast<Button *>(getElement("optionButton"));
-				Rectangle originRect = baseButton->getRect();
-				auto buttonProps = baseButton->dumpJson();
+			auto optionButton = ecs.getEntityManager().findName("optionButton");
+			if (diagComponent.line->hasOptions) {
+				Rectangle originRect = ecs.getComponent<Rectangle>(optionButton);
+				auto buttonBaseJson = dumpEntityJson(optionButton);
 				int i = 0;
-				for (auto &option : diagArea->line->options) {
-					Button *button = new Button();
-					button->fromJson(buttonProps);
-					button->setVisible(false);
-					button->setText(option.title);
+				for (auto &option : diagComponent.line->options) {
+					auto newButton = ecs.createEntity(TextFormat("option-%i", i));
+					for (auto &componentJson : buttonBaseJson.items()) {
+						ecs.insertComponentFromJson(newButton, componentJson.key(), componentJson.value());
+					}
 
-					Rectangle buttonRect = {originRect.x, originRect.y + (originRect.height * i), originRect.width,
-											originRect.height};
-					button->setRect(buttonRect);
+					ecs.getComponent<Rectangle>(newButton) = {originRect.x, originRect.y + (originRect.height * i),
+															  originRect.width, originRect.height};
+					ecs.getComponent<VisibilityComponent>(newButton).isVisible = false;
+					ecs.getComponent<LabelComponent>(newButton).text = option.title;
 
-					button->setUpElement(TextFormat("option-%i", i - 1));
-					button->setDownElement(TextFormat("option-%i", i + 1));
+					ecs.getComponent<InputComponent>(newButton).upButton.title = TextFormat("option-%i", i - 1);
+					ecs.getComponent<InputComponent>(newButton).downButton.title = TextFormat("option-%i", i + 1);
 
-					button->setCallback(CALLBACK_TRIGGER, [this, &option] {
+					initEntityComponents(newButton);
+
+					ecs.getComponent<InputComponent>(newButton).callbacks[CALLBACK_TRIGGER] = [this, &option] {
 						if (Game::isUsingBin()) {
-							printf("b \n");
 							Game::getUi().hideInterface();
 							Game::getUi().showDialogue(option.nextDialogue);
 							Game::getUi().setNotifyLock();
 							if (optionsCount > 0) {
 								for (int i = 0; i < optionsCount; i++) {
 									std::string elementName = TextFormat("option-%i", i);
-									if (elementExists(elementName)) {
-										removeElement(elementName);
+									auto buttonEntity = ecs.getEntityManager().findName(elementName);
+									if (buttonEntity != MAX_ENTITIES) {
+										ecs.destroyEntity(buttonEntity);
 									}
 								}
 							}
 						}
-					});
-
-					addElement(TextFormat("option-%i", i), button, 2);
+					};
 
 					i++;
 				}
+
 				changeFocusedElement("option-0");
 				optionsCount = i + 1;
 			} else {
-				getElement("optionsImage")->setVisible(false);
-				if (optionsCount > 0) {
-					for (int i = 0; i < optionsCount; i++) {
-						std::string elementName = TextFormat("option-%i", i);
-						if (elementExists(elementName)) {
-							removeElement(elementName);
-						}
+				auto optionsImage = ecs.getEntityManager().findName("optionsImage");
+				ecs.getComponent<VisibilityComponent>(optionsImage).isVisible = false;
+				for (int i = 0; i < optionsCount; i++) {
+					std::string elementName = TextFormat("option-%i", i);
+					auto entity = ecs.getEntityManager().findName(elementName);
+					if (entity != MAX_ENTITIES) {
+						ecs.destroyEntity(entity);
 					}
 				}
 				optionsCount = 0;
+				current = MAX_ENTITIES;
 			}
 		}
 	}
 }
 
 void DialogueInterfaceView::update() {
-	if (elementExists("dialogueArea")) {
-		auto *diagArea = static_cast<DialogueArea *>(getElement("dialogueArea"));
-		if (diagArea->isFinishedTyping() && diagArea->line->hasOptions) {
-			getElement("optionsImage")->setVisible(true);
+	auto diagArea = ecs.getEntityManager().findName("dialogueArea");
+	auto optionsImage = ecs.getEntityManager().findName("optionsImage");
+	if (diagArea != MAX_ENTITIES) {
+		auto &diagAreaComponent = ecs.getComponent<DialogueComponent>(diagArea);
+		if (diagAreaComponent.finishedTyping && diagAreaComponent.line->hasOptions) {
+			ecs.getComponent<VisibilityComponent>(optionsImage).isVisible = true;
+
 			int i = 0;
-			for (auto &option : diagArea->line->options) {
-				getElement(TextFormat("option-%i", i))->setVisible(true);
+			for (auto &option : diagAreaComponent.line->options) {
+				auto optionEntity = ecs.getEntityManager().findName(TextFormat("option-%i", i));
+				ecs.getComponent<VisibilityComponent>(optionEntity).isVisible = true;
 				i++;
 			}
 		}
-		if (diagArea->isDialogueFinished()) {
-			// finished dialogue..
+		if (diagAreaComponent.dialogueFinished) {
 			Game::getUi().hideInterface();
 		}
 	}

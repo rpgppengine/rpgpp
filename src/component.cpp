@@ -2,7 +2,108 @@
 
 #include <raymath.h>
 
+#include "dialogueBalloon.hpp"
 #include "game.hpp"
+#include "raylib.h"
+
+void LabelComponent::loadFont(const std::string &path) {
+	std::string fullPath = TextFormat("fonts/%s", font.path.c_str());
+	this->font.path = path;
+
+	if (Game::isUsingBin()) {
+		if (this->font.path.empty()) {
+			this->font.font = Game::getResources().getFont("LanaPixel");
+		} else {
+			this->font.font = Game::getResources().getFont(GetFileNameWithoutExt(path.c_str()));
+		}
+	} else {
+		if (this->font.path.empty()) {
+			auto fontPaths = LoadDirectoryFiles("fonts/");
+			if (fontPaths.count > 0) {
+				auto fontPath = fontPaths.paths[0];
+				fullPath = fontPath;
+			}
+		}
+		this->font.font = LoadFontEx(fullPath.c_str(), this->font.fontSize, nullptr, 256);
+	}
+}
+
+void TextAreaComponent::loadFont(const std::string &path) {
+	std::string fullPath = TextFormat("fonts/%s", font.path.c_str());
+	this->font.path = path;
+
+	if (Game::isUsingBin()) {
+		if (this->font.path.empty()) {
+			this->font.font = Game::getResources().getFont("LanaPixel");
+		} else {
+			this->font.font = Game::getResources().getFont(GetFileNameWithoutExt(path.c_str()));
+		}
+	} else {
+		if (this->font.path.empty()) {
+			auto fontPaths = LoadDirectoryFiles("fonts/");
+			if (fontPaths.count > 0) {
+				auto fontPath = fontPaths.paths[0];
+				fullPath = fontPath;
+			}
+		}
+		this->font.font = LoadFontEx(fullPath.c_str(), this->font.fontSize, nullptr, 256);
+	}
+}
+
+void ImageRectComponent::scaleImage(int scale) {
+	this->image.scale = scale;
+	Image image = LoadImage(TextFormat("images/%s", this->image.path.c_str()));
+	this->image.scale = (this->image.scale < 1) ? 1 : this->image.scale;
+	ImageResizeNN(&image, image.width * this->image.scale, image.height * this->image.scale);
+	this->image.texture = LoadTextureFromImage(image);
+	UnloadImage(image);
+}
+
+void ImageRectComponent::loadImage(const std::string &path) {
+	this->image.path = path;
+	scaleImage(this->image.scale);
+}
+
+void NinePatchImageRectComponent::scaleImage(int scale) {
+	this->image.scale = scale;
+	Image image = LoadImage(TextFormat("images/%s", this->image.path.c_str()));
+	this->image.scale = (this->image.scale < 1) ? 1 : this->image.scale;
+	ImageResizeNN(&image, image.width * this->image.scale, image.height * this->image.scale);
+	this->image.texture = LoadTextureFromImage(image);
+	UnloadImage(image);
+}
+
+void NinePatchImageRectComponent::loadImage(const std::string &path) {
+	this->image.path = path;
+	scaleImage(this->image.scale);
+}
+
+void ButtonComponent::setNormalTextColor(Color color) {
+	this->normalTextColor = color;
+	this->shownTextColor = color;
+}
+
+void DialogueComponent::setDialogue(const DialogueBin &dialogue) {
+	dialogueFinished = false;
+	finishedTyping = false;
+
+	this->dialogue = dialogue;
+	this->lineIndex = 0;
+	this->sectionIndex = 0;
+
+	line = &this->dialogue.lines.at(lineIndex);
+	section = &line->sections.at(sectionIndex);
+
+	firstCharTyped = false;
+	text = "";
+
+	for (auto k : dialogue.lines.at(lineIndex).sections) {
+		text = text.append(k.text);
+	}
+
+	this->frameCounter = 0;
+	this->charIndex = 0;
+}
 
 void DialogueComponent::putChar(Vector2 charMeasure, const char *c, Rectangle rect) {
 	Vector2 a = Vector2Add(textPos, Vector2{charMeasure.x + 1, 0.0f});

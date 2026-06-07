@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <functional>
 
+#include "dialogueBalloon.hpp"
 #include "gamedata.hpp"
 #include "raylib.h"
 
@@ -24,7 +25,7 @@ struct InputComponent {
 	UIElementRef leftButton;
 	UIElementRef rightButton;
 
-	std::map<CallbackType, std::function<void()>> callbacks = {};
+	std::map<CallbackType, std::function<void()>> callbacks = {{}, {}, {}};
 };
 
 struct LabelComponent {
@@ -34,6 +35,8 @@ struct LabelComponent {
 	TextAlignment verticalAlignment = TEXT_ALIGN_LEFT;
 
 	FontRef font;
+
+	void loadFont(const std::string &path);
 };
 
 struct TextAreaComponent {
@@ -41,6 +44,8 @@ struct TextAreaComponent {
 	Color textColor = BLACK;
 
 	FontRef font;
+
+	void loadFont(const std::string &path);
 };
 
 struct ColorRectComponent {
@@ -49,11 +54,15 @@ struct ColorRectComponent {
 
 struct ImageRectComponent {
 	ImageRef image;
+	void loadImage(const std::string &path);
+	void scaleImage(int scale);
 };
 
 struct NinePatchImageRectComponent {
 	NPatchInfo npatchInfo = {{0, 0, 0, 0}, 0, 0, 0, 0, NPATCH_NINE_PATCH};
 	ImageRef image;
+	void loadImage(const std::string &path);
+	void scaleImage(int scale);
 };
 
 struct DialogueComponent {
@@ -84,6 +93,7 @@ struct DialogueComponent {
 
 	bool dialogueFinished = false;
 
+	void setDialogue(const DialogueBin &dialogue);
 	void putChar(Vector2 charMeasure, const char *c, Rectangle rect);
 	void chooseSection(int i, Rectangle rect);
 	void advanceToNextLine();
@@ -94,6 +104,8 @@ struct ButtonComponent {
 	Color focusedTextColor = GRAY;
 
 	Color shownTextColor = BLACK;
+
+	void setNormalTextColor(Color color);
 };
 
 #endif

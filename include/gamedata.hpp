@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <unordered_map>
 #include <variant>
 #include <vector>
 
@@ -186,6 +187,7 @@ struct RoomBin {
 
 struct InterfaceViewBin {
 	std::map<std::string, UIElementBin> elements;
+	std::unordered_map<std::string, std::vector<std::uint8_t>> entites;
 };
 
 struct ProjectProgramSettings {
@@ -218,6 +220,7 @@ struct GameData {
 	std::vector<RoomBin> rooms;
 	std::map<std::string, ActorBin> actors;
 	std::vector<PropBin> props;
+	std::map<std::string, InterfaceViewBin> interfaceViews;
 	std::map<std::string, DialogueBin> dialogues;
 	std::map<std::string, MusicBin> music;
 	std::map<std::string, ScriptBin> scripts;

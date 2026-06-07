@@ -10,6 +10,7 @@
 #include "component.hpp"
 #include "dialogueArea.hpp"
 #include "entity.hpp"
+#include "gamedata.hpp"
 #include "imageRect.hpp"
 #include "label.hpp"
 #include "ninePatchImageRect.hpp"
@@ -42,6 +43,19 @@ EntityID construct(const std::string &title, const std::string &element, Coordin
 		ecs.addComponent(entity, Rectangle{0, 0, 50, 50});
 		for (auto &componentName : list) {
 			ecs.insertEmptyComponent(entity, componentName);
+		}
+
+		if (ecs.hasComponent<ButtonComponent>(entity) && ecs.hasComponent<InputComponent>(entity)) {
+			auto &input = ecs.getComponent<InputComponent>(entity);
+			input.callbacks[CALLBACK_FOCUSED] = [&ecs, entity] {
+				auto &button = ecs.getComponent<ButtonComponent>(entity);
+				button.shownTextColor = button.focusedTextColor;
+				printf("focused..\n");
+			};
+			input.callbacks[CALLBACK_UNFOCUSED] = [&ecs, entity] {
+				auto &button = ecs.getComponent<ButtonComponent>(entity);
+				button.shownTextColor = button.normalTextColor;
+			};
 		}
 	}
 

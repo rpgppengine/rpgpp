@@ -25,7 +25,7 @@ public:
 	void update();
 	void draw();
 	void drawEntity(EntityID entity);
-	void onNotify(Event event);
+	void onNotify(Event event, EntityID entity);
 };
 
 #endif

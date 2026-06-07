@@ -21,9 +21,9 @@ private:
 	Rectangle rect;
 	std::multimap<int, std::unique_ptr<UIElement>, std::less<int>> elements;
 
+protected:
 	Coordinator ecs;
 
-protected:
 	UIElement *focused = nullptr;
 	std::string focusedElementName = "";
 	EntityID current = MAX_ENTITIES;

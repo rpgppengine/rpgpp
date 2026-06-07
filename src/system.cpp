@@ -195,24 +195,22 @@ void System::drawEntity(EntityID entity) {
 	}
 }
 
-void System::onNotify(Event event) {
-	for (auto &entity : entities) {
-		auto &input = components->getComponent<InputComponent>(entity);
+void System::onNotify(Event event, EntityID entity) {
+	auto &input = components->getComponent<InputComponent>(entity);
 
-		if (event.key == KEY_UP) {
-			Game::getUi().getCurrentView()->changeFocusedElement(input.upButton.entityId);
-		}
-		if (event.key == KEY_DOWN) {
-			Game::getUi().getCurrentView()->changeFocusedElement(input.downButton.entityId);
-		}
-		if (event.key == KEY_LEFT) {
-			Game::getUi().getCurrentView()->changeFocusedElement(input.leftButton.entityId);
-		}
-		if (event.key == KEY_RIGHT) {
-			Game::getUi().getCurrentView()->changeFocusedElement(input.rightButton.entityId);
-		}
-		if (event.key == KEY_Z) {
-			input.callbacks[CALLBACK_TRIGGER]();
-		}
+	if (event.key == KEY_UP) {
+		Game::getUi().getCurrentView()->changeFocusedElement(input.upButton.title);
+	}
+	if (event.key == KEY_DOWN) {
+		Game::getUi().getCurrentView()->changeFocusedElement(input.downButton.title);
+	}
+	if (event.key == KEY_LEFT) {
+		Game::getUi().getCurrentView()->changeFocusedElement(input.leftButton.title);
+	}
+	if (event.key == KEY_RIGHT) {
+		Game::getUi().getCurrentView()->changeFocusedElement(input.rightButton.title);
+	}
+	if (event.key == KEY_Z) {
+		input.callbacks[CALLBACK_TRIGGER]();
 	}
 }

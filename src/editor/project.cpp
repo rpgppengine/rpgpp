@@ -20,8 +20,10 @@
 #include "dialogue.hpp"
 #include "dialogueParser.hpp"
 #include "editor.hpp"
+#include "entity.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"
+#include "interfaceView.hpp"
 #include "room.hpp"
 #include "screens/projectScreen.hpp"
 #include "services/fileSystemService.hpp"
@@ -552,6 +554,7 @@ GameData Project::generateStruct() {
 	}
 	UnloadDirectoryFiles(scriptsList);
 
+	// user scripts
 	auto userScriptsList = LoadDirectoryFiles("scripts/");
 	for (int i = 0; i < userScriptsList.count; i++) {
 		std::string scriptPath = userScriptsList.paths[i];
@@ -562,6 +565,20 @@ GameData Project::generateStruct() {
 
 		data.scripts[TextFormat("scripts/%s", GetFileName(scriptPath.c_str()))] = bin;
 		UnloadFileText(scriptText);
+	}
+
+	for (auto viewPath : getPaths(EngineFileType::FILE_INTERFACEVIEW)) {
+		InterfaceView view(viewPath);
+
+		InterfaceViewBin bin;
+
+		for (EntityID entity : view.getEntities()) {
+			auto entityJson = view.dumpEntityJson(entity);
+			auto cbor = json::to_cbor(entityJson);
+			bin.entites[view.getCoordinator().getEntityName(entity)] = cbor;
+		}
+
+		data.interfaceViews[GetFileNameWithoutExt(viewPath.c_str())] = bin;
 	}
 
 	return data;

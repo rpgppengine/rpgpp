@@ -157,4 +157,5 @@ void to_json(json &j, const ButtonComponent &button) {
 void from_json(const json &j, ButtonComponent &button) {
 	j.at("normalTextColor").get_to(button.normalTextColor);
 	j.at("focusedTextColor").get_to(button.focusedTextColor);
+	button.shownTextColor = button.normalTextColor;
 }
