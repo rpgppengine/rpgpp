@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "TGUI/Vector2.hpp"
+#include "drawHelper.hpp"
 #include "raylib.h"
 #include "views/worldView.hpp"
 
@@ -35,7 +36,7 @@ void NPatchView::drawCanvas() {
 	}
 
 	DrawTextureV(texture, {0, 0}, WHITE);
-	DrawRectangleLines(0, 0, static_cast<int>(texture.width), static_cast<int>(texture.height), GRAY);
+	DrawRectangleLinesPro({0, 0, static_cast<float>(texture.width), static_cast<float>(texture.height)}, GRAY);
 
 	lines.draw();
 }

@@ -99,6 +99,9 @@ void Game::useBin(const std::string &filePath) {
 			}
 		}
 	}
+
+	/// Setup Interfaces
+	ui->initBin(*gameData);
 }
 
 GameData &Game::getBin() { return *gameData; }

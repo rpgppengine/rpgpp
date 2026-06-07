@@ -186,7 +186,6 @@ struct RoomBin {
 };
 
 struct InterfaceViewBin {
-	std::map<std::string, UIElementBin> elements;
 	std::unordered_map<std::string, std::vector<std::uint8_t>> entites;
 };
 

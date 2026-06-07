@@ -55,10 +55,14 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 }
 
 InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{}) {
-	for (auto &[title, elementBin] : bin.elements) {
-		auto element = constructElement(elementBin.type);
-		element->fromBin(elementBin);
-		addElement(title, std::move(element), elementBin.layer);
+	for (auto &[title, elementCbor] : bin.entites) {
+		auto entity = ecs.createEntity(title);
+
+		auto elementJson = json::from_cbor(elementCbor);
+		for (auto &componentJson : elementJson.items()) {
+			ecs.insertComponentFromJson(entity, componentJson.key(), componentJson.value());
+		}
+		initEntityComponents(entity);
 	}
 }
 

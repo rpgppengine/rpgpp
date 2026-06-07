@@ -5,6 +5,7 @@
 #include "TGUI/Vector2.hpp"
 #include "component.hpp"
 #include "components/resizableCanvasBox.hpp"
+#include "drawHelper.hpp"
 #include "editor.hpp"
 #include "entity.hpp"
 #include "interfaceView.hpp"
@@ -71,10 +72,9 @@ void InterfaceViewView::drawCanvas() {
 		if (ecs.hasComponent<Rectangle>(entity)) {
 			system.drawEntity(entity);
 
+			// draw entity's rect
 			Rectangle rect = ecs.getComponent<Rectangle>(entity);
-
-			DrawRectangleLines(static_cast<int>(rect.x), static_cast<int>(rect.y), static_cast<int>(rect.width),
-							   static_cast<int>(rect.height), Fade(DARKGRAY, 0.7f));
+			DrawRectangleLinesPro(rect, Fade(DARKGRAY, 0.7f));
 
 			// draw entity name
 			auto measureText = MeasureTextEx(editorFont, name.c_str(), nameFontSize, nameSpacing);
@@ -87,11 +87,8 @@ void InterfaceViewView::drawCanvas() {
 	// draw window borders
 	auto windowSize = Editor::instance->getProject()->getProgramSettings().windowSize;
 
-	DrawLine(0, 0, windowSize.x, 0, DARKGRAY);
-	DrawLine(0, windowSize.y, windowSize.x, windowSize.y, DARKGRAY);
-
-	DrawLine(0, 0, 0, windowSize.y, DARKGRAY);
-	DrawLine(windowSize.x, 0, windowSize.x, windowSize.y, DARKGRAY);
+	Rectangle windowSizeRec = {0, 0, static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)};
+	DrawRectangleLinesPro(windowSizeRec, DARKGRAY);
 
 	// draw origin
 	drawOrigin();

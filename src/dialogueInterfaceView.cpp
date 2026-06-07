@@ -27,6 +27,7 @@ static const Rectangle optionsRect =
 	Rectangle{diagImageRect.x + (diagImageRect.width - 180), diagImageRect.y - 8 - 180, 180, 180};
 
 DialogueInterfaceView::DialogueInterfaceView() : InterfaceView(Rectangle{}) {
+	/*
 	auto diagImage = construct("diagImage", "NPatchImage", ecs);
 	ecs.getComponent<Rectangle>(diagImage) = diagImageRect;
 	auto &diagImageComponent = ecs.getComponent<NinePatchImageRectComponent>(diagImage);
@@ -69,13 +70,16 @@ DialogueInterfaceView::DialogueInterfaceView() : InterfaceView(Rectangle{}) {
 	ecs.getComponent<LabelComponent>(optionButton).verticalAlignment = TEXT_ALIGN_MIDDLE;
 	ecs.getComponent<LabelComponent>(optionButton).font.fontSize = 13 * 3;
 	initEntityComponents(optionButton);
+	*/
 
 	// test dialogue
+	/*
 	DialogueBin testDialogue;
 	DialogueLine diagLine;
 	diagLine.sections.push_back({"", "Hello!"});
 	testDialogue.lines.push_back(diagLine);
 	ecs.getComponent<DialogueComponent>(diagArea).setDialogue(testDialogue);
+	*/
 }
 
 DialogueInterfaceView::DialogueInterfaceView(const std::string &filePath) : InterfaceView(filePath) {}

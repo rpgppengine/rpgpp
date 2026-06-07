@@ -20,6 +20,11 @@ void System::update() {
 		if (hasComponent<DialogueComponent>(entity)) {
 			auto &dialogue = components->getComponent<DialogueComponent>(entity);
 
+			if (dialogue.line == nullptr) return;
+
+			if (dialogue.dialogue.lines.size() < dialogue.lineIndex) return;
+			if (dialogue.line->sections.size() < dialogue.sectionIndex) return;
+
 			dialogue.line = &dialogue.dialogue.lines.at(dialogue.lineIndex);
 			dialogue.section = &dialogue.line->sections.at(dialogue.sectionIndex);
 

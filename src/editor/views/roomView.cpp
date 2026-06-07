@@ -16,6 +16,7 @@
 #include "actions/startPointAction.hpp"
 #include "actor.hpp"
 #include "conversion.hpp"
+#include "drawHelper.hpp"
 #include "editor.hpp"
 #include "enum_visitor/enum_visitor.hpp"
 #include "gamedata.hpp"
@@ -128,7 +129,7 @@ void RoomView::drawCanvas() {
 			}
 
 			// Draw tile border
-			DrawRectangleLines(destRect.x, destRect.y, destRect.width, destRect.height, Fade(GRAY, 0.5f));
+			DrawRectangleLinesPro(destRect, Fade(GRAY, 0.5f));
 			if (CheckCollisionPointRec(mouseWorldPos, destRect)) {
 				overlayRect = destRect;
 			}

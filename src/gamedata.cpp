@@ -119,6 +119,16 @@ void serialize(Archive &a, DialogueBin &b) {
 }
 
 template <class Archive>
+void serialize(Archive &a, ScriptBin &b) {
+	a(b.bytecode);
+}
+
+template <class Archive>
+void serialize(Archive &a, InterfaceViewBin &b) {
+	a(b.entites);
+}
+
+template <class Archive>
 void serialize(Archive &a, ProjectProgramSettings &b) {
 	a(b.projectTitle, b.projectVersion, b.windowSize, b.programIconPath, b.windowResizeableFlag, b.windowStateFlag,
 	  b.targetFPS);
@@ -132,12 +142,7 @@ void serialize(Archive &a, ProjectGameSettings &b) {
 template <class Archive>
 void serialize(Archive &a, GameData &b) {
 	a(b.title, b.programSet, b.gameSet, b.images, b.fonts, b.tilesets, b.rooms, b.actors, b.props, b.dialogues, b.music,
-	  b.interactables, b.scripts);
-}
-
-template <class Archive>
-void serialize(Archive &a, ScriptBin &b) {
-	a(b.bytecode);
+	  b.interactables, b.scripts, b.interfaceViews);
 }
 
 void serializeDataToFile(std::string fileName, GameData data) {

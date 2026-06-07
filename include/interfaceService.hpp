@@ -8,6 +8,7 @@
 #include <string>
 
 #include "dialogueBalloon.hpp"
+#include "gamedata.hpp"
 #include "interfaceView.hpp"
 
 /** The InterfaceService acts for the User Interface (UI). */
@@ -30,6 +31,7 @@ public:
 	/** Empty constructor. */
 	InterfaceService();
 	~InterfaceService();
+	void initBin(GameData &bin);
 	/** Get the font used for the game's UI. */
 	Font getFont() const;
 	/** Get the texture, used for UI nine-patch components. */

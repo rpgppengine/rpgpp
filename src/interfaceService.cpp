@@ -12,6 +12,7 @@
 #include "dialogueBalloon.hpp"
 #include "dialogueInterfaceView.hpp"
 #include "game.hpp"
+#include "gamedata.hpp"
 #include "imageRect.hpp"
 #include "interfaceView.hpp"
 #include "ninePatchImageRect.hpp"
@@ -85,22 +86,27 @@ InterfaceService::InterfaceService() {
 	button->setCallback(CALLBACK_TRIGGER, [] { printf("button2 tirggered..\n"); });
 	view->addElement("button2", button2, 0);
 
-	// std::string viewDump = view->dumpJson().dump();
-	// SaveFileText("ui.json", viewDump.c_str());
-
-	// views.emplace("test", std::move(view));
+	auto diagView = std::make_unique<DialogueInterfaceView>();
+	views["test"] = std::move(diagView);
 
 	// currentViewName = "test";
-
-	auto diagView = std::make_unique<DialogueInterfaceView>();
-	views.emplace("test", std::move(diagView));
-
-	currentViewName = "test";
 }
 
 InterfaceService::~InterfaceService() {
 	// UnloadFont(font);
 	// UnloadTexture(this->uiTexture);
+}
+
+void InterfaceService::initBin(GameData &bin) {
+	if (bin.interfaceViews.count("dialogue") > 0) {
+		auto diagView = std::make_unique<DialogueInterfaceView>(bin.interfaceViews["dialogue"]);
+		views["test"] = std::move(diagView);
+	}
+
+	for (auto &[title, viewBin] : bin.interfaceViews) {
+		auto view = std::make_unique<InterfaceView>(viewBin);
+		views.emplace(title, std::move(view));
+	}
 }
 
 Font InterfaceService::getFont() const { return font; }
