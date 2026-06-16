@@ -4,19 +4,14 @@
 #include <memory>
 #include <vector>
 
-#include "button.hpp"
 #include "component.hpp"
-#include "dialogueArea.hpp"
 #include "dialogueBalloon.hpp"
 #include "entity.hpp"
 #include "game.hpp"
 #include "gamedata.hpp"
-#include "imageRect.hpp"
 #include "interfaceElementFactory.hpp"
 #include "interfaceView.hpp"
-#include "ninePatchImageRect.hpp"
 #include "raylib.h"
-#include "uiElement.hpp"
 
 static const Rectangle diagImageRect = Rectangle{10, 320, 620, 140};
 static const Rectangle normalDiagAreaRect = Rectangle{19, 329, 611, 131};
@@ -26,61 +21,7 @@ static const Rectangle portraitDiagAreaRect =
 static const Rectangle optionsRect =
 	Rectangle{diagImageRect.x + (diagImageRect.width - 180), diagImageRect.y - 8 - 180, 180, 180};
 
-DialogueInterfaceView::DialogueInterfaceView() : InterfaceView(Rectangle{}) {
-	/*
-	auto diagImage = construct("diagImage", "NPatchImage", ecs);
-	ecs.getComponent<Rectangle>(diagImage) = diagImageRect;
-	auto &diagImageComponent = ecs.getComponent<NinePatchImageRectComponent>(diagImage);
-	diagImageComponent.npatchInfo.top = 3;
-	diagImageComponent.npatchInfo.left = 3;
-	diagImageComponent.npatchInfo.bottom = 3;
-	diagImageComponent.npatchInfo.right = 3;
-	diagImageComponent.npatchInfo.layout = NPATCH_NINE_PATCH;
-	diagImageComponent.scaleImage(3);
-	diagImageComponent.loadImage("ui-npatch.png");
-
-	auto diagArea = construct("dialogueArea", "Dialogue", ecs);
-	ecs.getComponent<Rectangle>(diagArea) = normalDiagAreaRect;
-
-	auto portrait = construct("portrait", "Image", ecs);
-	ecs.getComponent<VisibilityComponent>(portrait).isVisible = false;
-	ecs.getComponent<Rectangle>(portrait) = {diagImageRect.x + 9, diagImageRect.y + 9, diagImageRect.height - (9 * 2),
-											 diagImageRect.height - (9 * 2)};
-
-	auto optionsImage = construct("optionsImage", "NPatchImage", ecs);
-	ecs.getComponent<VisibilityComponent>(optionsImage).isVisible = false;
-	ecs.getComponent<Rectangle>(optionsImage) = optionsRect;
-	auto &optionsImageComponent = ecs.getComponent<NinePatchImageRectComponent>(optionsImage);
-	optionsImageComponent.npatchInfo.top = 3;
-	optionsImageComponent.npatchInfo.left = 3;
-	optionsImageComponent.npatchInfo.bottom = 3;
-	optionsImageComponent.npatchInfo.right = 3;
-	optionsImageComponent.npatchInfo.layout = NPATCH_NINE_PATCH;
-	optionsImageComponent.scaleImage(3);
-	optionsImageComponent.loadImage("ui-npatch.png");
-
-	auto optionButton = construct("optionButton", "Button", ecs);
-	ecs.getComponent<VisibilityComponent>(optionButton).isVisible = false;
-	ecs.getComponent<Rectangle>(optionButton) = {optionsRect.x + 9, optionsRect.y + 9, optionsRect.width - (9 * 2), 51};
-	ecs.getComponent<ButtonComponent>(optionButton).setNormalTextColor(WHITE);
-	ecs.getComponent<ButtonComponent>(optionButton).focusedTextColor = YELLOW;
-	ecs.getComponent<ColorRectComponent>(optionButton).color = BLANK;
-	ecs.getComponent<LabelComponent>(optionButton).text = "Test.";
-	ecs.getComponent<LabelComponent>(optionButton).horizontalAlignment = TEXT_ALIGN_CENTRE;
-	ecs.getComponent<LabelComponent>(optionButton).verticalAlignment = TEXT_ALIGN_MIDDLE;
-	ecs.getComponent<LabelComponent>(optionButton).font.fontSize = 13 * 3;
-	initEntityComponents(optionButton);
-	*/
-
-	// test dialogue
-	/*
-	DialogueBin testDialogue;
-	DialogueLine diagLine;
-	diagLine.sections.push_back({"", "Hello!"});
-	testDialogue.lines.push_back(diagLine);
-	ecs.getComponent<DialogueComponent>(diagArea).setDialogue(testDialogue);
-	*/
-}
+DialogueInterfaceView::DialogueInterfaceView() : InterfaceView(Rectangle{}) {}
 
 DialogueInterfaceView::DialogueInterfaceView(const std::string &filePath) : InterfaceView(filePath) {}
 

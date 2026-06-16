@@ -14,17 +14,14 @@
 #include "gamedata.hpp"
 #include "lua.h"
 #include "saveable.hpp"
-#include "uiElement.hpp"
 
 class InterfaceView : public ISaveable {
 private:
 	Rectangle rect;
-	std::multimap<int, std::unique_ptr<UIElement>, std::less<int>> elements;
 
 protected:
 	Coordinator ecs;
 
-	UIElement *focused = nullptr;
 	std::string focusedElementName = "";
 	EntityID current = MAX_ENTITIES;
 
@@ -38,13 +35,12 @@ public:
 	nlohmann::json dumpJson();
 
 	bool elementExists(const std::string &title);
-	void addElement(const std::string &title, UIElement *element, int layer);
-	void addElement(const std::string &title, std::unique_ptr<UIElement> element, int layer);
+	EntityID addElement(const std::string &title);
 	void removeElement(const std::string &title);
-	UIElement *getElement(const std::string &title);
+	EntityID getElement(const std::string &title);
 	void renameElement(const std::string &title, const std::string &newTitle);
 	void changeFocusedElement(const std::string &title);
-	const std::multimap<int, std::unique_ptr<UIElement>, std::less<int>> &getElements();
+	const std::set<EntityID> &getElements();
 
 	virtual void onNotify(Event event);
 	virtual void update();

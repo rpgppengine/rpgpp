@@ -1,6 +1,5 @@
 #include "lua/uiTypesApi.hpp"
 
-#include "button.hpp"
 #include "component.hpp"
 #include "gamedata.hpp"
 #include "lua.h"

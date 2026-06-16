@@ -31,6 +31,7 @@ public:
 	/** Empty constructor. */
 	InterfaceService();
 	~InterfaceService();
+	/** Initialize this service with a GameBin. */
 	void initBin(GameData &bin);
 	/** Get the font used for the game's UI. */
 	Font getFont() const;

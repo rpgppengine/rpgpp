@@ -7,7 +7,6 @@
 #include "dialogueBalloon.hpp"
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
-#include "uiElement.hpp"
 
 class DialogueInterfaceView : public InterfaceView {
 public:

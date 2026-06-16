@@ -7,7 +7,6 @@
 #include "game.hpp"
 #include "raylib.h"
 #include "raymath.h"
-#include "uiElement.hpp"
 
 void System::update() {
 	if (components == nullptr || entitiesManager == nullptr) return;

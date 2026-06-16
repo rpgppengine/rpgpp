@@ -17,13 +17,11 @@
 #include "raylib.h"
 #include "sol/state_view.hpp"
 #include "system.hpp"
-#include "uiElement.hpp"
 
 InterfaceView::InterfaceView() : InterfaceView(Rectangle{}) {}
 
 InterfaceView::InterfaceView(Rectangle rect) {
 	this->rect = rect;
-	this->elements = std::multimap<int, std::unique_ptr<UIElement>, std::less<int>>{};
 
 	ecs.init();
 
@@ -86,80 +84,25 @@ nlohmann::json InterfaceView::dumpJson() {
 }
 
 bool InterfaceView::elementExists(const std::string &title) {
-	bool res = false;
-	for (auto &item : elements) {
-		if (item.second->getName() == title) {
-			res = true;
-			break;
-		}
-	}
-	return res;
+	return ecs.getEntityManager().findName(title) < MAX_ENTITIES;
 }
 
-void InterfaceView::addElement(const std::string &title, UIElement *element, int layer) {
-	element->setName(title);
-	element->setLayer(layer);
-	auto ptr = std::unique_ptr<UIElement>{};
-	ptr.reset(element);
-	this->elements.emplace(std::make_pair(layer, std::move(ptr)));
-}
-
-void InterfaceView::addElement(const std::string &title, std::unique_ptr<UIElement> element, int layer) {
-	element->setName(title);
-	element->setLayer(layer);
-	this->elements.emplace(std::make_pair(layer, std::move(element)));
-}
+EntityID InterfaceView::addElement(const std::string &title) { return ecs.createEntity(title); }
 
 void InterfaceView::removeElement(const std::string &title) {
-	for (auto &item : elements) {
-		if (item.second->getName() == title) {
-			if (focusedElementName == title) {
-				focusedElementName = "";
-				focused = nullptr;
-			}
-			elements.erase(item.first);
-			break;
-		}
+	EntityID entity = ecs.getEntityManager().findName(title);
+	if (entity < MAX_ENTITIES) {
+		ecs.destroyEntity(entity);
 	}
 }
 
-UIElement *InterfaceView::getElement(const std::string &title) {
-	UIElement *res = nullptr;
-	for (auto &&item : elements) {
-		if (item.second->getName() == title) {
-			res = item.second.get();
-			break;
-		}
-	}
-	return res;
-}
+EntityID InterfaceView::getElement(const std::string &title) { return ecs.getEntityManager().findName(title); }
 
-const std::multimap<int, std::unique_ptr<UIElement>, std::less<int>> &InterfaceView::getElements() { return elements; }
+const std::set<EntityID> &InterfaceView::getElements() { return ecs.getEntities(); }
 
-void InterfaceView::renameElement(const std::string &title, const std::string &newTitle) {
-	for (auto &item : elements) {
-		if (item.second->getName() == title) {
-			item.second->setName(newTitle);
-			break;
-		}
-	}
-}
+void InterfaceView::renameElement(const std::string &title, const std::string &newTitle) {}
 
 void InterfaceView::changeFocusedElement(const std::string &title) {
-	/*
-	if (elementExists(title)) {
-		auto *element = getElement(title);
-		if (element->isFocusable()) {
-			focusedElementName = title;
-			if (focused != nullptr) {
-				focused->invokeCallback(CALLBACK_UNFOCUSED);
-			}
-			focused = element;
-			focused->invokeCallback(CALLBACK_FOCUSED);
-		}
-	}
-		*/
-
 	auto entity = ecs.getEntityManager().findName(title);
 	if (entity <= MAX_ENTITIES) {
 		changeFocusedElement(entity);
@@ -167,43 +110,14 @@ void InterfaceView::changeFocusedElement(const std::string &title) {
 }
 
 void InterfaceView::onNotify(Event event) {
-	if (elementExists(focusedElementName)) {
-		focused = getElement(focusedElementName);
-	} else {
-		focused = nullptr;
-	}
-	if (focused != nullptr) {
-		focused->onNotify(event);
-	}
-
 	if (current < MAX_ENTITIES) {
 		ecs.getSystem().onNotify(event, current);
 	}
 }
 
-void InterfaceView::update() {
-	/*
-	for (auto &item : elements) {
-		if (item.second->isVisible()) {
-			item.second->update();
-		}
-	}
-	*/
+void InterfaceView::update() { ecs.update(); }
 
-	ecs.update();
-}
-
-void InterfaceView::draw() {
-	/*
-	for (auto &item : elements) {
-		if (item.second->isVisible()) {
-			item.second->draw();
-		}
-	}
-	*/
-
-	ecs.draw();
-}
+void InterfaceView::draw() { ecs.draw(); }
 
 Coordinator &InterfaceView::getCoordinator() { return ecs; }
 

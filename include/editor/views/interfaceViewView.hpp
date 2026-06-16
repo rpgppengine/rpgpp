@@ -10,7 +10,6 @@
 #include "interfaceView.hpp"
 #include "rttrVariantPropVisitor.hpp"
 #include "sol/state.hpp"
-#include "uiElement.hpp"
 #include "views/worldView.hpp"
 #include "widgets/propertiesBox.hpp"
 
@@ -18,7 +17,6 @@ class InterfaceViewView : public WorldView {
 private:
 	std::unique_ptr<ResizableCanvasBox> canvasBox;
 	bool hasActiveElement = false;
-	UIElement *activeElement = nullptr;
 	EntityID activeEntity = MAX_ENTITIES;
 	void setElementAtMouse();
 

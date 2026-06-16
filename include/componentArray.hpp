@@ -10,6 +10,7 @@
 #include <unordered_map>
 
 #include "entity.hpp"
+#include "jsonConversions.hpp"
 #include "lua.h"
 #include "nlohmann/json_fwd.hpp"
 #include "rttr/variant.h"

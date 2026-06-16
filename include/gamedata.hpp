@@ -84,6 +84,10 @@ enum InterfaceElementType {
 
 typedef std::variant<int, std::string, Rectangle, Color, NPatchInfo, UIElementRef, TextAlignment> PropVariant;
 
+struct Event {
+	KeyboardKey key;
+};
+
 struct UIElementBin {
 	InterfaceElementType type;
 	int layer;

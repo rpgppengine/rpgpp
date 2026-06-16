@@ -11,7 +11,6 @@
 #include "interfaceView.hpp"
 #include "project.hpp"
 #include "raylib.h"
-#include "uiElement.hpp"
 #include "views/worldView.hpp"
 
 InterfaceViewView::InterfaceViewView() {
