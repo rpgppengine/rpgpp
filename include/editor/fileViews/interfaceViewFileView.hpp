@@ -10,12 +10,14 @@
 #include "rttrVariantPropVisitor.hpp"
 #include "views/interfaceViewView.hpp"
 #include "widgets/propertiesBox.hpp"
+#include "widgets/propertyFields/fileField.hpp"
 
 class InterfaceViewFileView : public FileView {
 private:
 	static const int RIGHT_PANEL_W = 300;
 
 	tgui::TreeView::Ptr treeView;
+	FileField::Ptr scriptFileField;
 	PropertiesBox::Ptr propertiesBox;
 	InterfaceViewView::Ptr view;
 

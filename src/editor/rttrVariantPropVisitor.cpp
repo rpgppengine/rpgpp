@@ -9,6 +9,8 @@
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
 #include "raylib.h"
+#include "rttr/enumeration.h"
+#include "rttr/type.h"
 #include "rttr/variant.h"
 #include "widgets/propertiesBox.hpp"
 #include "widgets/propertyFields/boolField.hpp"
@@ -35,6 +37,7 @@ VariantPropVisitor::VariantPropVisitor() {
 	map["ImageRef"] = p_ImageRef;
 	map["NPatchInfo"] = p_NPatchInfo;
 	map["TextAlignment"] = p_TextAlignment;
+	map["CallbacksArray"] = p_CallbacksArray;
 }
 
 void VariantPropVisitor::Rect(std::string name, rttr::variant var) {
@@ -220,4 +223,23 @@ void VariantPropVisitor::p_TextAlignment(rttr::property prop) {
 	field->value->onItemSelect([alignment](int index) { *alignment = static_cast<TextAlignment>(index); });
 
 	box->addSelectField(field);
+}
+
+void VariantPropVisitor::p_CallbacksArray(rttr::property prop) {
+	CallbacksArray *arr = prop.get_value(component).get_value<CallbacksArray *>();
+
+	auto enumer = rttr::type::get_by_name("CallbackType").get_enumeration();
+
+	for (int i = 0; i < arr->funcNames.size(); i++) {
+		auto field = TextField::create();
+
+		std::string enumValName = enumer.value_to_name(static_cast<CallbackType>(i)).to_string();
+		field->label->setText(enumValName);
+
+		field->value->setText(arr->funcNames[i]);
+		field->value->onTextChange(
+			[i, arr](const tgui::String &newText) { arr->funcNames[i] = newText.toStdString(); });
+
+		box->addTextField(field);
+	}
 }

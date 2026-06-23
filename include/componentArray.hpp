@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdio>
 #include <nlohmann/json.hpp>
 #include <sol/object.hpp>
 #include <sol/userdata.hpp>
@@ -11,10 +12,12 @@
 
 #include "entity.hpp"
 #include "jsonConversions.hpp"
-#include "lua.h"
 #include "nlohmann/json_fwd.hpp"
+#include "rttr/property.h"
+#include "rttr/type.h"
 #include "rttr/variant.h"
 #include "sol/forward.hpp"
+#include "sol/make_reference.hpp"
 
 class IComponentArray {
 public:
@@ -110,6 +113,12 @@ public:
 		if (entityToIndex.find(entity) == entityToIndex.end()) {
 			throw std::runtime_error("Cannot get non-existing component.");
 		}
+
+		/*
+		for (const rttr::property &prop : getDataVariant(entity).get_type().get_properties()) {
+			printf("%s \n", prop.get_name().to_string().c_str());
+		}
+		*/
 
 		sol::object obj = sol::make_object(L, &components[entityToIndex[entity]]);
 		return obj;

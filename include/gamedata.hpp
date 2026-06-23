@@ -60,6 +60,12 @@ struct ImageRef {
 
 enum CallbackType { CALLBACK_TRIGGER, CALLBACK_FOCUSED, CALLBACK_UNFOCUSED };
 
+#define RPGPP_CALLBACK_MAX (3)
+
+struct CallbacksArray {
+	std::array<std::string, RPGPP_CALLBACK_MAX> funcNames = {};
+};
+
 enum TextAlignment {
 	TEXT_ALIGN_LEFT = 0,
 	TEXT_ALIGN_TOP = 0,
@@ -69,29 +75,10 @@ enum TextAlignment {
 	TEXT_ALIGN_BOTTOM = 2
 };
 
-enum InterfaceElementType {
-	INTERFACE_NULL,
-	INTERFACE_TEXTAREA,
-	INTERFACE_LABEL,
-	INTERFACE_COLORRECT,
-	INTERFACE_IMAGERECT,
-	INTERFACE_NINEPATCHIMAGERECT,
-	INTERFACE_BUTTON,
-	INTERFACE_DIALOGUEAREA
-};
-
-#define RPGPP_INTERFACE_ELEMENT_MAX (8)
-
 typedef std::variant<int, std::string, Rectangle, Color, NPatchInfo, UIElementRef, TextAlignment> PropVariant;
 
 struct Event {
 	KeyboardKey key;
-};
-
-struct UIElementBin {
-	InterfaceElementType type;
-	int layer;
-	std::map<std::string, PropVariant> props;
 };
 
 struct ActorBin {
@@ -190,6 +177,7 @@ struct RoomBin {
 };
 
 struct InterfaceViewBin {
+	std::string scriptSource = "";
 	std::unordered_map<std::string, std::vector<std::uint8_t>> entites;
 };
 

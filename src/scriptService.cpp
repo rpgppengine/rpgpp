@@ -8,6 +8,7 @@
 #include "lua/soundsApi.hpp"
 #include "lua/stateApi.hpp"
 #include "lua/worldApi.hpp"
+#include "sol/forward.hpp"
 #include "sol/state_view.hpp"
 #include "sol/table.hpp"
 
@@ -55,4 +56,9 @@ void ScriptService::addToState(nlohmann::json &j) {
 			props[prop.key()] = prop.value().get<float>();
 		}
 	}
+}
+
+sol::environment ScriptService::createEnvironment() {
+	sol::environment env(state);
+	return env;
 }

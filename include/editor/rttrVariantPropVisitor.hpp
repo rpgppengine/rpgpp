@@ -32,6 +32,7 @@ public:
 	static void p_ImageRef(rttr::property prop);
 	static void p_NPatchInfo(rttr::property prop);
 	static void p_TextAlignment(rttr::property prop);
+	static void p_CallbacksArray(rttr::property prop);
 };
 
 #endif

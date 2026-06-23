@@ -73,3 +73,8 @@ EntityID EntityManager::findName(const std::string &name) {
 }
 
 const std::string &EntityManager::getName(EntityID id) { return names[id]; }
+
+void EntityManager::renameEntity(EntityID id, const std::string &newName) {
+	if (id >= MAX_ENTITIES) return;
+	names[id] = newName;
+}

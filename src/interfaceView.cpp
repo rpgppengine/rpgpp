@@ -11,12 +11,19 @@
 #include "component.hpp"
 #include "coordinator.hpp"
 #include "entity.hpp"
+#include "game.hpp"
 #include "gamedata.hpp"
 #include "interfaceElementFactory.hpp"
 #include "lua.h"
+#include "lua/reflect.hpp"
 #include "raylib.h"
+#include "scriptService.hpp"
+#include "sol/environment.hpp"
+#include "sol/forward.hpp"
 #include "sol/state_view.hpp"
+#include "sol/types.hpp"
 #include "system.hpp"
+#include "uiTypesApi.hpp"
 
 InterfaceView::InterfaceView() : InterfaceView(Rectangle{}) {}
 
@@ -50,6 +57,8 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 			ecs.insertComponentFromJson(entity, componentJson.key(), componentJson.value());
 		}
 	}
+
+	scriptSource = j.at("script");
 }
 
 InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{}) {
@@ -61,6 +70,23 @@ InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{})
 			ecs.insertComponentFromJson(entity, componentJson.key(), componentJson.value());
 		}
 		initEntityComponents(entity);
+	}
+
+	scriptSource = bin.scriptSource;
+
+	if (!scriptSource.empty() && Game::isUsingBin()) {
+		std::string key = TextFormat("scripts/%s", scriptSource.c_str());
+		if (Game::getBin().scripts.count(key) > 0) {
+			std::string luaCode = Game::getBin().scripts[key].bytecode;
+			Game::getScripts().getState()["self"] = sol::nil;
+			auto env = sol::environment(Game::getScripts().getState(), Game::getScripts().getState().globals());
+			lua_ui_types_set(env);
+			env["self"] = this;
+			env["view"] = this;
+			this->env = env;
+
+			Game::getScripts().getState().do_string(luaCode, this->env);
+		}
 	}
 }
 
@@ -79,6 +105,8 @@ nlohmann::json InterfaceView::dumpJson() {
 			j["entities"][name][componentName] = componentJson;
 		}
 	}
+
+	j["script"] = scriptSource;
 
 	return j;
 }
@@ -100,12 +128,44 @@ EntityID InterfaceView::getElement(const std::string &title) { return ecs.getEnt
 
 const std::set<EntityID> &InterfaceView::getElements() { return ecs.getEntities(); }
 
-void InterfaceView::renameElement(const std::string &title, const std::string &newTitle) {}
+void InterfaceView::renameElement(const std::string &title, const std::string &newTitle) {
+	ecs.getEntityManager().renameEntity(ecs.getEntityManager().findName(title), newTitle);
+}
 
 void InterfaceView::changeFocusedElement(const std::string &title) {
 	auto entity = ecs.getEntityManager().findName(title);
 	if (entity <= MAX_ENTITIES) {
 		changeFocusedElement(entity);
+	}
+}
+
+void InterfaceView::changeFocusedElement(EntityID entity) {
+	if (entity < MAX_ENTITIES) {
+		if (ecs.hasComponent<InputComponent>(entity)) {
+			if (current < MAX_ENTITIES) {
+				auto &previousInput = ecs.getComponent<InputComponent>(current);
+				if (previousInput.callbacks[CALLBACK_UNFOCUSED] != nullptr) {
+					previousInput.callbacks[CALLBACK_UNFOCUSED]();
+				}
+
+				auto luaFunc = getLuaEnvironment()[previousInput.funcNames.funcNames[CALLBACK_UNFOCUSED]];
+				if (luaFunc.is<sol::function>()) {
+					luaFunc();
+				}
+			}
+
+			auto &input = ecs.getComponent<InputComponent>(entity);
+			if (input.callbacks[CALLBACK_FOCUSED] != nullptr) {
+				input.callbacks[CALLBACK_FOCUSED]();
+			}
+
+			auto luaFunc = getLuaEnvironment()[input.funcNames.funcNames[CALLBACK_FOCUSED]];
+			if (luaFunc.is<sol::function>()) {
+				luaFunc();
+			}
+
+			current = entity;
+		}
 	}
 }
 
@@ -123,17 +183,19 @@ Coordinator &InterfaceView::getCoordinator() { return ecs; }
 
 const std::set<EntityID> &InterfaceView::getEntities() { return ecs.getEntities(); }
 
-void InterfaceView::registerLua(lua_State *L) {
-	sol::state_view state{L};
+void InterfaceView::registerLua(sol::state_view L) {
+	env["self"] = this;
 
+	/*
 	for (auto &entity : getEntities()) {
-		sol::table tbl = state.create_named_table(TextFormat("Entity_%i", entity));
+		sol::table tbl = self.create_named(ecs.getEntityName(entity));
 
 		auto set = ecs.getEntityComponents(entity);
 		for (auto &name : set) {
-			tbl[name] = ecs.getLuaObject(entity, name, state.lua_state());
+			tbl[name] = ecs.getLuaObject(entity, name, env.lua_state());
 		}
 	}
+	*/
 
 	/*
 	std::string testCode = R"(
@@ -151,25 +213,6 @@ void InterfaceView::registerLua(lua_State *L) {
 		)";
 		luaState.script(testCode);
 		*/
-}
-
-void InterfaceView::changeFocusedElement(EntityID entity) {
-	if (entity < MAX_ENTITIES) {
-		if (ecs.hasComponent<InputComponent>(entity)) {
-			if (current < MAX_ENTITIES) {
-				auto &previousInput = ecs.getComponent<InputComponent>(current);
-				if (previousInput.callbacks[CALLBACK_UNFOCUSED] != nullptr) {
-					previousInput.callbacks[CALLBACK_UNFOCUSED]();
-				}
-			}
-
-			auto &input = ecs.getComponent<InputComponent>(entity);
-			if (input.callbacks[CALLBACK_FOCUSED] != nullptr) {
-				input.callbacks[CALLBACK_FOCUSED]();
-			}
-			current = entity;
-		}
-	}
 }
 
 nlohmann::json InterfaceView::dumpEntityJson(EntityID entity) {
@@ -210,7 +253,6 @@ void InterfaceView::initEntityComponents(EntityID entity) {
 		input.callbacks[CALLBACK_FOCUSED] = [this, entity] {
 			auto &button = ecs.getComponent<ButtonComponent>(entity);
 			button.shownTextColor = button.focusedTextColor;
-			printf("focused..\n");
 		};
 		input.callbacks[CALLBACK_UNFOCUSED] = [this, entity] {
 			auto &button = ecs.getComponent<ButtonComponent>(entity);
@@ -218,3 +260,9 @@ void InterfaceView::initEntityComponents(EntityID entity) {
 		};
 	}
 }
+
+void InterfaceView::setScriptFile(const std::string &fileName) { this->scriptSource = fileName; }
+
+std::string InterfaceView::getScriptFile() { return scriptSource; }
+
+sol::environment &InterfaceView::getLuaEnvironment() { return env; }

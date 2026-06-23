@@ -4,11 +4,16 @@
 #include <rttr/registration.h>
 
 #include "component.hpp"
+#include "gamedata.hpp"
 #include "raylib.h"
 #include "rttr/detail/registration/registration_impl.h"
 #include "rttr/policy.h"
 
 RTTR_REGISTRATION {
+	rttr::registration::enumeration<CallbackType>("CallbackType")(rttr::value("callback_focused", CALLBACK_FOCUSED),
+																  rttr::value("callback_unfocused", CALLBACK_UNFOCUSED),
+																  rttr::value("callback_trigger", CALLBACK_TRIGGER));
+
 	rttr::registration::class_<Rectangle>("Rectangle").constructor<>();
 	rttr::registration::class_<VisibilityComponent>("VisibilityComponent")
 		.constructor<>()
@@ -18,7 +23,8 @@ RTTR_REGISTRATION {
 		.property("upButton", &InputComponent::upButton)(rttr::policy::prop::bind_as_ptr)
 		.property("downButton", &InputComponent::downButton)(rttr::policy::prop::bind_as_ptr)
 		.property("leftButton", &InputComponent::leftButton)(rttr::policy::prop::bind_as_ptr)
-		.property("rightButton", &InputComponent::rightButton)(rttr::policy::prop::bind_as_ptr);
+		.property("rightButton", &InputComponent::rightButton)(rttr::policy::prop::bind_as_ptr)
+		.property("callbacks", &InputComponent::funcNames)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<LabelComponent>("LabelComponent")
 		.constructor<>()
 		.property("text", &LabelComponent::text)(rttr::policy::prop::bind_as_ptr)

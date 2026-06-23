@@ -60,8 +60,4 @@ void UIElementRefWindow::init() {
 
 		count++;
 	}
-
-	auto content = panel->getContentSize();
-	content.y = 24 * count;
-	panel->setContentSize(content);
 }

@@ -23,6 +23,7 @@ public:
 	Signature getSignature(EntityID id);
 	EntityID findName(const std::string &name);
 	const std::string &getName(EntityID id);
+	void renameEntity(EntityID id, const std::string &newName);
 };
 
 #endif

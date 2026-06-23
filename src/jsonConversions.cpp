@@ -54,6 +54,10 @@ void from_json(const json &j, NPatchInfo &info) {
 	j.at(5).get_to(info.layout);
 }
 
+void to_json(json &j, const CallbacksArray &info) { j = info.funcNames; }
+
+void from_json(const json &j, CallbacksArray &info) { info = {j}; }
+
 void to_json(json &j, const UIElementRef &info) { j = json{info.title, info.entityId}; }
 
 void from_json(const json &j, UIElementRef &info) {
@@ -68,6 +72,7 @@ void to_json(json &j, const InputComponent &input) {
 	j["down"] = input.downButton;
 	j["left"] = input.leftButton;
 	j["right"] = input.rightButton;
+	j["callbacks"] = input.funcNames;
 }
 
 void from_json(const json &j, InputComponent &input) {
@@ -75,6 +80,7 @@ void from_json(const json &j, InputComponent &input) {
 	j.at("down").get_to(input.downButton);
 	j.at("left").get_to(input.leftButton);
 	j.at("right").get_to(input.rightButton);
+	j.at("callbacks").get_to(input.funcNames);
 }
 
 void to_json(json &j, const VisibilityComponent &visibility) { j = visibility.isVisible; }

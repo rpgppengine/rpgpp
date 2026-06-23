@@ -125,7 +125,7 @@ void serialize(Archive &a, ScriptBin &b) {
 
 template <class Archive>
 void serialize(Archive &a, InterfaceViewBin &b) {
-	a(b.entites);
+	a(b.scriptSource, b.entites);
 }
 
 template <class Archive>

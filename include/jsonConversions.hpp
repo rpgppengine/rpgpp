@@ -27,6 +27,9 @@ void from_json(const json &j, FontRef &font);
 void to_json(json &j, const NPatchInfo &info);
 void from_json(const json &j, NPatchInfo &info);
 
+void to_json(json &j, const CallbacksArray &info);
+void from_json(const json &j, CallbacksArray &info);
+
 void to_json(json &j, const UIElementRef &info);
 void from_json(const json &j, UIElementRef &info);
 

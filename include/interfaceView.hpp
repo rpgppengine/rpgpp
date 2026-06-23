@@ -14,6 +14,8 @@
 #include "gamedata.hpp"
 #include "lua.h"
 #include "saveable.hpp"
+#include "sol/forward.hpp"
+#include "sol/state_view.hpp"
 
 class InterfaceView : public ISaveable {
 private:
@@ -24,6 +26,9 @@ protected:
 
 	std::string focusedElementName = "";
 	EntityID current = MAX_ENTITIES;
+
+	std::string scriptSource = "";
+	sol::environment env;
 
 public:
 	InterfaceView();
@@ -40,6 +45,7 @@ public:
 	EntityID getElement(const std::string &title);
 	void renameElement(const std::string &title, const std::string &newTitle);
 	void changeFocusedElement(const std::string &title);
+	void changeFocusedElement(EntityID entity);
 	const std::set<EntityID> &getElements();
 
 	virtual void onNotify(Event event);
@@ -49,10 +55,14 @@ public:
 	Coordinator &getCoordinator();
 	const std::set<EntityID> &getEntities();
 
-	void registerLua(lua_State *L);
-	void changeFocusedElement(EntityID entity);
+	void registerLua(sol::state_view L);
 	nlohmann::json dumpEntityJson(EntityID entity);
 	void initEntityComponents(EntityID entity);
+
+	void setScriptFile(const std::string &fileName);
+	std::string getScriptFile();
+
+	sol::environment &getLuaEnvironment();
 };
 
 #endif

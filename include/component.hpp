@@ -4,6 +4,8 @@
 #include <bitset>
 #include <cstdint>
 #include <functional>
+#include <string>
+#include <unordered_map>
 
 #include "dialogueBalloon.hpp"
 #include "gamedata.hpp"
@@ -25,6 +27,7 @@ struct InputComponent {
 	UIElementRef leftButton;
 	UIElementRef rightButton;
 
+	CallbacksArray funcNames;
 	std::map<CallbackType, std::function<void()>> callbacks = {{}, {}, {}};
 };
 

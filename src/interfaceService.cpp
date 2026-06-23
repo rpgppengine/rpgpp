@@ -10,6 +10,8 @@
 #include "game.hpp"
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
+#include "sol/forward.hpp"
+#include "sol/types.hpp"
 
 InterfaceService::InterfaceService() {
 	fpsVisible = false;
@@ -85,11 +87,21 @@ void InterfaceService::showInterface(const std::string &title) {
 		currentViewName = title;
 		notifyLock = true;
 		Game::getWorld().getPlayer().setMovementLock(true);
+
+		auto &env = views[title]->getLuaEnvironment();
+		if (env["open"].is<sol::function>()) {
+			env["open"]();
+		}
 	}
 }
 
 void InterfaceService::hideInterface() {
 	if (views.count(currentViewName) > 0) {
+		auto &env = views[currentViewName]->getLuaEnvironment();
+		if (env["close"].is<sol::function>()) {
+			env["close"]();
+		}
+
 		currentViewName = "";
 		Game::getWorld().getPlayer().setMovementLock(false);
 	}
@@ -138,4 +150,11 @@ void InterfaceService::draw() {
 	}
 }
 
-void InterfaceService::unload() const { UnloadTexture(this->uiTexture); }
+void InterfaceService::unload() const {
+	UnloadTexture(this->uiTexture);
+
+	// Abandon sol::environments before ScriptService is destructed
+	for (auto &[title, view] : views) {
+		view->getLuaEnvironment().abandon();
+	}
+}

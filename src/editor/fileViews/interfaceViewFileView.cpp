@@ -9,6 +9,7 @@
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Widgets/ContextMenu.hpp"
 #include "TGUI/Widgets/ScrollablePanel.hpp"
+#include "TGUI/Widgets/TabContainer.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "childWindows/elementInitWindow.hpp"
 #include "component.hpp"
@@ -31,6 +32,7 @@
 #include "views/worldView.hpp"
 #include "widgets/anyPropertyVisitor.hpp"
 #include "widgets/propertiesBox.hpp"
+#include "widgets/propertyFields/fileField.hpp"
 
 bool startsWith(const std::string &key, const std::string &prefix) {
 	return (key.size() >= prefix.size()) && (key.compare(0, prefix.size(), prefix) == 0);
@@ -61,11 +63,35 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	view->setSize({TextFormat("100%% - %d", RIGHT_PANEL_W), "100%"});
 	Editor::instance->getGui().addUpdate(WorldView::asUpdatable(view));
 
-	propertiesBox = PropertiesBox::create();
-	propertiesBox->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), "50%"});
-	propertiesBox->setSize({RIGHT_PANEL_W, "50%"});
+	auto tabsContainer = tgui::TabContainer::create();
+	tabsContainer->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), "50%"});
+	tabsContainer->setSize({RIGHT_PANEL_W, "50%"});
 
-	widgetContainer.push_back(propertiesBox);
+	auto filePropertiesPanel = tabsContainer->addTab("UI View");
+	auto elementPropertiesPanel = tabsContainer->addTab("Element");
+
+	widgetContainer.push_back(tabsContainer);
+
+	// view properties
+	scriptFileField = FileField::create();
+	scriptFileField->setSize({"100%", 24});
+	scriptFileField->label->setText("Script");
+	scriptFileField->pathFilters = {{"Script", {"*.lua"}}};
+	scriptFileField->callback = [this](const tgui::String &path) {
+		const auto ptr = dynamic_cast<Variant<InterfaceView> *>(this->variant);
+		const auto interface = ptr->get();
+
+		std::string fileName = GetFileName(path.toStdString().c_str());
+		interface->setScriptFile(fileName);
+	};
+
+	filePropertiesPanel->add(scriptFileField);
+
+	// element properties
+	propertiesBox = PropertiesBox::create();
+	propertiesBox->setSize("100%", "100%");
+
+	elementPropertiesPanel->add(propertiesBox);
 
 	std::weak_ptr<tgui::TreeView> weakTree = treeView;
 	std::weak_ptr<PropertiesBox> weakProps = propertiesBox;
@@ -182,6 +208,8 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 		for (auto &entity : interface->getEntities()) {
 			treeView->addItem({ecs.getEntityName(entity)});
 		}
+
+		scriptFileField->setValue(interface->getScriptFile());
 
 		addWidgets(layout);
 	}

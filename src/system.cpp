@@ -5,8 +5,11 @@
 #include "component.hpp"
 #include "entity.hpp"
 #include "game.hpp"
+#include "gamedata.hpp"
 #include "raylib.h"
 #include "raymath.h"
+#include "sol/forward.hpp"
+#include "sol/types.hpp"
 
 void System::update() {
 	if (components == nullptr || entitiesManager == nullptr) return;
@@ -200,6 +203,8 @@ void System::drawEntity(EntityID entity) {
 }
 
 void System::onNotify(Event event, EntityID entity) {
+	auto *view = Game::getUi().getCurrentView();
+
 	auto &input = components->getComponent<InputComponent>(entity);
 
 	if (event.key == KEY_UP) {
@@ -216,5 +221,9 @@ void System::onNotify(Event event, EntityID entity) {
 	}
 	if (event.key == KEY_Z) {
 		input.callbacks[CALLBACK_TRIGGER]();
+		auto luaFunc = view->getLuaEnvironment()[input.funcNames.funcNames[CALLBACK_TRIGGER]];
+		if (luaFunc.is<sol::function>()) {
+			luaFunc();
+		}
 	}
 }

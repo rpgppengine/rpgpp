@@ -578,6 +578,8 @@ GameData Project::generateStruct() {
 			bin.entites[view.getCoordinator().getEntityName(entity)] = cbor;
 		}
 
+		bin.scriptSource = view.getScriptFile();
+
 		data.interfaceViews[GetFileNameWithoutExt(viewPath.c_str())] = bin;
 	}
 
