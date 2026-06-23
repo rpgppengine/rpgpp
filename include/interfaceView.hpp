@@ -16,6 +16,7 @@
 #include "saveable.hpp"
 #include "sol/forward.hpp"
 #include "sol/state_view.hpp"
+#include "tween.hpp"
 
 class InterfaceView : public ISaveable {
 private:
@@ -29,6 +30,9 @@ protected:
 
 	std::string scriptSource = "";
 	sol::environment env;
+
+	float f = 0;
+	Tween t;
 
 public:
 	InterfaceView();

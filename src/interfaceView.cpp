@@ -23,6 +23,7 @@
 #include "sol/state_view.hpp"
 #include "sol/types.hpp"
 #include "system.hpp"
+#include "tween.hpp"
 #include "uiTypesApi.hpp"
 
 InterfaceView::InterfaceView() : InterfaceView(Rectangle{}) {}
@@ -42,6 +43,12 @@ InterfaceView::InterfaceView(Rectangle rect) {
 	ecs.registerComponent<DialogueComponent>();
 	ecs.registerComponent<ButtonComponent>();
 	ecs.registerComponent<InputComponent>();
+
+	t.a = 0;
+	t.b = 5;
+	t.duration = 5.0f;
+	t.left = t.duration;
+	t.ptr = &f;
 }
 
 InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectangle{}) {
@@ -175,7 +182,15 @@ void InterfaceView::onNotify(Event event) {
 	}
 }
 
-void InterfaceView::update() { ecs.update(); }
+void InterfaceView::update() {
+	ecs.update();
+	if (*t.ptr < t.b) {
+		linear(&t, 1 - (t.left / t.duration));
+	}
+	t.left -= GetFrameTime();
+
+	printf("%f \n", *t.ptr);
+}
 
 void InterfaceView::draw() { ecs.draw(); }
 
