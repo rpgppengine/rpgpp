@@ -16,6 +16,8 @@
 InterfaceService::InterfaceService() {
 	fpsVisible = false;
 
+	TweenProvider::setupTweenFuncs();
+
 	this->font = Game::getResources().getFont("LanaPixel");
 
 	Image img = LoadImage("images/ui-npatch.png");

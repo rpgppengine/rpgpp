@@ -17,6 +17,7 @@
 #include "sol/forward.hpp"
 #include "sol/state_view.hpp"
 #include "tween.hpp"
+#include "tweenContainer.hpp"
 
 class InterfaceView : public ISaveable {
 private:
@@ -33,6 +34,7 @@ protected:
 
 	float f = 0;
 	Tween t;
+	std::list<TweenContainer> tweens = {};
 
 public:
 	InterfaceView();
@@ -67,6 +69,7 @@ public:
 	std::string getScriptFile();
 
 	sol::environment &getLuaEnvironment();
+	std::list<TweenContainer> &getTweens();
 };
 
 #endif

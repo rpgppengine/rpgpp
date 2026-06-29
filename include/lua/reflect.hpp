@@ -14,7 +14,12 @@ RTTR_REGISTRATION {
 																  rttr::value("callback_unfocused", CALLBACK_UNFOCUSED),
 																  rttr::value("callback_trigger", CALLBACK_TRIGGER));
 
-	rttr::registration::class_<Rectangle>("Rectangle").constructor<>();
+	rttr::registration::class_<Rectangle>("Rectangle")
+		.constructor<>()
+		.property("x", &Rectangle::x)(rttr::policy::prop::bind_as_ptr)
+		.property("y", &Rectangle::y)(rttr::policy::prop::bind_as_ptr)
+		.property("width", &Rectangle::width)(rttr::policy::prop::bind_as_ptr)
+		.property("height", &Rectangle::height)(rttr::policy::prop::bind_as_ptr);
 	rttr::registration::class_<VisibilityComponent>("VisibilityComponent")
 		.constructor<>()
 		.property("is_visible", &VisibilityComponent::isVisible)(rttr::policy::prop::bind_as_ptr);

@@ -1,5 +1,7 @@
 #include "lua/uiTypesApi.hpp"
 
+#include <cstdio>
+
 #include "component.hpp"
 #include "entity.hpp"
 #include "game.hpp"
@@ -7,6 +9,7 @@
 #include "interfaceView.hpp"
 #include "lua.h"
 #include "raylib.h"
+#include "reflect.hpp"
 #include "rttr/type.h"
 #include "rttr/variant.h"
 #include "sol/environment.hpp"
@@ -17,9 +20,31 @@
 #include "sol/raii.hpp"
 #include "sol/stack_core.hpp"
 #include "sol/types.hpp"
+#include "tween.hpp"
 
 void lua_entity_addcomponent(EntityID entity, const std::string &componentName) {
 	Game::getUi().getCurrentView()->getCoordinator().insertEmptyComponent(entity, componentName);
+}
+
+void lua_entity_addtween(EntityID entity, const std::string &componentName, std::vector<float> argsVec, float duration,
+						 TweenType type) {
+	int i = 0;
+
+	auto &tweens = Game::getUi().getCurrentView()->getTweens();
+	auto &container = tweens.emplace_back();
+	auto variant = Game::getUi().getCurrentView()->getCoordinator().getComponentVariant(entity, componentName);
+	printf("%s \n", variant.get_type().get_name().to_string().c_str());
+	for (auto &prop : variant.get_type().get_raw_type().get_properties()) {
+		printf("%s \n", prop.get_name().to_string().c_str());
+		if (prop.get_type().is_pointer() && prop.get_type().get_raw_type().is_arithmetic()) {
+			float *f = prop.get_value(variant).get_value<float *>();
+			float val = *f;
+			Tween tween = {val, argsVec[i], f, duration, type};
+			container.addTween(tween);
+
+			i++;
+		}
+	}
 }
 
 sol::object lua_view_getElement(InterfaceView *view, const std::string &title) {
@@ -37,10 +62,26 @@ sol::object lua_view_getElement(InterfaceView *view, const std::string &title) {
 		tbl[name] = ecs.getLuaObject(entity, name, env.lua_state());
 	}
 
+	tbl.set_function("AddTween",
+					 [entity](const std::string &componentName, std::vector<float> argsVec, float duration,
+							  TweenType type) { lua_entity_addtween(entity, componentName, argsVec, duration, type); });
+
 	return tbl;
 }
 
 void lua_ui_types_set(sol::environment &env) {
+	env.new_enum("TweenType", "Linear", TweenType::LINEAR, "InSine", TweenType::INSINE, "OutSine", TweenType::OUTSINE,
+				 "InOutSine", TweenType::INOUTSINE, "InQuad", TweenType::INQUAD, "OutQuad", TweenType::OUTQUAD,
+				 "InOutQuad", TweenType::INOUTQUAD, "InCubic", TweenType::INCUBIC, "OutCubic", TweenType::OUTCUBIC,
+				 "InOutCubic", TweenType::INOUTCUBIC, "InQuart", TweenType::INQUART, "OutQuart", TweenType::OUTQUART,
+				 "InOutQuart", TweenType::INOUTQUART, "InQuint", TweenType::INQUINT, "OutQuint", TweenType::OUTQUINT,
+				 "InOutQuint", TweenType::INOUTQUINT, "InExpo", TweenType::INEXPO, "OutExpo", TweenType::OUTEXPO,
+				 "InOutExpo", TweenType::INOUTEXPO, "InCirc", TweenType::INCIRC, "OutCirc", TweenType::OUTCIRC,
+				 "InOutCirc", TweenType::INOUTCIRC, "InBack", TweenType::INBACK, "OutBack", TweenType::OUTBACK,
+				 "InOutBack", TweenType::INOUTBACK, "InElastic", TweenType::INELASTIC, "OutElastic",
+				 TweenType::OUTELASTIC, "InOutElastic", TweenType::INOUTELASTIC, "InBounce", TweenType::INBOUNCE,
+				 "OutBounce", TweenType::OUTBOUNCE, "InOutBounce", TweenType::INOUTBOUNCE);
+
 	env.new_usertype<InterfaceView>(
 		sol::no_construction(), "GetEntity", &lua_view_getElement, "DeleteEntity", &InterfaceView::removeElement,
 		"ScriptFile", sol::property(&InterfaceView::getScriptFile), "ChangeFocus",

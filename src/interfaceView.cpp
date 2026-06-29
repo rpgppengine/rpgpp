@@ -49,6 +49,9 @@ InterfaceView::InterfaceView(Rectangle rect) {
 	t.duration = 5.0f;
 	t.left = t.duration;
 	t.ptr = &f;
+
+	auto &ref = tweens.emplace_back();
+	// ref.addTween({0, 5, &f, 5.0f});
 }
 
 InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectangle{}) {
@@ -184,12 +187,9 @@ void InterfaceView::onNotify(Event event) {
 
 void InterfaceView::update() {
 	ecs.update();
-	if (*t.ptr < t.b) {
-		linear(&t, 1 - (t.left / t.duration));
+	for (auto &container : tweens) {
+		container.update();
 	}
-	t.left -= GetFrameTime();
-
-	printf("%f \n", *t.ptr);
 }
 
 void InterfaceView::draw() { ecs.draw(); }
@@ -281,3 +281,5 @@ void InterfaceView::setScriptFile(const std::string &fileName) { this->scriptSou
 std::string InterfaceView::getScriptFile() { return scriptSource; }
 
 sol::environment &InterfaceView::getLuaEnvironment() { return env; }
+
+std::list<TweenContainer> &InterfaceView::getTweens() { return tweens; }
