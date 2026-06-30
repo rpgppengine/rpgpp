@@ -51,3 +51,7 @@ void TweenContainer::update() {
 		}
 	}
 }
+
+int TweenContainer::getSize() {
+	return size;
+}

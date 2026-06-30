@@ -1,14 +1,21 @@
 [
-  {
-    "label": "Debug RPG++ Editor (Linux)",
-    "build": {
-      "command": "xmake",
-      "args": ["build", "--all"],
-      "cwd": "${ZED_WORKTREE_ROOT}",
-    },
-    "program": "${ZED_WORKTREE_ROOT}/build/linux/x86_64/debug/editor",
-    "request": "launch",
-    "adapter": "CodeLLDB",
-    "cwd": "${ZED_WORKTREE_ROOT}/build/linux/x86_64/debug",
-  },
+	{
+		"label": "Debug RPG++ Editor (Linux)",
+		"build": {
+			"command": "xmake",
+			"args": ["build", "--all"],
+			"cwd": "${ZED_WORKTREE_ROOT}",
+		},
+		"program": "${ZED_WORKTREE_ROOT}/build/linux/x86_64/debug/editor",
+		"request": "launch",
+		"adapter": "CodeLLDB",
+		"cwd": "${ZED_WORKTREE_ROOT}/build/linux/x86_64/debug",
+	},
+	{
+		"label": "Debug RPG++ Game (Linux)",
+		"program": "/home/nikodev/Documents/Projects/rpgpp-test-proj/TestProj",
+		"request": "launch",
+		"adapter": "CodeLLDB",
+		"cwd": "/home/nikodev/Documents/Projects/rpgpp-test-proj",
+	},
 ]

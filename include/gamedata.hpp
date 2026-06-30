@@ -75,8 +75,6 @@ enum TextAlignment {
 	TEXT_ALIGN_BOTTOM = 2
 };
 
-typedef std::variant<int, std::string, Rectangle, Color, NPatchInfo, UIElementRef, TextAlignment> PropVariant;
-
 struct Event {
 	KeyboardKey key;
 };

@@ -34,6 +34,8 @@ public:
 
 	EntityManager &getEntityManager() { return *entities; }
 
+	ComponentManager &getComponents() { return *components; }
+
 	EntityID createEntity(const std::string &name) {
 		auto entity = entities->newEntity(name);
 		system->entities.insert(entity);
@@ -116,6 +118,10 @@ public:
 		signature.set(components->getComponentType(componentName), true);
 		entities->setSignature(entity, signature);
 		components->insertComponentFromJson(entity, componentName, json);
+	}
+
+	void replaceComponentFromJson(EntityID entity, std::string componentName, nlohmann::json json) {
+		components->replaceComponentFromJson(entity, componentName, json);
 	}
 
 	sol::object getLuaObject(EntityID entity, std::string componentName, lua_State *L) const {

@@ -72,6 +72,19 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 }
 
 InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{}) {
+	this->bin = bin;
+	ecs.init();
+	ecs.registerComponent<VisibilityComponent>();
+	ecs.registerComponent<Rectangle>();
+	ecs.registerComponent<LabelComponent>();
+	ecs.registerComponent<TextAreaComponent>();
+	ecs.registerComponent<ColorRectComponent>();
+	ecs.registerComponent<ImageRectComponent>();
+	ecs.registerComponent<NinePatchImageRectComponent>();
+	ecs.registerComponent<DialogueComponent>();
+	ecs.registerComponent<ButtonComponent>();
+	ecs.registerComponent<InputComponent>();
+
 	for (auto &[title, elementCbor] : bin.entites) {
 		auto entity = ecs.createEntity(title);
 
@@ -96,6 +109,11 @@ InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{})
 			this->env = env;
 
 			Game::getScripts().getState().do_string(luaCode, this->env);
+
+			//run init function if it exists
+			if (this->env["init"].is<sol::function>()) {
+				this->env["init"]();
+			}
 		}
 	}
 }
@@ -179,6 +197,19 @@ void InterfaceView::changeFocusedElement(EntityID entity) {
 	}
 }
 
+void InterfaceView::resetElements() {
+	for (auto &[title, elementCbor] : bin.entites) {
+		auto entity = ecs.getEntityManager().findName(title);
+
+		auto elementJson = json::from_cbor(elementCbor);
+		for (auto &componentJson : elementJson.items()) {
+			ecs.replaceComponentFromJson(entity, componentJson.key(), componentJson.value());
+		}
+
+		initEntityComponents(entity);
+	}
+}
+
 void InterfaceView::onNotify(Event event) {
 	if (current < MAX_ENTITIES) {
 		ecs.getSystem().onNotify(event, current);
@@ -197,38 +228,6 @@ void InterfaceView::draw() { ecs.draw(); }
 Coordinator &InterfaceView::getCoordinator() { return ecs; }
 
 const std::set<EntityID> &InterfaceView::getEntities() { return ecs.getEntities(); }
-
-void InterfaceView::registerLua(sol::state_view L) {
-	env["self"] = this;
-
-	/*
-	for (auto &entity : getEntities()) {
-		sol::table tbl = self.create_named(ecs.getEntityName(entity));
-
-		auto set = ecs.getEntityComponents(entity);
-		for (auto &name : set) {
-			tbl[name] = ecs.getLuaObject(entity, name, env.lua_state());
-		}
-	}
-	*/
-
-	/*
-	std::string testCode = R"(
-			print('hello, let me test Entity_0.Rectangle')
-			print(Entity_0.Rectangle.x)
-			print(Entity_0.Rectangle.y)
-			print(Entity_0.Rectangle.width)
-			print(Entity_0.Rectangle.height)
-
-			print('the entity has a gray color')
-			print(Entity_0.ColorRectComponent.Color.r)
-			print(Entity_0.ColorRectComponent.Color.g)
-			print(Entity_0.ColorRectComponent.Color.b)
-			print(Entity_0.ColorRectComponent.Color.a)
-		)";
-		luaState.script(testCode);
-		*/
-}
 
 nlohmann::json InterfaceView::dumpEntityJson(EntityID entity) {
 	nlohmann::json j = json::object();
@@ -283,3 +282,12 @@ std::string InterfaceView::getScriptFile() { return scriptSource; }
 sol::environment &InterfaceView::getLuaEnvironment() { return env; }
 
 std::list<TweenContainer> &InterfaceView::getTweens() { return tweens; }
+
+void InterfaceView::addTweenContainer(TweenContainer tweenContainer) {
+	tweens.push_back(tweenContainer);
+}
+
+void InterfaceView::addTween(Tween tween) {
+	auto& container = tweens.emplace_back();
+	container.addTween(tween);
+}

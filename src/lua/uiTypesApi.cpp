@@ -22,11 +22,7 @@
 #include "sol/types.hpp"
 #include "tween.hpp"
 
-void lua_entity_addcomponent(EntityID entity, const std::string &componentName) {
-	Game::getUi().getCurrentView()->getCoordinator().insertEmptyComponent(entity, componentName);
-}
-
-void lua_entity_addtween(EntityID entity, const std::string &componentName, std::vector<float> argsVec, float duration,
+void lua_entity_tween(EntityID entity, const std::string &componentName, std::vector<float> argsVec, float duration,
 						 TweenType type) {
 	int i = 0;
 
@@ -47,29 +43,41 @@ void lua_entity_addtween(EntityID entity, const std::string &componentName, std:
 	}
 }
 
-sol::object lua_view_getElement(InterfaceView *view, const std::string &title) {
-	printf("%s \n", title.c_str());
+void lua_entity_tweenProp(EntityID entity, const std::string &componentName, const std::string &propName, float arg,
+						   float duration, TweenType type) {
+	auto variant = Game::getUi().getCurrentView()->getCoordinator().getComponentVariant(entity, componentName);
+	auto prop = variant.get_type().get_raw_type().get_property(propName);
 
-	EntityID entity = view->getElement(title);
-	auto &ecs = view->getCoordinator();
+	if (prop.get_type().is_pointer() && prop.get_type().get_raw_type().is_arithmetic()) {
+		float *f = prop.get_value(variant).get_value<float *>();
+		float val = *f;
+		Tween tween = {val, arg, f, duration, type};
 
-	sol::environment &env = Game::getUi().getCurrentView()->getLuaEnvironment();
-
-	sol::table tbl = env.create();
-
-	auto set = ecs.getEntityComponents(entity);
-	for (auto &name : set) {
-		tbl[name] = ecs.getLuaObject(entity, name, env.lua_state());
+		Game::getUi().getCurrentView()->addTween(tween);
 	}
+}
 
-	tbl.set_function("AddTween",
-					 [entity](const std::string &componentName, std::vector<float> argsVec, float duration,
-							  TweenType type) { lua_entity_addtween(entity, componentName, argsVec, duration, type); });
+sol::object lua_entity_getcomponent(EntityWrapper entity, const std::string& index) {
+	bool exists = Game::getUi().getCurrentView()->getCoordinator().getComponents().componentNameExists(index);
 
-	return tbl;
+	if (exists) {
+		auto obj = Game::getUi().getCurrentView()->getCoordinator().getLuaObject(
+			entity.entity, index, Game::getUi().getCurrentView()->getLuaEnvironment().lua_state());
+		return obj;
+	} else {
+		return sol::object(sol::nil);
+	}
+}
+
+EntityWrapper lua_view_getElement(InterfaceView *view, const std::string &title) {
+	EntityID entity = view->getElement(title);
+	return {entity};
 }
 
 void lua_ui_types_set(sol::environment &env) {
+	env.new_usertype<EntityWrapper>(
+		sol::no_construction(), sol::meta_function::index, lua_entity_getcomponent, "Tween", lua_entity_tween, "TweenProp", lua_entity_tweenProp);
+
 	env.new_enum("TweenType", "Linear", TweenType::LINEAR, "InSine", TweenType::INSINE, "OutSine", TweenType::OUTSINE,
 				 "InOutSine", TweenType::INOUTSINE, "InQuad", TweenType::INQUAD, "OutQuad", TweenType::OUTQUAD,
 				 "InOutQuad", TweenType::INOUTQUAD, "InCubic", TweenType::INCUBIC, "OutCubic", TweenType::OUTCUBIC,
@@ -82,10 +90,17 @@ void lua_ui_types_set(sol::environment &env) {
 				 TweenType::OUTELASTIC, "InOutElastic", TweenType::INOUTELASTIC, "InBounce", TweenType::INBOUNCE,
 				 "OutBounce", TweenType::OUTBOUNCE, "InOutBounce", TweenType::INOUTBOUNCE);
 
+	env.new_usertype<Tween>("Tween", sol::constructors<Tween()>(), "Start", &Tween::a, "End", &Tween::b, "Duration",
+							&Tween::duration, "Type", &Tween::type, "Ptr", &Tween::ptr);
+
+	env.new_usertype<TweenContainer>("TweenContainer", sol::constructors<TweenContainer()>(), "AddTween",
+									 &TweenContainer::addTween);
+
 	env.new_usertype<InterfaceView>(
 		sol::no_construction(), "GetEntity", &lua_view_getElement, "DeleteEntity", &InterfaceView::removeElement,
 		"ScriptFile", sol::property(&InterfaceView::getScriptFile), "ChangeFocus",
-		[](InterfaceView *view, const std::string &title) { view->changeFocusedElement(title); });
+		[](InterfaceView *view, const std::string &title) { view->changeFocusedElement(title); }, "Reset",
+		&InterfaceView::resetElements);
 
 	env.new_usertype<Rectangle>("Rectangle", "x", &Rectangle::x, "y", &Rectangle::y, "width", &Rectangle::width,
 								"height", &Rectangle::height);

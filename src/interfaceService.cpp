@@ -28,7 +28,6 @@ InterfaceService::InterfaceService() {
 	Rectangle destRec = Rectangle{0, 0, static_cast<float>(GetScreenWidth() - 20), 140};
 	destRec.x = (GetScreenWidth() - destRec.width) / 2;
 	destRec.y = (GetScreenHeight() - destRec.height) - 20;
-	this->dialogue = DialogueBalloon(destRec);
 
 	this->views = std::map<std::string, std::unique_ptr<InterfaceView>>{};
 
@@ -59,20 +58,20 @@ Font InterfaceService::getFont() const { return font; }
 
 Texture InterfaceService::getTexture() const { return uiTexture; }
 
-void InterfaceService::showDialogue(const std::string &id) {
+void InterfaceService::showDialogue(const std::string &id, bool runScript) {
 	if (Game::getBin().dialogues.count(id) > 0) {
 		auto diag = Game::getBin().dialogues[id];
-		showDialogue(diag);
+		showDialogue(diag, runScript);
 	} else {
 		throw std::runtime_error(TextFormat("This Dialogue does not exist: %s", id.c_str()));
 	}
 }
 
-void InterfaceService::showDialogue(const DialogueBin &dialogue) {
+void InterfaceService::showDialogue(const DialogueBin &dialogue, bool runScript) {
 	if (currentViewName != "dialogue") {
+		showInterface("dialogue", runScript);
 		DialogueInterfaceView *diagView = static_cast<DialogueInterfaceView *>(views.at("dialogue").get());
 		diagView->setDialogue(dialogue);
-		showInterface("dialogue");
 	}
 }
 
@@ -84,23 +83,25 @@ InterfaceView *InterfaceService::getCurrentView() {
 	}
 }
 
-void InterfaceService::showInterface(const std::string &title) {
+void InterfaceService::showInterface(const std::string &title, bool runScript) {
 	if (views.count(title) > 0) {
 		currentViewName = title;
 		notifyLock = true;
 		Game::getWorld().getPlayer().setMovementLock(true);
 
+		views[title]->runScript = runScript;
+
 		auto &env = views[title]->getLuaEnvironment();
-		if (env["open"].is<sol::function>()) {
+		if (env["open"].is<sol::function>() && runScript) {
 			env["open"]();
 		}
 	}
 }
 
-void InterfaceService::hideInterface() {
+void InterfaceService::hideInterface(bool runScript) {
 	if (views.count(currentViewName) > 0) {
 		auto &env = views[currentViewName]->getLuaEnvironment();
-		if (env["close"].is<sol::function>()) {
+		if (env["close"].is<sol::function>() && runScript) {
 			env["close"]();
 		}
 
@@ -128,8 +129,6 @@ void InterfaceService::update() {
 		views.at(currentViewName)->update();
 	}
 
-	dialogue.update();
-
 	for (auto &&item : views) {
 		item.second->update();
 	}
@@ -144,8 +143,6 @@ void InterfaceService::draw() {
 		DrawFPS(10, 10);
 		DrawTextEx(font, "rpgpp", Vector2{10, 36}, static_cast<float>(font.baseSize), 2, RED);
 	}
-
-	dialogue.draw();
 
 	if (views.count(currentViewName) > 0) {
 		views.at(currentViewName)->draw();

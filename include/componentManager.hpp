@@ -101,6 +101,10 @@ public:
 		arrays[componentName]->insertFromJson(entity, json);
 	}
 
+	void replaceComponentFromJson(EntityID entity, std::string componentName, nlohmann::json json) {
+		arrays[componentName]->replaceFromJson(entity, json);
+	}
+
 	sol::object getLua(EntityID entity, std::string componentName, lua_State *L) {
 		return arrays[componentName]->getLua(entity, L);
 	}
@@ -116,6 +120,10 @@ public:
 			const auto &component = pair.second;
 			component->entityDestroyed(entity);
 		}
+	}
+
+	bool componentNameExists(const std::string& name) {
+		return componentTypes.count(name) > 0;
 	}
 };
 

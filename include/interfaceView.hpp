@@ -24,6 +24,8 @@ private:
 	Rectangle rect;
 
 protected:
+	InterfaceViewBin bin;
+
 	Coordinator ecs;
 
 	std::string focusedElementName = "";
@@ -37,6 +39,8 @@ protected:
 	std::list<TweenContainer> tweens = {};
 
 public:
+	bool runScript = true;
+
 	InterfaceView();
 	explicit InterfaceView(Rectangle rect);
 
@@ -53,6 +57,7 @@ public:
 	void changeFocusedElement(const std::string &title);
 	void changeFocusedElement(EntityID entity);
 	const std::set<EntityID> &getElements();
+	void resetElements();
 
 	virtual void onNotify(Event event);
 	virtual void update();
@@ -61,7 +66,6 @@ public:
 	Coordinator &getCoordinator();
 	const std::set<EntityID> &getEntities();
 
-	void registerLua(sol::state_view L);
 	nlohmann::json dumpEntityJson(EntityID entity);
 	void initEntityComponents(EntityID entity);
 
@@ -69,7 +73,10 @@ public:
 	std::string getScriptFile();
 
 	sol::environment &getLuaEnvironment();
+
 	std::list<TweenContainer> &getTweens();
+	void addTweenContainer(TweenContainer tweenContainer);
+	void addTween(Tween tween);
 };
 
 #endif

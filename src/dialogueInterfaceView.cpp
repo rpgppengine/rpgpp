@@ -82,8 +82,8 @@ void DialogueInterfaceView::onNotify(Event event) {
 
 					ecs.getComponent<InputComponent>(newButton).callbacks[CALLBACK_TRIGGER] = [this, &option] {
 						if (Game::isUsingBin()) {
-							Game::getUi().hideInterface();
-							Game::getUi().showDialogue(option.nextDialogue);
+							Game::getUi().hideInterface(false);
+							Game::getUi().showDialogue(option.nextDialogue, false);
 							Game::getUi().setNotifyLock();
 							if (optionsCount > 0) {
 								for (int i = 0; i < optionsCount; i++) {
@@ -124,16 +124,31 @@ void DialogueInterfaceView::update() {
 	auto optionsImage = ecs.getEntityManager().findName("optionsImage");
 	if (diagArea != MAX_ENTITIES) {
 		auto &diagAreaComponent = ecs.getComponent<DialogueComponent>(diagArea);
-		if (diagAreaComponent.finishedTyping && diagAreaComponent.line->hasOptions) {
-			ecs.getComponent<VisibilityComponent>(optionsImage).isVisible = true;
+		if (diagAreaComponent.finishedTyping) {
+			if (!notifiedEndLine) {
+				// run user-defined function if any
+				if (env["on_line_finished"].is<sol::function>()) {
+					env["on_line_finished"]();
+				}
 
-			int i = 0;
-			for (auto &option : diagAreaComponent.line->options) {
-				auto optionEntity = ecs.getEntityManager().findName(TextFormat("option-%i", i));
-				ecs.getComponent<VisibilityComponent>(optionEntity).isVisible = true;
-				i++;
+				notifiedEndLine = true;
 			}
+
+			// show options if any
+			if (diagAreaComponent.line->hasOptions) {
+				ecs.getComponent<VisibilityComponent>(optionsImage).isVisible = true;
+
+				int i = 0;
+				for (auto &option : diagAreaComponent.line->options) {
+					auto optionEntity = ecs.getEntityManager().findName(TextFormat("option-%i", i));
+					ecs.getComponent<VisibilityComponent>(optionEntity).isVisible = true;
+					i++;
+				}
+			}
+		} else {
+			notifiedEndLine = false;
 		}
+
 		if (diagAreaComponent.dialogueFinished) {
 			Game::getUi().hideInterface();
 		}

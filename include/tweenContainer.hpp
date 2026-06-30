@@ -17,6 +17,7 @@ public:
 	void addTween(Tween tween);
 	void removeTween(int index);
 	void update();
+	int getSize();
 };
 
 #endif

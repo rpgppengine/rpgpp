@@ -26,6 +26,7 @@ public:
 	virtual rttr::variant getDataVariant(EntityID entity) = 0;
 	virtual nlohmann::json getDataJson(EntityID entity) = 0;
 	virtual void insertFromJson(EntityID entity, nlohmann::json json) = 0;
+	virtual void replaceFromJson(EntityID entity, nlohmann::json json) = 0;
 	virtual sol::object getLua(EntityID entity, lua_State *L) = 0;
 	virtual void insertEmptyData(EntityID entity) = 0;
 };
@@ -55,6 +56,11 @@ public:
 	void insertEmptyData(EntityID entity) {
 		T component;
 		insertData(entity, component);
+	}
+
+	void replaceData(EntityID entity, T component) {
+		auto index = entityToIndex[entity];
+		components[index] = component;
 	}
 
 	void removeData(EntityID entity) {
@@ -107,6 +113,11 @@ public:
 	void insertFromJson(EntityID entity, nlohmann::json json) {
 		T component = json;
 		insertData(entity, component);
+	}
+
+	void replaceFromJson(EntityID entity, nlohmann::json json) {
+		T component = json;
+		replaceData(entity, component);
 	}
 
 	sol::object getLua(EntityID entity, lua_State *L) {

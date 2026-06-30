@@ -12,6 +12,7 @@ class DialogueInterfaceView : public InterfaceView {
 public:
 	DialogueBin dialogue;
 	int optionsCount = 0;
+	bool notifiedEndLine = false;
 
 	DialogueInterfaceView();
 
