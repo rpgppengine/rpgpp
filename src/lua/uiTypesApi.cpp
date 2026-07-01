@@ -23,7 +23,7 @@
 #include "tween.hpp"
 
 void lua_entity_tween(EntityID entity, const std::string &componentName, std::vector<float> argsVec, float duration,
-						 TweenType type) {
+					  TweenType type) {
 	int i = 0;
 
 	auto &tweens = Game::getUi().getCurrentView()->getTweens();
@@ -44,7 +44,7 @@ void lua_entity_tween(EntityID entity, const std::string &componentName, std::ve
 }
 
 void lua_entity_tweenProp(EntityID entity, const std::string &componentName, const std::string &propName, float arg,
-						   float duration, TweenType type) {
+						  float duration, TweenType type) {
 	auto variant = Game::getUi().getCurrentView()->getCoordinator().getComponentVariant(entity, componentName);
 	auto prop = variant.get_type().get_raw_type().get_property(propName);
 
@@ -57,7 +57,43 @@ void lua_entity_tweenProp(EntityID entity, const std::string &componentName, con
 	}
 }
 
-sol::object lua_entity_getcomponent(EntityWrapper entity, const std::string& index) {
+void lua_entity_tweenPropAlt(sol::object entity, const std::string &componentName, const std::string &propName,
+							 sol::object arg, float duration, TweenType type) {
+	sol::table entityTable = entity;
+	sol::table componentTable = entityTable.get<sol::table>(componentName);
+
+	sol::userdata userdata = componentTable[propName];
+	sol::table meta = userdata[sol::metatable_key];
+
+	sol::userdata varUser = arg;
+	sol::table varMeta = varUser[sol::metatable_key];
+
+	TweenContainer container;
+
+	for (auto &tablePair : meta) {
+		std::string key = tablePair.first.as<std::string>();
+		auto val = tablePair.second;
+
+		sol::object propObj = userdata.get<sol::object>(key);
+		sol::object varPropObj = varUser.get<sol::object>(key);
+		if (propObj.is<float>() && varPropObj.is<float>()) {
+			TweenLua tween;
+			tween.a = propObj.as<float>();
+			tween.b = varPropObj.as<float>();
+			tween.key = key;
+			tween.dest = userdata;
+			tween.source = varUser;
+			tween.type = type;
+			tween.duration = duration;
+
+			container.addLuaTween(tween);
+		}
+	}
+
+	Game::getUi().getCurrentView()->addTweenContainer(container);
+}
+
+sol::object lua_entity_getcomponent(EntityWrapper entity, const std::string &index) {
 	bool exists = Game::getUi().getCurrentView()->getCoordinator().getComponents().componentNameExists(index);
 
 	if (exists) {
@@ -75,8 +111,9 @@ EntityWrapper lua_view_getElement(InterfaceView *view, const std::string &title)
 }
 
 void lua_ui_types_set(sol::environment &env) {
-	env.new_usertype<EntityWrapper>(
-		sol::no_construction(), sol::meta_function::index, lua_entity_getcomponent, "Tween", lua_entity_tween, "TweenProp", lua_entity_tweenProp);
+	env.new_usertype<EntityWrapper>(sol::no_construction(), sol::meta_function::index, lua_entity_getcomponent, "Tween",
+									lua_entity_tween, "TweenProp", lua_entity_tweenProp, "TweenAlt",
+									lua_entity_tweenPropAlt);
 
 	env.new_enum("TweenType", "Linear", TweenType::LINEAR, "InSine", TweenType::INSINE, "OutSine", TweenType::OUTSINE,
 				 "InOutSine", TweenType::INOUTSINE, "InQuad", TweenType::INQUAD, "OutQuad", TweenType::OUTQUAD,
@@ -102,9 +139,15 @@ void lua_ui_types_set(sol::environment &env) {
 		[](InterfaceView *view, const std::string &title) { view->changeFocusedElement(title); }, "Reset",
 		&InterfaceView::resetElements);
 
-	env.new_usertype<Rectangle>("Rectangle", "x", &Rectangle::x, "y", &Rectangle::y, "width", &Rectangle::width,
-								"height", &Rectangle::height);
-	env.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
+	env.new_usertype<Rectangle>(
+		"Rectangle",
+		sol::factories([] { return Rectangle{}; },
+					   [](float x, float y, float width, float height) { return Rectangle{x, y, width, height}; }),
+		"x", &Rectangle::x, "y", &Rectangle::y, "width", &Rectangle::width, "height", &Rectangle::height);
+	env.new_usertype<Color>("Color",
+							sol::factories([] { return WHITE; }, [](unsigned char r, unsigned char g,
+																	unsigned char b) { return Color{r, g, b, 255}; }),
+							"r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
 	env.new_enum("NPatchLayout", "NinePatch", NPATCH_NINE_PATCH, "ThreePatchHorizontal", NPATCH_THREE_PATCH_HORIZONTAL,
 				 "ThreePatchVertical", NPATCH_THREE_PATCH_VERTICAL);
 	env.new_usertype<FontRef>("Font", "Source", &FontRef::path, "FontSize", &FontRef::fontSize);

@@ -2,6 +2,9 @@
 #define _RPGPP_TWEEN_H
 
 #include <functional>
+#include <string>
+#include "sol/sol.hpp"
+#include "sol/forward.hpp"
 
 enum class TweenType {
 	LINEAR,
@@ -46,6 +49,18 @@ struct Tween {
 	float duration;
 	TweenType type = TweenType::LINEAR;
 	float left;
+};
+
+struct TweenLua {
+	float a;
+	float b;
+	sol::userdata source;
+	sol::userdata dest;
+	std::string key;
+	float duration;
+	TweenType type = TweenType::LINEAR;
+	float left;
+	bool empty = true;
 };
 
 struct TweenProvider {

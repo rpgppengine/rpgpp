@@ -291,3 +291,10 @@ void InterfaceView::addTween(Tween tween) {
 	auto& container = tweens.emplace_back();
 	container.addTween(tween);
 }
+
+void InterfaceView::abandonLua() {
+	for (auto& container : tweens) {
+		container.abandonLua();
+	}
+	env.abandon();
+}

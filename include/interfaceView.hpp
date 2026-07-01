@@ -77,6 +77,7 @@ public:
 	std::list<TweenContainer> &getTweens();
 	void addTweenContainer(TweenContainer tweenContainer);
 	void addTween(Tween tween);
+	void abandonLua();
 };
 
 #endif
