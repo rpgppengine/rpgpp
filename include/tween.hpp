@@ -2,7 +2,9 @@
 #define _RPGPP_TWEEN_H
 
 #include <functional>
+#include <list>
 #include <string>
+#include "gamedata.hpp"
 #include "sol/sol.hpp"
 #include "sol/forward.hpp"
 
@@ -67,6 +69,7 @@ struct TweenProvider {
 	static std::array<std::function<float(float)>, TWEEN_TYPE_MAX> arr;
 	static float tweenFunc(TweenType type, float t);
 	static void setupTweenFuncs();
+	static std::list<Tween> initPropTween(ElementProperty* dest, ElementProperty source, float duration, TweenType type);
 };
 
 float linear(float t);

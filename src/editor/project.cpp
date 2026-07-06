@@ -20,7 +20,6 @@
 #include "dialogue.hpp"
 #include "dialogueParser.hpp"
 #include "editor.hpp"
-#include "entity.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"
 #include "interfaceView.hpp"
@@ -572,10 +571,16 @@ GameData Project::generateStruct() {
 
 		InterfaceViewBin bin;
 
-		for (EntityID entity : view.getEntities()) {
-			auto entityJson = view.dumpEntityJson(entity);
-			auto cbor = json::to_cbor(entityJson);
-			bin.entites[view.getCoordinator().getEntityName(entity)] = cbor;
+		for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
+			auto element = view.getElement(i);
+
+			if (element != nullptr) {
+				UIElementBin elementBin;
+				elementBin.props = element->props;
+				elementBin.type = element->typeName;
+
+				bin.elements[view.getEntityName(i)] = elementBin;
+			}
 		}
 
 		bin.scriptSource = view.getScriptFile();

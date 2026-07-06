@@ -3,7 +3,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include "component.hpp"
 #include "gamedata.hpp"
 #include "raylib.h"
 
@@ -33,32 +32,7 @@ void from_json(const json &j, CallbacksArray &info);
 void to_json(json &j, const UIElementRef &info);
 void from_json(const json &j, UIElementRef &info);
 
-// components
-void to_json(json &j, const InputComponent &input);
-void from_json(const json &j, InputComponent &input);
-
-void to_json(json &j, const VisibilityComponent &visibility);
-void from_json(const json &j, VisibilityComponent &visibility);
-
-void to_json(json &j, const LabelComponent &label);
-void from_json(const json &j, LabelComponent &label);
-
-void to_json(json &j, const TextAreaComponent &textArea);
-void from_json(const json &j, TextAreaComponent &textArea);
-
-void to_json(json &j, const ColorRectComponent &color);
-void from_json(const json &j, ColorRectComponent &color);
-
-void to_json(json &j, const ImageRectComponent &image);
-void from_json(const json &j, ImageRectComponent &image);
-
-void to_json(json &j, const NinePatchImageRectComponent &ninePatch);
-void from_json(const json &j, NinePatchImageRectComponent &ninePatch);
-
-void to_json(json &j, const DialogueComponent &dialogue);
-void from_json(const json &j, DialogueComponent &dialogue);
-
-void to_json(json &j, const ButtonComponent &button);
-void from_json(const json &j, ButtonComponent &button);
+void to_json(json &j, const InputC &input);
+void from_json(const json &j, InputC &input);
 
 #endif

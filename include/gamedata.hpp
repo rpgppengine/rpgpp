@@ -11,6 +11,11 @@
 #include <variant>
 #include <vector>
 
+#include <cereal/types/array.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/variant.hpp>
+#include <cereal/types/unordered_map.hpp>
+
 #include "dialogueBalloon.hpp"
 
 #define RPGPP_DRAW_MULTIPLIER (3)
@@ -43,7 +48,7 @@ struct IRect {
 
 struct UIElementRef {
 	std::string title = "";
-	uint16_t entityId = 256;
+	uint8_t entityId = 255;
 };
 
 struct FontRef {
@@ -66,6 +71,15 @@ struct CallbacksArray {
 	std::array<std::string, RPGPP_CALLBACK_MAX> funcNames = {};
 };
 
+struct InputC {
+	UIElementRef upButton;
+	UIElementRef downButton;
+	UIElementRef leftButton;
+	UIElementRef rightButton;
+
+	CallbacksArray funcNames;
+};
+
 enum TextAlignment {
 	TEXT_ALIGN_LEFT = 0,
 	TEXT_ALIGN_TOP = 0,
@@ -74,6 +88,30 @@ enum TextAlignment {
 	TEXT_ALIGN_RIGHT = 2,
 	TEXT_ALIGN_BOTTOM = 2
 };
+
+struct VerticalAlignment {
+	TextAlignment val = TEXT_ALIGN_TOP;
+};
+
+struct HorizontalAlignment {
+	TextAlignment val = TEXT_ALIGN_LEFT;
+};
+
+enum ElementPropertyType {
+	UI_PROP_INT,
+	UI_PROP_BOOL,
+	UI_PROP_STRING,
+	UI_PROP_RECT,
+	UI_PROP_COLOR,
+	UI_PROP_FONT,
+	UI_PROP_IMAGE,
+	UI_PROP_REF,
+	UI_PROP_NPATCHINFO,
+	UI_PROP_INPUT
+};
+
+typedef std::variant<int, bool, std::string, Rectangle, Color, FontRef, ImageRef, VerticalAlignment, HorizontalAlignment, UIElementRef, NPatchInfo, InputC>
+	ElementProperty;
 
 struct Event {
 	KeyboardKey key;
@@ -174,9 +212,15 @@ struct RoomBin {
 	std::string musicSource;
 };
 
+struct UIElementBin {
+	std::string type = "";
+	std::unordered_map<std::string, ElementProperty> props;
+};
+
 struct InterfaceViewBin {
 	std::string scriptSource = "";
 	std::unordered_map<std::string, std::vector<std::uint8_t>> entites;
+	std::unordered_map<std::string, UIElementBin> elements = {};
 };
 
 struct ProjectProgramSettings {
@@ -222,5 +266,65 @@ struct DataSerialization {
 
 void serializeDataToFile(std::string fileName, GameData data);
 GameData deserializeFile(std::string fileName);
+
+template <class Archive>
+void serialize(Archive &a, Rectangle &b) {
+	a(b.x, b.y, b.width, b.height);
+}
+
+template <class Archive>
+void serialize(Archive &a, Color &b) {
+	a(b.a, b.r, b.g, b.b);
+}
+
+template <class Archive>
+void serialize(Archive &a, UIElementRef &b) {
+	a(b.title);
+}
+
+template <class Archive>
+void serialize(Archive &a, ImageRef &b) {
+	a(b.path, b.scale);
+}
+
+template <class Archive>
+void serialize(Archive &a, FontRef &b) {
+	a(b.path, b.fontSize);
+}
+
+template <class Archive>
+void serialize(Archive &a, HorizontalAlignment &b) {
+	a(b.val);
+}
+
+template <class Archive>
+void serialize(Archive &a, VerticalAlignment &b) {
+	a(b.val);
+}
+
+template <class Archive>
+void serialize(Archive &a, NPatchInfo &b) {
+	a(b.top, b.bottom, b.left, b.right, b.layout);
+}
+
+template <class Archive>
+void serialize(Archive &a, InputC &b) {
+	a(b.upButton, b.downButton, b.leftButton, b.rightButton, b.funcNames);
+}
+
+template <class Archive>
+void serialize(Archive &a, CallbacksArray &b) {
+	a(b.funcNames);
+}
+
+template <class Archive>
+void serialize(Archive &a, UIElementBin &b) {
+	a(b.type, b.props);
+}
+
+template <class Archive>
+void serialize(Archive &a, InterfaceViewBin &b) {
+	a(b.scriptSource, b.entites, b.elements);
+}
 
 #endif

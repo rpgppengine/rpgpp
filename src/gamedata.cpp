@@ -5,6 +5,8 @@
 #include <cereal/types/map.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
+#include <cereal/types/variant.hpp>
+#include <cereal/types/unordered_map.hpp>
 #include <fstream>
 #include <sstream>
 
@@ -20,21 +22,6 @@ void serialize(Archive &a, IRect &b) {
 template <class Archive>
 void serialize(Archive &a, IVector &b) {
 	a(b.x, b.y);
-}
-
-template <class Archive>
-void serialize(Archive &a, Rectangle &b) {
-	a(b.x, b.y, b.width, b.height);
-}
-
-template <class Archive>
-void serialize(Archive &a, Color &b) {
-	a(b.a, b.r, b.g, b.b);
-}
-
-template <class Archive>
-void serialize(Archive &a, UIElementRef &b) {
-	a(b.title);
 }
 
 template <class Archive>
@@ -123,10 +110,12 @@ void serialize(Archive &a, ScriptBin &b) {
 	a(b.bytecode);
 }
 
-template <class Archive>
+/*
+	template <class Archive>
 void serialize(Archive &a, InterfaceViewBin &b) {
-	a(b.scriptSource, b.entites);
+		a(b.scriptSource, b.entites, b.elements);
 }
+ */
 
 template <class Archive>
 void serialize(Archive &a, ProjectProgramSettings &b) {

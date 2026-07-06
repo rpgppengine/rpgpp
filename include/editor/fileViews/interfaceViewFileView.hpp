@@ -7,7 +7,7 @@
 #include "TGUI/Widgets/TreeView.hpp"
 #include "fileViews/fileView.hpp"
 #include "nlohmann/json_fwd.hpp"
-#include "rttrVariantPropVisitor.hpp"
+#include "uiElementPropVisitor.hpp"
 #include "views/interfaceViewView.hpp"
 #include "widgets/propertiesBox.hpp"
 #include "widgets/propertyFields/fileField.hpp"
@@ -24,11 +24,12 @@ private:
 	tgui::ContextMenu::Ptr elementContextMenu;
 	std::string selectedElement;
 
-	VariantPropVisitor visitor;
+	UIElementPropVisitor visitor;
 
 public:
 	InterfaceViewFileView();
 	void init(tgui::Group::Ptr layout, VariantWrapper *variant) override;
+	void visitProps(const std::string& title);
 };
 
 #endif

@@ -4,14 +4,15 @@
 #include <memory>
 #include <vector>
 
-#include "component.hpp"
 #include "dialogueBalloon.hpp"
-#include "entity.hpp"
 #include "game.hpp"
 #include "gamedata.hpp"
-#include "interfaceElementFactory.hpp"
 #include "interfaceView.hpp"
 #include "raylib.h"
+#include "ui_elements/button.hpp"
+#include "ui_elements/dialogueArea.hpp"
+#include "ui_elements/imageRect.hpp"
+#include "ui_elements/ninePatchImageRect.hpp"
 
 static const Rectangle diagImageRect = Rectangle{10, 320, 620, 140};
 static const Rectangle normalDiagAreaRect = Rectangle{19, 329, 611, 131};
@@ -30,9 +31,9 @@ DialogueInterfaceView::DialogueInterfaceView(InterfaceViewBin &bin) : InterfaceV
 void DialogueInterfaceView::setDialogue(DialogueBin dialogue) {
 	this->dialogue = dialogue;
 
-	auto diagArea = ecs.getEntityManager().findName("dialogueArea");
-	if (diagArea != MAX_ENTITIES) {
-		ecs.getComponent<DialogueComponent>(diagArea).setDialogue(dialogue);
+	DialogueArea *diagArea = static_cast<DialogueArea *>(getElement("dialogueArea"));
+	if (diagArea != nullptr) {
+		diagArea->setDialogue(dialogue);
 	}
 }
 
@@ -40,47 +41,44 @@ void DialogueInterfaceView::onNotify(Event event) {
 	InterfaceView::onNotify(event);
 
 	if (event.key == KEY_Z) {
-		auto diagArea = ecs.getEntityManager().findName("dialogueArea");
-		if (diagArea != MAX_ENTITIES) {
-			auto &diagComponent = ecs.getComponent<DialogueComponent>(diagArea);
+		DialogueArea *diagArea = static_cast<DialogueArea *>(getElement("dialogueArea"));
+
+		if (diagArea != nullptr) {
 			if (!Game::getUi().getNotifyLock()) {
-				diagComponent.advanceToNextLine();
+				diagArea->advanceToNextLine();
 			}
 
-			if (diagComponent.dialogueFinished) return;
+			if (diagArea->dialogueFinished) return;
 
-			auto portrait = ecs.getEntityManager().findName("portrait");
-			if (diagComponent.line->hasPortrait) {
-				ecs.getComponent<ImageRectComponent>(portrait).loadImage(diagComponent.line->imageId);
-				ecs.getComponent<VisibilityComponent>(portrait).isVisible = true;
-				ecs.getComponent<Rectangle>(diagArea) = portraitDiagAreaRect;
+			ImageRect *portrait = static_cast<ImageRect *>(getElement("portrait"));
+			if (diagArea->line->hasPortrait) {
+				portrait->loadImage(diagArea->line->imageId);
+				portrait->props["visible"] = true;
+				diagArea->props["rect"] = portraitDiagAreaRect;
 			} else {
-				ecs.getComponent<VisibilityComponent>(portrait).isVisible = false;
-				ecs.getComponent<Rectangle>(diagArea) = normalDiagAreaRect;
+				portrait->props["visible"] = false;
+				diagArea->props["rect"] = normalDiagAreaRect;
 			}
 
-			auto optionButton = ecs.getEntityManager().findName("optionButton");
-			if (diagComponent.line->hasOptions) {
-				Rectangle originRect = ecs.getComponent<Rectangle>(optionButton);
-				auto buttonBaseJson = dumpEntityJson(optionButton);
+			Button *optionButton = static_cast<Button *>(getElement("optionButton"));
+			if (diagArea->line->hasOptions) {
+				Rectangle originRect = std::get<Rectangle>(optionButton->props["rect"]);
+
 				int i = 0;
-				for (auto &option : diagComponent.line->options) {
-					auto newButton = ecs.createEntity(TextFormat("option-%i", i));
-					for (auto &componentJson : buttonBaseJson.items()) {
-						ecs.insertComponentFromJson(newButton, componentJson.key(), componentJson.value());
-					}
+				for (auto &option : diagArea->line->options) {
+					Button *newButton = static_cast<Button *>(cloneElement("optionButton", TextFormat("option-%i", i)));
 
-					ecs.getComponent<Rectangle>(newButton) = {originRect.x, originRect.y + (originRect.height * i),
-															  originRect.width, originRect.height};
-					ecs.getComponent<VisibilityComponent>(newButton).isVisible = false;
-					ecs.getComponent<LabelComponent>(newButton).text = option.title;
+					Rectangle &newRect = std::get<Rectangle>(newButton->props["rect"]);
+					newRect = {originRect.x, originRect.y + (originRect.height * i), originRect.width,
+							   originRect.height};
+					newButton->props["visible"] = false;
+					newButton->props["text"] = option.title;
 
-					ecs.getComponent<InputComponent>(newButton).upButton.title = TextFormat("option-%i", i - 1);
-					ecs.getComponent<InputComponent>(newButton).downButton.title = TextFormat("option-%i", i + 1);
+					InputC &input = std::get<InputC>(newButton->props["input"]);
+					input.upButton.title = TextFormat("option-%i", i - 1);
+					input.downButton.title = TextFormat("option-%i", i + 1);
 
-					initEntityComponents(newButton);
-
-					ecs.getComponent<InputComponent>(newButton).callbacks[CALLBACK_TRIGGER] = [this, &option] {
+					newButton->callbacks[CALLBACK_TRIGGER] = [this, &option] {
 						if (Game::isUsingBin()) {
 							Game::getUi().hideInterface(false);
 							Game::getUi().showDialogue(option.nextDialogue, false);
@@ -88,10 +86,7 @@ void DialogueInterfaceView::onNotify(Event event) {
 							if (optionsCount > 0) {
 								for (int i = 0; i < optionsCount; i++) {
 									std::string elementName = TextFormat("option-%i", i);
-									auto buttonEntity = ecs.getEntityManager().findName(elementName);
-									if (buttonEntity != MAX_ENTITIES) {
-										ecs.destroyEntity(buttonEntity);
-									}
+									removeElement(elementName);
 								}
 							}
 						}
@@ -102,46 +97,46 @@ void DialogueInterfaceView::onNotify(Event event) {
 
 				changeFocusedElement("option-0");
 				optionsCount = i + 1;
+				// has options
 			} else {
-				auto optionsImage = ecs.getEntityManager().findName("optionsImage");
-				ecs.getComponent<VisibilityComponent>(optionsImage).isVisible = false;
+				NinePatchImageRect *optionsImage = static_cast<NinePatchImageRect *>(getElement("optionsImage"));
+				optionsImage->props["visible"] = false;
 				for (int i = 0; i < optionsCount; i++) {
 					std::string elementName = TextFormat("option-%i", i);
-					auto entity = ecs.getEntityManager().findName(elementName);
-					if (entity != MAX_ENTITIES) {
-						ecs.destroyEntity(entity);
-					}
+					removeElement(elementName);
 				}
 				optionsCount = 0;
-				current = MAX_ENTITIES;
+				currentElement = MAX_ELEMENTS;
 			}
 		}
 	}
 }
 
 void DialogueInterfaceView::update() {
-	auto diagArea = ecs.getEntityManager().findName("dialogueArea");
-	auto optionsImage = ecs.getEntityManager().findName("optionsImage");
-	if (diagArea != MAX_ENTITIES) {
-		auto &diagAreaComponent = ecs.getComponent<DialogueComponent>(diagArea);
-		if (diagAreaComponent.finishedTyping) {
+	DialogueArea *diagArea = static_cast<DialogueArea *>(getElement("dialogueArea"));
+	NinePatchImageRect *optionsImage = static_cast<NinePatchImageRect *>(getElement("optionsImage"));
+	if (diagArea != nullptr) {
+		if (diagArea->finishedTyping) {
 			if (!notifiedEndLine) {
 				// run user-defined function if any
-				if (env["on_line_finished"].is<sol::function>()) {
-					env["on_line_finished"]();
+				if (hasScript()) {
+					if (env["on_line_finished"].is<sol::function>()) {
+						env["on_line_finished"]();
+					}
 				}
 
 				notifiedEndLine = true;
 			}
 
 			// show options if any
-			if (diagAreaComponent.line->hasOptions) {
-				ecs.getComponent<VisibilityComponent>(optionsImage).isVisible = true;
+			if (diagArea->line->hasOptions) {
+				optionsImage->props["visible"] = true;
 
 				int i = 0;
-				for (auto &option : diagAreaComponent.line->options) {
-					auto optionEntity = ecs.getEntityManager().findName(TextFormat("option-%i", i));
-					ecs.getComponent<VisibilityComponent>(optionEntity).isVisible = true;
+				for (auto& option : diagArea->line->options) {
+					Button* optionButton = static_cast<Button*>(getElement(TextFormat("option-%i", i)));
+					optionButton->props["visible"] = true;
+
 					i++;
 				}
 			}
@@ -149,7 +144,7 @@ void DialogueInterfaceView::update() {
 			notifiedEndLine = false;
 		}
 
-		if (diagAreaComponent.dialogueFinished) {
+		if (diagArea->dialogueFinished) {
 			Game::getUi().hideInterface();
 		}
 	}

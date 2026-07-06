@@ -6,10 +6,9 @@
 
 #include "TGUI/Signal.hpp"
 #include "components/resizableCanvasBox.hpp"
-#include "entity.hpp"
 #include "interfaceView.hpp"
-#include "rttrVariantPropVisitor.hpp"
 #include "sol/state.hpp"
+#include "uiElementPropVisitor.hpp"
 #include "views/worldView.hpp"
 #include "widgets/propertiesBox.hpp"
 
@@ -17,20 +16,20 @@ class InterfaceViewView : public WorldView {
 private:
 	std::unique_ptr<ResizableCanvasBox> canvasBox;
 	bool hasActiveElement = false;
-	EntityID activeEntity = MAX_ENTITIES;
+	ElementIndex activeElement = MAX_ELEMENTS;
 	void setElementAtMouse();
 
 public:
 	typedef std::shared_ptr<InterfaceViewView> Ptr;
 
 	tgui::SignalTyped<std::string> onActiveElementChanged = {"ActiveElementChanged"};
-	tgui::SignalTyped<EntityID> onActiveEntityChanged = {"ActiveEntityChanged"};
+	tgui::SignalTyped<ElementIndex> onActiveEntityChanged = {"ActiveEntityChanged"};
 
 	InterfaceViewView();
 
 	InterfaceView *ptr{nullptr};
 	PropertiesBox *propBox{nullptr};
-	VariantPropVisitor *visitor{nullptr};
+	UIElementPropVisitor *visitor{nullptr};
 
 	void drawCanvas() override;
 	void drawOverlay() override;
@@ -44,6 +43,8 @@ public:
 	void mouseMoved(tgui::Vector2f pos) override;
 
 	void selectElement(const std::string &elementName);
+
+	void visitProps(const std::string& title);
 };
 
 #endif

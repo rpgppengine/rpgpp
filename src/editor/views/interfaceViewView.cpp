@@ -3,11 +3,9 @@
 #include <memory>
 
 #include "TGUI/Vector2.hpp"
-#include "component.hpp"
 #include "components/resizableCanvasBox.hpp"
 #include "drawHelper.hpp"
 #include "editor.hpp"
-#include "entity.hpp"
 #include "interfaceView.hpp"
 #include "project.hpp"
 #include "raylib.h"
@@ -23,13 +21,15 @@ void InterfaceViewView::setInterfaceView(InterfaceView *ptr) { this->ptr = ptr; 
 
 void InterfaceViewView::setElementAtMouse() {
 	if (ptr != nullptr) {
-		EntityID selection = MAX_ENTITIES;
 		auto mouse = getMouseWorldPos();
-		for (auto &entity : ptr->getEntities()) {
-			if (ptr->getCoordinator().hasComponent<Rectangle>(entity)) {
-				auto &rect = ptr->getCoordinator().getComponent<Rectangle>(entity);
+		ElementIndex selection = MAX_ELEMENTS;
+
+		for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
+			auto element = ptr->getElement(i);
+			if (element != nullptr) {
+				auto &rect = std::get<Rectangle>(element->props["rect"]);
 				if (CheckCollisionPointRec(mouse, rect)) {
-					selection = entity;
+					selection = i;
 					canvasBox->updateRec(rect);
 
 					break;
@@ -37,14 +37,14 @@ void InterfaceViewView::setElementAtMouse() {
 			}
 		}
 
-		this->activeEntity = selection;
-		if (selection == MAX_ENTITIES) {
+		this->activeElement = selection;
+		if (selection == MAX_ELEMENTS) {
 			canvasBox->updateRec({0, 0, 1, 1});
 			onActiveElementChanged.emit(this, "");
-			onActiveEntityChanged.emit(this, MAX_ENTITIES);
+			onActiveEntityChanged.emit(this, MAX_ELEMENTS);
 		} else {
-			onActiveElementChanged.emit(this, ptr->getCoordinator().getEntityName(activeEntity));
-			onActiveEntityChanged.emit(this, activeEntity);
+			onActiveElementChanged.emit(this, ptr->getEntityName(selection));
+			onActiveEntityChanged.emit(this, activeElement);
 		}
 	}
 }
@@ -63,16 +63,15 @@ void InterfaceViewView::drawCanvas() {
 	const float nameSpacing = 0.5f;
 
 	// entities
-	auto &ecs = ptr->getCoordinator();
-	System &system = ecs.getSystem();
-	for (auto &entity : ptr->getEntities()) {
-		auto &name = ecs.getEntityName(entity);
+	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
+		auto element = ptr->getElement(i);
+		if (element != nullptr) {
+			auto& name = ptr->getEntityName(i);
 
-		if (ecs.hasComponent<Rectangle>(entity)) {
-			system.drawEntity(entity);
+			ptr->drawEntity(i);
 
-			// draw entity's rect
-			Rectangle rect = ecs.getComponent<Rectangle>(entity);
+			// draw element rect
+			Rectangle rect = std::get<Rectangle>(element->props["rect"]);
 			DrawRectangleLinesPro(rect, Fade(DARKGRAY, 0.7f));
 
 			// draw entity name
@@ -92,7 +91,7 @@ void InterfaceViewView::drawCanvas() {
 	// draw origin
 	drawOrigin();
 
-	if (activeEntity != MAX_ENTITIES) {
+	if (activeElement != MAX_ELEMENTS) {
 		canvasBox->draw();
 	}
 }
@@ -102,7 +101,7 @@ bool InterfaceViewView::leftMousePressed(tgui::Vector2f pos) {
 
 	const auto &mousePos = getMouseWorldPos();
 
-	if (canvasBox->leftMousePressed(mousePos) && activeEntity != MAX_ENTITIES) {
+	if (canvasBox->leftMousePressed(mousePos) && activeElement != MAX_ELEMENTS) {
 		canvasBox->focused = true;
 	}
 
@@ -110,22 +109,18 @@ bool InterfaceViewView::leftMousePressed(tgui::Vector2f pos) {
 }
 
 void InterfaceViewView::leftMouseReleased(tgui::Vector2f pos) {
-	if (activeEntity != MAX_ENTITIES) {
-		if (ptr->getCoordinator().hasComponent<Rectangle>(activeEntity)) {
-			auto &rect = ptr->getCoordinator().getComponent<Rectangle>(activeEntity);
-			rect = canvasBox->getRectangle();
+	if (activeElement != MAX_ELEMENTS) {
+		auto elementPtr = ptr->getElement(activeElement);
+
+		if (elementPtr != nullptr) {
+			Rectangle &elementRect = std::get<Rectangle>(elementPtr->props["rect"]);
+
+			elementRect = canvasBox->getRectangle();
 			canvasBox->focused = false;
 
 			if (propBox != nullptr && visitor != nullptr) {
 				propBox->clear();
-
-				auto &ecs = ptr->getCoordinator();
-
-				auto set = ecs.getEntityComponents(activeEntity);
-				for (auto &name : set) {
-					auto componentVariant = ecs.getComponentVariant(activeEntity, name);
-					visitor->componentVisit(componentVariant, propBox);
-				}
+				visitProps(ptr->getEntityName(activeElement));
 			}
 		}
 	}
@@ -136,7 +131,7 @@ void InterfaceViewView::leftMouseReleased(tgui::Vector2f pos) {
 void InterfaceViewView::mouseMoved(tgui::Vector2f pos) {
 	const auto &mousePos = getMouseWorldPos();
 
-	if (activeEntity != MAX_ENTITIES) {
+	if (activeElement != MAX_ELEMENTS) {
 		canvasBox->mouseMoved(mousePos);
 	}
 
@@ -146,12 +141,28 @@ void InterfaceViewView::mouseMoved(tgui::Vector2f pos) {
 void InterfaceViewView::selectElement(const std::string &elementName) {
 	if (ptr == nullptr) return;
 
-	auto &entityManager = ptr->getCoordinator().getEntityManager();
-	auto entity = entityManager.findName(elementName);
-	if (entity != MAX_ENTITIES) {
-		if (ptr->getCoordinator().hasComponent<Rectangle>(entity)) {
-			activeEntity = entity;
-			canvasBox->updateRec(ptr->getCoordinator().getComponent<Rectangle>(entity));
+	auto elementId = ptr->findByName(elementName);
+	if (elementId != MAX_ELEMENTS) {
+		activeElement = elementId;
+
+		auto element = ptr->getElement(elementId);
+
+		if (element != nullptr) {
+			Rectangle rect = std::get<Rectangle>(ptr->getElement(elementId)->props["rect"]);
+			canvasBox->updateRec(rect);
 		}
+	}
+}
+
+void InterfaceViewView::visitProps(const std::string& title) {
+	visitor->box = propBox;
+	visitor->view = ptr;
+
+	auto element = ptr->getElement(title);
+	visitor->element = element;
+	if (element == nullptr) return;
+	for (auto& [title, variant] : element->props) {
+		visitor->key = title;
+		std::visit(*visitor, variant);
 	}
 }

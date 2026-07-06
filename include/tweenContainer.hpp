@@ -10,7 +10,6 @@
 class TweenContainer {
 private:
 	std::array<Tween, MAX_TWEENS> tweens;
-	std::array<TweenLua, MAX_TWEENS> luaTweens;
 	int size = 0;
 	int sizeLua = 0;
 
@@ -19,13 +18,8 @@ public:
 	void addTween(Tween tween);
 	void removeTween(int index);
 
-	void addLuaTween(TweenLua tween);
-	void removeLuaTween(int index);
-
 	void update();
 	int getSize();
-
-	void abandonLua();
 };
 
 #endif

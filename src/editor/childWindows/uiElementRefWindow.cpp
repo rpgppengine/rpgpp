@@ -8,7 +8,6 @@
 #include "TGUI/Widgets/ScrollablePanel.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "childWindows/popupWindow.hpp"
-#include "entity.hpp"
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
 
@@ -20,7 +19,7 @@ UIElementRefWindow::UIElementRefWindow() : PopupWindow("Select an Element..") {
 	none->setPosition({0, "100% - 32"});
 	none->setSize("100%", 32);
 	none->onClick([this] {
-		ref->entityId = MAX_ENTITIES;
+		ref->entityId = MAX_ELEMENTS;
 		close();
 
 		if (field != nullptr) {
@@ -32,11 +31,11 @@ UIElementRefWindow::UIElementRefWindow() : PopupWindow("Select an Element..") {
 	list = tgui::TreeView::create();
 	list->setSize({"100%", "100% - 32"});
 	list->onItemSelect([this](const tgui::String &item) {
-		auto entity = view->getCoordinator().getEntityManager().findName(item.toStdString());
+		auto entity = view->findByName(item.toStdString());
 		ref->entityId = entity;
 		close();
 
-		if (field != nullptr && entity < MAX_ENTITIES) {
+		if (field != nullptr && entity < MAX_ELEMENTS) {
 			field->value->setText(item.toStdString());
 		}
 	});
@@ -48,16 +47,14 @@ void UIElementRefWindow::init() {
 
 	list->removeAllItems();
 
-	auto &ecs = view->getCoordinator();
-	int count = 0;
-	for (uint16_t entity : view->getEntities()) {
-		std::string name = "";
-		if (entity != MAX_ENTITIES) {
-			name = ecs.getEntityName(entity);
+	ElementIndex i = 0;
+	for (auto&& entity : view->getElements()) {
+		if (entity.get() != nullptr) {
+			std::string name = view->getEntityName(i);
+
+			list->addItem({name});
 		}
 
-		list->addItem({name});
-
-		count++;
+		i++;
 	}
 }

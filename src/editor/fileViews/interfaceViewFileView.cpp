@@ -12,11 +12,8 @@
 #include "TGUI/Widgets/TabContainer.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "childWindows/elementInitWindow.hpp"
-#include "component.hpp"
 #include "editor.hpp"
-#include "entity.hpp"
 #include "gamedata.hpp"
-#include "interfaceElementFactory.hpp"
 #include "interfaceView.hpp"
 #include "lua.h"
 #include "lua/reflect.hpp"
@@ -100,11 +97,10 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	treeView->onItemSelect([weakView, this, weakProps](const tgui::String &item) {
 		const auto ptr = dynamic_cast<Variant<InterfaceView> *>(this->variant);
 		const auto interface = ptr->get();
-		auto &ecs = interface->getCoordinator();
 
-		EntityID entity = ecs.getEntityManager().findName(item.toStdString());
+		ElementIndex element = interface->findByName(item.toStdString());
 
-		if (entity >= MAX_ENTITIES) return;
+		if (element >= MAX_ELEMENTS) return;
 
 		if (auto ptr = weakView.lock()) {
 			ptr->selectElement(item.toStdString());
@@ -112,39 +108,30 @@ InterfaceViewFileView::InterfaceViewFileView() {
 			if (auto sharedProps = weakProps.lock()) {
 				sharedProps->clear();
 
-				auto set = ecs.getEntityComponents(entity);
-				for (auto &name : set) {
-					auto componentVariant = ecs.getComponentVariant(entity, name);
-					visitor.componentVisit(componentVariant, sharedProps.get());
-				}
+				visitProps(item.toStdString());
 			}
 		}
 	});
 
-	view->onActiveEntityChanged([weakTree, weakView, this, weakProps](EntityID entity) {
+	view->onActiveEntityChanged([weakTree, weakView, this, weakProps](ElementIndex entity) {
 		const auto ptr = dynamic_cast<Variant<InterfaceView> *>(this->variant);
 		const auto interface = ptr->get();
-		auto &ecs = interface->getCoordinator();
 
 		if (auto ptr = weakTree.lock()) {
 			auto sharedView = weakView.lock();
-			if (entity >= MAX_ENTITIES) {
+			if (entity >= MAX_ELEMENTS) {
 				ptr->deselectItem();
 				if (auto sharedProps = weakProps.lock()) {
 					sharedProps->clear();
 				}
 			} else {
-				ptr->selectItem({visitor.view->getCoordinator().getEntityName(entity)});
+				ptr->selectItem({interface->getEntityName(entity)});
 				if (!sharedView) return;
 
 				if (auto sharedProps = weakProps.lock()) {
 					sharedProps->clear();
 
-					auto set = ecs.getEntityComponents(entity);
-					for (auto &name : set) {
-						auto componentVariant = ecs.getComponentVariant(entity, name);
-						visitor.componentVisit(componentVariant, sharedProps.get());
-					}
+					visitProps(interface->getEntityName(entity));
 				}
 			}
 		}
@@ -167,15 +154,10 @@ InterfaceViewFileView::InterfaceViewFileView() {
 			const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
 			const auto interface = ptr->get();
 
-			auto &ecs = interface->getCoordinator();
+			interface->removeElement(selectedElement);
 
-			EntityID entity = ecs.getEntityManager().findName(selectedElement);
-
-			if (entity < MAX_ENTITIES) {
-				ecs.destroyEntity(entity);
-				if (auto sharedTree = weakTree.lock()) {
-					sharedTree->removeItem({selectedElement});
-				}
+			if (auto sharedTree = weakTree.lock()) {
+				sharedTree->removeItem({selectedElement});
 			}
 		}
 	});
@@ -187,6 +169,22 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	widgetContainer.push_back(view);
 }
 
+void InterfaceViewFileView::visitProps(const std::string& title) {
+	const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
+	const auto interface = ptr->get();
+
+	visitor.box = propertiesBox.get();
+	visitor.view = interface;
+
+	auto element = interface->getElement(title);
+	visitor.element = element;
+	if (element == nullptr) return;
+	for (auto& [title, variant] : element->props) {
+		visitor.key = title;
+		std::visit(visitor, variant);
+	}
+}
+
 void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *variant) {
 	this->variant = variant;
 
@@ -194,19 +192,18 @@ void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *varian
 		const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
 		const auto interface = ptr->get();
 
-		auto &ecs = interface->getCoordinator();
-
-		for (auto &entity : interface->getEntities()) {
-			interface->initEntityComponents(entity);
-		}
-
 		visitor.view = interface;
 
 		view->setInterfaceView(interface);
 
 		treeView->removeAllItems();
-		for (auto &entity : interface->getEntities()) {
-			treeView->addItem({ecs.getEntityName(entity)});
+
+		ElementIndex i = 0;
+		for (auto &entity : interface->getElements()) {
+			if (interface->getElement(i) != nullptr) {
+				treeView->addItem({interface->getEntityName(i)});
+				i++;
+			}
 		}
 
 		scriptFileField->setValue(interface->getScriptFile());

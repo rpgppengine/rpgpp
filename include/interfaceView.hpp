@@ -5,19 +5,19 @@
 
 #include <functional>
 #include <memory>
+#include <queue>
 #include <set>
 #include <string>
 #include <vector>
 
-#include "coordinator.hpp"
-#include "entity.hpp"
 #include "gamedata.hpp"
-#include "lua.h"
+#include "lua.hpp"
 #include "saveable.hpp"
 #include "sol/forward.hpp"
 #include "sol/state_view.hpp"
 #include "tween.hpp"
 #include "tweenContainer.hpp"
+#include "ui_elements/uiElement.hpp"
 
 class InterfaceView : public ISaveable {
 private:
@@ -26,16 +26,19 @@ private:
 protected:
 	InterfaceViewBin bin;
 
-	Coordinator ecs;
-
 	std::string focusedElementName = "";
-	EntityID current = MAX_ENTITIES;
 
 	std::string scriptSource = "";
+	bool scriptFlag = false;
 	sol::environment env;
 
-	float f = 0;
-	Tween t;
+	std::array<std::unique_ptr<UIElement>, MAX_ELEMENTS> elements = {};
+	std::array<std::string, MAX_ELEMENTS> elementNames = {};
+
+	ElementIndex currentElement = MAX_ELEMENTS;
+	std::queue<ElementIndex> availableIds = {};
+	int size = 0;
+
 	std::list<TweenContainer> tweens = {};
 
 public:
@@ -49,34 +52,36 @@ public:
 
 	nlohmann::json dumpJson();
 
+	const std::string& getEntityName(int index);
+	ElementIndex findByName(const std::string& title);
+
 	bool elementExists(const std::string &title);
-	EntityID addElement(const std::string &title);
+	ElementIndex addElement(const std::string& title, const std::string& type);
 	void removeElement(const std::string &title);
-	EntityID getElement(const std::string &title);
+	UIElement* getElement(const std::string& title);
+	UIElement* getElement(ElementIndex i);
 	void renameElement(const std::string &title, const std::string &newTitle);
 	void changeFocusedElement(const std::string &title);
-	void changeFocusedElement(EntityID entity);
-	const std::set<EntityID> &getElements();
+	void changeFocusedElement(ElementIndex index);
+	UIElement* cloneElement(const std::string& title, const std::string& newTitle);
+	const std::array<std::unique_ptr<UIElement>, MAX_ELEMENTS>& getElements();
 	void resetElements();
 
 	virtual void onNotify(Event event);
 	virtual void update();
 	virtual void draw();
-
-	Coordinator &getCoordinator();
-	const std::set<EntityID> &getEntities();
-
-	nlohmann::json dumpEntityJson(EntityID entity);
-	void initEntityComponents(EntityID entity);
+	virtual void drawEntity(ElementIndex i);
 
 	void setScriptFile(const std::string &fileName);
 	std::string getScriptFile();
+	bool hasScript();
 
 	sol::environment &getLuaEnvironment();
 
 	std::list<TweenContainer> &getTweens();
 	void addTweenContainer(TweenContainer tweenContainer);
 	void addTween(Tween tween);
+
 	void abandonLua();
 };
 

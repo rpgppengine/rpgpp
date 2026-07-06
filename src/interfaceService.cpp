@@ -13,17 +13,14 @@
 #include "sol/forward.hpp"
 #include "sol/types.hpp"
 
+ElementFactory InterfaceService::factory = {};
+
 InterfaceService::InterfaceService() {
 	fpsVisible = false;
 
 	TweenProvider::setupTweenFuncs();
 
 	this->font = Game::getResources().getFont("LanaPixel");
-
-	Image img = LoadImage("images/ui-npatch.png");
-	ImageResizeNN(&img, img.width * 3, img.height * 3);
-
-	this->uiTexture = LoadTextureFromImage(img);
 
 	Rectangle destRec = Rectangle{0, 0, static_cast<float>(GetScreenWidth() - 20), 140};
 	destRec.x = (GetScreenWidth() - destRec.width) / 2;
@@ -55,8 +52,6 @@ void InterfaceService::initBin(GameData &bin) {
 }
 
 Font InterfaceService::getFont() const { return font; }
-
-Texture InterfaceService::getTexture() const { return uiTexture; }
 
 void InterfaceService::showDialogue(const std::string &id, bool runScript) {
 	if (Game::getBin().dialogues.count(id) > 0) {
@@ -92,8 +87,11 @@ void InterfaceService::showInterface(const std::string &title, bool runScript) {
 		views[title]->runScript = runScript;
 
 		auto &env = views[title]->getLuaEnvironment();
-		if (env["open"].is<sol::function>() && runScript) {
-			env["open"]();
+		if (views[title]->hasScript()) {
+			printf("has script.. \n");
+			if (env["open"].is<sol::function>() && runScript) {
+				env["open"]();
+			}
 		}
 	}
 }
@@ -101,14 +99,18 @@ void InterfaceService::showInterface(const std::string &title, bool runScript) {
 void InterfaceService::hideInterface(bool runScript) {
 	if (views.count(currentViewName) > 0) {
 		auto &env = views[currentViewName]->getLuaEnvironment();
-		if (env["close"].is<sol::function>() && runScript) {
-			env["close"]();
+		if (views[currentViewName]->hasScript()) {
+			if (env["close"].is<sol::function>() && runScript) {
+				env["close"]();
+			}
 		}
 
 		currentViewName = "";
 		Game::getWorld().getPlayer().setMovementLock(false);
 	}
 }
+
+ElementFactory &InterfaceService::getFactory() { return factory; }
 
 void InterfaceService::setNotifyLock() { notifyLock = true; }
 
@@ -150,7 +152,6 @@ void InterfaceService::draw() {
 }
 
 void InterfaceService::unload() const {
-	UnloadTexture(this->uiTexture);
 
 	// Abandon sol::environments before ScriptService is destructed
 	for (auto &[title, view] : views) {

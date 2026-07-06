@@ -8,13 +8,10 @@
 #include <vector>
 
 #include "actor.hpp"
-#include "component.hpp"
-#include "coordinator.hpp"
-#include "entity.hpp"
+#include "apiTypes.hpp"
 #include "game.hpp"
 #include "gamedata.hpp"
-#include "interfaceElementFactory.hpp"
-#include "lua.h"
+#include "lua.hpp"
 #include "lua/reflect.hpp"
 #include "raylib.h"
 #include "scriptService.hpp"
@@ -22,36 +19,20 @@
 #include "sol/forward.hpp"
 #include "sol/state_view.hpp"
 #include "sol/types.hpp"
-#include "system.hpp"
 #include "tween.hpp"
 #include "uiTypesApi.hpp"
+
+#include <cereal/types/variant.hpp>
+#include <cereal/archives/json.hpp>
 
 InterfaceView::InterfaceView() : InterfaceView(Rectangle{}) {}
 
 InterfaceView::InterfaceView(Rectangle rect) {
 	this->rect = rect;
 
-	ecs.init();
-
-	ecs.registerComponent<VisibilityComponent>();
-	ecs.registerComponent<Rectangle>();
-	ecs.registerComponent<LabelComponent>();
-	ecs.registerComponent<TextAreaComponent>();
-	ecs.registerComponent<ColorRectComponent>();
-	ecs.registerComponent<ImageRectComponent>();
-	ecs.registerComponent<NinePatchImageRectComponent>();
-	ecs.registerComponent<DialogueComponent>();
-	ecs.registerComponent<ButtonComponent>();
-	ecs.registerComponent<InputComponent>();
-
-	t.a = 0;
-	t.b = 5;
-	t.duration = 5.0f;
-	t.left = t.duration;
-	t.ptr = &f;
-
-	auto &ref = tweens.emplace_back();
-	// ref.addTween({0, 5, &f, 5.0f});
+	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
+		availableIds.push(i);
+	}
 }
 
 InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectangle{}) {
@@ -60,39 +41,30 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 	auto j = json::parse(fileText);
 	this->rect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
 
-	for (auto &item : j.at("entities").items()) {
-		auto obj = item.value();
-		auto entity = ecs.createEntity(item.key());
-		for (auto &componentJson : item.value().items()) {
-			ecs.insertComponentFromJson(entity, componentJson.key(), componentJson.value());
-		}
+	InterfaceViewBin bin;
+
+	{
+		std::stringstream stream;
+		stream << fileText;
+		cereal::JSONInputArchive cerealJson(stream);
+		cerealJson(bin);
 	}
 
-	scriptSource = j.at("script");
+	this->scriptSource = bin.scriptSource;
+	for (auto& [title, elementBin] : bin.elements) {
+		auto element = addElement(title, elementBin.type);
+		elements[element]->props = elementBin.props;
+		elements[element]->config();
+	}
 }
 
 InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{}) {
 	this->bin = bin;
-	ecs.init();
-	ecs.registerComponent<VisibilityComponent>();
-	ecs.registerComponent<Rectangle>();
-	ecs.registerComponent<LabelComponent>();
-	ecs.registerComponent<TextAreaComponent>();
-	ecs.registerComponent<ColorRectComponent>();
-	ecs.registerComponent<ImageRectComponent>();
-	ecs.registerComponent<NinePatchImageRectComponent>();
-	ecs.registerComponent<DialogueComponent>();
-	ecs.registerComponent<ButtonComponent>();
-	ecs.registerComponent<InputComponent>();
 
-	for (auto &[title, elementCbor] : bin.entites) {
-		auto entity = ecs.createEntity(title);
-
-		auto elementJson = json::from_cbor(elementCbor);
-		for (auto &componentJson : elementJson.items()) {
-			ecs.insertComponentFromJson(entity, componentJson.key(), componentJson.value());
-		}
-		initEntityComponents(entity);
+	for (auto &[title, elementBin] : bin.elements) {
+		auto element = addElement(title, elementBin.type);
+		elements[element]->props = elementBin.props;
+		elements[element]->config();
 	}
 
 	scriptSource = bin.scriptSource;
@@ -100,13 +72,17 @@ InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{})
 	if (!scriptSource.empty() && Game::isUsingBin()) {
 		std::string key = TextFormat("scripts/%s", scriptSource.c_str());
 		if (Game::getBin().scripts.count(key) > 0) {
+			scriptFlag = true;
+
 			std::string luaCode = Game::getBin().scripts[key].bytecode;
-			Game::getScripts().getState()["self"] = sol::nil;
+
 			auto env = sol::environment(Game::getScripts().getState(), Game::getScripts().getState().globals());
+			lua_basic_types_set(env);
 			lua_ui_types_set(env);
+			this->env = env;
+
 			env["self"] = this;
 			env["view"] = this;
-			this->env = env;
 
 			Game::getScripts().getState().do_string(luaCode, this->env);
 
@@ -115,169 +91,221 @@ InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{})
 				this->env["init"]();
 			}
 		}
+	} else {
+		scriptFlag = false;
 	}
 }
 
 nlohmann::json InterfaceView::dumpJson() {
 	auto j = json::object();
 
-	j["entities"] = json::object();
-	for (auto &entity : ecs.getEntities()) {
-		auto &name = ecs.getEntityName(entity);
+	InterfaceViewBin bin;
+	bin.scriptSource = scriptSource;
 
-		j["entities"][name] = json::object();
+	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
+		auto element = elements[i].get();
 
-		auto set = ecs.getEntityComponents(entity);
-		for (auto &componentName : set) {
-			auto componentJson = ecs.getComponentJson(entity, componentName);
-			j["entities"][name][componentName] = componentJson;
+		if (element != nullptr) {
+			UIElementBin elementBin;
+			elementBin.type = element->typeName;
+			elementBin.props = element->props;
+
+			bin.elements[elementNames[i]] = elementBin;
 		}
 	}
 
-	j["script"] = scriptSource;
+	std::stringstream stream;
+	{
+		cereal::JSONOutputArchive cerealJson(stream);
+		cerealJson(CEREAL_NVP(bin));
+	}
+
+	j = json::parse(stream.str());
 
 	return j;
 }
-
-bool InterfaceView::elementExists(const std::string &title) {
-	return ecs.getEntityManager().findName(title) < MAX_ENTITIES;
+//
+const std::string& InterfaceView::getEntityName(int index) {
+	return elementNames[index];
 }
 
-EntityID InterfaceView::addElement(const std::string &title) { return ecs.createEntity(title); }
+ElementIndex InterfaceView::findByName(const std::string& title) {
+	ElementIndex res = MAX_ELEMENTS;
+	for (int i = 0; i < MAX_ELEMENTS; i++) {
+		if (elementNames[i] == title) {
+			res = i;
+			break;
+		}
+	}
+	return res;
+}
+//
+bool InterfaceView::elementExists(const std::string &title) {
+	return findByName(title) < MAX_ELEMENTS;
+}
+
+ElementIndex InterfaceView::addElement(const std::string& title, const std::string& type) {
+	if (size >= MAX_ELEMENTS) {
+		throw std::runtime_error("Too many entities");
+	}
+
+	if (findByName(title) != MAX_ELEMENTS) {
+		throw std::runtime_error(TextFormat("This name is taken: %s", title.c_str()));
+	}
+
+	ElementIndex id = availableIds.front();
+	availableIds.pop();
+
+	elements[id] = std::move(InterfaceService::getFactory().constructElement(type));
+	elementNames[id] = title;
+
+	size++;
+
+	return id;
+}
 
 void InterfaceView::removeElement(const std::string &title) {
-	EntityID entity = ecs.getEntityManager().findName(title);
-	if (entity < MAX_ENTITIES) {
-		ecs.destroyEntity(entity);
+	ElementIndex i = findByName(title);
+	if (i < MAX_ELEMENTS) {
+		availableIds.push(i);
+		elements[i].reset();
+		elementNames[i].erase();
+		size--;
 	}
 }
 
-EntityID InterfaceView::getElement(const std::string &title) { return ecs.getEntityManager().findName(title); }
+UIElement* InterfaceView::getElement(const std::string& title) {
+	auto i = findByName(title);
+	if (i < MAX_ELEMENTS) {
+		return elements[i].get();
+	}
+	return nullptr;
+}
 
-const std::set<EntityID> &InterfaceView::getElements() { return ecs.getEntities(); }
+UIElement* InterfaceView::getElement(ElementIndex i) {
+	return elements[i].get();
+}
+
+const std::array<std::unique_ptr<UIElement>, MAX_ELEMENTS>& InterfaceView::getElements() {
+	return elements;
+}
 
 void InterfaceView::renameElement(const std::string &title, const std::string &newTitle) {
-	ecs.getEntityManager().renameEntity(ecs.getEntityManager().findName(title), newTitle);
+	auto i = findByName(title);
+	if (i < MAX_ELEMENTS) {
+		elementNames[i] = newTitle;
+	}
 }
 
 void InterfaceView::changeFocusedElement(const std::string &title) {
-	auto entity = ecs.getEntityManager().findName(title);
-	if (entity <= MAX_ENTITIES) {
+	auto entity = findByName(title);
+	if (entity <= MAX_ELEMENTS) {
 		changeFocusedElement(entity);
 	}
 }
 
-void InterfaceView::changeFocusedElement(EntityID entity) {
-	if (entity < MAX_ENTITIES) {
-		if (ecs.hasComponent<InputComponent>(entity)) {
-			if (current < MAX_ENTITIES) {
-				auto &previousInput = ecs.getComponent<InputComponent>(current);
-				if (previousInput.callbacks[CALLBACK_UNFOCUSED] != nullptr) {
-					previousInput.callbacks[CALLBACK_UNFOCUSED]();
+void InterfaceView::changeFocusedElement(ElementIndex index) {
+	if (index < MAX_ELEMENTS) {
+		auto element = elements[index].get();
+		if (element->props.count("input") > 0) {
+			if (currentElement < MAX_ELEMENTS) {
+				auto previousElement = elements[currentElement].get();
+				auto previousInput = std::get<InputC>(previousElement->props["input"]);
+
+				if (previousElement->callbacks[CALLBACK_UNFOCUSED] != nullptr) {
+					previousElement->callbacks[CALLBACK_UNFOCUSED]();
 				}
 
-				auto luaFunc = getLuaEnvironment()[previousInput.funcNames.funcNames[CALLBACK_UNFOCUSED]];
+				if (hasScript()) {
+					auto luaFunc = getLuaEnvironment()[previousInput.funcNames.funcNames[CALLBACK_UNFOCUSED]];
+					if (luaFunc.is<sol::function>()) {
+						luaFunc();
+					}
+				}
+			}
+
+			auto input = std::get<InputC>(element->props["input"]);
+
+			if (element->callbacks[CALLBACK_FOCUSED] != nullptr) {
+				element->callbacks[CALLBACK_FOCUSED]();
+			}
+
+			if (hasScript()) {
+				auto luaFunc = getLuaEnvironment()[input.funcNames.funcNames[CALLBACK_FOCUSED]];
 				if (luaFunc.is<sol::function>()) {
 					luaFunc();
 				}
 			}
 
-			auto &input = ecs.getComponent<InputComponent>(entity);
-			if (input.callbacks[CALLBACK_FOCUSED] != nullptr) {
-				input.callbacks[CALLBACK_FOCUSED]();
-			}
-
-			auto luaFunc = getLuaEnvironment()[input.funcNames.funcNames[CALLBACK_FOCUSED]];
-			if (luaFunc.is<sol::function>()) {
-				luaFunc();
-			}
-
-			current = entity;
+			currentElement = index;
 		}
 	}
 }
 
+UIElement* InterfaceView::cloneElement(const std::string& title, const std::string& newTitle) {
+	auto ptr = getElement(title);
+	if (ptr == nullptr) {
+		return nullptr;
+	}
+
+	auto newIndex = addElement(newTitle, ptr->typeName);
+	UIElement* newElement = getElement(newIndex);
+	newElement->props = ptr->props;
+
+	return newElement;
+}
+
 void InterfaceView::resetElements() {
-	for (auto &[title, elementCbor] : bin.entites) {
-		auto entity = ecs.getEntityManager().findName(title);
-
-		auto elementJson = json::from_cbor(elementCbor);
-		for (auto &componentJson : elementJson.items()) {
-			ecs.replaceComponentFromJson(entity, componentJson.key(), componentJson.value());
-		}
-
-		initEntityComponents(entity);
+	for (auto &[title, elementBin] : bin.elements) {
+		auto element = findByName(title);
+		elements[element]->props = elementBin.props;
+		elements[element]->config();
 	}
 }
 
 void InterfaceView::onNotify(Event event) {
-	if (current < MAX_ENTITIES) {
-		ecs.getSystem().onNotify(event, current);
+	if (currentElement < MAX_ELEMENTS) {
+		elements[currentElement]->onNotify(event);
 	}
 }
 
 void InterfaceView::update() {
-	ecs.update();
 	for (auto &container : tweens) {
 		container.update();
 	}
+
+	for (auto& element : elements) {
+		if (element.get() != nullptr) {
+			element->update();
+		}
+	}
 }
 
-void InterfaceView::draw() { ecs.draw(); }
-
-Coordinator &InterfaceView::getCoordinator() { return ecs; }
-
-const std::set<EntityID> &InterfaceView::getEntities() { return ecs.getEntities(); }
-
-nlohmann::json InterfaceView::dumpEntityJson(EntityID entity) {
-	nlohmann::json j = json::object();
-
-	auto set = ecs.getEntityComponents(entity);
-	for (auto &componentName : set) {
-		auto componentJson = ecs.getComponentJson(entity, componentName);
-		j[componentName] = componentJson;
+void InterfaceView::draw() {
+	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
+		auto element = getElement(i);
+		if (element != nullptr) {
+			drawEntity(i);
+		}
 	}
-
-	return j;
 }
 
-void InterfaceView::initEntityComponents(EntityID entity) {
-	if (ecs.hasComponent<LabelComponent>(entity)) {
-		auto &component = ecs.getComponent<LabelComponent>(entity);
-		component.loadFont(component.font.path);
-	}
+void InterfaceView::drawEntity(ElementIndex i) {
+	auto element = elements[i].get();
+	if (element == nullptr) return;
 
-	if (ecs.hasComponent<TextAreaComponent>(entity)) {
-		auto &component = ecs.getComponent<TextAreaComponent>(entity);
-		component.loadFont(component.font.path);
-	}
-
-	if (ecs.hasComponent<ImageRectComponent>(entity)) {
-		auto &component = ecs.getComponent<ImageRectComponent>(entity);
-		component.scaleImage(component.image.scale);
-	}
-
-	if (ecs.hasComponent<NinePatchImageRectComponent>(entity)) {
-		auto &component = ecs.getComponent<NinePatchImageRectComponent>(entity);
-		component.scaleImage(component.image.scale);
-	}
-
-	if (ecs.hasComponent<ButtonComponent>(entity) && ecs.hasComponent<InputComponent>(entity)) {
-		auto &input = ecs.getComponent<InputComponent>(entity);
-		input.callbacks[CALLBACK_FOCUSED] = [this, entity] {
-			auto &button = ecs.getComponent<ButtonComponent>(entity);
-			button.shownTextColor = button.focusedTextColor;
-		};
-		input.callbacks[CALLBACK_UNFOCUSED] = [this, entity] {
-			auto &button = ecs.getComponent<ButtonComponent>(entity);
-			button.shownTextColor = button.normalTextColor;
-		};
+	Rectangle rect = std::get<Rectangle>(element->props["rect"]);
+	bool visible = std::get<bool>(element->props["visible"]);
+	if (visible) {
+		element->draw(rect);
 	}
 }
 
 void InterfaceView::setScriptFile(const std::string &fileName) { this->scriptSource = fileName; }
 
 std::string InterfaceView::getScriptFile() { return scriptSource; }
+
+bool InterfaceView::hasScript() { return scriptFlag; }
 
 sol::environment &InterfaceView::getLuaEnvironment() { return env; }
 
@@ -293,8 +321,7 @@ void InterfaceView::addTween(Tween tween) {
 }
 
 void InterfaceView::abandonLua() {
-	for (auto& container : tweens) {
-		container.abandonLua();
+	if (hasScript()) {
+		env.abandon();
 	}
-	env.abandon();
 }

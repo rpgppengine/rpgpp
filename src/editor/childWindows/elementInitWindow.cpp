@@ -6,8 +6,7 @@
 #include "TGUI/Widgets/EditBox.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "childWindows/popupWindow.hpp"
-#include "entity.hpp"
-#include "interfaceElementFactory.hpp"
+#include "interfaceService.hpp"
 
 ElementInitWindow::ElementInitWindow() : PopupWindow("Create Element..") {
 	view = nullptr;
@@ -21,7 +20,7 @@ ElementInitWindow::ElementInitWindow() : PopupWindow("Create Element..") {
 	list->setPosition({0, 32});
 	list->setSize({"100%", "100% - 32"});
 
-	for (auto &elementName : getElementsFactoryList()) {
+	for (auto& elementName : InterfaceService::getFactory().elementNames) {
 		list->addItem({elementName});
 	}
 
@@ -29,17 +28,16 @@ ElementInitWindow::ElementInitWindow() : PopupWindow("Create Element..") {
 
 	list->onItemSelect([this, weakInput](const tgui::String &item) {
 		if (auto sharedInput = weakInput.lock()) {
-			if (view->getCoordinator().getEntityManager().findName(sharedInput->getText().toStdString()) <
-				MAX_ENTITIES) {
+			if (view->findByName(sharedInput->getText().toStdString()) <
+				MAX_ELEMENTS) {
 				list->deselectItem();
 				return;
 			}
 
-			EntityID entity =
-				construct(sharedInput->getText().toStdString(), item.toStdString(), view->getCoordinator());
-			if (entity < MAX_ENTITIES) {
-				view->initEntityComponents(entity);
+			ElementIndex elementId = view->addElement(sharedInput->getText().toStdString(), item.toStdString());
+			if (elementId < MAX_ELEMENTS) {
 				tree->addItem({sharedInput->getText().toStdString()});
+				view->getElement(elementId)->config();
 			}
 			close();
 		}

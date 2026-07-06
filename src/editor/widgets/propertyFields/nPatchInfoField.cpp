@@ -17,8 +17,8 @@ NPatchInfoField::NPatchInfoField(const char *typeName, bool initRenderer)
 		auto *ptr = Editor::instance->getGui().getChildWindowSubService()->getWindow("edit_npatch");
 		NPatchInfoWindow *window = static_cast<NPatchInfoWindow *>(ptr);
 
-		window->view->setup(&component->npatchInfo, component->image.texture, component->image.scale);
-		window->init(&component->npatchInfo, component->image.texture);
+		window->view->setup(info, imageRef->texture, imageRef->scale);
+		window->init(info, imageRef->texture);
 		window->open();
 	});
 

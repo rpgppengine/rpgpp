@@ -10,6 +10,7 @@
 #include "dialogueBalloon.hpp"
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
+#include "ui_elements/elementFactory.hpp"
 
 /** The InterfaceService acts for the User Interface (UI). */
 class InterfaceService {
@@ -18,8 +19,8 @@ private:
 	Font font;
 	bool fpsVisible;
 	bool notifyLock = false;
-	/** Texture for UI components. */
-	Texture uiTexture;
+	/** Helper for instantiating element types. */
+	static ElementFactory factory;
 	/** Available UI Views. */
 	std::map<std::string, std::unique_ptr<InterfaceView>> views;
 	/** Current active view. */
@@ -33,8 +34,6 @@ public:
 	void initBin(GameData &bin);
 	/** Get the font used for the game's UI. */
 	Font getFont() const;
-	/** Get the texture, used for UI nine-patch components. */
-	Texture getTexture() const;
 	/** Open a dialogue with a certain title. */
 	void showDialogue(const std::string &id, bool runScript = true);
 	/** Open the dialogue with a Dialogue structure */
@@ -47,6 +46,8 @@ public:
 	void hideInterface(bool runScript = true);
 	void setNotifyLock();
 	bool getNotifyLock();
+	/** Get a reference to the factory helper. */
+	static ElementFactory& getFactory();
 	/** Update routine. */
 	void update();
 	/** Draw routine. */

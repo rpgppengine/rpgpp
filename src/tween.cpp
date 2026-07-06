@@ -1,11 +1,51 @@
 #include "tween.hpp"
+
 #include <cmath>
+
 #include "raylib.h"
 
 std::array<std::function<float(float)>, TWEEN_TYPE_MAX> TweenProvider::arr;
 
-float TweenProvider::tweenFunc(TweenType type, float t) {
-	return arr[static_cast<int>(type)](t);
+float TweenProvider::tweenFunc(TweenType type, float t) { return arr[static_cast<int>(type)](t); }
+
+std::list<Tween> TweenProvider::initPropTween(ElementProperty *dest, ElementProperty source, float duration,
+											  TweenType type) {
+	std::list<Tween> arr = {};
+
+	Tween baseTween = {};
+	baseTween.duration = duration;
+	baseTween.type = type;
+
+	if (dest->index() == UI_PROP_RECT) {
+		Rectangle *destRect = std::get_if<Rectangle>(dest);
+		Rectangle sourceRect = std::get<Rectangle>(source);
+
+		Tween x = baseTween;
+		x.a = destRect->x;
+		x.b = sourceRect.x;
+		x.ptr = &destRect->x;
+		arr.push_front(x);
+
+		Tween y = baseTween;
+		y.a = destRect->y;
+		y.b = sourceRect.y;
+		y.ptr = &destRect->y;
+		arr.push_back(y);
+
+		Tween width = baseTween;
+		width.a = destRect->width;
+		width.b = sourceRect.width;
+		width.ptr = &destRect->width;
+		arr.push_back(width);
+
+		Tween height = baseTween;
+		height.a = destRect->height;
+		height.b = sourceRect.height;
+		height.ptr = &destRect->height;
+		arr.push_back(height);
+	}
+
+	return arr;
 }
 
 void TweenProvider::setupTweenFuncs() {
@@ -52,98 +92,52 @@ void TweenProvider::setupTweenFuncs() {
 	arr[static_cast<int>(TweenType::INOUTBOUNCE)] = inOutBounce;
 }
 
-float linear(float t) {
-	return t;
-}
+float linear(float t) { return t; }
 
-float inSine(float t) {
-	return 1 - std::cos((t * PI) / 2);
-}
+float inSine(float t) { return 1 - std::cos((t * PI) / 2); }
 
-float outSine(float t) {
-	return std::sin((t * PI) / 2);
-}
+float outSine(float t) { return std::sin((t * PI) / 2); }
 
-float inOutSine(float t) {
-	return -(std::cos(PI * t) - 1) / 2;
-}
+float inOutSine(float t) { return -(std::cos(PI * t) - 1) / 2; }
 
-float inQuad(float t) {
-	return t * t;
-}
+float inQuad(float t) { return t * t; }
 
-float outQuad(float t) {
-	return 1 - (1 - t) * (1 - t);
-}
+float outQuad(float t) { return 1 - (1 - t) * (1 - t); }
 
-float inOutQuad(float t) {
-	return t < 0.5f ? 2 * t * t : 1 - std::pow(-2 * t + 2, 2) / 2;
-}
+float inOutQuad(float t) { return t < 0.5f ? 2 * t * t : 1 - std::pow(-2 * t + 2, 2) / 2; }
 
-float inCubic(float t) {
-	return t * t * t;
-}
+float inCubic(float t) { return t * t * t; }
 
-float outCubic(float t) {
-	return 1 - std::pow(1 - t, 3);
-}
+float outCubic(float t) { return 1 - std::pow(1 - t, 3); }
 
-float inOutCubic(float t) {
-	return t < 0.5f ? 4 * t * t * t : 1 - std::pow(-2 * t + 2, 3) / 2;
-}
+float inOutCubic(float t) { return t < 0.5f ? 4 * t * t * t : 1 - std::pow(-2 * t + 2, 3) / 2; }
 
-float inQuart(float t) {
-	return t * t * t * t;
-}
+float inQuart(float t) { return t * t * t * t; }
 
-float outQuart(float t) {
-	return 1 - std::pow(1 - t, 4);
-}
+float outQuart(float t) { return 1 - std::pow(1 - t, 4); }
 
-float inOutQuart(float t) {
-	return t < 0.5f ? 8 * t * t * t * t : 1 - std::pow(-2 * t + 2, 4) / 2;
-}
+float inOutQuart(float t) { return t < 0.5f ? 8 * t * t * t * t : 1 - std::pow(-2 * t + 2, 4) / 2; }
 
-float inQuint(float t) {
-	return t * t * t * t * t;
-}
+float inQuint(float t) { return t * t * t * t * t; }
 
-float outQuint(float t) {
-	return 1 - std::pow(1 - t, 5);
-}
+float outQuint(float t) { return 1 - std::pow(1 - t, 5); }
 
-float inOutQuint(float t) {
-	return t < 0.5f ? 16 * t * t * t * t * t : 1 - std::pow(-2 * t + 2, 5) / 2;
-}
+float inOutQuint(float t) { return t < 0.5f ? 16 * t * t * t * t * t : 1 - std::pow(-2 * t + 2, 5) / 2; }
 
-float inExpo(float t) {
-	return t == 0 ? 0 : std::pow(2, 10 * t - 10);
-}
+float inExpo(float t) { return t == 0 ? 0 : std::pow(2, 10 * t - 10); }
 
-float outExpo(float t) {
-	return t == 1 ? 1 : 1 - std::pow(2, -10 * t);
-}
+float outExpo(float t) { return t == 1 ? 1 : 1 - std::pow(2, -10 * t); }
 
 float inOutExpo(float t) {
-	return t == 0
-	? 0
-	: t == 1
-	? 1 : t < 0.5f
-	? std::pow(2, 20 * t - 10) / 2 : (2 - std::pow(2, -20 * t + 10)) / 2;
+	return t == 0 ? 0 : t == 1 ? 1 : t < 0.5f ? std::pow(2, 20 * t - 10) / 2 : (2 - std::pow(2, -20 * t + 10)) / 2;
 }
 
-float inCirc(float t) {
-	return 1 - std::sqrt(1 - std::pow(t , 2));
-}
+float inCirc(float t) { return 1 - std::sqrt(1 - std::pow(t, 2)); }
 
-float outCirc(float t) {
-	return std::sqrt(1 - std::pow(t - 1, 2));
-}
+float outCirc(float t) { return std::sqrt(1 - std::pow(t - 1, 2)); }
 
 float inOutCirc(float t) {
-	return t < 0.5f
-	? (1 - std::sqrt(1 - std::pow(2 * t, 2))) / 2
-	: (std::sqrt(1 - std::pow(-2 * t + 2, 2)) + 1) / 2;
+	return t < 0.5f ? (1 - std::sqrt(1 - std::pow(2 * t, 2))) / 2 : (std::sqrt(1 - std::pow(-2 * t + 2, 2)) + 1) / 2;
 }
 
 float inBack(float t) {
@@ -164,46 +158,32 @@ float inOutBack(float t) {
 	const float c1 = 1.70158;
 	const float c2 = c1 + 1.0f;
 
-	return t < 0.5f
-	? (std::pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
-	: (std::pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
+	return t < 0.5f ? (std::pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
+					: (std::pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
 }
 
 float inElastic(float t) {
 	const float c4 = (2 * PI) / 3;
 
-	return t == 0
-	? 0
-	: t == 1
-	? 1
-	: -std::pow(2, 10 * t - 10) * std::sin((t * 10 - 10.75f) * c4);
+	return t == 0 ? 0 : t == 1 ? 1 : -std::pow(2, 10 * t - 10) * std::sin((t * 10 - 10.75f) * c4);
 }
 
 float outElastic(float t) {
 	const float c4 = (2 * PI) / 3;
 
-	return t == 0
-	? 0
-	: t == 1
-	? 1
-	: -std::pow(2, -10 * t) * std::sin((t * 10 - 0.75f) * c4) + 1;
+	return t == 0 ? 0 : t == 1 ? 1 : -std::pow(2, -10 * t) * std::sin((t * 10 - 0.75f) * c4) + 1;
 }
 
 float inOutElastic(float t) {
 	const float c5 = (2 * PI) / 4.5f;
 
-	return t == 0
-	? 0
-	: t == 1
-	? 1
-	: t < 0.5f
-	? -std::pow(2, 20 * t - 10) * std::sin((t * 20 - 11.125f) * c5) / 2
-	: std::pow(2, -20 * t + 10) * std::sin((t * 20 - 11.125f) * c5) / 2 + 1;
+	return t == 0	  ? 0
+		   : t == 1	  ? 1
+		   : t < 0.5f ? -std::pow(2, 20 * t - 10) * std::sin((t * 20 - 11.125f) * c5) / 2
+					  : std::pow(2, -20 * t + 10) * std::sin((t * 20 - 11.125f) * c5) / 2 + 1;
 }
 
-float inBounce(float t) {
-	return 1 - outBounce(t - 1);
-}
+float inBounce(float t) { return 1 - outBounce(t - 1); }
 
 float outBounce(float t) {
 	const float n1 = 7.5625f;
@@ -220,8 +200,4 @@ float outBounce(float t) {
 	}
 }
 
-float inOutBounce(float t) {
-	return t < 0.5f
-	? (1 - outBounce(1 - 2 * t)) / 2
-	: (1 + outBounce(2 * t - 1)) / 2;
-}
+float inOutBounce(float t) { return t < 0.5f ? (1 - outBounce(1 - 2 * t)) / 2 : (1 + outBounce(2 * t - 1)) / 2; }
