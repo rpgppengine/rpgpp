@@ -29,7 +29,7 @@ private:
 public:
 	InterfaceViewFileView();
 	void init(tgui::Group::Ptr layout, VariantWrapper *variant) override;
-	void visitProps(const std::string& title);
+	void visitProps(const std::string &title);
 };
 
 #endif

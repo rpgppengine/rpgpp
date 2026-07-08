@@ -1,9 +1,10 @@
 #include "ui_elements/uiElement.hpp"
+
 #include "game.hpp"
 
 UIElement::UIElement() { init(); }
 
-UIElement::UIElement(const std::string& typeName) {
+UIElement::UIElement(const std::string &typeName) {
 	this->typeName = typeName;
 	init();
 }
@@ -12,9 +13,9 @@ void UIElement::init() {
 	props["rect"] = Rectangle{0, 0, 20, 20};
 	props["visible"] = true;
 
-	callbacks[CALLBACK_FOCUSED] = []{};
-	callbacks[CALLBACK_UNFOCUSED] = []{};
-	callbacks[CALLBACK_TRIGGER] = []{};
+	callbacks[CALLBACK_FOCUSED] = [] {};
+	callbacks[CALLBACK_UNFOCUSED] = [] {};
+	callbacks[CALLBACK_TRIGGER] = [] {};
 }
 
 void UIElement::config() {}
@@ -51,6 +52,4 @@ void UIElement::onNotify(Event event) {
 	}
 }
 
-void UIElement::fromBin(UIElement& bin) {
-	props = bin.props;
-}
+void UIElement::fromBin(UIElement &bin) { props = bin.props; }

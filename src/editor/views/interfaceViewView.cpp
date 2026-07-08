@@ -66,7 +66,7 @@ void InterfaceViewView::drawCanvas() {
 	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
 		auto element = ptr->getElement(i);
 		if (element != nullptr) {
-			auto& name = ptr->getEntityName(i);
+			auto &name = ptr->getEntityName(i);
 
 			ptr->drawEntity(i);
 
@@ -154,14 +154,14 @@ void InterfaceViewView::selectElement(const std::string &elementName) {
 	}
 }
 
-void InterfaceViewView::visitProps(const std::string& title) {
+void InterfaceViewView::visitProps(const std::string &title) {
 	visitor->box = propBox;
 	visitor->view = ptr;
 
 	auto element = ptr->getElement(title);
 	visitor->element = element;
 	if (element == nullptr) return;
-	for (auto& [title, variant] : element->props) {
+	for (auto &[title, variant] : element->props) {
 		visitor->key = title;
 		std::visit(*visitor, variant);
 	}

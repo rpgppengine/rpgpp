@@ -4,17 +4,16 @@
 #include <raylib.h>
 
 #include <array>
+#include <cereal/types/array.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/variant.hpp>
+#include <cereal/types/vector.hpp>
 #include <cstdint>
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <variant>
 #include <vector>
-
-#include <cereal/types/array.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/variant.hpp>
-#include <cereal/types/unordered_map.hpp>
 
 #include "dialogueBalloon.hpp"
 
@@ -110,7 +109,8 @@ enum ElementPropertyType {
 	UI_PROP_INPUT
 };
 
-typedef std::variant<int, bool, std::string, Rectangle, Color, FontRef, ImageRef, VerticalAlignment, HorizontalAlignment, UIElementRef, NPatchInfo, InputC>
+typedef std::variant<int, bool, std::string, Rectangle, Color, FontRef, ImageRef, VerticalAlignment,
+					 HorizontalAlignment, UIElementRef, NPatchInfo, InputC>
 	ElementProperty;
 
 struct Event {

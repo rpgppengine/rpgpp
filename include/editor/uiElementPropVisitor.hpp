@@ -4,13 +4,13 @@
 #include "widgets/propertiesBox.hpp"
 
 struct UIElementPropVisitor {
-	PropertiesBox* box = nullptr;
-	InterfaceView* view = nullptr;
-	UIElement* element = nullptr;
+	PropertiesBox *box = nullptr;
+	InterfaceView *view = nullptr;
+	UIElement *element = nullptr;
 	std::string key;
 	void operator()(int val);
 	void operator()(bool val);
-	void operator()(const std::string& val);
+	void operator()(const std::string &val);
 	void operator()(Rectangle val);
 	void operator()(Color val);
 	void operator()(FontRef val);
@@ -21,7 +21,7 @@ struct UIElementPropVisitor {
 	void operator()(NPatchInfo val);
 	void operator()(InputC val);
 
-	void uiElementRef(UIElementRef* ref, const std::string& key);
+	void uiElementRef(UIElementRef *ref, const std::string &key);
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "ui_elements/elementFactory.hpp"
+
 #include "ui_elements/button.hpp"
 #include "ui_elements/colorRect.hpp"
 #include "ui_elements/dialogueArea.hpp"
@@ -16,11 +17,11 @@ ElementFactory::ElementFactory() {
 	map["DialogueArea"] = [] { return std::make_unique<DialogueArea>(); };
 	map["ValueSlider"] = [] { return std::make_unique<ValueSlider>(); };
 
-	for (auto& pair : map) {
+	for (auto &pair : map) {
 		elementNames.emplace_front(pair.first);
 	}
 }
 
-std::unique_ptr<UIElement> ElementFactory::constructElement(const std::string& title) {
+std::unique_ptr<UIElement> ElementFactory::constructElement(const std::string &title) {
 	return std::move(map[title]());
 }

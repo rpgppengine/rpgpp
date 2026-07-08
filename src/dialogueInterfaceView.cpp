@@ -133,8 +133,8 @@ void DialogueInterfaceView::update() {
 				optionsImage->props["visible"] = true;
 
 				int i = 0;
-				for (auto& option : diagArea->line->options) {
-					Button* optionButton = static_cast<Button*>(getElement(TextFormat("option-%i", i)));
+				for (auto &option : diagArea->line->options) {
+					Button *optionButton = static_cast<Button *>(getElement(TextFormat("option-%i", i)));
 					optionButton->props["visible"] = true;
 
 					i++;

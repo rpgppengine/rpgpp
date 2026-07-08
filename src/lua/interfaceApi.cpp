@@ -3,13 +3,11 @@
 #include "game.hpp"
 #include "sol/table.hpp"
 
-void lua_interface_open(const std::string &id) {
-	Game::getUi().showInterface(id, true);
-}
+void lua_interface_open(const std::string &id) { Game::getUi().showInterface(id, true); }
 
 void lua_opendiag(const std::string &id) { Game::getUi().showDialogue(id); }
 
-InterfaceView* lua_getui() { return Game::getUi().getCurrentView(); }
+InterfaceView *lua_getui() { return Game::getUi().getCurrentView(); }
 
 void lua_ui_set(sol::state_view &lua) {
 	auto space = lua["Interface"].get_or_create<sol::table>();

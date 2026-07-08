@@ -26,12 +26,10 @@ void NinePatchImageRect::draw(Rectangle rect) {
 	DrawTextureNPatch(image.texture, info, rect, origin, 0.0f, WHITE);
 }
 
-void NinePatchImageRect::config() {
-	scaleImage(std::get<ImageRef>(props["image"]).scale);
-}
+void NinePatchImageRect::config() { scaleImage(std::get<ImageRef>(props["image"]).scale); }
 
 void NinePatchImageRect::scaleImage(int scale) {
-	ImageRef& imageRef = std::get<ImageRef>(props["image"]);
+	ImageRef &imageRef = std::get<ImageRef>(props["image"]);
 
 	imageRef.scale = scale;
 	Image image = LoadImage(TextFormat("images/%s", imageRef.path.c_str()));
@@ -41,8 +39,8 @@ void NinePatchImageRect::scaleImage(int scale) {
 	UnloadImage(image);
 }
 
-void NinePatchImageRect::loadImage(const std::string& path) {
-	ImageRef& imageRef = std::get<ImageRef>(props["image"]);
+void NinePatchImageRect::loadImage(const std::string &path) {
+	ImageRef &imageRef = std::get<ImageRef>(props["image"]);
 
 	imageRef.path = path;
 	scaleImage(imageRef.scale);

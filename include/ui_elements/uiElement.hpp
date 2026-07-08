@@ -2,6 +2,7 @@
 #define _RPGPP_UI_ELEMENTS_H
 
 #include <functional>
+
 #include "gamedata.hpp"
 
 #define MAX_ELEMENTS (255)
@@ -11,7 +12,7 @@ struct UIElement {
 	std::array<std::function<void()>, RPGPP_CALLBACK_MAX> callbacks = {};
 	std::string typeName = "";
 	UIElement();
-	UIElement(const std::string& typeName);
+	UIElement(const std::string &typeName);
 	virtual ~UIElement() {};
 	virtual void init();
 	virtual void config();
@@ -19,7 +20,7 @@ struct UIElement {
 	virtual void draw(Rectangle rect) = 0;
 	virtual void onNotify(Event event);
 
-	void fromBin(UIElement& bin);
+	void fromBin(UIElement &bin);
 };
 
 typedef uint8_t ElementIndex;

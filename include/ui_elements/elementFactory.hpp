@@ -3,12 +3,13 @@
 
 #include <list>
 #include <memory>
+
 #include "ui_elements/uiElement.hpp"
 
 struct ElementFactory {
 	std::unordered_map<std::string, std::function<std::unique_ptr<UIElement>()>> map = {};
 	std::list<std::string> elementNames = {};
-	std::unique_ptr<UIElement> constructElement(const std::string& title);
+	std::unique_ptr<UIElement> constructElement(const std::string &title);
 
 	ElementFactory();
 };

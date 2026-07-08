@@ -48,7 +48,7 @@ void UIElementRefWindow::init() {
 	list->removeAllItems();
 
 	ElementIndex i = 0;
-	for (auto&& entity : view->getElements()) {
+	for (auto &&entity : view->getElements()) {
 		if (entity.get() != nullptr) {
 			std::string name = view->getEntityName(i);
 

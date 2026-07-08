@@ -47,7 +47,7 @@ public:
 	void setNotifyLock();
 	bool getNotifyLock();
 	/** Get a reference to the factory helper. */
-	static ElementFactory& getFactory();
+	static ElementFactory &getFactory();
 	/** Update routine. */
 	void update();
 	/** Draw routine. */

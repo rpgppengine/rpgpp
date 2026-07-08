@@ -17,12 +17,10 @@ void ImageRect::draw(Rectangle rect) {
 				   rect, Vector2{0, 0}, 0.0f, WHITE);
 }
 
-void ImageRect::config() {
-	scaleImage(std::get<ImageRef>(props["image"]).scale);
-}
+void ImageRect::config() { scaleImage(std::get<ImageRef>(props["image"]).scale); }
 
 void ImageRect::scaleImage(int scale) {
-	ImageRef& imageRef = std::get<ImageRef>(props["image"]);
+	ImageRef &imageRef = std::get<ImageRef>(props["image"]);
 
 	imageRef.scale = scale;
 	Image image = LoadImage(TextFormat("images/%s", imageRef.path.c_str()));
@@ -32,8 +30,8 @@ void ImageRect::scaleImage(int scale) {
 	UnloadImage(image);
 }
 
-void ImageRect::loadImage(const std::string& path) {
-	ImageRef& imageRef = std::get<ImageRef>(props["image"]);
+void ImageRect::loadImage(const std::string &path) {
+	ImageRef &imageRef = std::get<ImageRef>(props["image"]);
 
 	imageRef.path = path;
 	scaleImage(imageRef.scale);

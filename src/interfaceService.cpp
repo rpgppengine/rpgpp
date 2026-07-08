@@ -152,7 +152,6 @@ void InterfaceService::draw() {
 }
 
 void InterfaceService::unload() const {
-
 	// Abandon sol::environments before ScriptService is destructed
 	for (auto &[title, view] : views) {
 		view->abandonLua();

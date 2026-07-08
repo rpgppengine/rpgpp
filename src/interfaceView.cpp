@@ -1,6 +1,8 @@
 #include "interfaceView.hpp"
 
 #include <algorithm>
+#include <cereal/archives/json.hpp>
+#include <cereal/types/variant.hpp>
 #include <functional>
 #include <memory>
 #include <string>
@@ -21,9 +23,6 @@
 #include "sol/types.hpp"
 #include "tween.hpp"
 #include "uiTypesApi.hpp"
-
-#include <cereal/types/variant.hpp>
-#include <cereal/archives/json.hpp>
 
 InterfaceView::InterfaceView() : InterfaceView(Rectangle{}) {}
 
@@ -51,7 +50,7 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 	}
 
 	this->scriptSource = bin.scriptSource;
-	for (auto& [title, elementBin] : bin.elements) {
+	for (auto &[title, elementBin] : bin.elements) {
 		auto element = addElement(title, elementBin.type);
 		elements[element]->props = elementBin.props;
 		elements[element]->config();
@@ -86,7 +85,7 @@ InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{})
 
 			Game::getScripts().getState().do_string(luaCode, this->env);
 
-			//run init function if it exists
+			// run init function if it exists
 			if (this->env["init"].is<sol::function>()) {
 				this->env["init"]();
 			}
@@ -125,11 +124,9 @@ nlohmann::json InterfaceView::dumpJson() {
 	return j;
 }
 //
-const std::string& InterfaceView::getEntityName(int index) {
-	return elementNames[index];
-}
+const std::string &InterfaceView::getEntityName(int index) { return elementNames[index]; }
 
-ElementIndex InterfaceView::findByName(const std::string& title) {
+ElementIndex InterfaceView::findByName(const std::string &title) {
 	ElementIndex res = MAX_ELEMENTS;
 	for (int i = 0; i < MAX_ELEMENTS; i++) {
 		if (elementNames[i] == title) {
@@ -140,11 +137,9 @@ ElementIndex InterfaceView::findByName(const std::string& title) {
 	return res;
 }
 //
-bool InterfaceView::elementExists(const std::string &title) {
-	return findByName(title) < MAX_ELEMENTS;
-}
+bool InterfaceView::elementExists(const std::string &title) { return findByName(title) < MAX_ELEMENTS; }
 
-ElementIndex InterfaceView::addElement(const std::string& title, const std::string& type) {
+ElementIndex InterfaceView::addElement(const std::string &title, const std::string &type) {
 	if (size >= MAX_ELEMENTS) {
 		throw std::runtime_error("Too many entities");
 	}
@@ -174,7 +169,7 @@ void InterfaceView::removeElement(const std::string &title) {
 	}
 }
 
-UIElement* InterfaceView::getElement(const std::string& title) {
+UIElement *InterfaceView::getElement(const std::string &title) {
 	auto i = findByName(title);
 	if (i < MAX_ELEMENTS) {
 		return elements[i].get();
@@ -182,13 +177,9 @@ UIElement* InterfaceView::getElement(const std::string& title) {
 	return nullptr;
 }
 
-UIElement* InterfaceView::getElement(ElementIndex i) {
-	return elements[i].get();
-}
+UIElement *InterfaceView::getElement(ElementIndex i) { return elements[i].get(); }
 
-const std::array<std::unique_ptr<UIElement>, MAX_ELEMENTS>& InterfaceView::getElements() {
-	return elements;
-}
+const std::array<std::unique_ptr<UIElement>, MAX_ELEMENTS> &InterfaceView::getElements() { return elements; }
 
 void InterfaceView::renameElement(const std::string &title, const std::string &newTitle) {
 	auto i = findByName(title);
@@ -244,14 +235,14 @@ void InterfaceView::changeFocusedElement(ElementIndex index) {
 	}
 }
 
-UIElement* InterfaceView::cloneElement(const std::string& title, const std::string& newTitle) {
+UIElement *InterfaceView::cloneElement(const std::string &title, const std::string &newTitle) {
 	auto ptr = getElement(title);
 	if (ptr == nullptr) {
 		return nullptr;
 	}
 
 	auto newIndex = addElement(newTitle, ptr->typeName);
-	UIElement* newElement = getElement(newIndex);
+	UIElement *newElement = getElement(newIndex);
 	newElement->props = ptr->props;
 
 	return newElement;
@@ -276,7 +267,7 @@ void InterfaceView::update() {
 		container.update();
 	}
 
-	for (auto& element : elements) {
+	for (auto &element : elements) {
 		if (element.get() != nullptr) {
 			element->update();
 		}
@@ -313,12 +304,10 @@ sol::environment &InterfaceView::getLuaEnvironment() { return env; }
 
 std::list<TweenContainer> &InterfaceView::getTweens() { return tweens; }
 
-void InterfaceView::addTweenContainer(TweenContainer tweenContainer) {
-	tweens.push_back(tweenContainer);
-}
+void InterfaceView::addTweenContainer(TweenContainer tweenContainer) { tweens.push_back(tweenContainer); }
 
 void InterfaceView::addTween(Tween tween) {
-	auto& container = tweens.emplace_back();
+	auto &container = tweens.emplace_back();
 	container.addTween(tween);
 }
 

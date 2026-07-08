@@ -11,7 +11,7 @@ struct NinePatchImageRect : public UIElement {
 
 	void config();
 	void scaleImage(int scale);
-	void loadImage(const std::string& path);
+	void loadImage(const std::string &path);
 };
 
 #endif

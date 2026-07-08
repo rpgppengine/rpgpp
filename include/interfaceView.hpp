@@ -52,19 +52,19 @@ public:
 
 	nlohmann::json dumpJson();
 
-	const std::string& getEntityName(int index);
-	ElementIndex findByName(const std::string& title);
+	const std::string &getEntityName(int index);
+	ElementIndex findByName(const std::string &title);
 
 	bool elementExists(const std::string &title);
-	ElementIndex addElement(const std::string& title, const std::string& type);
+	ElementIndex addElement(const std::string &title, const std::string &type);
 	void removeElement(const std::string &title);
-	UIElement* getElement(const std::string& title);
-	UIElement* getElement(ElementIndex i);
+	UIElement *getElement(const std::string &title);
+	UIElement *getElement(ElementIndex i);
 	void renameElement(const std::string &title, const std::string &newTitle);
 	void changeFocusedElement(const std::string &title);
 	void changeFocusedElement(ElementIndex index);
-	UIElement* cloneElement(const std::string& title, const std::string& newTitle);
-	const std::array<std::unique_ptr<UIElement>, MAX_ELEMENTS>& getElements();
+	UIElement *cloneElement(const std::string &title, const std::string &newTitle);
+	const std::array<std::unique_ptr<UIElement>, MAX_ELEMENTS> &getElements();
 	void resetElements();
 
 	virtual void onNotify(Event event);

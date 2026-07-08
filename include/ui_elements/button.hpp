@@ -12,7 +12,7 @@ struct Button : public UIElement {
 	Color shownTextColor = BLACK;
 
 	void config();
-	void loadFont(const std::string& path);
+	void loadFont(const std::string &path);
 };
 
 #endif

@@ -44,7 +44,7 @@ public:
 
 	void selectElement(const std::string &elementName);
 
-	void visitProps(const std::string& title);
+	void visitProps(const std::string &title);
 };
 
 #endif

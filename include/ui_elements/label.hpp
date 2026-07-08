@@ -10,7 +10,7 @@ struct Label : public UIElement {
 	void draw(Rectangle rect);
 
 	void config();
-	void loadFont(const std::string& path);
+	void loadFont(const std::string &path);
 };
 
 #endif

@@ -35,8 +35,10 @@ void Button::draw(Rectangle rect) {
 	//
 	auto text = std::get<std::string>(props["text"]);
 	auto textColor = shownTextColor;
-	TextAlignment horizontalAlignment = static_cast<TextAlignment>(std::get<HorizontalAlignment>(props["horizontalAlignment"]).val);
-	TextAlignment verticalAlignment = static_cast<TextAlignment>(std::get<VerticalAlignment>(props["verticalAlignment"]).val);
+	TextAlignment horizontalAlignment =
+		static_cast<TextAlignment>(std::get<HorizontalAlignment>(props["horizontalAlignment"]).val);
+	TextAlignment verticalAlignment =
+		static_cast<TextAlignment>(std::get<VerticalAlignment>(props["verticalAlignment"]).val);
 	auto font = std::get<FontRef>(props["font"]);
 
 	Vector2 textSize = MeasureTextEx(font.font, text.c_str(), static_cast<float>(font.fontSize), 1);
