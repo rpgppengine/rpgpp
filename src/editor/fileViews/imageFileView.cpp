@@ -38,8 +38,8 @@ void ImageFileView::init(tgui::Group::Ptr layout, VariantWrapper *variant) {
 	auto image = ptr->get();
 
 	imageView->setImage(image);
-	infoLabel->setText(TextFormat("%s | Image Size: %ix%i", GetFileName(image->source.c_str()), image->image.width,
-								  image->image.height));
+	infoLabel->setText(
+		TextFormat("%s | %ix%i", GetFileName(image->source.c_str()), image->image.width, image->image.height));
 
 	addWidgets(layout);
 }

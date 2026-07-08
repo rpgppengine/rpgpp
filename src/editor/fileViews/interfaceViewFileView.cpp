@@ -11,6 +11,7 @@
 #include "TGUI/Widgets/ScrollablePanel.hpp"
 #include "TGUI/Widgets/TabContainer.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
+#include "bindTranslation.hpp"
 #include "childWindows/elementInitWindow.hpp"
 #include "editor.hpp"
 #include "gamedata.hpp"
@@ -35,7 +36,8 @@ bool startsWith(const std::string &key, const std::string &prefix) {
 }
 
 InterfaceViewFileView::InterfaceViewFileView() {
-	auto createButton = tgui::Button::create("Create..");
+	auto createButton = tgui::Button::create("");
+	bindTranslation<tgui::Button>(createButton, "screen.project.viewsview.create", &tgui::Button::setText);
 	createButton->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), 0});
 	createButton->setSize({RIGHT_PANEL_W, 32});
 	createButton->onClick([this] {
@@ -64,7 +66,7 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	tabsContainer->setSize({RIGHT_PANEL_W, "50%"});
 
 	auto filePropertiesPanel = tabsContainer->addTab("UI View");
-	auto elementPropertiesPanel = tabsContainer->addTab("Element");
+	auto elementPropertiesPanel = tabsContainer->addTab("Properties");
 
 	widgetContainer.push_back(tabsContainer);
 
@@ -168,7 +170,7 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	widgetContainer.push_back(view);
 }
 
-void InterfaceViewFileView::visitProps(const std::string& title) {
+void InterfaceViewFileView::visitProps(const std::string &title) {
 	const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
 	const auto interface = ptr->get();
 
@@ -178,7 +180,7 @@ void InterfaceViewFileView::visitProps(const std::string& title) {
 	auto element = interface->getElement(title);
 	visitor.element = element;
 	if (element == nullptr) return;
-	for (auto& [title, variant] : element->props) {
+	for (auto &[title, variant] : element->props) {
 		visitor.key = title;
 		std::visit(visitor, variant);
 	}

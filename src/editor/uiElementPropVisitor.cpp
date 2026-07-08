@@ -56,7 +56,7 @@ void UIElementPropVisitor::operator()(Rectangle val) {
 	std::string k = key;
 
 	auto field = RectangleField::create();
-	field->label->setText("Rectangle");
+	field->label->setText(k);
 	field->setValue(val);
 	field->onChange([this, k](Rectangle newRect) {
 		element->props[k] = newRect;
@@ -71,7 +71,10 @@ void UIElementPropVisitor::operator()(Color val) {
 	auto field = ColorField::create();
 	field->label->setText(key);
 	field->setColor(val);
-	field->onColorChanged([this, k](Color newValue) { element->props[k] = newValue; element->config(); });
+	field->onColorChanged([this, k](Color newValue) {
+		element->props[k] = newValue;
+		element->config();
+	});
 	box->addColorField(field);
 }
 
