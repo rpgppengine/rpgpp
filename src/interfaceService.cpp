@@ -44,10 +44,10 @@ void InterfaceService::initBin(GameData &bin) {
 	}
 
 	for (auto &[title, viewBin] : bin.interfaceViews) {
-		if (title == "dialogue") return;
-
-		auto view = std::make_unique<InterfaceView>(viewBin);
-		views.emplace(title, std::move(view));
+		if (title != "dialogue") {
+			auto view = std::make_unique<InterfaceView>(viewBin);
+			views.emplace(title, std::move(view));
+		}
 	}
 }
 

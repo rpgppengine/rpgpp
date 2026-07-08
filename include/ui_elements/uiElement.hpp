@@ -17,7 +17,7 @@ struct UIElement {
 	virtual void config();
 	virtual void update() = 0;
 	virtual void draw(Rectangle rect) = 0;
-	void onNotify(Event event);
+	virtual void onNotify(Event event);
 
 	void fromBin(UIElement& bin);
 };

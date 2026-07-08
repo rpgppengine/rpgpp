@@ -199,7 +199,7 @@ void InterfaceView::renameElement(const std::string &title, const std::string &n
 
 void InterfaceView::changeFocusedElement(const std::string &title) {
 	auto entity = findByName(title);
-	if (entity <= MAX_ELEMENTS) {
+	if (entity < MAX_ELEMENTS) {
 		changeFocusedElement(entity);
 	}
 }
@@ -207,6 +207,8 @@ void InterfaceView::changeFocusedElement(const std::string &title) {
 void InterfaceView::changeFocusedElement(ElementIndex index) {
 	if (index < MAX_ELEMENTS) {
 		auto element = elements[index].get();
+		if (element == nullptr) return;
+
 		if (element->props.count("input") > 0) {
 			if (currentElement < MAX_ELEMENTS) {
 				auto previousElement = elements[currentElement].get();

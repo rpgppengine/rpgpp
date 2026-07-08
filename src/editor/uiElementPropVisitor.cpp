@@ -15,11 +15,14 @@ void UIElementPropVisitor::operator()(int val) {
 	std::string k = key;
 
 	auto field = IntField::create();
-	field->value->setMinimum(1);
-	field->value->setMaximum(5);
+	field->value->setMinimum(0);
+	field->value->setMaximum(1000);
 	field->label->setText(key);
 	field->value->setValue(val);
-	field->value->onValueChange([this, k](int newValue) { element->props[k] = newValue; });
+	field->value->onValueChange([this, k](int newValue) {
+		element->props[k] = newValue;
+		element->config();
+	});
 	box->addIntField(field);
 }
 
@@ -29,7 +32,10 @@ void UIElementPropVisitor::operator()(bool val) {
 	auto field = BoolField::create();
 	field->label->setText(key);
 	field->value->setChecked(val);
-	field->value->onChange([this, k](bool newValue) { element->props[k] = newValue; });
+	field->value->onChange([this, k](bool newValue) {
+		element->props[k] = newValue;
+		element->config();
+	});
 	box->addBooleanField(field);
 }
 
@@ -39,8 +45,10 @@ void UIElementPropVisitor::operator()(const std::string &val) {
 	auto textField = TextField::create();
 	textField->label->setText(key);
 	textField->value->setText(val);
-	textField->value->onTextChange(
-		[this, k](const tgui::String &newText) { element->props[k] = newText.toStdString(); });
+	textField->value->onTextChange([this, k](const tgui::String &newText) {
+		element->props[k] = newText.toStdString();
+		element->config();
+	});
 	box->addTextField(textField);
 }
 
@@ -50,7 +58,10 @@ void UIElementPropVisitor::operator()(Rectangle val) {
 	auto field = RectangleField::create();
 	field->label->setText("Rectangle");
 	field->setValue(val);
-	field->onChange([this, k](Rectangle newRect) { element->props[k] = newRect; });
+	field->onChange([this, k](Rectangle newRect) {
+		element->props[k] = newRect;
+		element->config();
+	});
 	box->addRectangleField(field);
 }
 
@@ -60,7 +71,7 @@ void UIElementPropVisitor::operator()(Color val) {
 	auto field = ColorField::create();
 	field->label->setText(key);
 	field->setColor(val);
-	field->onColorChanged([this, k](Color newValue) { element->props[k] = newValue; });
+	field->onColorChanged([this, k](Color newValue) { element->props[k] = newValue; element->config(); });
 	box->addColorField(field);
 }
 
@@ -78,6 +89,8 @@ void UIElementPropVisitor::operator()(ImageRef val) {
 		image.path = newImageName;
 		image.texture = LoadTexture(
 			TextFormat("%s/images/%s", Editor::instance->project->getBasePath().c_str(), newImageName.c_str()));
+
+		element->config();
 	};
 	box->addFileField(imageField);
 
@@ -94,6 +107,8 @@ void UIElementPropVisitor::operator()(ImageRef val) {
 		ImageResizeNN(&loadedImage, loadedImage.width * image.scale, loadedImage.height * image.scale);
 		image.texture = LoadTextureFromImage(loadedImage);
 		UnloadImage(loadedImage);
+
+		element->config();
 	});
 	box->addIntField(scale);
 }
@@ -113,6 +128,8 @@ void UIElementPropVisitor::operator()(FontRef val) {
 		auto &font = std::get<FontRef>(element->props[k]);
 		font.path = newFontName;
 		font.font = LoadFontEx(fullPath.c_str(), 13, nullptr, 256);
+
+		element->config();
 	};
 	box->addFileField(fontField);
 
@@ -124,6 +141,8 @@ void UIElementPropVisitor::operator()(FontRef val) {
 	fontSize->value->onValueChange([this, k](int newValue) {
 		auto &font = std::get<FontRef>(element->props[k]);
 		font.fontSize = newValue;
+
+		element->config();
 	});
 	box->addIntField(fontSize);
 }

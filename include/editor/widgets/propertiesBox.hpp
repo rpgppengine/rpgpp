@@ -11,7 +11,6 @@
 #include "TGUI/Widgets/ChildWindow.hpp"
 #include "TGUI/Widgets/GrowVerticalLayout.hpp"
 #include "TGUI/Widgets/ScrollablePanel.hpp"
-#include "any_ptr/any_ptr.h"
 #include "interactable.hpp"
 #include "widgets/propertyFields/boolField.hpp"
 #include "widgets/propertyFields/colorField.hpp"
@@ -39,8 +38,6 @@ public:
 	tgui::SignalTyped<nlohmann::json> onJsonChanged = {"JsonChanged"};
 
 	Interactable *interactable = nullptr;
-
-	std::map<std::string, xxx::any_ptr> anyProps = {};
 
 	PropertiesBox(const char *typeName = "PropertiesBox", bool initRenderer = true);
 

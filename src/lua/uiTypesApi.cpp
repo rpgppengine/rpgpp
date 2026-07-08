@@ -20,7 +20,8 @@
 #include "sol/types.hpp"
 #include "tween.hpp"
 
-void lua_element_tween(UIElement *element, const std::string& propName, sol::object val, float duration, TweenType type) {
+void lua_element_tween(UIElement *element, const std::string &propName, sol::object val, float duration,
+					   TweenType type) {
 	auto destVar = &element->props[propName];
 	auto sourceVar = val.as<ElementProperty>();
 
@@ -30,7 +31,7 @@ void lua_element_tween(UIElement *element, const std::string& propName, sol::obj
 
 	auto resList = TweenProvider::initPropTween(destVar, sourceVar, duration, type);
 	TweenContainer cont;
-	for (auto& tween : resList) {
+	for (auto &tween : resList) {
 		cont.addTween(tween);
 	}
 	Game::getUi().getCurrentView()->addTweenContainer(cont);
@@ -41,9 +42,22 @@ sol::object lua_view_getElement(InterfaceView *view, const std::string &title) {
 	return sol::make_object(state, view->getElement(title));
 }
 
-sol::object lua_element_var(UIElement *element, const std::string &prop) {
+sol::object lua_element_index(UIElement *element, const std::string &prop) {
 	auto state = Game::getUi().getCurrentView()->getLuaEnvironment().lua_state();
-	return sol::make_object(state, element->props[prop]);
+	if (element->props.count(prop) > 0) {
+		return sol::make_object(state, element->props[prop]);
+	} else {
+		return sol::object(sol::nil);
+	}
+}
+
+void lua_element_newindex(UIElement *element, const std::string &prop, sol::object value) {
+	if (element->props.count(prop) > 0 && value.is<ElementProperty>()) {
+		auto variant = value.as<ElementProperty>();
+		if (element->props[prop].index() == variant.index()) {
+			element->props[prop] = variant;
+		}
+	}
 }
 
 void lua_ui_types_set(sol::environment &env) {
@@ -65,7 +79,10 @@ void lua_ui_types_set(sol::environment &env) {
 	env.new_usertype<TweenContainer>("TweenContainer", sol::constructors<TweenContainer()>(), "AddTween",
 									 &TweenContainer::addTween);
 
-	env.new_usertype<InterfaceView>(sol::no_construction(), "GetEntity", lua_view_getElement, "Reset", &InterfaceView::resetElements);
+	env.new_usertype<InterfaceView>(
+		sol::no_construction(), "GetEntity", lua_view_getElement, "Reset", &InterfaceView::resetElements, "ChangeFocus",
+		[](InterfaceView *view, const std::string &title) { view->changeFocusedElement(title); });
 
-	env.new_usertype<UIElement>(sol::no_construction(), sol::meta_function::index, lua_element_var, "Tween", lua_element_tween);
+	env.new_usertype<UIElement>(sol::no_construction(), sol::meta_function::index, lua_element_index,
+								sol::meta_function::new_index, lua_element_newindex, "Tween", lua_element_tween);
 }

@@ -27,7 +27,6 @@
 #include "sol/types.hpp"
 #include "views/interfaceViewView.hpp"
 #include "views/worldView.hpp"
-#include "widgets/anyPropertyVisitor.hpp"
 #include "widgets/propertiesBox.hpp"
 #include "widgets/propertyFields/fileField.hpp"
 
