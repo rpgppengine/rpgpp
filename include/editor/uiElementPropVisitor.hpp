@@ -1,6 +1,7 @@
 #ifndef _RPGPP_UIELEMENTPROPVISITOR_H
 #define _RPGPP_UIELEMENTPROPVISITOR_H
 
+#include "childWindows/editListFieldWindow.hpp"
 #include "widgets/propertiesBox.hpp"
 
 struct UIElementPropVisitor {
@@ -19,9 +20,12 @@ struct UIElementPropVisitor {
 	void operator()(VerticalAlignment val);
 	void operator()(HorizontalAlignment val);
 	void operator()(NPatchInfo val);
+	void operator()(StringVector val);
 	void operator()(InputC val);
 
 	void uiElementRef(UIElementRef *ref, const std::string &key);
+
+	EditListFieldWindow<std::string> *editListFieldWindow;
 };
 
 #endif

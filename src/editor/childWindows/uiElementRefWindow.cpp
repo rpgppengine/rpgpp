@@ -33,6 +33,7 @@ UIElementRefWindow::UIElementRefWindow() : PopupWindow("Select an Element..") {
 	list->onItemSelect([this](const tgui::String &item) {
 		auto entity = view->findByName(item.toStdString());
 		ref->entityId = entity;
+		ref->title = item.toStdString();
 		close();
 
 		if (field != nullptr && entity < MAX_ELEMENTS) {

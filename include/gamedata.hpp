@@ -109,12 +109,15 @@ enum ElementPropertyType {
 	UI_PROP_INPUT
 };
 
+typedef std::vector<std::string> StringVector;
+
 typedef std::variant<int, bool, std::string, Rectangle, Color, FontRef, ImageRef, VerticalAlignment,
-					 HorizontalAlignment, UIElementRef, NPatchInfo, InputC>
+					 HorizontalAlignment, UIElementRef, NPatchInfo, InputC, StringVector>
 	ElementProperty;
 
 struct Event {
 	KeyboardKey key;
+	bool hold = false;
 };
 
 struct ActorBin {

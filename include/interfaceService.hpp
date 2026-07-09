@@ -25,6 +25,8 @@ private:
 	std::map<std::string, std::unique_ptr<InterfaceView>> views;
 	/** Current active view. */
 	std::string currentViewName;
+	/** Last KeyboardKey. */
+	KeyboardKey lastKey = KEY_NULL;
 
 public:
 	/** Empty constructor. */
@@ -46,6 +48,8 @@ public:
 	void hideInterface(bool runScript = true);
 	void setNotifyLock();
 	bool getNotifyLock();
+	/** Get the last pressed key. */
+	KeyboardKey getLastKey();
 	/** Get a reference to the factory helper. */
 	static ElementFactory &getFactory();
 	/** Update routine. */

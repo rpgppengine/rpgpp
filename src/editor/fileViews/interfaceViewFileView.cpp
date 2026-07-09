@@ -36,6 +36,8 @@ bool startsWith(const std::string &key, const std::string &prefix) {
 }
 
 InterfaceViewFileView::InterfaceViewFileView() {
+	editListFieldWindow = std::make_unique<EditListFieldWindow<std::string>>();
+
 	auto createButton = tgui::Button::create("");
 	bindTranslation<tgui::Button>(createButton, "screen.project.viewsview.create", &tgui::Button::setText);
 	createButton->setPosition({TextFormat("100%% - %d", RIGHT_PANEL_W), 0});
@@ -176,6 +178,7 @@ void InterfaceViewFileView::visitProps(const std::string &title) {
 
 	visitor.box = propertiesBox.get();
 	visitor.view = interface;
+	visitor.editListFieldWindow  = editListFieldWindow.get();
 
 	auto element = interface->getElement(title);
 	visitor.element = element;

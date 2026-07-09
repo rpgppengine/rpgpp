@@ -1,19 +1,18 @@
-#include "ui_elements/button.hpp"
-
+#include "ui_elements/comboBox.hpp"
 #include "game.hpp"
 #include "raymath.h"
 
-Button::Button() : UIElement("Button") { init(); }
+ComboBox::ComboBox() : UIElement("ComboBox") {
+	init();
+}
 
-void Button::init() {
-	UIElement::init();
-	props["text"] = "";
-	props["normalTextColor"] = BLACK;
-	props["focusedTextColor"] = GRAY;
-	props["bgColor"] = RAYWHITE;
-	props["horizontalAlignment"] = HorizontalAlignment{};
-	props["verticalAlignment"] = VerticalAlignment{};
+void ComboBox::init() {
+	props["value"] = 0;
+	props["stringValue"] = std::string{};
+	props["values"] = StringVector{"one", "two", "three"};
 	props["font"] = FontRef{};
+	props["normalTextColor"] = RAYWHITE;
+	props["focusedTextColor"] = GRAY;
 	props["input"] = InputC{};
 
 	callbacks[CALLBACK_FOCUSED] = [this] {
@@ -26,19 +25,27 @@ void Button::init() {
 	};
 }
 
-void Button::update() {}
+void ComboBox::config() {
+	FontRef &font = std::get<FontRef>(props["font"]);
+	loadFont(font.path);
 
-void Button::draw(Rectangle rect) {
-	auto bgColor = std::get<Color>(props["bgColor"]);
+	Color normalTextColor = std::get<Color>(props["normalTextColor"]);
+	this->shownTextColor = normalTextColor;
 
-	DrawRectangleRec(rect, bgColor);
-	//
-	auto text = std::get<std::string>(props["text"]);
+	StringVector* vec = std::get_if<StringVector>(&props["values"]);
+	int index = std::get<int>(props["value"]);
+
+	std::string newStringValue = (*vec)[index];
+	props["stringValue"] = newStringValue;
+}
+
+void ComboBox::update() {}
+
+void ComboBox::draw(Rectangle rect) {
+	auto text = std::get<std::string>(props["stringValue"]);
 	auto textColor = shownTextColor;
-	TextAlignment horizontalAlignment =
-		static_cast<TextAlignment>(std::get<HorizontalAlignment>(props["horizontalAlignment"]).val);
-	TextAlignment verticalAlignment =
-		static_cast<TextAlignment>(std::get<VerticalAlignment>(props["verticalAlignment"]).val);
+	TextAlignment horizontalAlignment = TEXT_ALIGN_MIDDLE;
+	TextAlignment verticalAlignment = TEXT_ALIGN_CENTRE;
 	auto font = std::get<FontRef>(props["font"]);
 
 	Vector2 textSize = MeasureTextEx(font.font, text.c_str(), static_cast<float>(font.fontSize), 1);
@@ -50,15 +57,34 @@ void Button::draw(Rectangle rect) {
 	DrawTextEx(font.font, text.c_str(), textPos, static_cast<float>(font.fontSize), 1, textColor);
 }
 
-void Button::config() {
-	FontRef &font = std::get<FontRef>(props["font"]);
-	loadFont(font.path);
+void ComboBox::onNotify(Event event) {
+	if (event.hold) return;
 
-	Color normalTextColor = std::get<Color>(props["normalTextColor"]);
-	this->shownTextColor = normalTextColor;
+	StringVector* vec = std::get_if<StringVector>(&props["values"]);
+	int* index = std::get_if<int>(&props["value"]);
+
+	if (event.key == KEY_LEFT) {
+		if (*index > 0) {
+			(*index)--;
+		} else {
+			(*index) = (vec->size() - 1);
+		}
+	}
+	if (event.key == KEY_RIGHT) {
+		if (*index < (vec->size() - 1)) {
+			(*index)++;
+		} else {
+			(*index) = 0;
+		}
+	}
+
+	std::string newStringValue = (*vec)[*index];
+	props["stringValue"] = newStringValue;
+
+	UIElement::onNotify(event);
 }
 
-void Button::loadFont(const std::string &path) {
+void ComboBox::loadFont(const std::string &path) {
 	FontRef &font = std::get<FontRef>(props["font"]);
 
 	std::string fullPath = TextFormat("fonts/%s", font.path.c_str());

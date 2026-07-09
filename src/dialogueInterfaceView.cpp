@@ -40,6 +40,7 @@ void DialogueInterfaceView::setDialogue(DialogueBin dialogue) {
 void DialogueInterfaceView::onNotify(Event event) {
 	InterfaceView::onNotify(event);
 
+	if (event.hold) return;
 	if (event.key == KEY_Z) {
 		DialogueArea *diagArea = static_cast<DialogueArea *>(getElement("dialogueArea"));
 

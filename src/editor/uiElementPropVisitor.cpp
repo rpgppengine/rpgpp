@@ -212,6 +212,22 @@ void UIElementPropVisitor::operator()(NPatchInfo val) {
 	box->addNPatchFIeld(field);
 }
 
+void UIElementPropVisitor::operator()(StringVector val) {
+	std::string k = key;
+
+	StringVector* vec = std::get_if<StringVector>(&element->props[k]);
+
+	auto field = ListField<std::string>::create();
+	field->label->setText(k);
+	field->value->onPress([this, vec, field] {
+		editListFieldWindow->field = field.get();
+		editListFieldWindow->setup(vec);
+		editListFieldWindow->open();
+	});
+
+	box->addListField<std::string>(field);
+}
+
 void UIElementPropVisitor::operator()(InputC val) {
 	std::string k = key;
 

@@ -22,6 +22,7 @@ void UIElement::config() {}
 
 void UIElement::onNotify(Event event) {
 	if (props.count("input") <= 0) return;
+	if (event.hold) return;
 
 	InputC input = std::get<InputC>(props["input"]);
 

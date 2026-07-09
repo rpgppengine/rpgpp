@@ -116,6 +116,8 @@ void InterfaceService::setNotifyLock() { notifyLock = true; }
 
 bool InterfaceService::getNotifyLock() { return notifyLock; }
 
+KeyboardKey InterfaceService::getLastKey() { return lastKey; }
+
 void InterfaceService::update() {
 	if (IsKeyPressed(KEY_Q)) {
 		fpsVisible = !fpsVisible;
@@ -125,7 +127,14 @@ void InterfaceService::update() {
 		if (!notifyLock) {
 			auto key = GetKeyPressed();
 			if (key != KEY_NULL) {
+				lastKey = static_cast<KeyboardKey>(key);
 				views.at(currentViewName)->onNotify({static_cast<KeyboardKey>(key)});
+			}
+
+			if (lastKey != KEY_NULL) {
+				if (IsKeyDown(lastKey)) {
+					views.at(currentViewName)->onNotify({static_cast<KeyboardKey>(lastKey), true});
+				}
 			}
 		}
 		views.at(currentViewName)->update();

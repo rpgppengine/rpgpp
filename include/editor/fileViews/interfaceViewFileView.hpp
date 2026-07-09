@@ -25,6 +25,7 @@ private:
 	std::string selectedElement;
 
 	UIElementPropVisitor visitor;
+	std::unique_ptr<EditListFieldWindow<std::string>> editListFieldWindow;
 
 public:
 	InterfaceViewFileView();
