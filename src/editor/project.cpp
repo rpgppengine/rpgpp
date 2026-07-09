@@ -2,12 +2,9 @@
 
 #include <raylib.h>
 
-#include <algorithm>
 #include <array>
 #include <cassert>
-#include <cstddef>
 #include <cstdio>
-#include <cstdlib>
 #include <filesystem>
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -61,10 +58,11 @@ Project::Project(const std::string &path) {
 	programSet.windowStateFlag = j.value("windowState", 0);
 	programSet.targetFPS = j.value("targetFPS", 60);
 
-	gameSet.defaultRoomPath = j.value("defaultRoom", "");
+	gameSet.defaultLoadingPath = j.value("defaultRoom", "");
 	gameSet.playerActorPath = j.value("playerActor", "");
 	gameSet.tileSize = j.value("tileSize", 16);
 	gameSet.debugDraw = j.value("debugDraw", false);
+	gameSet.isLoadUi = j.value("isLoadUi", false);
 	gameSet.exportImageScales = j.value("exportImageScales", std::vector<int>{1});
 	gameSet.exportFontSizes = j.value("exportFontSizes", std::vector<int>{13});
 
@@ -121,7 +119,8 @@ json Project::toJson() {
 	j["windowState"] = programSet.windowStateFlag;
 	j["targetFPS"] = programSet.targetFPS;
 
-	j["defaultRoom"] = gameSet.defaultRoomPath;
+	j["defaultRoom"] = gameSet.defaultLoadingPath;
+	j["isLoadUi"] = gameSet.isLoadUi;
 	j["tileSize"] = gameSet.tileSize;
 	j["playerActor"] = gameSet.playerActorPath;
 	j["debugDraw"] = gameSet.debugDraw;

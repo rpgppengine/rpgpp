@@ -8,11 +8,8 @@
 #include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
 #include <fstream>
-#include <sstream>
 
 #include "dialogueBalloon.hpp"
-#include "interactable.hpp"
-#include "raylib.h"
 
 template <class Archive>
 void serialize(Archive &a, IRect &b) {
@@ -125,7 +122,7 @@ void serialize(Archive &a, ProjectProgramSettings &b) {
 
 template <class Archive>
 void serialize(Archive &a, ProjectGameSettings &b) {
-	a(b.defaultRoomPath, b.playerActorPath, b.tileSize, b.debugDraw, b.exportImageScales, b.exportFontSizes);
+	a(b.defaultLoadingPath, b.isLoadUi, b.playerActorPath, b.tileSize, b.debugDraw, b.exportImageScales, b.exportFontSizes);
 }
 
 template <class Archive>

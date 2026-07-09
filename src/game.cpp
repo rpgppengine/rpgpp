@@ -6,6 +6,7 @@
 #include <sol/forward.hpp>
 #include <sol/sol.hpp>	// FIXME : lua.h not found
 #include <stdexcept>
+#include <string>
 
 #include "gamedata.hpp"
 #include "scriptService.hpp"
@@ -85,13 +86,25 @@ void Game::useBin(const std::string &filePath) {
 	SetWindowIcon(iconImage);
 
 	UnloadImage(iconImage);
-	///
+
+	/// Setup Interfaces
+	ui->initBin(*gameData);
 
 	/// Select the default room from the settings
-	if (gameData->gameSet.defaultRoomPath.empty()) {
+
+	// Thefirey33:
+	// Decided on a very hybrid system that allows the user to load a Room or an UIElement at first.
+	// Had an idea where some games might want the player to immediately start without a main menu, as some RPG games do want to do that.
+
+	// NOTE: Hacky solution. Will fix later when i'm not bashing my head against wall.
+	if (gameData->gameSet.isLoadUi) {
+		ui->showInterface(GetFileNameWithoutExt(gameData->gameSet.defaultLoadingPath.c_str()));
+	}
+
+	if (gameData->gameSet.defaultLoadingPath.empty()) {
 		world->setRoomBin(gameData->rooms.at(0));
 	} else {
-		std::string chosenName = GetFileNameWithoutExt(gameData->gameSet.defaultRoomPath.c_str());
+		std::string chosenName = GetFileNameWithoutExt(gameData->gameSet.defaultLoadingPath.c_str());
 		for (auto &room : gameData->rooms) {
 			if (room.name == chosenName) {
 				world->setRoomBin(room);
@@ -99,9 +112,6 @@ void Game::useBin(const std::string &filePath) {
 			}
 		}
 	}
-
-	/// Setup Interfaces
-	ui->initBin(*gameData);
 }
 
 GameData &Game::getBin() { return *gameData; }

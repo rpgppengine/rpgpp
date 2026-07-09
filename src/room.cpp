@@ -12,7 +12,6 @@
 #include "actor.hpp"
 #include "actorContainer.hpp"
 #include "collisionsContainer.hpp"
-#include "conversion.hpp"
 #include "game.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"

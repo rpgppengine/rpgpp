@@ -1,7 +1,6 @@
 #include "screens/projectScreen.hpp"
 
 #include <cassert>
-#include <cstdio>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -348,7 +347,7 @@ void ProjectScreen::addResourceButtons(EngineFileType fileType) {
 						auto messageBox = tgui::MessageBox::create();
 
 						if (listedResourcesType == EngineFileType::FILE_MAP) {
-							auto defaultRoomPath = project->getGameSettings().defaultRoomPath;
+							auto defaultRoomPath = project->getGameSettings().defaultLoadingPath;
 							if (defaultRoomPath.empty() && project->getPaths(EngineFileType::FILE_MAP).size() <= 1) {
 								bindTranslation(messageBox, "dialog.delete_file.room_must_exist",
 												&tgui::MessageBox::setText);

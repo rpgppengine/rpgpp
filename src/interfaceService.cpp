@@ -82,7 +82,12 @@ void InterfaceService::showInterface(const std::string &title, bool runScript) {
 	if (views.count(title) > 0) {
 		currentViewName = title;
 		notifyLock = true;
-		Game::getWorld().getPlayer().setMovementLock(true);
+
+		auto& worldServiceRef = Game::getWorld();
+
+		if (worldServiceRef.getIfRoomExist()) {
+			worldServiceRef.getPlayer().setMovementLock(true);
+		}
 
 		views[title]->runScript = runScript;
 

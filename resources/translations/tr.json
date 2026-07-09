@@ -176,7 +176,7 @@
 			},
 			"game": {
 				"_label": "Oyun",
-				"default_room": "Öntanımlı Oda",
+				"default_load": "Öntanımlı Oda/Ekran",
 				"player_actor": "Oyuncunun Aktörü",
 				"tile_size": "Kare Boyutu",
 				"debug_draw": "Hata Ayıklamayı Çiz",

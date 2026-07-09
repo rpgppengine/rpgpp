@@ -48,6 +48,10 @@ void WorldService::doFadeTransition() {
 Player &WorldService::getPlayer() const { return this->room->getPlayer(); }
 
 void WorldService::update() {
+	if (room == nullptr) {
+		return;
+	}
+
 	if (transitionActive) {
 		frameCounter++;
 		if (frameCounter >= 2) {
@@ -85,7 +89,15 @@ void WorldService::update() {
 	room->update();
 }
 
+bool WorldService::getIfRoomExist() {
+	return room != nullptr;
+}
+
 void WorldService::draw() const {
+	if (room == nullptr) {
+		return;
+	}
+
 	room->draw();
 
 	if (transitionActive) {
