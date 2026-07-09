@@ -98,6 +98,9 @@
 				"tile_height": "Kare Yüksekliği",
 				"texture": "Doku"
 			},
+			"viewsview": {
+				"create": "Oluştur"
+			},
 			"roomview": {
 				"mapwidth": "Harita Genişliği",
 				"mapheight": "Harita Yüksekliği",
@@ -222,6 +225,10 @@
 			"title": "Listeyi Düzenleyin...",
 			"add": "Ekle..",
 			"close": "Kapat"
+		},
+		"init_element": {
+			"title": "Öğe Oluştur",
+			"elm_name": "Öğe Adı"
 		}
 	},
 	"widget": {
