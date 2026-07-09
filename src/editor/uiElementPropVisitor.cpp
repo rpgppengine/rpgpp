@@ -195,6 +195,9 @@ void UIElementPropVisitor::uiElementRef(UIElementRef *ref, const std::string &ke
 	if (ref->entityId < MAX_ELEMENTS) {
 		field->value->setText(view->getEntityName(ref->entityId));
 	}
+	if (!ref->title.empty() && view->findByName(ref->title) < MAX_ELEMENTS) {
+		field->value->setText(ref->title);
+	}
 	box->addRefField(field);
 }
 

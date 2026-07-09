@@ -17,6 +17,8 @@ protected:
 public:
 	tgui::Label::Ptr label;
 	tgui::EditBox::Ptr value;
+	tgui::BitmapButton::Ptr remove;
+	bool removable = false;
 
 	typedef std::shared_ptr<TextField> Ptr;
 	typedef std::shared_ptr<const TextField> ConstPtr;
@@ -27,6 +29,8 @@ public:
 	static TextField::Ptr copy(TextField::ConstPtr widget);
 
 	void setSize(const tgui::Layout2d &size) override;
+
+	void enableRemoving();
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "ui_elements/elementFactory.hpp"
 
 #include "comboBox.hpp"
+#include "textBox.hpp"
 #include "ui_elements/button.hpp"
 #include "ui_elements/colorRect.hpp"
 #include "ui_elements/dialogueArea.hpp"
@@ -18,6 +19,7 @@ ElementFactory::ElementFactory() {
 	map["DialogueArea"] = [] { return std::make_unique<DialogueArea>(); };
 	map["ValueSlider"] = [] { return std::make_unique<ValueSlider>(); };
 	map["ComboBox"] = [] { return std::make_unique<ComboBox>(); };
+	map["TextBox"] = [] { return std::make_unique<TextBox>(); };
 
 	for (auto &pair : map) {
 		elementNames.emplace_front(pair.first);

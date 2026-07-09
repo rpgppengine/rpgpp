@@ -1,10 +1,9 @@
 #include "ui_elements/comboBox.hpp"
+
 #include "game.hpp"
 #include "raymath.h"
 
-ComboBox::ComboBox() : UIElement("ComboBox") {
-	init();
-}
+ComboBox::ComboBox() : UIElement("ComboBox") { init(); }
 
 void ComboBox::init() {
 	props["value"] = 0;
@@ -32,8 +31,12 @@ void ComboBox::config() {
 	Color normalTextColor = std::get<Color>(props["normalTextColor"]);
 	this->shownTextColor = normalTextColor;
 
-	StringVector* vec = std::get_if<StringVector>(&props["values"]);
+	StringVector *vec = std::get_if<StringVector>(&props["values"]);
 	int index = std::get<int>(props["value"]);
+
+	if (index < 0 || index >= vec->size()) {
+		index = 0;
+	}
 
 	std::string newStringValue = (*vec)[index];
 	props["stringValue"] = newStringValue;
@@ -60,8 +63,10 @@ void ComboBox::draw(Rectangle rect) {
 void ComboBox::onNotify(Event event) {
 	if (event.hold) return;
 
-	StringVector* vec = std::get_if<StringVector>(&props["values"]);
-	int* index = std::get_if<int>(&props["value"]);
+	StringVector *vec = std::get_if<StringVector>(&props["values"]);
+	int *index = std::get_if<int>(&props["value"]);
+
+	if (vec->empty() || vec->size() == 1) return;
 
 	if (event.key == KEY_LEFT) {
 		if (*index > 0) {
