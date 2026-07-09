@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "TGUI/Layout.hpp"
@@ -193,6 +194,34 @@ void ProjectScreen::initItems(tgui::Group::Ptr layout) {
 }
 
 void ProjectScreen::addFileView(EngineFileType fileType, const std::string &path) {
+	std::string fileName = GetFileName(path.c_str());
+
+	if (!FileExists(path.c_str())) {
+		// NOTE: This is a fix for when the user accidentally deletes a file in the project root directory,
+		// so the engine doesn't try opening a now deleted file.
+		auto &ts = Editor::instance->getTranslations();
+
+		auto fileNotExistMsgbox = tgui::MessageBox::create();
+		fileNotExistMsgbox->setPosition({"50%", "50%"});
+		fileNotExistMsgbox->setOrigin({0.5, 0.5});
+
+		bindTranslation(fileNotExistMsgbox, "screen.project.filenotexist.notice", &tgui::MessageBox::setText);
+		fileNotExistMsgbox->addButton(ts.getKey("button.okay"));
+
+		std::weak_ptr<tgui::MessageBox> weakMsgbox = fileNotExistMsgbox;
+		fileNotExistMsgbox->onButtonPress.connect([this, fileName, weakMsgbox](){
+			if (auto box = weakMsgbox.lock()) {
+				box->close();
+				this->addResourceButtons(this->listedResourcesType);
+				fileTabs->closeTabFilename(fileName);
+			}
+		});
+
+		Editor::instance->getGui().gui->add(fileNotExistMsgbox);
+		return;
+	}
+
+
 	Editor::instance->getGui().gui->setTabKeyUsageEnabled(fileType != EngineFileType::FILE_SCRIPT);
 
 	std::unique_ptr<ProjectFile> projectFile = fileVisitor->visit(fileType, path);
@@ -202,7 +231,8 @@ void ProjectScreen::addFileView(EngineFileType fileType, const std::string &path
 		return;
 	}
 
-	size_t idx = fileTabs->addFileTab(path, GetFileName(path.c_str()));
+	auto idx = fileTabs->addFileTab(path, fileName);
+
 	if (idx != -1) {
 		fileViewGroup->removeAllWidgets();
 
@@ -374,6 +404,7 @@ void ProjectScreen::addResourceButtons(EngineFileType fileType) {
 									std::error_code ec;
 									std::filesystem::remove(filePath, ec);
 									addResourceButtons(listedResourcesType);
+									fileTabs->closeTabFilename(GetFileName(filePath.c_str()));
 								}
 
 								if (auto parent = box->getParent()) parent->remove(box);

@@ -284,6 +284,10 @@ void InterfaceView::draw() {
 }
 
 void InterfaceView::drawEntity(ElementIndex i) {
+	if (i < 0 || i > elements.size()) {
+		return;
+	}
+
 	auto element = elements[i].get();
 	if (element == nullptr) return;
 

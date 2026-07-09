@@ -55,6 +55,9 @@
 		},
 		"project": {
 			"create_new_resource": "Yeni Kaynak",
+			"filenotexist": {
+				"notice": "Bu dosya artık yoktur!"
+			},
 			"emptyview": {
 				"notice": "Hiç bir dosya ya da görünüş tanımlanmamıştır!"
 			},

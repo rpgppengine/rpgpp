@@ -1,9 +1,11 @@
 #include "widgets/fileTab.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
 #include <memory>
+#include <string>
 
 #include "TGUI/Color.hpp"
 #include "TGUI/Loading/Theme.hpp"
@@ -12,6 +14,7 @@
 #include "TGUI/Vector2.hpp"
 #include "TGUI/Widget.hpp"
 #include "TGUI/Widgets/Tabs.hpp"
+#include "TGUI/Widgets/TabsBase.hpp"
 #include "components/tooltip.hpp"
 #include "editor.hpp"
 #include "fileTabRenderer.hpp"
@@ -40,6 +43,37 @@ FileTab::Ptr FileTab::copy(FileTab::ConstPtr widget) {
 		return std::static_pointer_cast<FileTab>(widget->clone());
 	else
 		return nullptr;
+}
+
+tgui::TabsBase::Tab* FileTab::getTabId(const std::string fileName) {
+	auto tab = std::find_if(m_tabs.begin(), m_tabs.end(), [fileName](const tgui::TabsBase::Tab tab) {
+		return tab.id == fileName;
+	});
+	if (tab == m_tabs.end())
+		return nullptr;
+	return tab.base();
+}
+
+tgui::TabsBase::Tab* FileTab::getTabName(const std::string fileName) {
+	auto tab = std::find_if(m_tabs.begin(), m_tabs.end(), [fileName](const tgui::TabsBase::Tab tab) {
+		return tab.text.getString() == fileName;
+	});
+	if (tab == m_tabs.end())
+		return nullptr;
+	return tab.base();
+}
+
+void FileTab::closeTabFilename(const std::string fileName){
+	auto tab = this->getTabName(fileName);
+
+	auto indx = this->getIndexById(tab->id);
+	// Remove the tab and move to the before tab of this current tab.
+	this->remove(fileName);
+	onTabClose.emit(this, tab->id);
+
+	if (m_tabs.size() > 0) {
+		select(std::max(0, indx - 1));
+	}
 }
 
 void FileTab::closeAndOpenNextTab(std::size_t i) {
@@ -179,11 +213,12 @@ size_t FileTab::addFileTab(const std::string &path, const std::string &fileName)
 		tabIdxToInsert = 0;
 	}
 
-	for (size_t i = 0; i < m_tabs.size(); ++i) {
-		if (m_tabs[i].id == path) {
-			select(i);
-			return -1;
-		}
+	// Fix for the selection, as previously two fileTabs were being created.
+	auto tabRef = this->getTabId(path);
+	if (tabRef != nullptr || this->getTabName(fileName) != nullptr) {
+		auto tabIndx = this->getIndexById(path);
+		select(tabIndx);
+		return -1;
 	}
 
 	tabIdxToInsert += 1;

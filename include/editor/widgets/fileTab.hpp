@@ -2,6 +2,7 @@
 #define _RPGPP_FILETAB_H
 
 #include <cstddef>
+#include <string>
 
 #include "TGUI/Signal.hpp"
 #include "TGUI/Widget.hpp"
@@ -61,7 +62,10 @@ public:
 
 	bool select(std::size_t i);
 
+	tgui::TabsBase::Tab* getTabId(const std::string id);
+	tgui::TabsBase::Tab* getTabName(const std::string fileName);
 	size_t addFileTab(const std::string &path, const std::string &fileName);
+	void closeTabFilename(std::string fileName);
 	void closeCurrentTab();
 
 protected:

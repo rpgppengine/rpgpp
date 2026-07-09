@@ -40,6 +40,12 @@ void FileInitVisitor::visit(EngineFileType fileType, NewFileDialog::Ptr dialog) 
 	}
 }
 
+void createDirectoryIfNotExist(const char* directoryName) {
+	if (!DirectoryExists(directoryName))
+		MakeDirectory(directoryName);
+}
+
+
 void FileInitVisitor::empty(NewFileDialog::Ptr dialog) {
 	dialog->confirmButton->onPress([dialog] {
 		printf("%s \n", dialog->titleField->getText().toStdString().c_str());
@@ -54,6 +60,7 @@ void FileInitVisitor::tileset(NewFileDialog::Ptr dialog) {
 	dialog->confirmButton->onPress([dialog] {
 		std::string title = dialog->titleField->getText().toStdString();
 		std::string filePath = dialog->fileField->getChosenPath().toStdString();
+		createDirectoryIfNotExist("images");
 		filePath = TextFormat("images/%s", GetFileName(filePath.c_str()));
 		if (!title.empty() && !filePath.empty()) {
 			dialog->window->close();
@@ -76,6 +83,7 @@ void FileInitVisitor::room(NewFileDialog::Ptr dialog) {
 	dialog->confirmButton->onPress([dialog] {
 		std::string title = dialog->titleField->getText().toStdString();
 		std::string filePath = dialog->fileField->getChosenPath().toStdString();
+		createDirectoryIfNotExist("tilesets");
 		std::string shortFilePath = TextFormat("tilesets/%s", GetFileName(filePath.c_str()));
 		if (!title.empty() && !filePath.empty()) {
 			std::unique_ptr<TileSet> tileSet = std::make_unique<TileSet>(shortFilePath);
@@ -103,6 +111,7 @@ void FileInitVisitor::actor(NewFileDialog::Ptr dialog) {
 	dialog->confirmButton->onPress([dialog] {
 		std::string title = dialog->titleField->getText().toStdString();
 		std::string filePath = dialog->fileField->getChosenPath().toStdString();
+		createDirectoryIfNotExist("tilesets");
 		filePath = TextFormat("tilesets/%s", GetFileName(filePath.c_str()));
 		if (!title.empty() && !filePath.empty()) {
 			std::unique_ptr<TileSet> tileSet = std::make_unique<TileSet>(filePath);
@@ -130,6 +139,7 @@ void FileInitVisitor::prop(NewFileDialog::Ptr dialog) {
 	dialog->confirmButton->onPress([dialog] {
 		std::string title = dialog->titleField->getText().toStdString();
 		std::string filePath = dialog->fileField->getChosenPath().toStdString();
+		createDirectoryIfNotExist("images");
 		filePath = TextFormat("images/%s", GetFileName(filePath.c_str()));
 		if (!title.empty() && !filePath.empty()) {
 			std::unique_ptr<Prop> prop = std::make_unique<Prop>(Rectangle{0, 0, 16, 16}, Vector2{0, 0});
@@ -154,6 +164,7 @@ void FileInitVisitor::dialogue(NewFileDialog::Ptr dialog) {
 	dialog->confirmButton->onPress([dialog] {
 		std::string title = dialog->titleField->getText().toStdString();
 		std::string filePath = dialog->fileField->getChosenPath().toStdString();
+		createDirectoryIfNotExist("images");
 		filePath = TextFormat("images/%s", GetFileName(filePath.c_str()));
 		if (!title.empty()) {
 			std::unique_ptr<Dialogue> diag = std::make_unique<Dialogue>();
@@ -191,7 +202,7 @@ void FileInitVisitor::interactable(NewFileDialog::Ptr dialog) {
 			std::unique_ptr<Interactable> interactable =
 				std::make_unique<Interactable>(title, Vector2{-1, -1}, _RPGPP_TILESIZE);
 			interactable->setDisplayTitle(title);
-
+			createDirectoryIfNotExist("interactibles");
 			std::string newFilePath = TextFormat("interactables/%s.rinter", TextToLower(title.c_str()));
 			nlohmann::json fileJson = interactable->dumpJson();
 			SaveFileText(newFilePath.c_str(), fileJson.dump().c_str());
@@ -213,7 +224,7 @@ void FileInitVisitor::interface(NewFileDialog::Ptr dialog) {
 
 		if (!title.empty()) {
 			std::unique_ptr<InterfaceView> interfaceView = std::make_unique<InterfaceView>();
-
+			createDirectoryIfNotExist("views");
 			std::string newFilePath = TextFormat("views/%s.rui", title.c_str());
 			nlohmann::json fileJson = interfaceView->dumpJson();
 			SaveFileText(newFilePath.c_str(), fileJson.dump().c_str());

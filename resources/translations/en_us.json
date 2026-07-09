@@ -55,6 +55,9 @@
 		},
 		"project": {
 			"create_new_resource": "New Resource",
+			"filenotexist": {
+				"notice": "This file doesn't exist anymore!"
+			},
 			"emptyview": {
 				"notice": "No file opened or view not defined yet!"
 			},
@@ -247,7 +250,8 @@
 	"button": {
 		"go_back": "Go Back",
 		"restart": "Restart",
-		"restart_later": "Restart Later"
+		"restart_later": "Restart Later",
+		"okay": "Okay"
 	},
 	"context_menu": {
 		"copy_full_path": "Copy full path",
