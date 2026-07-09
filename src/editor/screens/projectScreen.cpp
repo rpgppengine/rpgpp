@@ -66,6 +66,7 @@ void ProjectScreen::bindMenuBarAndHK(tgui::MenuBar::Ptr menuBarPtr) {
 			tgui::String currentFile = fileTabs->getSelectedId();
 			auto &projectFile = openedFiles.at(currentFile);
 			projectFile->saveFile(projectFile->getFilePath());
+			projectFile->getView().dirty = false;
 		}
 	};
 
@@ -229,8 +230,7 @@ void ProjectScreen::addFileView(EngineFileType fileType, const std::string &path
 		Editor::instance->getFs().openFileInDefaultApp(mutPath);
 		return;
 	}
-
-	auto idx = fileTabs->addFileTab(path, fileName);
+	auto idx = fileTabs->addFileTab(path, fileName, projectFile.get()->getViewPtr());
 
 	if (idx != -1) {
 		fileViewGroup->removeAllWidgets();

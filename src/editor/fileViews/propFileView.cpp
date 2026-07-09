@@ -35,6 +35,7 @@ PropFileView::PropFileView() {
 		} else {
 			interactableTypeField->value->deselectItem();
 		}
+		this->dirty = true;
 	});
 	propBox->addBooleanField(hasInteractableField);
 
@@ -44,25 +45,35 @@ PropFileView::PropFileView() {
 		interactableTypeField->value->addItem(GetFileNameWithoutExt(k.c_str()));
 	}
 	interactableTypeField->value->onItemSelect(
-		[this](const tgui::String &item) { propView->getProp()->setInteractableType(item.toStdString()); });
+		[this](const tgui::String &item) {
+			this->dirty = true;
+			propView->getProp()->setInteractableType(item.toStdString());
+		});
 	propBox->addSelectField(interactableTypeField);
 
 	propImageField = FileField::create();
 	bindTranslation(propImageField->label, "screen.project.propview.image", &tgui::Label::setText);
 	propImageField->pathFilters = {{"Image", {"*.png"}}};  // TODO: Add more image types
 	propImageField->callback = [this](const tgui::String &path) {
+		this->dirty = true;
 		propView->getProp()->setTextureFromPath(path.toStdString());
 	};
 	propBox->addFileField(propImageField);
 
 	atlasRectField = RectangleField::create();
 	bindTranslation(atlasRectField->label, "screen.project.propview.atlas", &tgui::Label::setText);
-	atlasRectField->onChange([this](Rectangle r) { propView->updateAtlasRect(r); });
+	atlasRectField->onChange([this](Rectangle r) {
+		this->dirty = true;
+		propView->updateAtlasRect(r);
+	});
 	propBox->addRectangleField(atlasRectField);
 
 	collisionsField = RectangleField::create();
 	bindTranslation(collisionsField->label, "screen.project.propview.collision", &tgui::Label::setText);
-	collisionsField->onChange([this](Rectangle r) { propView->updateCollisionRect(r); });
+	collisionsField->onChange([this](Rectangle r) {
+		this->dirty = true;
+		propView->updateCollisionRect(r);
+	});
 	propBox->addRectangleField(collisionsField);
 
 	propPreview = PropPreview::create();
@@ -101,4 +112,5 @@ void PropFileView::init(tgui::Group::Ptr layout, VariantWrapper *variant) {
 	}
 
 	addWidgets(layout);
+	this->dirty = false;
 }

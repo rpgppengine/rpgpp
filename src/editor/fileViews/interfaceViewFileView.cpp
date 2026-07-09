@@ -1,31 +1,18 @@
 #include "fileViews/interfaceViewFileView.hpp"
 
-#include <cstdio>
 #include <memory>
 #include <vector>
 
 #include "TGUI/String.hpp"
-#include "TGUI/ToolTip.hpp"
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Widgets/ContextMenu.hpp"
-#include "TGUI/Widgets/ScrollablePanel.hpp"
 #include "TGUI/Widgets/TabContainer.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "bindTranslation.hpp"
 #include "childWindows/elementInitWindow.hpp"
 #include "editor.hpp"
-#include "gamedata.hpp"
 #include "interfaceView.hpp"
-#include "lua.h"
-#include "lua/reflect.hpp"
-#include "lua/uiTypesApi.hpp"
-#include "nlohmann/json_fwd.hpp"
 #include "raylib.h"
-#include "rttr/type.h"
-#include "rttr/variant.h"
-#include "services/fileSystemService.hpp"
-#include "sol/forward.hpp"
-#include "sol/types.hpp"
 #include "views/interfaceViewView.hpp"
 #include "views/worldView.hpp"
 #include "widgets/propertiesBox.hpp"
@@ -83,6 +70,7 @@ InterfaceViewFileView::InterfaceViewFileView() {
 
 		std::string fileName = GetFileName(path.toStdString().c_str());
 		interface->setScriptFile(fileName);
+		this->dirty = true;
 	};
 
 	filePropertiesPanel->add(scriptFileField);
@@ -161,6 +149,7 @@ InterfaceViewFileView::InterfaceViewFileView() {
 
 			if (auto sharedTree = weakTree.lock()) {
 				sharedTree->removeItem({selectedElement});
+				this->dirty = true;
 			}
 		}
 	});

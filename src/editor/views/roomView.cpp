@@ -380,6 +380,7 @@ void RoomView::handleModePress(tgui::Vector2f pos) {
 
 	if (!layerVisitor->isAvailable) return;
 
+	this->onAttributeChanged.emit(this);
 	switch (tool) {
 		case RoomTool::TOOL_PLACE: {
 			std::unique_ptr<Action> act = std::make_unique<PlaceTileAction>(data);
@@ -417,6 +418,7 @@ void RoomView::handleEditPress(tgui::Vector2f pos) {
 	Vector2 atlasCoords = tileMap->getTile(selectedTile.x, selectedTile.y).getAtlasTile().getAtlasCoords();
 	IVector atlasCoordsInt = {static_cast<int>(atlasCoords.x), static_cast<int>(atlasCoords.y)};
 
+	this->onAttributeChanged.emit(this);
 	switch (layer) {
 		case RoomLayer::LAYER_TILES: {
 			tileSetView->setSelectedTile(atlasCoordsInt);

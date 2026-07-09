@@ -72,8 +72,10 @@ bool ResizableCanvasBox::leftMousePressed(Vector2 mousePos) {
 	return false;
 }
 
-void ResizableCanvasBox::mouseMoved(Vector2 mousePos, int snapWidth, int snapHeight) {
-	if (!isResizing || !focused) return;
+bool ResizableCanvasBox::mouseMovedTrigger(Vector2 mousePos, int snapWidth, int snapHeight) {
+	if (!isResizing || !focused) return false;
+
+	bool movedIndicator = false;
 
 	int dx = std::round((mousePos.x - startMousePos.x) / snapWidth) * snapWidth;
 	int dy = std::round((mousePos.y - startMousePos.y) / snapHeight) * snapHeight;
@@ -85,24 +87,35 @@ void ResizableCanvasBox::mouseMoved(Vector2 mousePos, int snapWidth, int snapHei
 	if (resizeDirection & LEFT) {
 		x = prevX + dx;
 		width = prevWidth - dx;
+		movedIndicator = true;
 	}
 	if (resizeDirection & RIGHT) {
 		width = prevWidth + dx;
+		movedIndicator = true;
 	}
 	if (resizeDirection & TOP) {
 		y = prevY + dy;
 		height = prevHeight - dy;
+		movedIndicator = true;
 	}
 	if (resizeDirection & BOTTOM) {
 		height = prevHeight + dy;
+		movedIndicator = true;
 	}
 	if (resizeDirection & MOVE) {
 		x = prevX + dx;
 		y = prevY + dy;
+		movedIndicator = true;
 	}
 
 	width = std::max(minSize, width);
 	height = std::max(minSize, height);
+
+	return movedIndicator;
+}
+
+void ResizableCanvasBox::mouseMoved(Vector2 mousePos, int snapWidth, int snapHeight) {
+	this->mouseMovedTrigger(mousePos, snapWidth, snapHeight);
 }
 
 Rectangle ResizableCanvasBox::leftMouseReleased(Vector2 mousePos) {

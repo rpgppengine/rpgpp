@@ -27,6 +27,7 @@ public:
 	void addWidgets(tgui::Group::Ptr layout);
 	void saveFile(const std::string &path);
 	FileView &getView();
+	FileView* getViewPtr();
 };
 
 #endif

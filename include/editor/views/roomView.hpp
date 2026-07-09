@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "TGUI/Signal.hpp"
 #include "TGUI/Vector2.hpp"
 #include "TGUI/Widgets/ComboBox.hpp"
 #include "fileViews/fileView.hpp"
@@ -42,6 +43,7 @@ public:
 	FileView *fileView;
 	tgui::ComboBox *interactableChoose;
 	tgui::ComboBox *propChoose;
+	tgui::Signal onAttributeChanged = {"OnAttributeChanged"};
 	RoomLayerViewVisitor *layerVisitor;
 
 	RoomView();

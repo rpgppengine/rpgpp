@@ -20,8 +20,10 @@ protected:
 	std::stack<std::unique_ptr<Action>> past;
 	std::stack<std::unique_ptr<Action>> future;
 
+
 public:
 	bool fileViewFocused = false;
+	bool dirty = false;
 
 	FileView();
 	virtual ~FileView();

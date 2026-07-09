@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -11,6 +12,7 @@
 #include "TGUI/Loading/Theme.hpp"
 #include "TGUI/Sprite.hpp"
 #include "TGUI/Text.hpp"
+#include "TGUI/TextStyle.hpp"
 #include "TGUI/Vector2.hpp"
 #include "TGUI/Widget.hpp"
 #include "TGUI/Widgets/Tabs.hpp"
@@ -18,6 +20,7 @@
 #include "components/tooltip.hpp"
 #include "editor.hpp"
 #include "fileTabRenderer.hpp"
+#include "fileViews/fileView.hpp"
 #include "raylib.h"
 
 using namespace tgui;
@@ -69,6 +72,7 @@ void FileTab::closeTabFilename(const std::string fileName){
 	auto indx = this->getIndexById(tab->id);
 	// Remove the tab and move to the before tab of this current tab.
 	this->remove(fileName);
+	this->m_fileViews.erase(tab->id.toStdString());
 	onTabClose.emit(this, tab->id);
 
 	if (m_tabs.size() > 0) {
@@ -84,6 +88,7 @@ void FileTab::closeAndOpenNextTab(std::size_t i) {
 	if (prevSelected == i && m_tabs.size() > 0) {
 		select(std::min(i, m_tabs.size() - 1));
 	}
+	this->m_fileViews.erase(prevId.toStdString());
 }
 
 bool FileTab::leftMousePressed(Vector2f pos) {
@@ -207,11 +212,13 @@ bool FileTab::select(std::size_t index) {
 	return true;
 }
 
-size_t FileTab::addFileTab(const std::string &path, const std::string &fileName) {
+size_t FileTab::addFileTab(const std::string &path, const std::string &fileName, FileView* view) {
 	size_t tabIdxToInsert = m_selectedTab;
 	if (tabIdxToInsert == -1) {
 		tabIdxToInsert = 0;
 	}
+
+	this->m_fileViews[path] = view;
 
 	// Fix for the selection, as previously two fileTabs were being created.
 	auto tabRef = this->getTabId(path);
@@ -263,7 +270,9 @@ void FileTab::renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &s
 	else if (m_spriteTab.isSet())
 		spriteTab = &m_spriteTab;
 
+
 	if (roundedCorners) {
+
 		states.transform.translate({-borderWidth, 0});
 		target.drawRoundedRectangle(states, {m_tabs[i].width + (2 * borderWidth), getSize().y},
 									tgui::Color::applyOpacity(backgroundColor, m_opacityCached),
@@ -346,7 +355,15 @@ void FileTab::renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &s
 	// Draw the text
 	textStates.transform.translate({m_distanceToSideCached + ((usableWidth - m_tabs[i].text.getSize().x) / 2.f),
 									((usableHeight - m_tabs[i].text.getSize().y) / 2.f)});
-	target.drawText(textStates, m_tabs[i].text);
+
+	auto tab = m_tabs[i];
+	auto val = this->m_fileViews.find(tab.id.toStdString());
+	if (val != this->m_fileViews.end()){
+		auto textTab = tab.text;
+		textTab.setStyle(val->second->dirty && tgui::TextStyle::Bold);
+		target.drawText(textStates, textTab);
+	}
+
 
 	if (clippingRequired) target.removeClippingLayer();
 }

@@ -97,6 +97,7 @@ void FrameEditor::init() {
 			frameButtons.pop_back();
 
 			this->updateFrameButtons();
+			this->onAttributeChanged.emit(this);
 		}
 	});
 	topBarLayout->add(delFrame);
@@ -115,6 +116,7 @@ void FrameEditor::init() {
 	addFrame->onPress.connect([&, this] {
 		actor->addAnimationFrame(actor->getAnimationDirection(), {0, 0});
 		this->addFrameButton(actor->getAnimationCount() - 1);
+		this->onAttributeChanged.emit(this);
 	});
 
 	encaserLayout->setSize({"100%", MAX_ANI_BAR_HEIGHT});

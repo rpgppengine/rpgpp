@@ -81,6 +81,7 @@ RoomFileView::RoomFileView() {
 		Vector2 worldSize = this->roomView->getRoom()->getTileMap()->getMaxWorldSize();
 		worldSize.x = static_cast<int>(value);
 		this->roomView->getRoom()->getTileMap()->setWorldSize(worldSize);
+		this->dirty = true;
 	});
 	props->addIntField(widthField);
 
@@ -90,6 +91,7 @@ RoomFileView::RoomFileView() {
 		Vector2 worldSize = this->roomView->getRoom()->getTileMap()->getMaxWorldSize();
 		worldSize.y = static_cast<int>(value);
 		this->roomView->getRoom()->getTileMap()->setWorldSize(worldSize);
+		this->dirty = true;
 	});
 	props->addIntField(heightField);
 
@@ -100,6 +102,7 @@ RoomFileView::RoomFileView() {
 		auto room = this->roomView->getRoom();
 		room->getTileMap()->setTileSet(path.toStdString());
 		tileSetView->setTileSet(room->getTileMap()->getTileSet());
+		this->dirty = true;
 	};
 	props->addFileField(tileSetField);
 
@@ -109,6 +112,7 @@ RoomFileView::RoomFileView() {
 	musicFileField->pathFilters = {{"Music File", {"*.mp4", "*.ogg", "*.wav"}}};
 	musicFileField->callback = [this](const tgui::String &path) {
 		roomView->getRoom()->setMusicSource(GetFileNameWithoutExt(path.toStdString().c_str()));
+		this->dirty = true;
 	};
 
 	props->addFileField(musicFileField);
@@ -116,6 +120,7 @@ RoomFileView::RoomFileView() {
 	props->addButton("Clear Music", [this] {
 		roomView->getRoom()->setMusicSource("");
 		musicFileField->value->setText("");
+		this->dirty = true;
 	});
 
 	widgetContainer.push_back(props);
@@ -178,6 +183,9 @@ void RoomFileView::init(tgui::Group::Ptr layout, VariantWrapper *variant) {
 	if (room == nullptr) return;
 
 	roomView->setRoom(room);
+	roomView->onAttributeChanged.connect([this] {
+		this->dirty = true;
+	});
 	tileSetView->setTileSet(room->getTileMap()->getTileSet());
 	widthField->value->setValue(room->getTileMap()->getMaxWorldSize().x);
 	heightField->value->setValue(room->getTileMap()->getMaxWorldSize().y);
@@ -185,4 +193,5 @@ void RoomFileView::init(tgui::Group::Ptr layout, VariantWrapper *variant) {
 	musicFileField->value->setText(GetFileNameWithoutExt(room->getMusicSource().c_str()));
 
 	addWidgets(layout);
+	this->dirty = false;
 }

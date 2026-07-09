@@ -1,8 +1,6 @@
 #include "fileViews/soundFileView.hpp"
 
 #include <TGUI/Widgets/Panel.hpp>
-#include <cmath>
-#include <cstdio>
 #include <memory>
 #include <string>
 

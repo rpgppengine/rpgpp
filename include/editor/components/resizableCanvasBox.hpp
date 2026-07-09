@@ -15,6 +15,7 @@ public:
 	// @returns true if the box was clicked, false otherwise
 	bool leftMousePressed(Vector2 mousePos);
 	void mouseMoved(Vector2 mousePos, int snapWidth = 1, int snapHeight = 1);
+	bool mouseMovedTrigger(Vector2 mousePos, int snapWidth = 1, int snapHeight = 1);
 	// @returns the new rectangle after the mouse is released
 	Rectangle leftMouseReleased(Vector2 mousePos);
 
