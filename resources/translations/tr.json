@@ -250,7 +250,8 @@
 	"button": {
 		"go_back": "Geri Git",
 		"restart": "Yeniden Başlat",
-		"restart_later": "Sonra Yeniden Başlat"
+		"restart_later": "Sonra Yeniden Başlat",
+		"okay": "Tamam"
 	},
 	"context_menu": {
 		"copy_full_path": "Full yolunu kopyala",
