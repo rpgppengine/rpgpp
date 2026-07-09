@@ -48,25 +48,21 @@ FileTab::Ptr FileTab::copy(FileTab::ConstPtr widget) {
 		return nullptr;
 }
 
-tgui::TabsBase::Tab* FileTab::getTabId(const std::string fileName) {
-	auto tab = std::find_if(m_tabs.begin(), m_tabs.end(), [fileName](const tgui::TabsBase::Tab tab) {
-		return tab.id == fileName;
-	});
-	if (tab == m_tabs.end())
-		return nullptr;
+tgui::TabsBase::Tab *FileTab::getTabId(const std::string fileName) {
+	auto tab = std::find_if(m_tabs.begin(), m_tabs.end(),
+							[fileName](const tgui::TabsBase::Tab tab) { return tab.id == fileName; });
+	if (tab == m_tabs.end()) return nullptr;
 	return tab.base();
 }
 
-tgui::TabsBase::Tab* FileTab::getTabName(const std::string fileName) {
-	auto tab = std::find_if(m_tabs.begin(), m_tabs.end(), [fileName](const tgui::TabsBase::Tab tab) {
-		return tab.text.getString() == fileName;
-	});
-	if (tab == m_tabs.end())
-		return nullptr;
+tgui::TabsBase::Tab *FileTab::getTabName(const std::string fileName) {
+	auto tab = std::find_if(m_tabs.begin(), m_tabs.end(),
+							[fileName](const tgui::TabsBase::Tab tab) { return tab.text.getString() == fileName; });
+	if (tab == m_tabs.end()) return nullptr;
 	return tab.base();
 }
 
-void FileTab::closeTabFilename(const std::string fileName){
+void FileTab::closeTabFilename(const std::string fileName) {
 	auto tab = this->getTabName(fileName);
 
 	auto indx = this->getIndexById(tab->id);
@@ -212,7 +208,7 @@ bool FileTab::select(std::size_t index) {
 	return true;
 }
 
-size_t FileTab::addFileTab(const std::string &path, const std::string &fileName, FileView* view) {
+size_t FileTab::addFileTab(const std::string &path, const std::string &fileName, FileView *view) {
 	size_t tabIdxToInsert = m_selectedTab;
 	if (tabIdxToInsert == -1) {
 		tabIdxToInsert = 0;
@@ -236,12 +232,11 @@ size_t FileTab::addFileTab(const std::string &path, const std::string &fileName,
 	return tabIdxToInsert;
 }
 
-void FileTab::renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &states, int i, bool roundedCorners,
-						float borderWidth, float usableHeight, tgui::Sprite &close) const {
+void FileTab::renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &states, int i, float borderWidth,
+						float usableHeight, tgui::Sprite &close) const {
 	if (!m_tabs[i].visible) return;
 
 	RenderStates textStates = states;
-	if (roundedCorners) textStates.transform.translate({0, m_bordersCached.getTop()});
 
 	tgui::Color backgroundColor;
 	if ((!m_enabled || !m_tabs[i].enabled) && m_backgroundColorDisabledCached.isSet())
@@ -270,44 +265,38 @@ void FileTab::renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &s
 	else if (m_spriteTab.isSet())
 		spriteTab = &m_spriteTab;
 
+	if (spriteTab) {
+		Sprite spriteTabCopy = *spriteTab;
+		spriteTabCopy.setSize({m_tabs[i].width, usableHeight});
+		target.drawSprite(states, spriteTabCopy);
 
-	if (roundedCorners) {
+	} else	// No texture was loaded
+		target.drawFilledRect(states, {m_tabs[i].width, usableHeight},
+							  tgui::Color::applyOpacity(backgroundColor, m_opacityCached));
 
-		states.transform.translate({-borderWidth, 0});
-		target.drawRoundedRectangle(states, {m_tabs[i].width + (2 * borderWidth), getSize().y},
-									tgui::Color::applyOpacity(backgroundColor, m_opacityCached),
-									m_roundedBorderRadiusCached, m_bordersCached,
-									tgui::Color::applyOpacity(m_borderColorCached, m_opacityCached));
-		states.transform.translate({m_tabs[i].width + 2 * borderWidth, 0});
-	} else {
-		if (spriteTab) {
-			Sprite spriteTabCopy = *spriteTab;
-			spriteTabCopy.setSize({m_tabs[i].width, usableHeight});
-			target.drawSprite(states, spriteTabCopy);
+	// draw close button
+	auto drawBtnTabStates = states;
+	drawBtnTabStates.transform.translate(
+		{m_tabs[i].width - CLOSE_BUTTON_SIZE - MARGIN_LR, (usableHeight - CLOSE_BUTTON_SIZE) / 2.f});
+	close.setSize({CLOSE_BUTTON_SIZE, CLOSE_BUTTON_SIZE});
+	target.drawSprite(drawBtnTabStates, close);
 
-		} else	// No texture was loaded
-			target.drawFilledRect(states, {m_tabs[i].width, usableHeight},
-								  tgui::Color::applyOpacity(backgroundColor, m_opacityCached));
-
-		// draw close button
-		auto tabState = states;
-		tabState.transform.translate(
-			{m_tabs[i].width - CLOSE_BUTTON_SIZE - MARGIN_LR, (usableHeight - CLOSE_BUTTON_SIZE) / 2.f});
-		close.setSize({CLOSE_BUTTON_SIZE, CLOSE_BUTTON_SIZE});
-		target.drawSprite(tabState, close);
-
-		// Draw the borders between the tabs
-		if ((borderWidth != 0) && (i < m_tabs.size())) {
-			target.drawBorders(states, Borders{borderWidth}, {m_tabs[i].width, usableHeight},
-							   tgui::Color::applyOpacity(m_borderColorCached, m_opacityCached));
-			// target.drawFilledRect(
-			// 	states, {borderWidth, usableHeight},
-			// 	tgui::Color::applyOpacity(m_borderColorCached,
-			// 							  m_opacityCached));
-			// states.transform.translate({borderWidth, 0});
-		}
-		states.transform.translate({m_tabs[i].width, 0});
+	// draw dirty tab indicator
+	auto currentTab = m_tabs[i];
+	auto foundFileViews = this->m_fileViews.find(currentTab.id.toStdString());
+	bool dirty = foundFileViews->second->dirty;
+	if (foundFileViews != this->m_fileViews.end() && dirty) {
+		auto drawDirtyTabStates = states;
+		drawDirtyTabStates.transform.translate({MARGIN_LR, (usableHeight - CLOSE_BUTTON_SIZE * .75f) / 2.f});
+		target.drawCircle(drawDirtyTabStates, CLOSE_BUTTON_SIZE * .75f, m_textColorCached);
 	}
+
+	// Draw the borders between the tabs
+	if ((borderWidth != 0) && (i < m_tabs.size())) {
+		target.drawBorders(states, Borders{borderWidth}, {m_tabs[i].width, usableHeight},
+						   tgui::Color::applyOpacity(m_borderColorCached, m_opacityCached));
+	}
+	states.transform.translate({m_tabs[i].width, 0});
 
 	// Highlight the borders of the selected and hovered tab when requested
 	if (m_bordersCached != Borders{0}) {
@@ -352,18 +341,11 @@ void FileTab::renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &s
 	if (clippingRequired)
 		target.addClippingLayer(textStates, {{m_distanceToSideCached, 0}, {usableWidth, usableHeight}});
 
-	// Draw the text
-	textStates.transform.translate({m_distanceToSideCached + ((usableWidth - m_tabs[i].text.getSize().x) / 2.f),
-									((usableHeight - m_tabs[i].text.getSize().y) / 2.f)});
+	float textTranslateX = m_distanceToSideCached + ((usableWidth - m_tabs[i].text.getSize().x) / 2.f);
+	float textTranslateY = ((usableHeight - m_tabs[i].text.getSize().y) / 2.f);
 
-	auto tab = m_tabs[i];
-	auto val = this->m_fileViews.find(tab.id.toStdString());
-	if (val != this->m_fileViews.end()){
-		auto textTab = tab.text;
-		textTab.setStyle(val->second->dirty && tgui::TextStyle::Bold);
-		target.drawText(textStates, textTab);
-	}
-
+	textStates.transform.translate({textTranslateX, textTranslateY});
+	target.drawText(textStates, m_tabs[i].text);
 
 	if (clippingRequired) target.removeClippingLayer();
 }
@@ -374,17 +356,7 @@ void FileTab::draw(tgui::BackendRenderTarget &target, tgui::RenderStates states)
 	Sprite close(closeTexture);
 
 	const float borderWidth = (m_bordersCached.getLeftPlusRight()) / 2.f;
-	const bool roundedCorners = (m_roundedBorderRadiusCached > 0) && !m_spriteTab.isSet();
-	if (!roundedCorners) {
-		// // Draw the borders around the tabs
-		// if (m_bordersCached != Borders{0}) {
-		// 	target.drawBorders(states, m_bordersCached, getSize(),
-		// 					   tgui::Color::applyOpacity(m_borderColorCached,
-		// 												 m_opacityCached));
-		// 	states.transform.translate(m_bordersCached.getOffset());
-		// }
-	} else
-		states.transform.translate({borderWidth, 0});
+	states.transform.translate({borderWidth, 0});
 
 	const float usableHeight = getSize().y;
 
@@ -395,11 +367,11 @@ void FileTab::draw(tgui::BackendRenderTarget &target, tgui::RenderStates states)
 			states.transform.translate({m_tabs[i].width, 0});
 			continue;
 		}
-		renderTab(target, states, i, roundedCorners, borderWidth, usableHeight, close);
+		renderTab(target, states, i, borderWidth, usableHeight, close);
 	}
 	if (isDragging) {
 		draggingState.transform.translate({deltaMousePos.x, 0});
-		renderTab(target, draggingState, draggedTab, roundedCorners, borderWidth, usableHeight, close);
+		renderTab(target, draggingState, draggedTab, borderWidth, usableHeight, close);
 		draggingState.transform.translate({-deltaMousePos.x, 0});
 	}
 }

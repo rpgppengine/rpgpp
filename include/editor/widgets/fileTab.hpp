@@ -30,10 +30,10 @@ private:
 
 	bool cursorModified = false;
 
-	void renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &states, int idx, bool roundedCorners,
-				   float borderWidth, float usableHeight, tgui::Sprite &close) const;
+	void renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &states, int idx, float borderWidth,
+				   float usableHeight, tgui::Sprite &close) const;
 	void closeAndOpenNextTab(std::size_t idx);
-	std::map<std::string, FileView*> m_fileViews;
+	std::map<std::string, FileView *> m_fileViews;
 
 public:
 	bool useExternalMouseEvent = false;
@@ -64,9 +64,9 @@ public:
 
 	bool select(std::size_t i);
 
-	tgui::TabsBase::Tab* getTabId(const std::string id);
-	tgui::TabsBase::Tab* getTabName(const std::string fileName);
-	size_t addFileTab(const std::string &path, const std::string &fileName, FileView* fileView);
+	tgui::TabsBase::Tab *getTabId(const std::string id);
+	tgui::TabsBase::Tab *getTabName(const std::string fileName);
+	size_t addFileTab(const std::string &path, const std::string &fileName, FileView *fileView);
 	void closeTabFilename(std::string fileName);
 	void closeCurrentTab();
 
