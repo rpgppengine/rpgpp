@@ -66,7 +66,7 @@ void ProjectScreen::bindMenuBarAndHK(tgui::MenuBar::Ptr menuBarPtr) {
 			tgui::String currentFile = fileTabs->getSelectedId();
 			auto &projectFile = openedFiles.at(currentFile);
 			projectFile->saveFile(projectFile->getFilePath());
-			projectFile->getView().dirty = false;
+			projectFile->getView().setDirty(false);
 		}
 	};
 

@@ -17,9 +17,10 @@ protected:
 	std::stack<std::unique_ptr<Action>> past;
 	std::stack<std::unique_ptr<Action>> future;
 
+	bool dirty = false;
+
 public:
 	bool fileViewFocused = false;
-	bool dirty = false;
 
 	FileView();
 	virtual ~FileView();
@@ -31,6 +32,9 @@ public:
 	void pushAction(std::unique_ptr<Action> action);
 	void undoAction();
 	void redoAction();
+
+	void setDirty(bool value = true);
+	bool getDirty();
 };
 
 #endif
