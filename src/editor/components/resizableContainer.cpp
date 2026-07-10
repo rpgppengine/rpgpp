@@ -27,11 +27,11 @@ int ResizableContainer::getMinResizeHeight() { return minResizeHeight; }
 void ResizableContainer::setGrabberSize(int size) { grabberSize = size; }
 int ResizableContainer::getGrabberSize() { return grabberSize; }
 
-void ResizableContainer::enableResize(ResizeDirectionC direction) { resizeFlags |= static_cast<char>(direction); }
+void ResizableContainer::enableResize(ResizeDirection direction) { resizeFlags |= static_cast<char>(direction); }
 
-void ResizableContainer::disableResize(ResizeDirectionC direction) { resizeFlags &= ~static_cast<char>(direction); }
+void ResizableContainer::disableResize(ResizeDirection direction) { resizeFlags &= ~static_cast<char>(direction); }
 
-bool ResizableContainer::isResizable(ResizeDirectionC direction) { return resizeFlags & static_cast<char>(direction); }
+bool ResizableContainer::isResizable(ResizeDirection direction) { return resizeFlags & static_cast<char>(direction); }
 
 ResizableContainer::Ptr ResizableContainer::create(const tgui::Layout2d &size, const tgui::Layout2d &position) {
 	return std::make_shared<ResizableContainer>(size, position);
@@ -46,18 +46,18 @@ ResizableContainer::Ptr ResizableContainer::copy(ResizableContainer::ConstPtr wi
 
 tgui::Widget::Ptr ResizableContainer::clone() const { return std::make_shared<ResizableContainer>(*this); }
 
-bool ResizableContainer::inEnabledGrabber(ResizeDirectionC direction, tgui::Vector2f absolutePos) {
+bool ResizableContainer::inEnabledGrabber(ResizeDirection direction, tgui::Vector2f absolutePos) {
 	if (!isResizable(direction)) return false;
 
 	switch (direction) {
-		case ResizeDirectionC::LEFT:
+		case ResizeDirection::LEFT:
 			return bounded(absolutePos.x, 0, grabberSize) and bounded(absolutePos.y, 0, getSize().y);
-		case ResizeDirectionC::RIGHT:
+		case ResizeDirection::RIGHT:
 			return bounded(absolutePos.x, getSize().x - grabberSize, getSize().x) and
 				   bounded(absolutePos.y, 0, getSize().y);
-		case ResizeDirectionC::TOP:
+		case ResizeDirection::TOP:
 			return bounded(absolutePos.y, 0, grabberSize) and bounded(absolutePos.x, 0, getSize().x);
-		case ResizeDirectionC::BOTTOM:
+		case ResizeDirection::BOTTOM:
 			return bounded(absolutePos.y, getSize().y - grabberSize, getSize().y) and
 				   bounded(absolutePos.x, 0, getSize().x);
 		default:
@@ -71,14 +71,14 @@ bool ResizableContainer::leftMousePressed(tgui::Vector2f pos) {
 	startSize = getSize();
 	startPosition = getPosition();
 
-	if (inEnabledGrabber(ResizeDirectionC::LEFT, absolutePos)) {
-		grabbingFlag = static_cast<char>(ResizeDirectionC::LEFT);
-	} else if (inEnabledGrabber(ResizeDirectionC::RIGHT, absolutePos)) {
-		grabbingFlag = static_cast<char>(ResizeDirectionC::RIGHT);
-	} else if (inEnabledGrabber(ResizeDirectionC::TOP, absolutePos)) {
-		grabbingFlag = static_cast<char>(ResizeDirectionC::TOP);
-	} else if (inEnabledGrabber(ResizeDirectionC::BOTTOM, absolutePos)) {
-		grabbingFlag = static_cast<char>(ResizeDirectionC::BOTTOM);
+	if (inEnabledGrabber(ResizeDirection::LEFT, absolutePos)) {
+		grabbingFlag = static_cast<char>(ResizeDirection::LEFT);
+	} else if (inEnabledGrabber(ResizeDirection::RIGHT, absolutePos)) {
+		grabbingFlag = static_cast<char>(ResizeDirection::RIGHT);
+	} else if (inEnabledGrabber(ResizeDirection::TOP, absolutePos)) {
+		grabbingFlag = static_cast<char>(ResizeDirection::TOP);
+	} else if (inEnabledGrabber(ResizeDirection::BOTTOM, absolutePos)) {
+		grabbingFlag = static_cast<char>(ResizeDirection::BOTTOM);
 	}
 
 	return tgui::Group::leftMousePressed(pos);
@@ -87,16 +87,16 @@ bool ResizableContainer::leftMousePressed(tgui::Vector2f pos) {
 void ResizableContainer::manualMouseMoved(tgui::Vector2f pos) {
 	auto absolutePos = pos - getPosition();
 
-	if (inEnabledGrabber(ResizeDirectionC::LEFT, absolutePos)) {
+	if (inEnabledGrabber(ResizeDirection::LEFT, absolutePos)) {
 		SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
 		cursorModified = true;
-	} else if (inEnabledGrabber(ResizeDirectionC::RIGHT, absolutePos)) {
+	} else if (inEnabledGrabber(ResizeDirection::RIGHT, absolutePos)) {
 		SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
 		cursorModified = true;
-	} else if (inEnabledGrabber(ResizeDirectionC::TOP, absolutePos)) {
+	} else if (inEnabledGrabber(ResizeDirection::TOP, absolutePos)) {
 		SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
 		cursorModified = true;
-	} else if (inEnabledGrabber(ResizeDirectionC::BOTTOM, absolutePos)) {
+	} else if (inEnabledGrabber(ResizeDirection::BOTTOM, absolutePos)) {
 		SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
 		cursorModified = true;
 	} else if (cursorModified) {
@@ -105,21 +105,21 @@ void ResizableContainer::manualMouseMoved(tgui::Vector2f pos) {
 	}
 
 	tgui::Vector2f deltaMousePos = absolutePos - startMousePos;
-	if (grabbingFlag == static_cast<char>(ResizeDirectionC::LEFT)) {
+	if (grabbingFlag == static_cast<char>(ResizeDirection::LEFT)) {
 		float newW = startSize.x.getValue() - deltaMousePos.x;
 		newW = std::clamp(newW, static_cast<float>(minResizeWidth), static_cast<float>(maxResizeWidth));
 		setSize(newW, startSize.y);
 		setPosition(startPosition.x + deltaMousePos.x, startPosition.y);
-	} else if (grabbingFlag == static_cast<char>(ResizeDirectionC::RIGHT)) {
+	} else if (grabbingFlag == static_cast<char>(ResizeDirection::RIGHT)) {
 		float newW = startSize.x.getValue() + deltaMousePos.x;
 		newW = std::clamp(newW, static_cast<float>(minResizeWidth), static_cast<float>(maxResizeWidth));
 		setSize(newW, startSize.y);
-	} else if (grabbingFlag == static_cast<char>(ResizeDirectionC::TOP)) {
+	} else if (grabbingFlag == static_cast<char>(ResizeDirection::TOP)) {
 		float newH = startSize.y.getValue() - deltaMousePos.y;
 		newH = std::clamp(newH, static_cast<float>(minResizeHeight), static_cast<float>(maxResizeHeight));
 		setSize(startSize.x, newH);
 		setPosition(startPosition.x, startPosition.y + deltaMousePos.y);
-	} else if (grabbingFlag == static_cast<char>(ResizeDirectionC::BOTTOM)) {
+	} else if (grabbingFlag == static_cast<char>(ResizeDirection::BOTTOM)) {
 		float newH = startSize.y.getValue() + deltaMousePos.y;
 		newH = std::clamp(newH, static_cast<float>(minResizeHeight), static_cast<float>(maxResizeHeight));
 		setSize(startSize.x, newH);

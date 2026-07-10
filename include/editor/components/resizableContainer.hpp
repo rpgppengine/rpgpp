@@ -4,8 +4,7 @@
 #include "TGUI/Signal.hpp"
 #include "TGUI/Vector2.hpp"
 #include "TGUI/Widgets/Group.hpp"
-
-enum class ResizeDirectionC { MOVE = 0, LEFT = 1 << 0, RIGHT = 1 << 1, TOP = 1 << 2, BOTTOM = 1 << 3 };
+#include "resizeDirection.hpp"
 
 class ResizableContainer : public tgui::Group {
 private:
@@ -23,13 +22,13 @@ private:
 	bool isGrabbing = false;
 	bool cursorModified = false;
 
-	bool inEnabledGrabber(ResizeDirectionC direction, tgui::Vector2f absolutePos);
+	bool inEnabledGrabber(ResizeDirection direction, tgui::Vector2f absolutePos);
 
 public:
 	ResizableContainer(const tgui::Layout2d &size, const tgui::Layout2d &position);
-	void enableResize(ResizeDirectionC direction);
-	void disableResize(ResizeDirectionC direction);
-	bool isResizable(ResizeDirectionC direction);
+	void enableResize(ResizeDirection direction);
+	void disableResize(ResizeDirection direction);
+	bool isResizable(ResizeDirection direction);
 
 	void setMaxResizeWidth(int width);
 	void setMaxResizeHeight(int height);
