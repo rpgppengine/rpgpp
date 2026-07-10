@@ -13,6 +13,13 @@
 #include "screens/projectScreen.hpp"
 #include "views/worldView.hpp"
 
+bool RectanglesEqual(Rectangle rec1, Rectangle rec2) {
+	return (rec1.x == rec2.x) &&
+	(rec1.y && rec2.y) &&
+	(rec1.width && rec2.width) &&
+	(rec1.height && rec2.height);
+}
+
 InterfaceViewView::InterfaceViewView() {
 	canvasBox = std::make_unique<ResizableCanvasBox>("activeEelement", 0, 0, 1, 1, RED);
 }
@@ -121,26 +128,28 @@ void InterfaceViewView::leftMouseReleased(tgui::Vector2f pos) {
 			elementRect = canvasBox->getRectangle();
 			canvasBox->focused = false;
 
-			auto action = std::make_unique<Action>();
-			action->onAction = [elementPtr, elementRect, this] {
-				Rectangle* ptr = std::get_if<Rectangle>(&elementPtr->props["rect"]);
-				*ptr = elementRect;
+			if (!RectanglesEqual(oldRect, elementRect)) {
+				auto action = std::make_unique<Action>();
+				action->onAction = [elementPtr, elementRect, this] {
+					Rectangle* ptr = std::get_if<Rectangle>(&elementPtr->props["rect"]);
+					*ptr = elementRect;
 
-				visitProps(this->ptr->getEntityName(activeElement));
+					visitProps(this->ptr->getEntityName(activeElement));
 
-				canvasBox->updateRec(elementRect);
-			};
-			action->onUndo = [elementPtr, oldRect, this] {
-				Rectangle* ptr = std::get_if<Rectangle>(&elementPtr->props["rect"]);
-				*ptr = oldRect;
+					canvasBox->updateRec(elementRect);
+				};
+				action->onUndo = [elementPtr, oldRect, this] {
+					Rectangle* ptr = std::get_if<Rectangle>(&elementPtr->props["rect"]);
+					*ptr = oldRect;
 
-				visitProps(this->ptr->getEntityName(activeElement));
+					visitProps(this->ptr->getEntityName(activeElement));
 
-				canvasBox->updateRec(oldRect);
-			};
+					canvasBox->updateRec(oldRect);
+				};
 
-			auto screen = aurora::downcast<screens::ProjectScreen *>(Editor::instance->getGui().currentScreen.get());
-			screen->getCurrentFile().getView().pushAction(std::move(action));
+				auto screen = aurora::downcast<screens::ProjectScreen *>(Editor::instance->getGui().currentScreen.get());
+				screen->getCurrentFile().getView().pushAction(std::move(action));
+			}
 		}
 	}
 

@@ -284,7 +284,7 @@ void FileTab::renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &s
 	// draw dirty tab indicator
 	auto currentTab = m_tabs[i];
 	auto foundFileViews = this->m_fileViews.find(currentTab.id.toStdString());
-	bool dirty = foundFileViews->second->dirty;
+	bool dirty = foundFileViews->second->getDirty();
 	if (foundFileViews != this->m_fileViews.end() && dirty) {
 		auto drawDirtyTabStates = states;
 		drawDirtyTabStates.transform.translate({MARGIN_LR, (usableHeight - CLOSE_BUTTON_SIZE * .75f) / 2.f});
