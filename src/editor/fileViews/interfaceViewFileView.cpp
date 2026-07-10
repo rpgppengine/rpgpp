@@ -18,10 +18,6 @@
 #include "widgets/propertiesBox.hpp"
 #include "widgets/propertyFields/fileField.hpp"
 
-bool startsWith(const std::string &key, const std::string &prefix) {
-	return (key.size() >= prefix.size()) && (key.compare(0, prefix.size(), prefix) == 0);
-}
-
 InterfaceViewFileView::InterfaceViewFileView() {
 	editListFieldWindow = std::make_unique<EditListFieldWindow<std::string>>();
 

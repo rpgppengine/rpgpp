@@ -425,7 +425,7 @@ ResizableContainer::Ptr ProjectScreen::createResourcesList() {
 	TranslationService &tService = Editor::instance->getTranslations();
 
 	auto group = ResizableContainer::create({modifiable_RESLIST_W, tgui::Layout("100%") - TOOLBAR_H}, {0, TOOLBAR_H});
-	group->enableResize(ResizeDirection::RIGHT);
+	group->enableResize(ResizeDirectionC::RIGHT);
 	group->setMinResizeWidth(MIN_RESLIST_W);
 	group->setMaxResizeWidth(MAX_RESLIST_W);
 	group->useExternalMouseEvent = true;

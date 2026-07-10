@@ -3,12 +3,14 @@
 #include <memory>
 
 #include "TGUI/Vector2.hpp"
+#include "actions/action.hpp"
 #include "components/resizableCanvasBox.hpp"
 #include "drawHelper.hpp"
 #include "editor.hpp"
 #include "interfaceView.hpp"
 #include "project.hpp"
 #include "raylib.h"
+#include "screens/projectScreen.hpp"
 #include "views/worldView.hpp"
 
 InterfaceViewView::InterfaceViewView() {
@@ -114,14 +116,31 @@ void InterfaceViewView::leftMouseReleased(tgui::Vector2f pos) {
 
 		if (elementPtr != nullptr) {
 			Rectangle &elementRect = std::get<Rectangle>(elementPtr->props["rect"]);
+			Rectangle oldRect = elementRect;
 
 			elementRect = canvasBox->getRectangle();
 			canvasBox->focused = false;
 
-			if (propBox != nullptr && visitor != nullptr) {
-				propBox->clear();
-				visitProps(ptr->getEntityName(activeElement));
-			}
+			auto action = std::make_unique<Action>();
+			action->onAction = [elementPtr, elementRect, this] {
+				Rectangle* ptr = std::get_if<Rectangle>(&elementPtr->props["rect"]);
+				*ptr = elementRect;
+
+				visitProps(this->ptr->getEntityName(activeElement));
+
+				canvasBox->updateRec(elementRect);
+			};
+			action->onUndo = [elementPtr, oldRect, this] {
+				Rectangle* ptr = std::get_if<Rectangle>(&elementPtr->props["rect"]);
+				*ptr = oldRect;
+
+				visitProps(this->ptr->getEntityName(activeElement));
+
+				canvasBox->updateRec(oldRect);
+			};
+
+			auto screen = aurora::downcast<screens::ProjectScreen *>(Editor::instance->getGui().currentScreen.get());
+			screen->getCurrentFile().getView().pushAction(std::move(action));
 		}
 	}
 
@@ -155,6 +174,9 @@ void InterfaceViewView::selectElement(const std::string &elementName) {
 }
 
 void InterfaceViewView::visitProps(const std::string &title) {
+	if (propBox != nullptr && visitor != nullptr) return;
+	propBox->clear();
+
 	visitor->box = propBox;
 	visitor->view = ptr;
 

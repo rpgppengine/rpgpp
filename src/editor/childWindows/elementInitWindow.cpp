@@ -5,9 +5,19 @@
 #include "TGUI/String.hpp"
 #include "TGUI/Widgets/EditBox.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
+#include "actions/action.hpp"
 #include "bindTranslation.hpp"
 #include "childWindows/popupWindow.hpp"
 #include "interfaceService.hpp"
+#include "screens/projectScreen.hpp"
+
+void ElementInitWindow::onAddElement(const std::string& title, const std::string& type) {
+	ElementIndex elementId = view->addElement(title, type);
+	if (elementId < MAX_ELEMENTS) {
+		tree->addItem({title});
+		view->getElement(elementId)->config();
+	}
+}
 
 ElementInitWindow::ElementInitWindow() : PopupWindow("Create Element..") {
 	bindTranslation(this->currentWindow, "dialog.init_element.title", &tgui::ChildWindow::setTitle);
@@ -35,12 +45,27 @@ ElementInitWindow::ElementInitWindow() : PopupWindow("Create Element..") {
 				return;
 			}
 
+			/*
 			ElementIndex elementId = view->addElement(sharedInput->getText().toStdString(), item.toStdString());
 			if (elementId < MAX_ELEMENTS) {
 				tree->addItem({sharedInput->getText().toStdString()});
 				view->getElement(elementId)->config();
 			}
+			*/
 			close();
+
+			std::string title = sharedInput->getText().toStdString();
+			std::string elementType = item.toStdString();
+
+			auto action = std::make_unique<Action>();
+			action->onAction = [this, title, elementType] { onAddElement(title, elementType); };
+			action->onUndo = [this, title] {
+				view->removeElement(title);
+				tree->removeItem({title});
+			};
+
+			auto screen = aurora::downcast<screens::ProjectScreen *>(Editor::instance->getGui().currentScreen.get());
+			screen->getCurrentFile().getView().pushAction(std::move(action));
 		}
 	});
 

@@ -16,6 +16,8 @@ public:
 	tgui::TreeView *tree = nullptr;
 	ElementInitWindow();
 	void init();
+
+	void onAddElement(const std::string& title, const std::string& type);
 };
 
 #endif
