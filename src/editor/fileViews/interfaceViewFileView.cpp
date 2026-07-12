@@ -155,22 +155,72 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	});
 
 	elementContextMenu = tgui::ContextMenu::create();
+	elementContextMenu->addMenuItem("Move Up");
+	elementContextMenu->addMenuItem("Move Down");
 	elementContextMenu->addMenuItem("Delete");
 	elementContextMenu->onMenuItemClick([this, weakTree](const std::vector<tgui::String> &hierarchy) {
 		if (hierarchy.empty()) return;
 
 		auto item = hierarchy[0];
 
+		const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
+		const auto interface = ptr->get();
+
+		auto screen = aurora::downcast<screens::ProjectScreen *>(Editor::instance->getGui().currentScreen.get());
+
+		if (item == "Move Up") {
+			ElementIndex index = interface->findByName(selectedElement);
+
+			auto action = std::make_unique<Action>();
+			action->onAction = [this, interface, index] {
+				interface->swapElements(index, index - 1);
+
+				populateTree();
+			};
+			action->onUndo = [this, interface, index] {
+				interface->swapElements(index, index - 1);
+
+				populateTree();
+			};
+
+			screen->getCurrentFile().getView().pushAction(std::move(action));
+		}
+
+		if (item == "Move Down") {
+			ElementIndex index = interface->findByName(selectedElement);
+
+			auto action = std::make_unique<Action>();
+			action->onAction = [this, interface, index] {
+				interface->swapElements(index, index + 1);
+
+				populateTree();
+			};
+			action->onUndo = [this, interface, index] {
+				interface->swapElements(index, index + 1);
+
+				populateTree();
+			};
+
+			screen->getCurrentFile().getView().pushAction(std::move(action));
+		}
+
 		if (item == "Delete") {
-			const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
-			const auto interface = ptr->get();
+			UIElement* element = interface->getElement(selectedElement);
+			auto elementProps = element->props;
+			auto elementType = element->typeName;
 
-			interface->removeElement(selectedElement);
+			auto action = std::make_unique<Action>();
+			action->onAction = [this, interface] {
+				interface->removeElement(selectedElement);
+				treeView->removeItem({selectedElement});
+			};
+			action->onUndo = [this, interface, elementType, elementProps] {
+				ElementIndex newIndex = interface->addElement(selectedElement, elementType);
+				interface->getElement(newIndex)->props = elementProps;
+				treeView->addItem({selectedElement});
+			};
 
-			if (auto sharedTree = weakTree.lock()) {
-				sharedTree->removeItem({selectedElement});
-				this->dirty = true;
-			}
+			screen->getCurrentFile().getView().pushAction(std::move(action));
 		}
 	});
 	Editor::instance->getGui().gui->add(elementContextMenu);
@@ -196,6 +246,21 @@ void InterfaceViewFileView::visitProps(const std::string &title) {
 	for (auto &[title, variant] : element->props) {
 		visitor.key = title;
 		std::visit(visitor, variant);
+	}
+}
+
+void InterfaceViewFileView::populateTree() {
+	const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);
+	const auto interface = ptr->get();
+
+	treeView->removeAllItems();
+
+	ElementIndex i = 0;
+	for (auto &entity : interface->getElements()) {
+		if (interface->getElement(i) != nullptr) {
+			treeView->addItem({interface->getEntityName(i)});
+			i++;
+		}
 	}
 }
 

@@ -14,7 +14,6 @@
 #include "game.hpp"
 #include "gamedata.hpp"
 #include "lua.hpp"
-#include "lua/reflect.hpp"
 #include "raylib.h"
 #include "scriptService.hpp"
 #include "sol/environment.hpp"
@@ -166,6 +165,16 @@ void InterfaceView::removeElement(const std::string &title) {
 		elements[i].reset();
 		elementNames[i].erase();
 		size--;
+
+		ElementIndex j = i;
+		UIElement* elem = getElement(j + 1);
+		while (elem != nullptr) {
+			elements[j].swap(elements[j + 1]);
+			elementNames[j].swap(elementNames[j + 1]);
+
+			j++;
+			elem = getElement(j + 1);
+		}
 	}
 }
 
@@ -186,6 +195,17 @@ void InterfaceView::renameElement(const std::string &title, const std::string &n
 	if (i < MAX_ELEMENTS) {
 		elementNames[i] = newTitle;
 	}
+}
+
+void InterfaceView::swapElements(ElementIndex a, ElementIndex b) {
+	if (a < 0 || a >= MAX_ELEMENTS) return;
+	if (b < 0 || b >= MAX_ELEMENTS) return;
+
+	if (elements[a] == nullptr) return;
+	if (elements[b] == nullptr) return;
+
+	elements[a].swap(elements[b]);
+	elementNames[a].swap(elementNames[b]);
 }
 
 void InterfaceView::changeFocusedElement(const std::string &title) {

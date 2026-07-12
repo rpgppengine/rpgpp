@@ -11,7 +11,6 @@
 #include "TGUI/Widgets/Label.hpp"
 #include "TGUI/Widgets/Panel.hpp"
 #include "raylib.h"
-#include "rttr/variant.h"
 
 class ColorField : public tgui::Group {
 private:

@@ -65,6 +65,7 @@ public:
 	void changeFocusedElement(ElementIndex index);
 	UIElement *cloneElement(const std::string &title, const std::string &newTitle);
 	const std::array<std::unique_ptr<UIElement>, MAX_ELEMENTS> &getElements();
+	void swapElements(ElementIndex a, ElementIndex b);
 	void resetElements();
 
 	virtual void onNotify(Event event);
