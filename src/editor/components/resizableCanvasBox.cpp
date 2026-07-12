@@ -36,30 +36,52 @@ Rectangle ResizableCanvasBox::getRectangle() { return {this->x, this->y, this->w
 
 void ResizableCanvasBox::setResizeMargin(float newResizeMargin) { this->resizeMargin = newResizeMargin; }
 
-bool ResizableCanvasBox::leftMousePressed(Vector2 mousePos) {
-	resizeDirection = NONE;
-
-	if (mousePos.x >= x && mousePos.x <= x + width && mousePos.y >= y && mousePos.y <= y + height) {
+int ResizableCanvasBox::inGrabber(Vector2 pos) {
+	int direction = NONE;
+	if (pos.x >= x && pos.x <= x + width && pos.y >= y && pos.y <= y + height) {
 		if (isResizable) {
-			if (mousePos.x >= x && mousePos.x <= x + resizeMargin) {
-				resizeDirection |= LEFT;
+			if (pos.x >= x && pos.x <= x + resizeMargin) {
+				direction |= LEFT;
 			}
 
-			if (mousePos.x >= x + width - resizeMargin && mousePos.x <= x + width) {
-				resizeDirection |= RIGHT;
+			if (pos.x >= x + width - resizeMargin && pos.x <= x + width) {
+				direction |= RIGHT;
 			}
 
-			if (mousePos.y >= y && mousePos.y <= y + resizeMargin) {
-				resizeDirection |= TOP;
+			if (pos.y >= y && pos.y <= y + resizeMargin) {
+				direction |= TOP;
 			}
 
-			if (mousePos.y >= y + height - resizeMargin && mousePos.y <= y + height) {
-				resizeDirection |= BOTTOM;
+			if (pos.y >= y + height - resizeMargin && pos.y <= y + height) {
+				direction |= BOTTOM;
 			}
 		}
+	}
+	return direction;
+}
 
-		if (resizeDirection == NONE) {
-			resizeDirection |= MOVE;
+void ResizableCanvasBox::updateCursor(Vector2 absolutePos) {
+	int hoveredGrabber = inGrabber(absolutePos);
+	if (hoveredGrabber & (LEFT | RIGHT)) {
+		SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
+		cursorModified = true;
+	} else if (hoveredGrabber & (TOP | BOTTOM)) {
+		SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
+		cursorModified = true;
+	} else if (cursorModified) {
+		SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+		cursorModified = false;
+	}
+}
+
+bool ResizableCanvasBox::leftMousePressed(Vector2 mousePos) {
+	activeGrabber = NONE;
+
+	if (mousePos.x >= x && mousePos.x <= x + width && mousePos.y >= y && mousePos.y <= y + height) {
+		activeGrabber = inGrabber(mousePos);
+
+		if (activeGrabber == NONE) {
+			activeGrabber |= MOVE;
 		}
 
 		isResizing = true;
@@ -75,6 +97,7 @@ bool ResizableCanvasBox::leftMousePressed(Vector2 mousePos) {
 }
 
 bool ResizableCanvasBox::mouseMovedTrigger(Vector2 mousePos, int snapWidth, int snapHeight) {
+	updateCursor(mousePos);
 	if (!isResizing || !focused) return false;
 
 	bool movedIndicator = false;
@@ -82,29 +105,29 @@ bool ResizableCanvasBox::mouseMovedTrigger(Vector2 mousePos, int snapWidth, int 
 	int dx = std::round((mousePos.x - startMousePos.x) / snapWidth) * snapWidth;
 	int dy = std::round((mousePos.y - startMousePos.y) / snapHeight) * snapHeight;
 
-	if ((resizeDirection & LEFT) && prevWidth - dx < minSize) dx = prevWidth - minSize;
+	if ((activeGrabber & LEFT) && prevWidth - dx < minSize) dx = prevWidth - minSize;
 
-	if ((resizeDirection & TOP) && prevHeight - dy < minSize) dy = prevHeight - minSize;
+	if ((activeGrabber & TOP) && prevHeight - dy < minSize) dy = prevHeight - minSize;
 
-	if (resizeDirection & LEFT) {
+	if (activeGrabber & LEFT) {
 		x = prevX + dx;
 		width = prevWidth - dx;
 		movedIndicator = true;
 	}
-	if (resizeDirection & RIGHT) {
+	if (activeGrabber & RIGHT) {
 		width = prevWidth + dx;
 		movedIndicator = true;
 	}
-	if (resizeDirection & TOP) {
+	if (activeGrabber & TOP) {
 		y = prevY + dy;
 		height = prevHeight - dy;
 		movedIndicator = true;
 	}
-	if (resizeDirection & BOTTOM) {
+	if (activeGrabber & BOTTOM) {
 		height = prevHeight + dy;
 		movedIndicator = true;
 	}
-	if (resizeDirection & MOVE) {
+	if (activeGrabber & MOVE) {
 		x = prevX + dx;
 		y = prevY + dy;
 		movedIndicator = true;
@@ -123,7 +146,7 @@ void ResizableCanvasBox::mouseMoved(Vector2 mousePos, int snapWidth, int snapHei
 Rectangle ResizableCanvasBox::leftMouseReleased(Vector2 mousePos) {
 	if (isResizing) {
 		isResizing = false;
-		resizeDirection = NONE;
+		activeGrabber = NONE;
 	}
 	return Rectangle{x, y, width, height};
 }

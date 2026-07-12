@@ -45,7 +45,10 @@ private:
 	bool isResizing = false;
 	Vector2 startMousePos{};
 	float prevX = 0, prevY = 0, prevWidth = 0, prevHeight = 0;
-	int resizeDirection = NONE;
+	int activeGrabber = NONE;
+	int inGrabber(Vector2 pos);
+	bool cursorModified = false;
+	void updateCursor(Vector2 absolutePos);
 };
 
 #endif

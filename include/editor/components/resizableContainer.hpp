@@ -23,6 +23,7 @@ private:
 	bool cursorModified = false;
 
 	bool inEnabledGrabber(ResizeDirection direction, tgui::Vector2f absolutePos);
+	void updateCursor(tgui::Vector2f absolutePos);
 
 public:
 	ResizableContainer(const tgui::Layout2d &size, const tgui::Layout2d &position);
