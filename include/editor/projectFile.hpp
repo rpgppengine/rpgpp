@@ -28,6 +28,7 @@ public:
 	void saveFile(const std::string &path);
 	FileView &getView();
 	FileView* getViewPtr();
+	EngineFileType getFileType();
 };
 
 #endif

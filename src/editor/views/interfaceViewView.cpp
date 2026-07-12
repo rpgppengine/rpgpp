@@ -22,6 +22,7 @@ bool RectanglesEqual(Rectangle rec1, Rectangle rec2) {
 
 InterfaceViewView::InterfaceViewView() {
 	canvasBox = std::make_unique<ResizableCanvasBox>("activeEelement", 0, 0, 1, 1, RED);
+	canvasBox->setResizeMargin(2.0f);
 }
 
 InterfaceViewView::Ptr InterfaceViewView::create() { return std::make_shared<InterfaceViewView>(); }
@@ -56,6 +57,15 @@ void InterfaceViewView::setElementAtMouse() {
 			onActiveEntityChanged.emit(this, activeElement);
 		}
 	}
+}
+
+void InterfaceViewView::update() {
+	if (IsKeyDown(KEY_LEFT_SHIFT)) {
+		activeSnapSize = gridSnapSize;
+	} else {
+		activeSnapSize = 1;
+	}
+	WorldView::update();
 }
 
 void InterfaceViewView::drawOverlay() {}
@@ -160,7 +170,7 @@ void InterfaceViewView::mouseMoved(tgui::Vector2f pos) {
 	const auto &mousePos = getMouseWorldPos();
 
 	if (activeElement != MAX_ELEMENTS) {
-		canvasBox->mouseMoved(mousePos);
+		canvasBox->mouseMoved(mousePos, activeSnapSize, activeSnapSize);
 	}
 
 	return WorldView::mouseMoved(pos);

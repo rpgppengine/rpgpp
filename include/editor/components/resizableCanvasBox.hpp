@@ -24,8 +24,10 @@ public:
 	void updatePosition(float x, float y);
 	void updateSize(float width, float height);
 	void updateColor(Color color);
-
 	void updateRec(Rectangle rec);
+
+	void setResizeMargin(float newResizeMargin);
+
 	bool focused = false;
 	std::string id{};
 
@@ -33,7 +35,7 @@ public:
 	float getMinSize() const { return minSize; }
 
 private:
-	const float RESIZE_MARGIN = 1.f;
+	float resizeMargin = 1.f;
 	float minSize = 2.f;
 	bool isResizable = true;
 

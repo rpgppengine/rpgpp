@@ -6,6 +6,7 @@
 #include "TGUI/String.hpp"
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Widgets/ContextMenu.hpp"
+#include "TGUI/Widgets/GrowHorizontalLayout.hpp"
 #include "TGUI/Widgets/TabContainer.hpp"
 #include "TGUI/Widgets/TreeView.hpp"
 #include "bindTranslation.hpp"
@@ -41,9 +42,26 @@ InterfaceViewFileView::InterfaceViewFileView() {
 
 	widgetContainer.push_back(treeView);
 
+	auto toolPanel = tgui::Panel::create();
+	toolPanel->setSize({TextFormat("100%% - %d", RIGHT_PANEL_W), 32});
+
+	auto toolLayout = tgui::GrowHorizontalLayout::create();
+	toolPanel->add(toolLayout);
+
+	snapGridField = IntField::create();
+	snapGridField->label->setText("Snap Grid");
+	snapGridField->setSize({200, "100%"});
+	snapGridField->value->setMinimum(2);
+	snapGridField->value->setMaximum(16);
+	snapGridField->value->setValue(4);
+
+	toolLayout->add(snapGridField);
+
+	widgetContainer.push_back(toolPanel);
+
 	view = InterfaceViewView::create();
-	view->setPosition({0, 0});
-	view->setSize({TextFormat("100%% - %d", RIGHT_PANEL_W), "100%"});
+	view->setPosition({0, 32});
+	view->setSize({TextFormat("100%% - %d", RIGHT_PANEL_W), "100% - 32"});
 	Editor::instance->getGui().addUpdate(WorldView::asUpdatable(view));
 
 	auto tabsContainer = tgui::TabContainer::create();
@@ -97,6 +115,12 @@ InterfaceViewFileView::InterfaceViewFileView() {
 
 				visitProps(item.toStdString());
 			}
+		}
+	});
+
+	snapGridField->value->onValueChange([weakView] (int newValue) {
+		if (auto sharedView = weakView.lock()) {
+			sharedView->gridSnapSize = newValue;
 		}
 	});
 
@@ -163,10 +187,11 @@ void InterfaceViewFileView::visitProps(const std::string &title) {
 
 	visitor.box = propertiesBox.get();
 	visitor.view = interface;
-	visitor.editListFieldWindow  = editListFieldWindow.get();
+	visitor.editListFieldWindow = editListFieldWindow.get();
 
 	auto element = interface->getElement(title);
 	visitor.element = element;
+	visitor.currentItemId = interface->findByName(title);
 	if (element == nullptr) return;
 	for (auto &[title, variant] : element->props) {
 		visitor.key = title;
@@ -176,6 +201,7 @@ void InterfaceViewFileView::visitProps(const std::string &title) {
 
 void InterfaceViewFileView::init(tgui::Group::Ptr layout, VariantWrapper *variant) {
 	this->variant = variant;
+	this->visitor.screen = aurora::downcast<screens::ProjectScreen *>(Editor::instance->getGui().currentScreen.get());
 
 	if (variant != nullptr) {
 		const auto ptr = dynamic_cast<Variant<InterfaceView> *>(variant);

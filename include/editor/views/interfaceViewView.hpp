@@ -18,6 +18,7 @@ private:
 	bool hasActiveElement = false;
 	ElementIndex activeElement = MAX_ELEMENTS;
 	void setElementAtMouse();
+	int activeSnapSize = 1;
 
 public:
 	typedef std::shared_ptr<InterfaceViewView> Ptr;
@@ -31,12 +32,16 @@ public:
 	PropertiesBox *propBox{nullptr};
 	UIElementPropVisitor *visitor{nullptr};
 
+	int gridSnapSize = 4;
+
 	void drawCanvas() override;
 	void drawOverlay() override;
 
 	static InterfaceViewView::Ptr create();
 
 	void setInterfaceView(InterfaceView *ptr);
+
+	void update() override;
 
 	bool leftMousePressed(tgui::Vector2f pos) override;
 	void leftMouseReleased(tgui::Vector2f pos) override;

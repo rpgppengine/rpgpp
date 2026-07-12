@@ -49,15 +49,15 @@ public:
 
 	void addPropsJson(nlohmann::json &j, bool clear = true, bool editable = false);
 	void addIntField(const tgui::String &title, int initialValue, std::function<void(float)> callback);
-	void addIntField(IntField::Ptr field);
-	void addFileField(FileField::Ptr field);
-	void addTextField(TextField::Ptr field);
-	void addBooleanField(BoolField::Ptr field);
-	void addRectangleField(RectangleField::Ptr field);
-	void addSelectField(SelectField::Ptr field);
-	void addColorField(ColorField::Ptr field);
-	void addRefField(UIElementRefField::Ptr field);
-	void addNPatchFIeld(NPatchInfoField::Ptr field);
+	void addIntField(IntField::Ptr field, const std::string& title = "");
+	void addFileField(FileField::Ptr field, const std::string& title = "");
+	void addTextField(TextField::Ptr field, const std::string& title = "");
+	void addBooleanField(BoolField::Ptr field, const std::string& title = "");
+	void addRectangleField(RectangleField::Ptr field, const std::string& title = "");
+	void addSelectField(SelectField::Ptr field, const std::string& title = "");
+	void addColorField(ColorField::Ptr field, const std::string& title = "");
+	void addRefField(UIElementRefField::Ptr field, const std::string& title = "");
+	void addNPatchFIeld(NPatchInfoField::Ptr field, const std::string& title = "");
 
 	template<typename T>
 	void addListField(typename ListField<T>::Ptr field) {
@@ -71,6 +71,8 @@ public:
 	void addWidget(tgui::Widget::Ptr widget);
 	tgui::Button::Ptr constructButton(const tgui::String &title, std::function<void()> callback);
 	void addSection(const tgui::String &title);
+
+	tgui::Widget* getPropertyField(const std::string& title);
 
 	void clear();
 };

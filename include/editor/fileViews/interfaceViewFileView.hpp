@@ -21,6 +21,8 @@ private:
 	PropertiesBox::Ptr propertiesBox;
 	InterfaceViewView::Ptr view;
 
+	IntField::Ptr snapGridField;
+
 	tgui::ContextMenu::Ptr elementContextMenu;
 	std::string selectedElement;
 

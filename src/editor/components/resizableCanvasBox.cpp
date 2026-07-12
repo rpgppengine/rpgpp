@@ -34,24 +34,26 @@ void ResizableCanvasBox::updateRec(Rectangle rec) {
 
 Rectangle ResizableCanvasBox::getRectangle() { return {this->x, this->y, this->width, this->height}; }
 
+void ResizableCanvasBox::setResizeMargin(float newResizeMargin) { this->resizeMargin = newResizeMargin; }
+
 bool ResizableCanvasBox::leftMousePressed(Vector2 mousePos) {
 	resizeDirection = NONE;
 
 	if (mousePos.x >= x && mousePos.x <= x + width && mousePos.y >= y && mousePos.y <= y + height) {
 		if (isResizable) {
-			if (mousePos.x >= x && mousePos.x <= x + RESIZE_MARGIN) {
+			if (mousePos.x >= x && mousePos.x <= x + resizeMargin) {
 				resizeDirection |= LEFT;
 			}
 
-			if (mousePos.x >= x + width - RESIZE_MARGIN && mousePos.x <= x + width) {
+			if (mousePos.x >= x + width - resizeMargin && mousePos.x <= x + width) {
 				resizeDirection |= RIGHT;
 			}
 
-			if (mousePos.y >= y && mousePos.y <= y + RESIZE_MARGIN) {
+			if (mousePos.y >= y && mousePos.y <= y + resizeMargin) {
 				resizeDirection |= TOP;
 			}
 
-			if (mousePos.y >= y + height - RESIZE_MARGIN && mousePos.y <= y + height) {
+			if (mousePos.y >= y + height - resizeMargin && mousePos.y <= y + height) {
 				resizeDirection |= BOTTOM;
 			}
 		}
@@ -131,7 +133,7 @@ void ResizableCanvasBox::draw() {
 	if (focused) {
 		opacity = 0.5;
 	}
-	DrawRectangleLinesEx(Rectangle{x, y, width, height}, 1, Fade(BLACK, opacity));
+	DrawRectangleLinesEx(Rectangle{x, y, width, height}, resizeMargin, Fade(BLACK, opacity));
 	DrawRectangleRec(Rectangle{x, y, width, height}, Fade(color, opacity));
 	// Implement draw logic here
 }

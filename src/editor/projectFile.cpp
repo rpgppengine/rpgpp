@@ -12,9 +12,7 @@
 #include "tileset.hpp"
 #include "variant.hpp"
 
-ProjectFile::ProjectFile() {
-	view = std::make_unique<EmptyFileView>();
-}
+ProjectFile::ProjectFile() { view = std::make_unique<EmptyFileView>(); }
 
 ProjectFile::ProjectFile(std::unique_ptr<FileView> view, std::unique_ptr<VariantWrapper> variant,
 						 EngineFileType fileType, bool isSaveable) {
@@ -48,4 +46,6 @@ void ProjectFile::saveFile(const std::string &path) {
 
 FileView &ProjectFile::getView() { return *view; }
 
-FileView* ProjectFile::getViewPtr() { return view.get(); }
+FileView *ProjectFile::getViewPtr() { return view.get(); }
+
+EngineFileType ProjectFile::getFileType() { return fileType; }

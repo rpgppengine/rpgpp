@@ -2,6 +2,7 @@
 #define _RPGPP_UIELEMENTPROPVISITOR_H
 
 #include "childWindows/editListFieldWindow.hpp"
+#include "screens/projectScreen.hpp"
 #include "widgets/propertiesBox.hpp"
 
 struct UIElementPropVisitor {
@@ -26,6 +27,10 @@ struct UIElementPropVisitor {
 	void uiElementRef(UIElementRef *ref, const std::string &key);
 
 	EditListFieldWindow<std::string> *editListFieldWindow;
+	screens::ProjectScreen* screen;
+	int currentItemId = 0;
+
+	void visitProps();
 };
 
 #endif

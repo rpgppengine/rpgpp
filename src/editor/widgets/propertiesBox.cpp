@@ -219,49 +219,49 @@ void PropertiesBox::addIntField(const tgui::String &title, int initialValue, std
 	layout->add(group);
 }
 
-void PropertiesBox::addIntField(IntField::Ptr field) {
+void PropertiesBox::addIntField(IntField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addFileField(FileField::Ptr field) {
+void PropertiesBox::addFileField(FileField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addTextField(TextField::Ptr field) {
+void PropertiesBox::addTextField(TextField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addBooleanField(BoolField::Ptr field) {
+void PropertiesBox::addBooleanField(BoolField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addSelectField(SelectField::Ptr field) {
+void PropertiesBox::addSelectField(SelectField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addColorField(ColorField::Ptr field) {
+void PropertiesBox::addColorField(ColorField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addRefField(UIElementRefField::Ptr field) {
+void PropertiesBox::addRefField(UIElementRefField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addNPatchFIeld(NPatchInfoField::Ptr field) {
+void PropertiesBox::addNPatchFIeld(NPatchInfoField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addRectangleField(RectangleField::Ptr field) {
+void PropertiesBox::addRectangleField(RectangleField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 48});
-	layout->add(field);
+	layout->add(field, title);
 }
 
 void PropertiesBox::addInterPropField(InterPropField::Ptr field) {
@@ -282,5 +282,9 @@ void PropertiesBox::addPropertiesBox(PropertiesBox::Ptr box) {
 }
 
 void PropertiesBox::addWidget(tgui::Widget::Ptr widget) { layout->add(widget); }
+
+tgui::Widget* PropertiesBox::getPropertyField(const std::string& title) {
+	return layout->get(title).get();
+}
 
 void PropertiesBox::clear() { layout->removeAllWidgets(); }

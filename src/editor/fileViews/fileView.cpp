@@ -18,8 +18,8 @@ void FileView::addWidgets(tgui::Group::Ptr layout) {
 void FileView::pushAction(std::unique_ptr<Action> action) {
 	if (action->executeOnAdd) {
 		action->execute();
-		dirty = true;
 	}
+	dirty = true;
 
 	past.push(std::move(action));
 }

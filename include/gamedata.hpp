@@ -60,6 +60,13 @@ struct ImageRef {
 	std::string path = "";
 	Texture texture;
 	int scale = 1;
+	void scaleImage(int newScale) {
+		this->scale = newScale;
+		auto loadedImage = LoadImage(TextFormat("images/%s", path.c_str()));
+		ImageResizeNN(&loadedImage, loadedImage.width * scale, loadedImage.height * scale);
+		texture = LoadTextureFromImage(loadedImage);
+		UnloadImage(loadedImage);
+	}
 };
 
 enum CallbackType { CALLBACK_TRIGGER, CALLBACK_FOCUSED, CALLBACK_UNFOCUSED };
