@@ -15,13 +15,13 @@
 
 bool RectanglesEqual(Rectangle rec1, Rectangle rec2) {
 	return (rec1.x == rec2.x) &&
-	(rec1.y && rec2.y) &&
-	(rec1.width && rec2.width) &&
-	(rec1.height && rec2.height);
+	(rec1.y == rec2.y) &&
+	(rec1.width == rec2.width) &&
+	(rec1.height == rec2.height);
 }
 
 InterfaceViewView::InterfaceViewView() {
-	canvasBox = std::make_unique<ResizableCanvasBox>("activeEelement", 0, 0, 1, 1, RED);
+	canvasBox = std::make_unique<ResizableCanvasBox>("activeElement", 0, 0, 1, 1, RED);
 	canvasBox->setResizeMargin(2.0f);
 }
 

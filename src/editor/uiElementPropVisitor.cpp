@@ -409,15 +409,14 @@ void UIElementPropVisitor::operator()(InputC val) {
 	uiElementRef(&input->leftButton, "leftButton");
 	uiElementRef(&input->rightButton, "rightButton");
 
-	for (int i = 0; i < input->funcNames.funcNames.size(); i++) {
+	for (auto& funcName : input->funcNames.funcNames) {
 		auto field = TextField::create();
 
-		std::string enumValName = std::to_string(i);
-		field->label->setText(enumValName);
+		field->label->setText(funcName.first);
 
-		field->value->setText(input->funcNames.funcNames[i]);
+		field->value->setText(funcName.second);
 		field->value->onTextChange(
-			[i, input](const tgui::String &newText) { input->funcNames.funcNames[i] = newText.toStdString(); });
+			[funcName, input](const tgui::String &newText) { input->funcNames.funcNames[funcName.first] = newText.toStdString(); });
 
 		box->addTextField(field, k);
 	}

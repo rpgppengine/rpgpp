@@ -9,7 +9,7 @@
 
 struct UIElement {
 	std::unordered_map<std::string, ElementProperty> props = {};
-	std::array<std::function<void()>, RPGPP_CALLBACK_MAX> callbacks = {};
+	std::unordered_map<std::string, std::function<void()>> callbacks = {};
 	std::string typeName = "";
 	UIElement();
 	UIElement(const std::string &typeName);

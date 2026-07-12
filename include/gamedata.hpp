@@ -69,12 +69,18 @@ struct ImageRef {
 	}
 };
 
-enum CallbackType { CALLBACK_TRIGGER, CALLBACK_FOCUSED, CALLBACK_UNFOCUSED };
+const std::string CALLBACK_TRIGGER = "callback_trigger";
+const std::string CALLBACK_FOCUSED = "callback_focused";
+const std::string CALLBACK_UNFOCUSED = "callback_unfocused";
 
 #define RPGPP_CALLBACK_MAX (3)
 
 struct CallbacksArray {
-	std::array<std::string, RPGPP_CALLBACK_MAX> funcNames = {};
+	std::unordered_map<std::string, std::string> funcNames = {
+		{CALLBACK_TRIGGER, ""},
+		{CALLBACK_UNFOCUSED, ""},
+		{CALLBACK_FOCUSED, ""}
+	};
 };
 
 struct InputC {

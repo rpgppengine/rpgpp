@@ -17,13 +17,8 @@ private:
 	bool lock;
 	/** Id for the next room. */
 	std::string deferredRoomId;
+	/** Whether there will be a deferred change of Room event. */
 	bool deferRoomChange;
-	/** Frame counter for transition tween */
-	int frameCounter;
-	bool transitionActive;
-	Color transitionColor;
-	float alpha;
-	bool transitionSecondStage;
 
 public:
 	/** Empty constructor. */

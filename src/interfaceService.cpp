@@ -16,6 +16,12 @@
 ElementFactory InterfaceService::factory = {};
 
 InterfaceService::InterfaceService() {
+	this->frameCounter = 0;
+	this->transitionActive = false;
+	this->transitionColor = Color{0, 0, 0, 1};
+	this->alpha = 0.0f;
+	this->transitionSecondStage = false;
+
 	fpsVisible = false;
 
 	TweenProvider::setupTweenFuncs();
@@ -83,7 +89,7 @@ void InterfaceService::showInterface(const std::string &title, bool runScript) {
 		currentViewName = title;
 		notifyLock = true;
 
-		auto& worldServiceRef = Game::getWorld();
+		auto &worldServiceRef = Game::getWorld();
 
 		if (worldServiceRef.getIfRoomExist()) {
 			worldServiceRef.getPlayer().setMovementLock(true);
@@ -117,13 +123,56 @@ void InterfaceService::hideInterface(bool runScript) {
 
 ElementFactory &InterfaceService::getFactory() { return factory; }
 
+void InterfaceService::doFadeTransition() {
+	this->transitionActive = true;
+	this->frameCounter = 0;
+	this->transitionColor = Color{0, 0, 0, 1};
+	this->alpha = 0.0f;
+	this->transitionSecondStage = false;
+}
+
 void InterfaceService::setNotifyLock() { notifyLock = true; }
 
 bool InterfaceService::getNotifyLock() { return notifyLock; }
 
 KeyboardKey InterfaceService::getLastKey() { return lastKey; }
 
+void InterfaceService::updateFade() {
+	if (transitionActive) {
+		frameCounter++;
+		if (frameCounter >= 2) {
+			frameCounter = 0;
+			if (!transitionSecondStage) {
+				if (alpha < 1.0f) {
+					alpha += 0.02f;
+					transitionColor = Fade(transitionColor, alpha);
+				} else {
+					transitionSecondStage = true;
+
+					// halfpoint callback
+					onTransitionPoint();
+					onTransitionPoint = nullptr;
+				}
+			} else {
+				if (alpha > 0.0f) {
+					alpha -= 0.02f;
+					transitionColor = Fade(transitionColor, alpha);
+				} else {
+					transitionActive = false;
+					transitionSecondStage = false;
+				}
+			}
+		}
+	}
+}
+
+void InterfaceService::setTransitionPointCallback(std::function<void()> callback) {
+	this->onTransitionPoint = callback;
+}
+
 void InterfaceService::update() {
+	updateFade();
+
 	if (IsKeyPressed(KEY_Q)) {
 		fpsVisible = !fpsVisible;
 	}
@@ -162,6 +211,11 @@ void InterfaceService::draw() {
 
 	if (views.count(currentViewName) > 0) {
 		views.at(currentViewName)->draw();
+	}
+
+	if (transitionActive) {
+		DrawRectangleRec(Rectangle{0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())},
+						 transitionColor);
 	}
 }
 

@@ -28,6 +28,14 @@ private:
 	/** Last KeyboardKey. */
 	KeyboardKey lastKey = KEY_NULL;
 
+	/** Frame counter for transition tween */
+	int frameCounter;
+	bool transitionActive;
+	Color transitionColor;
+	float alpha;
+	bool transitionSecondStage;
+	std::function<void()> onTransitionPoint;
+
 public:
 	/** Empty constructor. */
 	InterfaceService();
@@ -52,6 +60,14 @@ public:
 	KeyboardKey getLastKey();
 	/** Get a reference to the factory helper. */
 	static ElementFactory &getFactory();
+
+	/** Active a fade transition. */
+	void doFadeTransition();
+	/** Update transition routine. */
+	void updateFade();
+	/** Set transition point callback. */
+	void setTransitionPointCallback(std::function<void()> callback);
+
 	/** Update routine. */
 	void update();
 	/** Draw routine. */

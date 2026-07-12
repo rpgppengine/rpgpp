@@ -9,10 +9,6 @@
 #include "rttr/policy.h"
 
 RTTR_REGISTRATION {
-	rttr::registration::enumeration<CallbackType>("CallbackType")(rttr::value("callback_focused", CALLBACK_FOCUSED),
-																  rttr::value("callback_unfocused", CALLBACK_UNFOCUSED),
-																  rttr::value("callback_trigger", CALLBACK_TRIGGER));
-
 	rttr::registration::class_<Rectangle>("Rectangle")
 		.constructor<>()
 		.property("x", &Rectangle::x)(rttr::policy::prop::bind_as_ptr)
