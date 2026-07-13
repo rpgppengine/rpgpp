@@ -68,6 +68,8 @@ public:
 	void swapElements(ElementIndex a, ElementIndex b);
 	void resetElements();
 
+	ElementIndex getSize();
+
 	virtual void onNotify(Event event);
 	virtual void update();
 	virtual void draw();

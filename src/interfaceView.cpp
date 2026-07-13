@@ -265,6 +265,14 @@ UIElement *InterfaceView::cloneElement(const std::string &title, const std::stri
 	UIElement *newElement = getElement(newIndex);
 	newElement->props = ptr->props;
 
+	ElementIndex elemIndex = findByName(title);
+	ElementIndex cnt = size - elemIndex;
+
+	for (ElementIndex i = elemIndex; i < size; i++) {
+		elements[i].swap(elements[newIndex]);
+		elementNames[i].swap(elementNames[newIndex]);
+	}
+
 	return newElement;
 }
 
@@ -274,6 +282,10 @@ void InterfaceView::resetElements() {
 		elements[element]->props = elementBin.props;
 		elements[element]->config();
 	}
+}
+
+ElementIndex InterfaceView::getSize() {
+	return size;
 }
 
 void InterfaceView::onNotify(Event event) {
@@ -295,7 +307,18 @@ void InterfaceView::update() {
 }
 
 void InterfaceView::draw() {
+	/*
 	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
+		auto element = getElement(i);
+		if (element != nullptr) {
+			drawEntity(i);
+		}
+	}
+	*/
+	//printf("%i \n", static_cast<ElementIndex>(size));
+	for (ElementIndex i = static_cast<ElementIndex>(size - 1); i >= 0; i--) {
+		if (i == MAX_ELEMENTS) break;
+		printf("%i \n", i);
 		auto element = getElement(i);
 		if (element != nullptr) {
 			drawEntity(i);

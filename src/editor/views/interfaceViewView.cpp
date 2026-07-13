@@ -82,7 +82,8 @@ void InterfaceViewView::drawCanvas() {
 	const float nameSpacing = 0.5f;
 
 	// entities
-	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
+	for (ElementIndex i = ptr->getSize() - 1; i >= 0; i--) {
+		if (i == MAX_ELEMENTS) break;
 		auto element = ptr->getElement(i);
 		if (element != nullptr) {
 			auto &name = ptr->getEntityName(i);
