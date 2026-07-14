@@ -142,7 +142,6 @@ void Interactable::interact() {
 	if (Game::getBin().scripts.count(intBin.scriptPath) != 0) {
 		auto bc = Game::getBin().scripts[intBin.scriptPath].bytecode;
 		auto result = state.safe_script(bc, &sol::script_pass_on_error);
-		// auto unsafe_result = state.unsafe_script(bc);
 
 		if (!result.valid()) {
 			sol::error error = result;

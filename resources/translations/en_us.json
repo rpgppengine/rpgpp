@@ -232,6 +232,10 @@
 		"init_element": {
 			"title": "Create Element",
 			"elm_name": "Element Name"
+		},
+		"rename_element": {
+			"title": "Rename Element",
+			"rename": "Rename"
 		}
 	},
 	"widget": {

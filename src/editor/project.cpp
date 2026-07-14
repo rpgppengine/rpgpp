@@ -73,6 +73,9 @@ Project::Project(const std::string &path) {
 std::string Project::create(const std::string &dirPath, const std::string &title) {
 	Project p;
 	p.getProgramSettings().projectTitle = title;
+	p.getProgramSettings().programIconPath = "logo-sq.png";
+	p.getGameSettings().defaultLoadingPath = "mainmenu";
+	p.getGameSettings().isLoadUi = true;
 	json j = p.toJson();
 	std::string fileContent = j.dump();
 

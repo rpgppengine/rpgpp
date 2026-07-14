@@ -15,6 +15,7 @@
 Game *Game::instance_ = nullptr;
 std::unique_ptr<GameData> Game::gameData = std::unique_ptr<GameData>{};
 bool Game::usesBin = false;
+bool Game::willClose = false;
 std::unique_ptr<StateService> Game::state = std::unique_ptr<StateService>{};
 std::unique_ptr<WorldService> Game::world = std::unique_ptr<WorldService>{};
 std::unique_ptr<InterfaceService> Game::ui = std::unique_ptr<InterfaceService>{};
@@ -127,6 +128,8 @@ SoundService &Game::getSounds() { return *sounds; }
 ScriptService &Game::getScripts() { return *scripts; }
 
 void Game::update() {
+	if (WindowShouldClose() || IsKeyPressed(KEY_ESCAPE)) willClose = true;
+
 	sounds->update();
 	world->update();
 	ui->update();
@@ -146,3 +149,11 @@ void Game::unload() {
 }
 
 void Game::setLua(sol::state_view lua) { scripts->setLua(lua); }
+
+void Game::closeGame() {
+	willClose = true;
+}
+
+bool Game::windowWillClose() {
+	return willClose;
+}

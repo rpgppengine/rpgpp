@@ -15,6 +15,7 @@
 #include "childWindows/projectSettingsWindow.hpp"
 #include "childWindows/settingsWindow.hpp"
 #include "childWindows/uiElementRefWindow.hpp"
+#include "childWindows/elementRenameWindow.hpp"
 
 ChildWindowSubService::ChildWindowSubService() { this->createWindows(); }
 
@@ -44,6 +45,8 @@ void ChildWindowSubService::createWindows() {
 	this->childWindows.try_emplace("edit_npatch", std::make_unique<NPatchInfoWindow>());
 
 	this->childWindows.try_emplace("create_ui_element", std::make_unique<ElementInitWindow>());
+
+	this->childWindows.try_emplace("rename_ui_element", std::make_unique<ElementRenameWindow>());
 }
 
 void ChildWindowSubService::openWindow(const std::string &windowName) {

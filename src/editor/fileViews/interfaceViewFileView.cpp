@@ -11,6 +11,7 @@
 #include "TGUI/Widgets/TreeView.hpp"
 #include "bindTranslation.hpp"
 #include "childWindows/elementInitWindow.hpp"
+#include "childWindows/elementRenameWindow.hpp"
 #include "editor.hpp"
 #include "interfaceView.hpp"
 #include "raylib.h"
@@ -155,6 +156,7 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	});
 
 	elementContextMenu = tgui::ContextMenu::create();
+	elementContextMenu->addMenuItem("Rename");
 	elementContextMenu->addMenuItem("Move Up");
 	elementContextMenu->addMenuItem("Move Down");
 	elementContextMenu->addMenuItem("Delete");
@@ -167,6 +169,20 @@ InterfaceViewFileView::InterfaceViewFileView() {
 		const auto interface = ptr->get();
 
 		auto screen = aurora::downcast<screens::ProjectScreen *>(Editor::instance->getGui().currentScreen.get());
+
+		if (item == "Rename") {
+			ElementIndex index = interface->findByName(selectedElement);
+
+			auto windowPtr = Editor::instance->getGui().getChildWindowSubService()->getWindow("rename_ui_element");
+			ElementRenameWindow* renameWindow = static_cast<ElementRenameWindow*>(windowPtr);
+
+			renameWindow->view = interface;
+			renameWindow->tree = treeView.get();
+			renameWindow->elementIndex = index;
+
+			renameWindow->init();
+			renameWindow->open();
+		}
 
 		if (item == "Move Up") {
 			ElementIndex index = interface->findByName(selectedElement);

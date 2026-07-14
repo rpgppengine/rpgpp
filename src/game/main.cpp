@@ -16,7 +16,7 @@ int main() {
 
 	SetTargetFPS(60);
 
-	while (!WindowShouldClose()) {
+	while (!Game::windowWillClose()) {
 		game.update();
 
 		BeginDrawing();

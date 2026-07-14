@@ -22,6 +22,7 @@ private:
 	static Game *instance_;
 	static std::unique_ptr<GameData> gameData;
 	static bool usesBin;
+	static bool willClose;
 	static std::unique_ptr<StateService> state;
 	static std::unique_ptr<WorldService> world;
 	static std::unique_ptr<InterfaceService> ui;
@@ -50,6 +51,9 @@ public:
 	static void unload();
 
 	static void setLua(sol::state_view lua);
+
+	static void closeGame();
+	static bool windowWillClose();
 };
 
 #endif

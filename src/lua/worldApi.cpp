@@ -18,4 +18,7 @@ void lua_world_set(sol::state_view lua) {
 	space.set_function("GetRoom", lua_world_getroom);
 	space.set_function<void(const std::string &)>("SetRoom", lua_world_setroom);
 	space.set_function("GetPlayer", lua_world_getplayer);
+
+	auto gameSpace = lua["Game"].get_or_create<sol::table>();
+	gameSpace.set_function("Close", &Game::closeGame);
 }
