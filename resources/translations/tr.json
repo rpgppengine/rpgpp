@@ -232,7 +232,12 @@
 		"init_element": {
 			"title": "Öğe Oluştur",
 			"elm_name": "Öğe Adı"
+		},
+		"rename_element": {
+			"title": "Öğeyi Yeniden Adlandır...",
+			"rename": "Yeniden Adlandır"		
 		}
+
 	},
 	"widget": {
 		"filechooser": {
