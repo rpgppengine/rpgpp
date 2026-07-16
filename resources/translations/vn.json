@@ -58,6 +58,9 @@
 		},
 		"project": {
 			"create_new_resource": "Tạo tài nguyên",
+			"filenotexist": {
+				"notice": "Tệp tin không tồn tại!"
+			},
 			"emptyview": {
 				"notice": "Chưa mở tệp tin nào, hoặc tệp tin chưa được hỗ trợ để mở!"
 			},
@@ -138,6 +141,9 @@
 				"script": "Tệp Script",
 				"on_touch": "Kích hoạt khi chạm?"
 			},
+			"viewsview": {
+				"create": "Tạo"
+			},
 			"toolbar": {
 				"play": "Chạy chương trình",
 				"build": "Dịch và tạo chương trình"
@@ -178,7 +184,7 @@
 			},
 			"game": {
 				"_label": "Trò chơi",
-				"default_room": "Room mặc định",
+				"default_load": "Room/UI mặc định",
 				"player_actor": "Actor người chơi",
 				"tile_size": "Kích cỡ Tile",
 				"debug_draw": "Vẽ gỡ lỗi",
@@ -230,6 +236,14 @@
 			"title": "Sửa danh sách",
 			"add": "Thêm",
 			"close": "Thoát"
+		},
+		"init_element": {
+			"title": "Tạo phần tử UI",
+			"elm_name": "Tên phân tử"
+		},
+		"rename_element": {
+			"title": "Đổi tên phần tử UI",
+			"rename": "Đổi tên"
 		}
 	},
 
@@ -250,7 +264,8 @@
 	"button": {
 		"go_back": "Quay lại",
 		"restart": "Khởi động lại",
-		"restart_later": "Khởi động lại sau"
+		"restart_later": "Khởi động lại sau",
+		"okay": "Ok"
 	},
 	"context_menu": {
 		"copy_full_path": "Sao chép đường dẫn",
