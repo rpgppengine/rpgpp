@@ -22,7 +22,7 @@ static const Rectangle portraitDiagAreaRect =
 static const Rectangle optionsRect =
 	Rectangle{diagImageRect.x + (diagImageRect.width - 180), diagImageRect.y - 8 - 180, 180, 180};
 
-DialogueInterfaceView::DialogueInterfaceView() : InterfaceView(Rectangle{}) {}
+DialogueInterfaceView::DialogueInterfaceView() : InterfaceView() {}
 
 DialogueInterfaceView::DialogueInterfaceView(const std::string &filePath) : InterfaceView(filePath) {}
 

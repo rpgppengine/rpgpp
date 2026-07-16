@@ -52,5 +52,3 @@ void UIElement::onNotify(Event event) {
 		}
 	}
 }
-
-void UIElement::fromBin(UIElement &bin) { props = bin.props; }

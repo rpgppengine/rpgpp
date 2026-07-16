@@ -1,8 +1,6 @@
-# Lua API Reference
+# Actor
 
-## Actor
-
-### ChangeAnimation
+## ChangeAnimation
 
 
 ```lua
@@ -11,7 +9,7 @@
 
  Change the Actor's current animation and play it.
 
-### GetPosition
+## GetPosition
 
 
 ```lua
@@ -21,7 +19,7 @@
 
  Get the Actor's position
 
-### GetTilePosition
+## GetTilePosition
 
 
 ```lua
@@ -30,7 +28,7 @@
 
  Get this Actor's tile position.
 
-### MoveByVelocity
+## MoveByVelocity
 
 
 ```lua
@@ -39,7 +37,7 @@
 
  Move the Actor using a velocity vector.
 
-### PlayAnimation
+## PlayAnimation
 
 
 ```lua
@@ -48,7 +46,7 @@
 
  Temporarily play an animation.
 
-### SetPosition
+## SetPosition
 
 
 ```lua
@@ -57,7 +55,7 @@
 
  Set this Actor's position.
 
-### SetTilePosition
+## SetTilePosition
 
 
 ```lua
@@ -69,9 +67,9 @@
 
 ---
 
-## ActorContainer
+# ActorContainer
 
-### Exists
+## Exists
 
 
 ```lua
@@ -81,7 +79,7 @@
 
  Whether an Actor with such a name exists in the current room.
 
-### Get
+## Get
 
 
 ```lua
@@ -91,7 +89,7 @@
 
  Get an Actor by its in-room name.
 
-### Push
+## Push
 
 
 ```lua
@@ -100,7 +98,7 @@
 
  Add a new Actor at this tile position of this type. It will have this in-room name.
 
-### Remove
+## Remove
 
 
 ```lua
@@ -112,23 +110,23 @@
 
 ---
 
-## CollisionsContainer
+# CollisionsContainer
 
-### Exists
+## Exists
 
 
 ```lua
 (method) CollisionsContainer:Exists(item: Vector2)
 ```
 
-### Push
+## Push
 
 
 ```lua
 (method) CollisionsContainer:Push(item: Vector2)
 ```
 
-### Remove
+## Remove
 
 
 ```lua
@@ -138,18 +136,35 @@
 
 ---
 
-## Direction
+# Direction
 
 
 ---
 
-## GameState
+# Game
+
+ The Game namespace is responsible for maanging the state of the program itself
+
+
+## Close
+
+
+```lua
+function Game.Close()
+```
+
+ Closes the game.
+
+
+---
+
+# GameState
 
  The StateService is responsible for storing gameplay-related variables
  that make up the state of the game.
 
 
-### Get
+## Get
 
 
 ```lua
@@ -159,7 +174,7 @@ function GameState.Get(prop: string)
 
  Get a property
 
-### Set
+## Set
 
 
 ```lua
@@ -171,9 +186,9 @@ function GameState.Set(prop: string, value: any)
 
 ---
 
-## Interactable
+# Interactable
 
-### GetPosition
+## GetPosition
 
 
 ```lua
@@ -183,7 +198,7 @@ function GameState.Set(prop: string, value: any)
 
  Get the World position of this Interactable
 
-### GetType
+## GetType
 
 
 ```lua
@@ -193,7 +208,7 @@ function GameState.Set(prop: string, value: any)
 
  Get this Interactable's type
 
-### IsOnTouch
+## IsOnTouch
 
 
 ```lua
@@ -203,16 +218,16 @@ function GameState.Set(prop: string, value: any)
 
  Whether this Interactable is set to be interacted with on player collision or not.
 
-### SetOnTouch
+## SetOnTouch
 
 
 ```lua
 (method) Interactable:SetOnTouch(value: boolean)
 ```
 
- Set whether this interactable will be invoked when player touches it. 
+ Set whether this interactable will be invoked when player touches it.
 
-### SetProp
+## SetProp
 
 
 ```lua
@@ -221,7 +236,7 @@ function GameState.Set(prop: string, value: any)
 
  Set an Interactable's property
 
-### SetType
+## SetType
 
 
 ```lua
@@ -233,16 +248,16 @@ function GameState.Set(prop: string, value: any)
 
 ---
 
-## InteractablesContainer
+# InteractablesContainer
 
-### Exists
+## Exists
 
 
 ```lua
 (method) InteractablesContainer:Exists(pos: Vector2)
 ```
 
-### GetAt
+## GetAt
 
 
 ```lua
@@ -250,14 +265,14 @@ function GameState.Set(prop: string, value: any)
   -> Interactable
 ```
 
-### Push
+## Push
 
 
 ```lua
 (method) InteractablesContainer:Push(pos: Vector2, type: string)
 ```
 
-### Remove
+## Remove
 
 
 ```lua
@@ -267,12 +282,21 @@ function GameState.Set(prop: string, value: any)
 
 ---
 
-## Interface
+# Interface
 
  The InterfaceService acts for the User Interface (UI).
 
 
-### OpenDialogue
+## GetCurrentView
+
+
+```lua
+function Interface.GetCurrentView()
+```
+
+ Get a reference to the current UI View.
+
+## OpenDialogue
 
 
 ```lua
@@ -281,12 +305,59 @@ function Interface.OpenDialogue(dialogue: string)
 
  Open a dialogue with a certain title.
 
+## OpenView
+
+
+```lua
+function Interface.OpenView(title: string)
+```
+
+ Open the UI View identified by this title.
+
 
 ---
 
-## Player
+# InterfaceView
 
-### GetActor
+## ChangeFocus
+
+
+```lua
+(method) InterfaceView:ChangeFocus(name: string)
+```
+
+ Change focus to another UI element.
+
+## GetEntity
+
+
+```lua
+(method) InterfaceView:GetEntity(name: string)
+  -> UIElement
+```
+
+ Get an element from the UI View.
+
+## Reset
+
+
+```lua
+(method) InterfaceView:Reset()
+```
+
+ Reset the elements to their original positions and sizes.
+
+
+---
+
+# LuaLS
+
+
+---
+
+# Player
+
+## GetActor
 
 
 ```lua
@@ -296,7 +367,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get the player's actor.
 
-### GetPosition
+## GetPosition
 
 
 ```lua
@@ -306,7 +377,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get the player's position
 
-### GetTilePosition
+## GetTilePosition
 
 
 ```lua
@@ -315,7 +386,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get this player's tile position.
 
-### MoveByVelocity
+## MoveByVelocity
 
 
 ```lua
@@ -324,7 +395,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Move the Actor using a velocity vector.
 
-### SetPosition
+## SetPosition
 
 
 ```lua
@@ -333,7 +404,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Set this player's position.
 
-### SetTilePosition
+## SetTilePosition
 
 
 ```lua
@@ -345,9 +416,9 @@ function Interface.OpenDialogue(dialogue: string)
 
 ---
 
-## Prop
+# Prop
 
-### GetInteractable
+## GetInteractable
 
 
 ```lua
@@ -357,7 +428,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get the Interactable of this Prop.
 
-### GetPosition
+## GetPosition
 
 
 ```lua
@@ -367,7 +438,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get the absolute world position of this Prop.
 
-### GetTilePosition
+## GetTilePosition
 
 
 ```lua
@@ -377,7 +448,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get the tile position of this Prop.
 
-### SetPosition
+## SetPosition
 
 
 ```lua
@@ -386,7 +457,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Set the absolute world position of this Prop.
 
-### SetTilePosition
+## SetTilePosition
 
 
 ```lua
@@ -398,16 +469,16 @@ function Interface.OpenDialogue(dialogue: string)
 
 ---
 
-## PropsContainer
+# PropsContainer
 
-### Exists
+## Exists
 
 
 ```lua
 (method) PropsContainer:Exists(pos: Vector2)
 ```
 
-### GetAt
+## GetAt
 
 
 ```lua
@@ -415,14 +486,14 @@ function Interface.OpenDialogue(dialogue: string)
   -> Prop
 ```
 
-### Push
+## Push
 
 
 ```lua
 (method) PropsContainer:Push(pos: Vector2, type: string)
 ```
 
-### Remove
+## Remove
 
 
 ```lua
@@ -432,9 +503,9 @@ function Interface.OpenDialogue(dialogue: string)
 
 ---
 
-## Room
+# Room
 
-### GetActors
+## GetActors
 
 
 ```lua
@@ -444,7 +515,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get a refernece to the collection of Actors.
 
-### GetCollisions
+## GetCollisions
 
 
 ```lua
@@ -454,7 +525,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get a reference to the CollisionsContainer of this Room.
 
-### GetInteractables
+## GetInteractables
 
 
 ```lua
@@ -464,7 +535,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get a reference to the InteractablesContainer of this Room.
 
-### GetPlayer
+## GetPlayer
 
 
 ```lua
@@ -474,7 +545,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get a reference to the Player object.
 
-### GetProps
+## GetProps
 
 
 ```lua
@@ -484,7 +555,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Get a reference to the PropsContainer of this Room.
 
-### GetStartTile
+## GetStartTile
 
 
 ```lua
@@ -494,7 +565,7 @@ function Interface.OpenDialogue(dialogue: string)
 
  Set the start tile position.
 
-### GetTileMap
+## GetTileMap
 
 
 ```lua
@@ -507,12 +578,12 @@ function Interface.OpenDialogue(dialogue: string)
 
 ---
 
-## Sounds
+# Sounds
 
  The SoundService is responsible for playing sounds and managing the current background music
 
 
-### LoadMusic
+## LoadMusic
 
 
 ```lua
@@ -521,7 +592,7 @@ function Sounds.LoadMusic(music: string)
 
  Load the music with the specified id.
 
-### PlayMusic
+## PlayMusic
 
 
 ```lua
@@ -530,7 +601,7 @@ function Sounds.PlayMusic()
 
  Play the loaded music.
 
-### PlaySound
+## PlaySound
 
 
 ```lua
@@ -542,9 +613,9 @@ function Sounds.PlaySound(sound: string)
 
 ---
 
-## TileMap
+# TileMap
 
-### GetWorldSizeInTiles
+## GetWorldSizeInTiles
 
 
 ```lua
@@ -554,7 +625,7 @@ function Sounds.PlaySound(sound: string)
 
  Get the size of this TileMap in tiles.
 
-### SetEmptyTile
+## SetEmptyTile
 
 
 ```lua
@@ -563,7 +634,7 @@ function Sounds.PlaySound(sound: string)
 
  Set the tile at the specified world position to be empty (not drawn).
 
-### SetTile
+## SetTile
 
 
 ```lua
@@ -576,9 +647,28 @@ function Sounds.PlaySound(sound: string)
 
 ---
 
-## Vector2
+# TweenType
 
-### new
+
+---
+
+# UIElement
+
+## Tween
+
+
+```lua
+(method) UIElement:Tween(property: string, value: any, duration: number, tweenType: TweenType)
+```
+
+ Tween this element.
+
+
+---
+
+# Vector2
+
+## new
 
 
 ```lua
@@ -587,7 +677,7 @@ function Vector2.new(x: number, y: number)
 
  Construct a new `Vector2`
 
-### x
+## x
 
 
 ```lua
@@ -596,7 +686,7 @@ number
 
 The x coordinate
 
-### y
+## y
 
 
 ```lua
@@ -608,36 +698,36 @@ The y coordinate
 
 ---
 
-## WorldService
+# World
 
  The WorldService is responsible for containing and drawing the Room.
 
 
-### GetPlayer
+## GetPlayer
 
 
 ```lua
-function WorldService.GetPlayer()
+function World.GetPlayer()
   -> Player
 ```
 
  Get the Player.
 
-### GetRoom
+## GetRoom
 
 
 ```lua
-function WorldService.GetRoom()
+function World.GetRoom()
   -> Room
 ```
 
  Get the current Room
 
-### SetRoom
+## SetRoom
 
 
 ```lua
-function WorldService.SetRoom(room: string)
+function World.SetRoom(room: string)
 ```
 
  Set the current room using a room title in the game.

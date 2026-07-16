@@ -1,18 +1,18 @@
 --- The WorldService is responsible for containing and drawing the Room.
 ---
---- @class WorldService
-local WorldService = {}
+--- @class World
+local World = {}
 
 --- Get the Player.
 --- @return Player
-function WorldService.GetPlayer() end
+function World.GetPlayer() end
 
 --- Set the current room using a room title in the game.
 --- @param room string
-function WorldService.SetRoom(room) end
+function World.SetRoom(room) end
 
 --- Get the current Room
 --- @return Room
-function WorldService.GetRoom() end
+function World.GetRoom() end
 
-return WorldService
+return World

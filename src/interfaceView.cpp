@@ -23,17 +23,13 @@
 #include "tween.hpp"
 #include "uiTypesApi.hpp"
 
-InterfaceView::InterfaceView() : InterfaceView(Rectangle{}) {}
-
-InterfaceView::InterfaceView(Rectangle rect) {
-	this->rect = rect;
-
+InterfaceView::InterfaceView() {
 	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
 		availableIds.push(i);
 	}
 }
 
-InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectangle{}) {
+InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView() {
 	std::string fileText = LoadFileText(filePath.c_str());
 
 	auto j = json::parse(fileText);
@@ -56,7 +52,7 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView(Rectan
 	}
 }
 
-InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView(Rectangle{}) {
+InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView() {
 	this->bin = bin;
 
 	for (auto &[title, elementBin] : bin.elements) {
