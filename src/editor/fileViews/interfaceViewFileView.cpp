@@ -159,6 +159,8 @@ InterfaceViewFileView::InterfaceViewFileView() {
 	elementContextMenu->addMenuItem("Rename");
 	elementContextMenu->addMenuItem("Move Up");
 	elementContextMenu->addMenuItem("Move Down");
+	elementContextMenu->addMenuItem("Move to Top");
+	elementContextMenu->addMenuItem("Move to Bottom");
 	elementContextMenu->addMenuItem("Delete");
 	elementContextMenu->onMenuItemClick([this, weakTree](const std::vector<tgui::String> &hierarchy) {
 		if (hierarchy.empty()) return;
@@ -213,6 +215,44 @@ InterfaceViewFileView::InterfaceViewFileView() {
 			};
 			action->onUndo = [this, interface, index] {
 				interface->swapElements(index, index + 1);
+
+				populateTree();
+			};
+
+			screen->getCurrentFile().getView().pushAction(std::move(action));
+		}
+
+		if (item == "Move to Top") {
+			ElementIndex index = interface->findByName(selectedElement);
+
+			auto action = std::make_unique<Action>();
+			action->onAction = [this, interface, index] {
+				interface->moveToPosition(index, 0);
+
+				populateTree();
+			};
+			action->onUndo = [this, interface, index] {
+				interface->moveToPosition(0, index);
+
+				populateTree();
+			};
+
+			screen->getCurrentFile().getView().pushAction(std::move(action));
+		}
+
+		if (item == "Move to Bottom") {
+			ElementIndex index = interface->findByName(selectedElement);
+
+			auto interfaceSize = interface->getSize();
+
+			auto action = std::make_unique<Action>();
+			action->onAction = [this, interface, index, interfaceSize] {
+				interface->moveToPosition(index, interfaceSize - 1);
+
+				populateTree();
+			};
+			action->onUndo = [this, interface, index, interfaceSize] {
+				interface->moveToPosition(interfaceSize - 1, index);
 
 				populateTree();
 			};

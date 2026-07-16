@@ -176,7 +176,7 @@
 			},
 			"game": {
 				"_label": "Game",
-				"default_load": "Default Room/UI Element",
+				"default_load": "Default Room/UI View",
 				"player_actor": "Player Actor",
 				"tile_size": "Tile Size",
 				"debug_draw": "Debug Draw",

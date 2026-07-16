@@ -167,7 +167,7 @@ void InterfaceView::removeElement(const std::string &title) {
 		size--;
 
 		ElementIndex j = i;
-		UIElement* elem = getElement(j + 1);
+		UIElement *elem = getElement(j + 1);
 		while (elem != nullptr) {
 			elements[j].swap(elements[j + 1]);
 			elementNames[j].swap(elementNames[j + 1]);
@@ -206,6 +206,23 @@ void InterfaceView::swapElements(ElementIndex a, ElementIndex b) {
 
 	elements[a].swap(elements[b]);
 	elementNames[a].swap(elementNames[b]);
+}
+
+void InterfaceView::moveToPosition(ElementIndex source, ElementIndex dest)  {
+	ElementIndex i = source;
+	while (i != dest) {
+		if (dest > source) {
+			elements[i].swap(elements[i + 1]);
+			elementNames[i].swap(elementNames[i + 1]);
+
+			i++;
+		} else if (dest < source) {
+			elements[i].swap(elements[i - 1]);
+			elementNames[i].swap(elementNames[i - 1]);
+
+			i--;
+		}
+	}
 }
 
 void InterfaceView::changeFocusedElement(const std::string &title) {
@@ -284,9 +301,7 @@ void InterfaceView::resetElements() {
 	}
 }
 
-ElementIndex InterfaceView::getSize() {
-	return size;
-}
+ElementIndex InterfaceView::getSize() { return size; }
 
 void InterfaceView::onNotify(Event event) {
 	if (currentElement < MAX_ELEMENTS) {
@@ -307,15 +322,6 @@ void InterfaceView::update() {
 }
 
 void InterfaceView::draw() {
-	/*
-	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
-		auto element = getElement(i);
-		if (element != nullptr) {
-			drawEntity(i);
-		}
-	}
-	*/
-	//printf("%i \n", static_cast<ElementIndex>(size));
 	for (ElementIndex i = static_cast<ElementIndex>(size - 1); i >= 0; i--) {
 		if (i == MAX_ELEMENTS) break;
 		printf("%i \n", i);
