@@ -280,8 +280,9 @@ UIElement *InterfaceView::cloneElement(const std::string &title, const std::stri
 
 	ElementIndex elemIndex = findByName(title);
 	ElementIndex cnt = size - elemIndex;
+	ElementIndex upper = static_cast<ElementIndex>(size);
 
-	for (ElementIndex i = elemIndex; i < size; i++) {
+	for (ElementIndex i = elemIndex; i < upper; i++) {
 		elements[i].swap(elements[newIndex]);
 		elementNames[i].swap(elementNames[newIndex]);
 	}
