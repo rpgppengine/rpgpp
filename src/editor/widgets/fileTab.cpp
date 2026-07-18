@@ -52,14 +52,28 @@ tgui::TabsBase::Tab *FileTab::getTabId(const std::string fileName) {
 	auto tab = std::find_if(m_tabs.begin(), m_tabs.end(),
 							[fileName](const tgui::TabsBase::Tab tab) { return tab.id == fileName; });
 	if (tab == m_tabs.end()) return nullptr;
+
+#if defined(__WIN64)
+	return tab._Ptr;
+#elif defined(__linux__)
 	return tab.base();
+#else
+	return nullptr;
+#endif
 }
 
 tgui::TabsBase::Tab *FileTab::getTabName(const std::string fileName) {
 	auto tab = std::find_if(m_tabs.begin(), m_tabs.end(),
 							[fileName](const tgui::TabsBase::Tab tab) { return tab.text.getString() == fileName; });
 	if (tab == m_tabs.end()) return nullptr;
+
+#if defined(__WIN64)
+	return tab._Ptr;
+#elif defined(__linux__)
 	return tab.base();
+#else
+	return nullptr;
+#endif
 }
 
 void FileTab::closeTabFilename(const std::string fileName) {

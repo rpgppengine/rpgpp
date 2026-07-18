@@ -204,7 +204,7 @@ void InterfaceView::swapElements(ElementIndex a, ElementIndex b) {
 	elementNames[a].swap(elementNames[b]);
 }
 
-void InterfaceView::moveToPosition(ElementIndex source, ElementIndex dest)  {
+void InterfaceView::moveToPosition(ElementIndex source, ElementIndex dest) {
 	ElementIndex i = source;
 	while (i != dest) {
 		if (dest > source) {
@@ -320,7 +320,7 @@ void InterfaceView::update() {
 void InterfaceView::draw() {
 	for (ElementIndex i = static_cast<ElementIndex>(size - 1); i >= 0; i--) {
 		if (i == MAX_ELEMENTS) break;
-		printf("%i \n", i);
+
 		auto element = getElement(i);
 		if (element != nullptr) {
 			drawEntity(i);

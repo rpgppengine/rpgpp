@@ -25,6 +25,8 @@ public:
 
 	void update();
 	void draw();
+
+	void removeOptionButtons();
 };
 
 #endif

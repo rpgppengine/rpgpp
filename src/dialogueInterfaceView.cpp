@@ -37,6 +37,15 @@ void DialogueInterfaceView::setDialogue(DialogueBin dialogue) {
 	}
 }
 
+void DialogueInterfaceView::removeOptionButtons() {
+	if (optionsCount > 0) {
+		for (int i = 0; i < optionsCount; i++) {
+			std::string elementName = TextFormat("option-%i", i);
+			removeElement(elementName);
+		}
+	}
+}
+
 void DialogueInterfaceView::onNotify(Event event) {
 	InterfaceView::onNotify(event);
 
@@ -79,17 +88,15 @@ void DialogueInterfaceView::onNotify(Event event) {
 					input.upButton.title = TextFormat("option-%i", i - 1);
 					input.downButton.title = TextFormat("option-%i", i + 1);
 
-					newButton->callbacks[CALLBACK_TRIGGER] = [this, &option] {
+					newButton->callbacks[CALLBACK_TRIGGER] = [&option] {
 						if (Game::isUsingBin()) {
 							Game::getUi().hideInterface(false);
 							Game::getUi().showDialogue(option.nextDialogue, false);
 							Game::getUi().setNotifyLock();
-							if (optionsCount > 0) {
-								for (int i = 0; i < optionsCount; i++) {
-									std::string elementName = TextFormat("option-%i", i);
-									removeElement(elementName);
-								}
-							}
+
+							auto viewPtr = static_cast<DialogueInterfaceView *>(Game::getUi().getCurrentView());
+
+							viewPtr->removeOptionButtons();
 						}
 					};
 

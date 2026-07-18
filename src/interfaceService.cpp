@@ -99,7 +99,6 @@ void InterfaceService::showInterface(const std::string &title, bool runScript) {
 
 		auto &env = views[title]->getLuaEnvironment();
 		if (views[title]->hasScript()) {
-			printf("has script.. \n");
 			if (env["open"].is<sol::function>() && runScript) {
 				env["open"]();
 			}
