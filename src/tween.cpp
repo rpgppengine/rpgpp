@@ -122,7 +122,7 @@ float inQuint(float t) { return t * t * t * t * t; }
 
 float outQuint(float t) { return 1 - std::pow(1 - t, 5); }
 
-float inOutQuint(float t) { return t < 0.5f ? 16 * t * t * t * t * t : 1 - std::pow(-2 * t + 2, 5) / 2; }
+float inOutQuint(float t) { return t < 0.5f ? 16.0f * t * t * t * t * t : 1 - std::pow(-2 * t + 2, 5) / 2.0f; }
 
 float inExpo(float t) { return t == 0 ? 0 : std::pow(2, 10 * t - 10); }
 
