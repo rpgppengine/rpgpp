@@ -6,6 +6,7 @@
 #include <sol/forward.hpp>
 #include <sol/sol.hpp>	// FIXME : lua.h not found
 #include <stdexcept>
+#include <string>
 
 #include "gamedata.hpp"
 #include "scriptService.hpp"
@@ -14,6 +15,7 @@
 Game *Game::instance_ = nullptr;
 std::unique_ptr<GameData> Game::gameData = std::unique_ptr<GameData>{};
 bool Game::usesBin = false;
+bool Game::willClose = false;
 std::unique_ptr<StateService> Game::state = std::unique_ptr<StateService>{};
 std::unique_ptr<WorldService> Game::world = std::unique_ptr<WorldService>{};
 std::unique_ptr<InterfaceService> Game::ui = std::unique_ptr<InterfaceService>{};
@@ -37,9 +39,18 @@ Game &Game::instance() {
 	return *instance_;
 }
 
-void Game::init() {
+Game *Game::instancePtr() { return instance_; }
+
+void Game::init(bool usesBin) {
 	gameData = std::make_unique<GameData>();
-	usesBin = false;
+	Game::usesBin = false;
+
+	if (usesBin) {
+		std::string filePath = "game.bin";
+		gameData = std::make_unique<GameData>(deserializeFile(filePath));
+		Game::usesBin = true;
+	}
+
 	resources = std::make_unique<ResourceService>();
 	state = std::make_unique<StateService>();
 	world = std::make_unique<WorldService>();
@@ -55,7 +66,7 @@ void Game::useBin(const std::string &filePath) {
 	usesBin = true;
 
 	// resources
-	resources->init();
+	// resources->init();
 
 	/// Setup program
 	SetWindowTitle(gameData->title.c_str());
@@ -76,13 +87,23 @@ void Game::useBin(const std::string &filePath) {
 	SetWindowIcon(iconImage);
 
 	UnloadImage(iconImage);
-	///
+
+	/// Setup Interfaces
+	ui->initBin(*gameData);
 
 	/// Select the default room from the settings
-	if (gameData->gameSet.defaultRoomPath.empty()) {
+
+	// Thefirey33:
+	// Decided on a very hybrid system that allows the user to load a Room or an UIElement at first.
+	// Had an idea where some games might want the player to immediately start without a main menu, as some RPG games do want to do that.
+	if (gameData->gameSet.isLoadUi) {
+		ui->showInterface(GetFileNameWithoutExt(gameData->gameSet.defaultLoadingPath.c_str()));
+	}
+
+	if (gameData->gameSet.defaultLoadingPath.empty()) {
 		world->setRoomBin(gameData->rooms.at(0));
 	} else {
-		std::string chosenName = GetFileNameWithoutExt(gameData->gameSet.defaultRoomPath.c_str());
+		std::string chosenName = GetFileNameWithoutExt(gameData->gameSet.defaultLoadingPath.c_str());
 		for (auto &room : gameData->rooms) {
 			if (room.name == chosenName) {
 				world->setRoomBin(room);
@@ -107,6 +128,8 @@ SoundService &Game::getSounds() { return *sounds; }
 ScriptService &Game::getScripts() { return *scripts; }
 
 void Game::update() {
+	if (WindowShouldClose() || IsKeyPressed(KEY_ESCAPE)) willClose = true;
+
 	sounds->update();
 	world->update();
 	ui->update();
@@ -126,3 +149,11 @@ void Game::unload() {
 }
 
 void Game::setLua(sol::state_view lua) { scripts->setLua(lua); }
+
+void Game::closeGame() {
+	willClose = true;
+}
+
+bool Game::windowWillClose() {
+	return willClose;
+}

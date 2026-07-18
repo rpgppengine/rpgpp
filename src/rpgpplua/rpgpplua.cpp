@@ -19,8 +19,7 @@ extern "C"
 #ifdef _WIN32
 	__declspec(dllexport)
 #endif
-	int
-	luaopen_rpgpplua(lua_State *L) {
+	int luaopen_rpgpplua(lua_State *L) {
 	sol::state_view lua(L);
 	lua.set_function("printer", &printer);
 

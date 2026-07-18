@@ -10,13 +10,13 @@ int main() {
 	InitAudioDevice();
 
 	Game game;
-	game.init();
+	game.init(true);
 
 	game.useBin("game.bin");
 
 	SetTargetFPS(60);
 
-	while (!WindowShouldClose()) {
+	while (!Game::windowWillClose()) {
 		game.update();
 
 		BeginDrawing();

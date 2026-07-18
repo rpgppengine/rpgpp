@@ -9,6 +9,7 @@
 #include "editor.hpp"
 #include "raylib.h"
 #include "widgets/propertyFields/fieldConfig.hpp"
+
 FileField::FileField(const char *typeName, bool initRenderer) : tgui::SubwidgetContainer(typeName, initRenderer) {
 	label = tgui::Label::create("Label");
 	label->setHorizontalAlignment(tgui::HorizontalAlignment::Left);

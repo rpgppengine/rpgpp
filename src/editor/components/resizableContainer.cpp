@@ -84,25 +84,23 @@ bool ResizableContainer::leftMousePressed(tgui::Vector2f pos) {
 	return tgui::Group::leftMousePressed(pos);
 }
 
-void ResizableContainer::manualMouseMoved(tgui::Vector2f pos) {
-	auto absolutePos = pos - getPosition();
-
-	if (inEnabledGrabber(ResizeDirection::LEFT, absolutePos)) {
+void ResizableContainer::updateCursor(tgui::Vector2f absolutePos) {
+	if (inEnabledGrabber(ResizeDirection::LEFT, absolutePos) || inEnabledGrabber(ResizeDirection::RIGHT, absolutePos)) {
 		SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
 		cursorModified = true;
-	} else if (inEnabledGrabber(ResizeDirection::RIGHT, absolutePos)) {
-		SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
-		cursorModified = true;
-	} else if (inEnabledGrabber(ResizeDirection::TOP, absolutePos)) {
-		SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
-		cursorModified = true;
-	} else if (inEnabledGrabber(ResizeDirection::BOTTOM, absolutePos)) {
+	} else if (inEnabledGrabber(ResizeDirection::TOP, absolutePos) ||
+			   inEnabledGrabber(ResizeDirection::BOTTOM, absolutePos)) {
 		SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
 		cursorModified = true;
 	} else if (cursorModified) {
 		SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 		cursorModified = false;
 	}
+}
+
+void ResizableContainer::manualMouseMoved(tgui::Vector2f pos) {
+	auto absolutePos = pos - getPosition();
+	updateCursor(absolutePos);
 
 	tgui::Vector2f deltaMousePos = absolutePos - startMousePos;
 	if (grabbingFlag == static_cast<char>(ResizeDirection::LEFT)) {

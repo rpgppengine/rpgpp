@@ -8,6 +8,7 @@
 #include "TGUI/Widgets/Group.hpp"
 #include "TGUI/Widgets/Label.hpp"
 #include "widgets/propertyFields/fieldConfig.hpp"
+
 SelectField::SelectField(const char *typeName, bool initRenderer) : tgui::Group(typeName, initRenderer) {
 	label = tgui::Label::create("Label");
 	label->setHorizontalAlignment(tgui::HorizontalAlignment::Left);

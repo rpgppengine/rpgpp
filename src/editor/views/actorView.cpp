@@ -34,6 +34,7 @@ void ActorView::setActor(Actor *actor) {
 
 	this->atlasBox =
 		std::make_unique<ResizableCanvasBox>("atlasRect", actor->getCurrentAnimationRectangle(), BLUE, false);
+	this->onAttributeChanged.emit(this);
 
 	actor->resetAnimation();
 }
@@ -43,11 +44,15 @@ void ActorView::mouseMoved(tgui::Vector2f pos) {
 
 	const auto &mousePos = getMouseWorldPos();
 
-	collisionBox->mouseMoved(mousePos, RPGPP_DRAW_MULTIPLIER, RPGPP_DRAW_MULTIPLIER);
+	if (collisionBox->mouseMovedTrigger(mousePos, RPGPP_DRAW_MULTIPLIER, RPGPP_DRAW_MULTIPLIER)){
+		this->onAttributeChanged.emit(this);
+	}
 
 	const auto &tileSize = this->actor->getTileSet().getTileSize();
 
-	atlasBox->mouseMoved(mousePos, tileSize.x, tileSize.y);
+	if (atlasBox->mouseMovedTrigger(mousePos, tileSize.x, tileSize.y)){
+		this->onAttributeChanged.emit(this);
+	}
 
 	WorldView::mouseMoved(pos);
 }
@@ -67,6 +72,7 @@ bool ActorView::leftMousePressed(tgui::Vector2f pos) {
 void ActorView::setCollisionRect(const Rectangle &collision) {
 	this->actor->setCollisionRect(collision);
 	this->collisionBox->updateRec(collision);
+	this->onAttributeChanged.emit(this);
 }
 
 void ActorView::leftMouseReleased(tgui::Vector2f pos) {
@@ -88,7 +94,9 @@ void ActorView::leftMouseReleased(tgui::Vector2f pos) {
 	WorldView::leftMouseReleased(pos);
 }
 
-void ActorView::setAtlasRect(const Rectangle &rect) { this->atlasBox->updateRec(rect); }
+void ActorView::setAtlasRect(const Rectangle &rect) {
+	this->atlasBox->updateRec(rect);
+}
 
 void ActorView::drawCanvas() {
 	if (actor == nullptr || collisionBox == nullptr) {

@@ -42,6 +42,7 @@ ActorFileView::ActorFileView() {
 		actorView->setAtlasRect(actorView->actor->getCurrentAnimationRectangle());
 		frameEditor->updateFrameButtons(true);
 		actorView->actor->resetAnimation();
+		this->dirty = true;
 	};
 	propBox->addFileField(tileSetField);
 
@@ -55,6 +56,9 @@ ActorFileView::ActorFileView() {
 	frameEditor->setPosition({0, canvasHeight});
 	frameEditor->getRenderer()->setPadding(5);
 	frameEditor->setSize({rightPanelOffset, BOTTOM_ANIMATION_PANEL});
+	frameEditor->onAttributeChanged.connect([this]() {
+		this->dirty = true;
+	});
 
 	widgetContainer.push_back(frameEditor);
 	widgetContainer.push_back(propBox);
@@ -77,10 +81,15 @@ void ActorFileView::init(tgui::Group::Ptr layout, VariantWrapper *variant) {
 			this->actorView->setAtlasRect(actorView->actor->getCurrentAnimationRectangle());
 		};
 
+		actorView->onAttributeChanged.connect([this]{
+			this->dirty = true;
+		});
+
 		// NOTE: Always initialize this later. Otherwise, we might see
 		// flying ComboBoxes, John.
 		frameEditor->init();
 
 		addWidgets(layout);
+		this->dirty = false;
 	}
 }

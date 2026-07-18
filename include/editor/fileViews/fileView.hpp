@@ -13,12 +13,11 @@ class FileView {
 protected:
 	VariantWrapper *variant;
 	std::vector<tgui::Widget::Ptr> widgetContainer;
-	std::vector<std::unique_ptr<Action>> actions;
-	int currentAction = -1;
-	std::vector<std::unique_ptr<Action>>::iterator iter;
 
 	std::stack<std::unique_ptr<Action>> past;
 	std::stack<std::unique_ptr<Action>> future;
+
+	bool dirty = false;
 
 public:
 	bool fileViewFocused = false;
@@ -33,6 +32,9 @@ public:
 	void pushAction(std::unique_ptr<Action> action);
 	void undoAction();
 	void redoAction();
+
+	void setDirty(bool value = true);
+	bool getDirty();
 };
 
 #endif

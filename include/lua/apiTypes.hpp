@@ -17,5 +17,6 @@ struct lua_Vector2 {
 };
 
 void lua_types_set(sol::state_view lua);
+void lua_basic_types_set(sol::environment &env);
 
 #endif

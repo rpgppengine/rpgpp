@@ -4,12 +4,12 @@
 #include <cereal/types/array.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/string.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
 #include <fstream>
 
 #include "dialogueBalloon.hpp"
-#include "interactable.hpp"
-#include "raylib.h"
 
 template <class Archive>
 void serialize(Archive &a, IRect &b) {
@@ -19,11 +19,6 @@ void serialize(Archive &a, IRect &b) {
 template <class Archive>
 void serialize(Archive &a, IVector &b) {
 	a(b.x, b.y);
-}
-
-template <class Archive>
-void serialize(Archive &a, Color &b) {
-	a(b.a, b.r, b.g, b.b);
 }
 
 template <class Archive>
@@ -108,6 +103,18 @@ void serialize(Archive &a, DialogueBin &b) {
 }
 
 template <class Archive>
+void serialize(Archive &a, ScriptBin &b) {
+	a(b.bytecode);
+}
+
+/*
+	template <class Archive>
+void serialize(Archive &a, InterfaceViewBin &b) {
+		a(b.scriptSource, b.entites, b.elements);
+}
+ */
+
+template <class Archive>
 void serialize(Archive &a, ProjectProgramSettings &b) {
 	a(b.projectTitle, b.projectVersion, b.windowSize, b.programIconPath, b.windowResizeableFlag, b.windowStateFlag,
 	  b.targetFPS);
@@ -115,18 +122,13 @@ void serialize(Archive &a, ProjectProgramSettings &b) {
 
 template <class Archive>
 void serialize(Archive &a, ProjectGameSettings &b) {
-	a(b.defaultRoomPath, b.playerActorPath, b.tileSize, b.debugDraw, b.exportImageScales, b.exportFontSizes);
+	a(b.defaultLoadingPath, b.isLoadUi, b.playerActorPath, b.tileSize, b.debugDraw, b.exportImageScales, b.exportFontSizes);
 }
 
 template <class Archive>
 void serialize(Archive &a, GameData &b) {
 	a(b.title, b.programSet, b.gameSet, b.images, b.fonts, b.tilesets, b.rooms, b.actors, b.props, b.dialogues, b.music,
-	  b.interactables, b.scripts);
-}
-
-template <class Archive>
-void serialize(Archive &a, ScriptBin &b) {
-	a(b.bytecode);
+	  b.interactables, b.scripts, b.interfaceViews);
 }
 
 void serializeDataToFile(std::string fileName, GameData data) {

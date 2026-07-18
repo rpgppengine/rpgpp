@@ -22,6 +22,7 @@ private:
 	static Game *instance_;
 	static std::unique_ptr<GameData> gameData;
 	static bool usesBin;
+	static bool willClose;
 	static std::unique_ptr<StateService> state;
 	static std::unique_ptr<WorldService> world;
 	static std::unique_ptr<InterfaceService> ui;
@@ -32,6 +33,7 @@ private:
 public:
 	Game();
 	static Game &instance();
+	static Game *instancePtr();
 	static bool isUsingBin();
 	static void useBin(const std::string &filePath);
 	static GameData &getBin();
@@ -42,13 +44,16 @@ public:
 	static SoundService &getSounds();
 	static ScriptService &getScripts();
 
-	static void init();
+	static void init(bool useBin = false);
 
 	static void update();
 	static void draw();
 	static void unload();
 
 	static void setLua(sol::state_view lua);
+
+	static void closeGame();
+	static bool windowWillClose();
 };
 
 #endif

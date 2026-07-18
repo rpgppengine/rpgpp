@@ -17,17 +17,14 @@ private:
 	bool lock;
 	/** Id for the next room. */
 	std::string deferredRoomId;
+	/** Whether there will be a deferred change of Room event. */
 	bool deferRoomChange;
-	/** Frame counter for transition tween */
-	int frameCounter;
-	bool transitionActive;
-	Color transitionColor;
-	float alpha;
-	bool transitionSecondStage;
 
 public:
 	/** Empty constructor. */
 	WorldService();
+	/** Check if the room exists. */
+	bool getIfRoomExist();
 	/** Get a reference to the current room. */
 	Room &getRoom() const;
 	/** Set the current room using path to a .rmap file. */

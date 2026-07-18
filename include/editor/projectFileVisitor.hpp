@@ -28,6 +28,7 @@ public:
 	static std::unique_ptr<ProjectFile> soundView(const std::string &path);
 	static std::unique_ptr<ProjectFile> musicView(const std::string &path);
 	static std::unique_ptr<ProjectFile> interactableView(const std::string &path);
+	static std::unique_ptr<ProjectFile> interfaceView(const std::string &path);
 };
 
 #endif

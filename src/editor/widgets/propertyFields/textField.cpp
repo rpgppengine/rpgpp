@@ -15,9 +15,17 @@ TextField::TextField(const char *typeName, bool initRenderer) : tgui::SubwidgetC
 	label->setHorizontalAlignment(tgui::HorizontalAlignment::Left);
 	label->setVerticalAlignment(tgui::VerticalAlignment::Center);
 	value = tgui::EditBox::create();
+	remove = tgui::BitmapButton::create();
+	remove->setSize({0, 0});
 
 	m_container->add(label);
 	m_container->add(value);
+
+	auto closeImagePath = Editor::instance->getFs().getResourcePath("close.png");
+	tgui::Texture imageTexture(closeImagePath);
+	remove->setImage(imageTexture);
+	remove->setVisible(false);
+	m_container->add(remove);
 
 	updateSize();
 }
@@ -40,8 +48,32 @@ void TextField::setSize(const tgui::Layout2d &size) {
 }
 
 void TextField::updateSize() {
+	/*
 	label->setPosition({PADDING, 0});
 	label->setSize({getSize().x * 0.5f - PADDING, getSize().y});
 	value->setSize({getSize().x * 0.5f - PADDING, getSize().y});
 	value->setPosition({getSize().x * 0.5, 0});
+	*/
+
+	if (!removable) {
+		label->setPosition({PADDING, 0});
+		label->setSize({getSize().x * 0.5f - PADDING, getSize().y});
+		value->setSize({getSize().x * 0.5f - PADDING, getSize().y});
+		value->setPosition({getSize().x * 0.5, 0});
+		remove->setPosition({0, 0});
+		remove->setSize({0, 0});
+	} else {
+		label->setPosition({PADDING, 0});
+		label->setSize({getSize().x * 0.4f, getSize().y});
+		value->setPosition({getSize().x * 0.4f, 0});
+		value->setSize({getSize().x * 0.4f, getSize().y});
+		remove->setPosition({getSize().x * 0.8f, 0});
+		remove->setSize({getSize().x * 0.2f, getSize().y});
+	}
+}
+
+void TextField::enableRemoving() {
+	removable = true;
+	remove->setVisible(true);
+	updateSize();
 }

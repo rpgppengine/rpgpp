@@ -99,3 +99,31 @@ void lua_types_set(sol::state_view lua) {
 							 &Player::setTilePosition, "MoveByVelocity", &Player::moveByVelocity, "GetActor",
 							 &Player::getActor);
 }
+
+void lua_basic_types_set(sol::environment &env) {
+	env.new_usertype<Vector2>(
+		"Vector2", sol::factories([]() { return Vector2(); }, [](float a, float b) { return Vector2{a, b}; }), "x",
+		&Vector2::x, "y", &Vector2::y);
+	env.new_usertype<Rectangle>(
+		"Rectangle",
+		sol::factories([] { return Rectangle{}; },
+					   [](float x, float y, float width, float height) { return Rectangle{x, y, width, height}; }),
+		"x", &Rectangle::x, "y", &Rectangle::y, "width", &Rectangle::width, "height", &Rectangle::height,
+		sol::meta_function::to_string,
+		[](Rectangle rect) { return TextFormat("{%f, %f, %f, %f}", rect.x, rect.y, rect.width, rect.height); });
+	env.new_usertype<Color>(
+		"Color",
+		sol::factories([] { return WHITE; },
+					   [](unsigned char r, unsigned char g, unsigned char b) { return Color{r, g, b, 255}; }),
+		"r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a, sol::meta_function::to_string,
+		[](Color color) { return TextFormat("{%i, %i, %i, %i}", color.r, color.g, color.b, color.a); });
+	env.new_enum("NPatchLayout", "NinePatch", NPATCH_NINE_PATCH, "ThreePatchHorizontal", NPATCH_THREE_PATCH_HORIZONTAL,
+				 "ThreePatchVertical", NPATCH_THREE_PATCH_VERTICAL);
+	env.new_usertype<FontRef>("Font", "Path", &FontRef::path, "FontSize", &FontRef::fontSize);
+	env.new_usertype<ImageRef>("Image", "Path", &ImageRef::path, "Scale", &ImageRef::scale);
+	env.new_usertype<NPatchInfo>("NPatchInfo", "Top", &NPatchInfo::top, "Bottom", &NPatchInfo::bottom, "Left",
+								 &NPatchInfo::left, "Right", &NPatchInfo::right);
+	env.new_enum("TextAlignment", "Top", TEXT_ALIGN_BOTTOM, "Center", TEXT_ALIGN_CENTRE, "Bottom", TEXT_ALIGN_BOTTOM,
+				 "Left", TEXT_ALIGN_LEFT, "Middle", TEXT_ALIGN_MIDDLE, "Right", TEXT_ALIGN_RIGHT);
+	env.new_usertype<UIElementRef>("UIElementRef", "Id", &UIElementRef::entityId);
+}

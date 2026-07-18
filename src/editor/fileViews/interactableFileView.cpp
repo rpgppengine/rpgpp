@@ -3,13 +3,10 @@
 #include "TGUI/String.hpp"
 #include "TGUI/Widgets/Label.hpp"
 #include "bindTranslation.hpp"
-#include "childWindows/newPropWindow.hpp"
-#include "editor.hpp"
 #include "interactable.hpp"
 #include "raylib.h"
 #include "widgets/propertiesBox.hpp"
 #include "widgets/propertyFields/boolField.hpp"
-#include "widgets/propertyFields/intField.hpp"
 #include "widgets/propertyFields/textField.hpp"
 
 InteractableFileView::InteractableFileView() {
@@ -26,6 +23,7 @@ InteractableFileView::InteractableFileView() {
 			const auto interactable = ptr->get();
 
 			interactable->setDisplayTitle(text.toStdString());
+			this->dirty = true;
 		}
 	});
 	props->addTextField(nameField);
@@ -39,6 +37,7 @@ InteractableFileView::InteractableFileView() {
 			const auto interactable = ptr->get();
 
 			interactable->setScriptSourcePath(TextFormat("scripts/%s", GetFileName(path.toStdString().c_str())));
+			this->dirty = true;
 		}
 	};
 	props->addFileField(scriptField);
@@ -52,6 +51,7 @@ InteractableFileView::InteractableFileView() {
 			const auto interactable = ptr->get();
 
 			interactable->setOnTouch(value);
+			this->dirty = true;
 		}
 	});
 	props->addBooleanField(onTouchField);

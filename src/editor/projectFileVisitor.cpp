@@ -12,12 +12,14 @@
 #include "fileViews/fontFileView.hpp"
 #include "fileViews/imageFileView.hpp"
 #include "fileViews/interactableFileView.hpp"
+#include "fileViews/interfaceViewFileView.hpp"
 #include "fileViews/propFileView.hpp"
 #include "fileViews/roomFileView.hpp"
 #include "fileViews/soundFileView.hpp"
 #include "fileViews/tilesetFileView.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"
+#include "interfaceView.hpp"
 #include "projectFile.hpp"
 #include "room.hpp"
 #include "saveables/fontWrapper.hpp"
@@ -42,6 +44,7 @@ ProjectFileVisitor::ProjectFileVisitor() {
 	funcs[static_cast<int>(EngineFileType::FILE_SOUND)] = soundView;
 	funcs[static_cast<int>(EngineFileType::FILE_MUSIC)] = musicView;
 	funcs[static_cast<int>(EngineFileType::FILE_INTERACTABLE)] = interactableView;
+	funcs[static_cast<int>(EngineFileType::FILE_INTERFACEVIEW)] = interfaceView;
 }
 
 std::unique_ptr<ProjectFile> ProjectFileVisitor::visit(EngineFileType fileType, const std::string &path) {
@@ -122,5 +125,12 @@ std::unique_ptr<ProjectFile> ProjectFileVisitor::interactableView(const std::str
 	std::unique_ptr<InteractableFileView> view = std::make_unique<InteractableFileView>();
 	std::unique_ptr<VariantWrapper> variant = std::make_unique<Variant<Interactable>>(new Interactable(path));
 	auto res = std::make_unique<ProjectFile>(std::move(view), std::move(variant), EngineFileType::FILE_INTERACTABLE);
+	return std::move(res);
+}
+
+std::unique_ptr<ProjectFile> ProjectFileVisitor::interfaceView(const std::string &path) {
+	std::unique_ptr<InterfaceViewFileView> view = std::make_unique<InterfaceViewFileView>();
+	std::unique_ptr<VariantWrapper> variant = std::make_unique<Variant<InterfaceView>>(new InterfaceView(path));
+	auto res = std::make_unique<ProjectFile>(std::move(view), std::move(variant), EngineFileType::FILE_INTERFACEVIEW);
 	return std::move(res);
 }

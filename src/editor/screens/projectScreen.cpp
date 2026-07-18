@@ -1,10 +1,10 @@
 #include "screens/projectScreen.hpp"
 
 #include <cassert>
-#include <cstdio>
 #include <filesystem>
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "TGUI/Layout.hpp"
@@ -66,6 +66,7 @@ void ProjectScreen::bindMenuBarAndHK(tgui::MenuBar::Ptr menuBarPtr) {
 			tgui::String currentFile = fileTabs->getSelectedId();
 			auto &projectFile = openedFiles.at(currentFile);
 			projectFile->saveFile(projectFile->getFilePath());
+			projectFile->getView().setDirty(false);
 		}
 	};
 
@@ -193,6 +194,33 @@ void ProjectScreen::initItems(tgui::Group::Ptr layout) {
 }
 
 void ProjectScreen::addFileView(EngineFileType fileType, const std::string &path) {
+	std::string fileName = GetFileName(path.c_str());
+
+	if (!FileExists(path.c_str())) {
+		// NOTE: This is a fix for when the user accidentally deletes a file in the project root directory,
+		// so the engine doesn't try opening a now deleted file.
+		auto &ts = Editor::instance->getTranslations();
+
+		auto fileNotExistMsgbox = tgui::MessageBox::create();
+		fileNotExistMsgbox->setPosition({"50%", "50%"});
+		fileNotExistMsgbox->setOrigin({0.5, 0.5});
+
+		bindTranslation(fileNotExistMsgbox, "screen.project.filenotexist.notice", &tgui::MessageBox::setText);
+		fileNotExistMsgbox->addButton(ts.getKey("button.okay"));
+
+		std::weak_ptr<tgui::MessageBox> weakMsgbox = fileNotExistMsgbox;
+		fileNotExistMsgbox->onButtonPress.connect([this, fileName, weakMsgbox]() {
+			if (auto box = weakMsgbox.lock()) {
+				box->close();
+				this->addResourceButtons(this->listedResourcesType);
+				fileTabs->closeTabFilename(fileName);
+			}
+		});
+
+		Editor::instance->getGui().gui->add(fileNotExistMsgbox);
+		return;
+	}
+
 	Editor::instance->getGui().gui->setTabKeyUsageEnabled(fileType != EngineFileType::FILE_SCRIPT);
 
 	std::unique_ptr<ProjectFile> projectFile = fileVisitor->visit(fileType, path);
@@ -201,8 +229,8 @@ void ProjectScreen::addFileView(EngineFileType fileType, const std::string &path
 		Editor::instance->getFs().openFileInDefaultApp(mutPath);
 		return;
 	}
+	auto idx = fileTabs->addFileTab(path, fileName, projectFile.get()->getViewPtr());
 
-	size_t idx = fileTabs->addFileTab(path, GetFileName(path.c_str()));
 	if (idx != -1) {
 		fileViewGroup->removeAllWidgets();
 
@@ -318,7 +346,7 @@ void ProjectScreen::addResourceButtons(EngineFileType fileType) {
 						auto messageBox = tgui::MessageBox::create();
 
 						if (listedResourcesType == EngineFileType::FILE_MAP) {
-							auto defaultRoomPath = project->getGameSettings().defaultRoomPath;
+							auto defaultRoomPath = project->getGameSettings().defaultLoadingPath;
 							if (defaultRoomPath.empty() && project->getPaths(EngineFileType::FILE_MAP).size() <= 1) {
 								bindTranslation(messageBox, "dialog.delete_file.room_must_exist",
 												&tgui::MessageBox::setText);
@@ -374,6 +402,7 @@ void ProjectScreen::addResourceButtons(EngineFileType fileType) {
 									std::error_code ec;
 									std::filesystem::remove(filePath, ec);
 									addResourceButtons(listedResourcesType);
+									fileTabs->closeTabFilename(GetFileName(filePath.c_str()));
 								}
 
 								if (auto parent = box->getParent()) parent->remove(box);

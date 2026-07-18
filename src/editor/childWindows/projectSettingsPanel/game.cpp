@@ -1,6 +1,8 @@
 #include "childWindows/projectSettingsPanel/game.hpp"
 
+#include <cstring>
 #include <memory>
+#include <string>
 
 #include "TGUI/String.hpp"
 #include "TGUI/Widgets/GrowVerticalLayout.hpp"
@@ -9,6 +11,7 @@
 #include "childWindows/editListFieldWindow.hpp"
 #include "childWindows/settingsPanel/base.hpp"
 #include "editor.hpp"
+#include "gamedata.hpp"
 #include "listHelper.hpp"
 #include "project.hpp"
 #include "raylib.h"
@@ -31,14 +34,25 @@ ProjectSettingsPanelGame::ProjectSettingsPanelGame(tgui::TabContainer::Ptr tabCo
 	layout->setOrigin({0.5, 0});
 	layout->getRenderer()->setSpaceBetweenWidgets(10.0f);
 
-	defaultRoom = FileField::create();
-	bindTranslation(defaultRoom->label, "dialog.project_settings.game.default_room", &tgui::Label::setText);
-	defaultRoom->setSize({"100%", 24});
-	defaultRoom->pathFilters = {{"RPG++ Room", {"*.rmap"}}};
-	defaultRoom->callback = [](const tgui::String &path) {
+	defaultLoading = FileField::create();
+	bindTranslation(defaultLoading->label, "dialog.project_settings.game.default_load", &tgui::Label::setText);
+	defaultLoading->setSize({"100%", 24});
+	defaultLoading->pathFilters = {{"RPG++ Room", {"*.rmap"}}, {"RPG++ UI", {"*.rui"}}};
+	defaultLoading->callback = [](const tgui::String &path) {
 		Project *project = Editor::instance->getProject();
+		std::string pathCStr = path.toStdString();
 		if (project != nullptr) {
-			project->getGameSettings().defaultRoomPath = TextFormat("maps/%s", GetFileName(path.toStdString().c_str()));
+			const char* ext = GetFileExtension(pathCStr.c_str());
+			const char* fileName = GetFileName(pathCStr.c_str());
+
+			ProjectGameSettings &gameSet = project->getGameSettings();
+			if (strcmp(ext, ".rmap") == 0) {
+				gameSet.defaultLoadingPath = TextFormat("maps/%s", fileName);
+				gameSet.isLoadUi = false;
+			} else {
+				gameSet.defaultLoadingPath = GetFileNameWithoutExt(fileName);
+				gameSet.isLoadUi = true;
+			}
 		}
 	};
 
@@ -72,7 +86,7 @@ ProjectSettingsPanelGame::ProjectSettingsPanelGame(tgui::TabContainer::Ptr tabCo
 	bindTranslation(debugDraw->label, "dialog.project_settings.game.debug_draw", &tgui::Label::setText);
 	debugDraw->label->setText("Debug Draw");
 	debugDraw->setSize({"100%", 24});
-	debugDraw->value->onCheck([](bool value) {
+	debugDraw->value->onChange([](bool value) {
 		Project *project = Editor::instance->getProject();
 		if (project != nullptr) {
 			project->getGameSettings().debugDraw = value;
@@ -108,7 +122,7 @@ ProjectSettingsPanelGame::ProjectSettingsPanelGame(tgui::TabContainer::Ptr tabCo
 		}
 	});
 
-	layout->add(defaultRoom);
+	layout->add(defaultLoading);
 	layout->add(playerActor);
 	layout->add(tileSize);
 	layout->add(debugDraw);
@@ -123,10 +137,10 @@ void ProjectSettingsPanelGame::setup(Project *project) {
 	if (project == nullptr) return;
 
 	auto &gameSet = project->getGameSettings();
-
-	defaultRoom->value->setText(GetFileName(gameSet.defaultRoomPath.c_str()));
+	defaultLoading->value->setText(GetFileName(gameSet.defaultLoadingPath.c_str()));
 	playerActor->value->setText(GetFileName(gameSet.playerActorPath.c_str()));
 	tileSize->value->setValue(gameSet.tileSize);
+	debugDraw->value->setChecked(gameSet.debugDraw);
 	exportImageScales->value->setText(VecToString(gameSet.exportImageScales));
 	exportFontSizes->value->setText(VecToString(gameSet.exportFontSizes));
 }

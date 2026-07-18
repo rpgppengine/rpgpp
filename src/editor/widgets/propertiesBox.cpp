@@ -16,18 +16,18 @@
 #include "childWindows/newPropWindow.hpp"
 #include "editor.hpp"
 #include "widgets/propertyFields/boolField.hpp"
+#include "widgets/propertyFields/colorField.hpp"
 #include "widgets/propertyFields/fieldConfig.hpp"
 #include "widgets/propertyFields/fileField.hpp"
 #include "widgets/propertyFields/intField.hpp"
 #include "widgets/propertyFields/interPropField.hpp"
+#include "widgets/propertyFields/nPatchInfoField.hpp"
 #include "widgets/propertyFields/rectangleField.hpp"
 #include "widgets/propertyFields/selectField.hpp"
 #include "widgets/propertyFields/textField.hpp"
+#include "widgets/propertyFields/uiElementRefField.hpp"
 
-PropertiesBox::PropertiesBox(const char *typeName, bool initRenderer) : tgui::ChildWindow(typeName, initRenderer) {
-	this->setTitle("Props");
-	this->setTitleButtons(tgui::ChildWindow::TitleButton::None);
-
+PropertiesBox::PropertiesBox(const char *typeName, bool initRenderer) : tgui::ScrollablePanel(typeName, initRenderer) {
 	auto vertLayout = tgui::GrowVerticalLayout::create();
 	vertLayout->getRenderer()->setSpaceBetweenWidgets(GAP);
 
@@ -36,6 +36,7 @@ PropertiesBox::PropertiesBox(const char *typeName, bool initRenderer) : tgui::Ch
 
 	add(vertLayout);
 	this->layout = vertLayout;
+	getRenderer()->setPadding({0, 8, 0, 8});
 }
 
 PropertiesBox::Ptr PropertiesBox::create() { return std::make_shared<PropertiesBox>(); }
@@ -51,7 +52,7 @@ PropertiesBox::Ptr PropertiesBox::copy(PropertiesBox::ConstPtr widget) {
 tgui::Widget::Ptr PropertiesBox::clone() const { return std::make_shared<PropertiesBox>(*this); }
 
 void PropertiesBox::draw(tgui::BackendRenderTarget &target, tgui::RenderStates states) const {
-	tgui::ChildWindow::draw(target, states);
+	tgui::ScrollablePanel::draw(target, states);
 }
 
 void PropertiesBox::addPropsJson(nlohmann::json &j, bool clear, bool editable) {
@@ -129,9 +130,10 @@ void PropertiesBox::addPropsJson(nlohmann::json &j, bool clear, bool editable) {
 				auto textField = TextField::create();
 				textField->label->setText(item.key());
 				textField->value->setText(item.value().get<std::string>());
-				textField->value->onTextChange([&j, item](const tgui::String &text) {
+				textField->value->onTextChange([&j, item, this](const tgui::String &text) {
 					std::string st = text.toStdString();
 					j.at(item.key()) = st;
+					onJsonChanged.emit(this, j);
 				});
 				addTextField(textField);
 			}
@@ -139,14 +141,20 @@ void PropertiesBox::addPropsJson(nlohmann::json &j, bool clear, bool editable) {
 				auto intField = IntField::create();
 				intField->label->setText(item.key());
 				intField->value->setValue(item.value().get<float>());
-				intField->value->onValueChange([&j, item](float value) { j.at(item.key()) = value; });
+				intField->value->onValueChange([&j, item, this](float value) {
+					j.at(item.key()) = value;
+					onJsonChanged.emit(this, j);
+				});
 				addIntField(intField);
 			}
 			if (item.value().is_boolean()) {
 				auto boolField = BoolField::create();
 				boolField->label->setText(item.key());
 				boolField->value->setChecked(item.value().get<bool>());
-				boolField->value->onChange([&j, item](bool checked) { j.at(item.key()) = checked; });
+				boolField->value->onChange([&j, item, this](bool checked) {
+					j.at(item.key()) = checked;
+					onJsonChanged.emit(this, j);
+				});
 				addBooleanField(boolField);
 			}
 			if (item.value().is_object()) {
@@ -162,6 +170,8 @@ void PropertiesBox::addPropsJson(nlohmann::json &j, bool clear, bool editable) {
 						auto &ref = j.at(item.key());
 
 						ref.at("value") = GetFileNameWithoutExt(filePath.toStdString().c_str());
+
+						onJsonChanged.emit(this, j);
 					};
 
 					if (propType == "dialogue") {
@@ -209,39 +219,61 @@ void PropertiesBox::addIntField(const tgui::String &title, int initialValue, std
 	layout->add(group);
 }
 
-void PropertiesBox::addIntField(IntField::Ptr field) {
+void PropertiesBox::addIntField(IntField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addFileField(FileField::Ptr field) {
+void PropertiesBox::addFileField(FileField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addTextField(TextField::Ptr field) {
+void PropertiesBox::addTextField(TextField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addBooleanField(BoolField::Ptr field) {
+void PropertiesBox::addBooleanField(BoolField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addSelectField(SelectField::Ptr field) {
+void PropertiesBox::addSelectField(SelectField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 24});
-	layout->add(field);
+	layout->add(field, title);
 }
 
-void PropertiesBox::addRectangleField(RectangleField::Ptr field) {
+void PropertiesBox::addColorField(ColorField::Ptr field, const std::string& title) {
+	field->setSize({"100%", 24});
+	layout->add(field, title);
+}
+
+void PropertiesBox::addRefField(UIElementRefField::Ptr field, const std::string& title) {
+	field->setSize({"100%", 24});
+	layout->add(field, title);
+}
+
+void PropertiesBox::addNPatchFIeld(NPatchInfoField::Ptr field, const std::string& title) {
+	field->setSize({"100%", 24});
+	layout->add(field, title);
+}
+
+void PropertiesBox::addRectangleField(RectangleField::Ptr field, const std::string& title) {
 	field->setSize({"100%", 48});
-	layout->add(field);
+	layout->add(field, title);
 }
 
 void PropertiesBox::addInterPropField(InterPropField::Ptr field) {
 	field->setSize({"100%", 24});
 	layout->add(field);
+}
+
+void PropertiesBox::addSection(const tgui::String &title) {
+	auto label = tgui::Label::create(title);
+	label->setVerticalAlignment(tgui::VerticalAlignment::Center);
+	label->setSize({"100%", 24});
+	layout->add(label);
 }
 
 void PropertiesBox::addPropertiesBox(PropertiesBox::Ptr box) {
@@ -250,3 +282,9 @@ void PropertiesBox::addPropertiesBox(PropertiesBox::Ptr box) {
 }
 
 void PropertiesBox::addWidget(tgui::Widget::Ptr widget) { layout->add(widget); }
+
+tgui::Widget* PropertiesBox::getPropertyField(const std::string& title) {
+	return layout->get(title).get();
+}
+
+void PropertiesBox::clear() { layout->removeAllWidgets(); }

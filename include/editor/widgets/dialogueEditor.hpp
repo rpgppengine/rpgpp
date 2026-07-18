@@ -47,7 +47,7 @@ public:
 	 * This fixes an interesting case with TGUI .w.
 	 */
 	void fixSelectionRange();
-	bool isTextNonEditable(std::string& tagName);
+	bool isTextNonEditable(std::string &tagName);
 };
 
 #endif /* _RPGPP_DIALOGUEEDITOR_HPP */

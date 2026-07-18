@@ -1,1 +1,11 @@
-{"diag":[["Introductor","Welcome to RPG++!","0",""]]}
+{
+	"diag": [
+		{
+			"characterName": "Introductor",
+			"text": "Welcome to RPG++!",
+			"hasPortrait": false,
+			"imageId": "",
+			"options": []
+		}
+	]
+}

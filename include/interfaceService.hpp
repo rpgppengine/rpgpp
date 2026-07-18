@@ -8,7 +8,9 @@
 #include <string>
 
 #include "dialogueBalloon.hpp"
+#include "gamedata.hpp"
 #include "interfaceView.hpp"
+#include "ui_elements/elementFactory.hpp"
 
 /** The InterfaceService acts for the User Interface (UI). */
 class InterfaceService {
@@ -16,25 +18,56 @@ private:
 	/** The loaded font that will be used for the User Interface. */
 	Font font;
 	bool fpsVisible;
-	/** Texture for UI components. */
-	Texture uiTexture;
-	/** Component for in-game dialogue. */
-	DialogueBalloon dialogue;
+	bool notifyLock = false;
+	/** Helper for instantiating element types. */
+	static ElementFactory factory;
 	/** Available UI Views. */
-	std::unique_ptr<std::map<std::string, InterfaceView>> views;
+	std::map<std::string, std::unique_ptr<InterfaceView>> views;
+	/** Current active view. */
+	std::string currentViewName;
+	/** Last KeyboardKey. */
+	KeyboardKey lastKey = KEY_NULL;
+
+	/** Frame counter for transition tween */
+	int frameCounter;
+	bool transitionActive;
+	Color transitionColor;
+	float alpha;
+	bool transitionSecondStage;
+	std::function<void()> onTransitionPoint;
 
 public:
 	/** Empty constructor. */
 	InterfaceService();
 	~InterfaceService();
+	/** Initialize this service with a GameBin. */
+	void initBin(GameData &bin);
 	/** Get the font used for the game's UI. */
 	Font getFont() const;
-	/** Get the texture, used for UI nine-patch components. */
-	Texture getTexture() const;
 	/** Open a dialogue with a certain title. */
-	void showDialogue(const std::string &id);
+	void showDialogue(const std::string &id, bool runScript = true);
 	/** Open the dialogue with a Dialogue structure */
-	void showDialogue(const DialogueBin &dialogue);
+	void showDialogue(const DialogueBin &dialogue, bool runScript = true);
+	/** Get the current active view. */
+	InterfaceView *getCurrentView();
+	/** Set this view as the current one and show it. */
+	void showInterface(const std::string &title, bool runScript = true);
+	/** Hide the current view (no current view). */
+	void hideInterface(bool runScript = true);
+	void setNotifyLock();
+	bool getNotifyLock();
+	/** Get the last pressed key. */
+	KeyboardKey getLastKey();
+	/** Get a reference to the factory helper. */
+	static ElementFactory &getFactory();
+
+	/** Active a fade transition. */
+	void doFadeTransition();
+	/** Update transition routine. */
+	void updateFade();
+	/** Set transition point callback. */
+	void setTransitionPointCallback(std::function<void()> callback);
+
 	/** Update routine. */
 	void update();
 	/** Draw routine. */

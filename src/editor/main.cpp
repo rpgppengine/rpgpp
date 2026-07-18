@@ -11,5 +11,7 @@ int main() {
 	gui.uiLoop();
 	editor->unload();
 
+	printf("Closing editor..\n");
+
 	return 0;
 }

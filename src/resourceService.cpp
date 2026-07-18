@@ -35,7 +35,7 @@ void ResourceService::init() {
 			for (int imageScale : Game::getBin().gameSet.exportImageScales) {
 				if (imageScale > 1) {
 					Image image = LoadImageFromMemory(data.ext.c_str(), data.data.data(), data.dataSize);
-					ImageResize(&image, image.width * imageScale, image.height * imageScale);
+					ImageResizeNN(&image, image.width * imageScale, image.height * imageScale);
 					Texture2D texture = LoadTextureFromImage(image);
 					addTexture(TextFormat("%s-%i", name.c_str(), imageScale), texture);
 					UnloadImage(image);
@@ -64,16 +64,20 @@ void ResourceService::addTextureFromFile(const std::string &filePath) {
 	addTexture(newId, text);
 }
 
-Texture2D ResourceService::getTexture(const std::string &id) { return textures[id]; }
+Texture2D ResourceService::getTexture(const std::string &id) { return textures.at(id); }
+
+bool ResourceService::textureExists(const std::string &id) { return textures.count(id) > 0; }
 
 void ResourceService::addFont(const std::string &id, Font font) { fonts[id] = font; }
 
 void ResourceService::addFontFromFile(const std::string &filePath, int fontSize) {
-	Font font = LoadFontEx(filePath.c_str(), fontSize, nullptr, 250);
+	Font font = LoadFontEx(filePath.c_str(), fontSize, nullptr, 256);
 	addFont(GetFileNameWithoutExt(filePath.c_str()), font);
 }
 
 Font ResourceService::getFont(const std::string &id) { return fonts.at(id); }
+
+bool ResourceService::fontExists(const std::string &id) { return fonts.count(id) > 0; }
 
 void ResourceService::unload() const {
 	for (const auto &[name, texture] : textures) {

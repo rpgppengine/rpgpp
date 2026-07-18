@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "TGUI/Widgets/Label.hpp"
 #include "childWindows/editListFieldWindow.hpp"
 #include "childWindows/settingsPanel/base.hpp"
 #include "widgets/propertyFields/boolField.hpp"
@@ -12,7 +13,7 @@
 
 class ProjectSettingsPanelGame : public SettingsPanelBase {
 public:
-	FileField::Ptr defaultRoom;
+	FileField::Ptr defaultLoading;
 	FileField::Ptr playerActor;
 	IntField::Ptr tileSize;
 	BoolField::Ptr debugDraw;

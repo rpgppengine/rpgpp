@@ -975,6 +975,69 @@
             {
                 "async": false,
                 "deprecated": false,
+                "desc": " The Game namespace is responsible for maanging the state of the program itself\n",
+                "file": "game.lua",
+                "finish": [
+                    2,
+                    15
+                ],
+                "rawdesc": " The Game namespace is responsible for maanging the state of the program itself\n",
+                "start": [
+                    2,
+                    11
+                ],
+                "type": "doc.class",
+                "view": "Game",
+                "visible": "public"
+            }
+        ],
+        "desc": " The Game namespace is responsible for maanging the state of the program itself\n",
+        "fields": [
+            {
+                "async": false,
+                "deprecated": false,
+                "desc": " Closes the game.",
+                "extends": {
+                    "args": [],
+                    "desc": " Closes the game.",
+                    "finish": [
+                        6,
+                        25
+                    ],
+                    "rawdesc": " Closes the game.",
+                    "start": [
+                        6,
+                        0
+                    ],
+                    "type": "function",
+                    "view": "function Game.Close()"
+                },
+                "file": "game.lua",
+                "finish": [
+                    6,
+                    19
+                ],
+                "name": "Close",
+                "rawdesc": " Closes the game.",
+                "start": [
+                    6,
+                    9
+                ],
+                "type": "setfield",
+                "view": "function",
+                "visible": "public"
+            }
+        ],
+        "name": "Game",
+        "rawdesc": " The Game namespace is responsible for maanging the state of the program itself\n",
+        "type": "type",
+        "view": "Game"
+    },
+    {
+        "defines": [
+            {
+                "async": false,
+                "deprecated": false,
                 "desc": " The StateService is responsible for storing gameplay-related variables\n that make up the state of the game.\n",
                 "file": "stateService.lua",
                 "finish": [
@@ -1299,7 +1362,7 @@
             {
                 "async": false,
                 "deprecated": false,
-                "desc": " Set whether this interactable will be invoked when player touches it. ",
+                "desc": " Set whether this interactable will be invoked when player touches it.",
                 "extends": {
                     "args": [
                         {
@@ -1329,12 +1392,12 @@
                             "view": "boolean"
                         }
                     ],
-                    "desc": " Set whether this interactable will be invoked when player touches it. ",
+                    "desc": " Set whether this interactable will be invoked when player touches it.",
                     "finish": [
                         110,
                         43
                     ],
-                    "rawdesc": " Set whether this interactable will be invoked when player touches it. ",
+                    "rawdesc": " Set whether this interactable will be invoked when player touches it.",
                     "start": [
                         110,
                         0
@@ -1348,7 +1411,7 @@
                     32
                 ],
                 "name": "SetOnTouch",
-                "rawdesc": " Set whether this interactable will be invoked when player touches it. ",
+                "rawdesc": " Set whether this interactable will be invoked when player touches it.",
                 "start": [
                     110,
                     9
@@ -1795,17 +1858,51 @@
             {
                 "async": false,
                 "deprecated": false,
+                "desc": " Get a reference to the current UI View.",
+                "extends": {
+                    "args": [],
+                    "desc": " Get a reference to the current UI View.",
+                    "finish": [
+                        15,
+                        39
+                    ],
+                    "rawdesc": " Get a reference to the current UI View.",
+                    "start": [
+                        15,
+                        0
+                    ],
+                    "type": "function",
+                    "view": "function Interface.GetCurrentView()"
+                },
+                "file": "interfaceService.lua",
+                "finish": [
+                    15,
+                    33
+                ],
+                "name": "GetCurrentView",
+                "rawdesc": " Get a reference to the current UI View.",
+                "start": [
+                    15,
+                    9
+                ],
+                "type": "setfield",
+                "view": "function",
+                "visible": "public"
+            },
+            {
+                "async": false,
+                "deprecated": false,
                 "desc": " Open a dialogue with a certain title.",
                 "extends": {
                     "args": [
                         {
                             "finish": [
-                                7,
+                                11,
                                 40
                             ],
                             "name": "dialogue",
                             "start": [
-                                7,
+                                11,
                                 32
                             ],
                             "type": "local",
@@ -1814,12 +1911,12 @@
                     ],
                     "desc": " Open a dialogue with a certain title.",
                     "finish": [
-                        7,
+                        11,
                         45
                     ],
                     "rawdesc": " Open a dialogue with a certain title.",
                     "start": [
-                        7,
+                        11,
                         0
                     ],
                     "type": "function",
@@ -1827,11 +1924,59 @@
                 },
                 "file": "interfaceService.lua",
                 "finish": [
-                    7,
+                    11,
                     31
                 ],
                 "name": "OpenDialogue",
                 "rawdesc": " Open a dialogue with a certain title.",
+                "start": [
+                    11,
+                    9
+                ],
+                "type": "setfield",
+                "view": "function",
+                "visible": "public"
+            },
+            {
+                "async": false,
+                "deprecated": false,
+                "desc": " Open the UI View identified by this title.",
+                "extends": {
+                    "args": [
+                        {
+                            "finish": [
+                                7,
+                                33
+                            ],
+                            "name": "title",
+                            "start": [
+                                7,
+                                28
+                            ],
+                            "type": "local",
+                            "view": "string"
+                        }
+                    ],
+                    "desc": " Open the UI View identified by this title.",
+                    "finish": [
+                        7,
+                        38
+                    ],
+                    "rawdesc": " Open the UI View identified by this title.",
+                    "start": [
+                        7,
+                        0
+                    ],
+                    "type": "function",
+                    "view": "function Interface.OpenView(title: string)"
+                },
+                "file": "interfaceService.lua",
+                "finish": [
+                    7,
+                    27
+                ],
+                "name": "OpenView",
+                "rawdesc": " Open the UI View identified by this title.",
                 "start": [
                     7,
                     9
@@ -1847,7 +1992,208 @@
         "view": "Interface"
     },
     {
-        "DOC": "/home/nikodev/Документи/Projects/rpgpp/luasrc",
+        "defines": [
+            {
+                "async": false,
+                "deprecated": false,
+                "file": "types.lua",
+                "finish": [
+                    281,
+                    24
+                ],
+                "start": [
+                    281,
+                    11
+                ],
+                "type": "doc.class",
+                "view": "InterfaceView",
+                "visible": "public"
+            }
+        ],
+        "fields": [
+            {
+                "async": false,
+                "deprecated": false,
+                "desc": " Change focus to another UI element.",
+                "extends": {
+                    "args": [
+                        {
+                            "finish": [
+                                291,
+                                8
+                            ],
+                            "name": "self",
+                            "start": [
+                                291,
+                                8
+                            ],
+                            "type": "self",
+                            "view": "InterfaceView"
+                        },
+                        {
+                            "finish": [
+                                291,
+                                39
+                            ],
+                            "name": "name",
+                            "start": [
+                                291,
+                                35
+                            ],
+                            "type": "local",
+                            "view": "string"
+                        }
+                    ],
+                    "desc": " Change focus to another UI element.",
+                    "finish": [
+                        291,
+                        44
+                    ],
+                    "rawdesc": " Change focus to another UI element.",
+                    "start": [
+                        291,
+                        0
+                    ],
+                    "type": "function",
+                    "view": "(method) InterfaceView:ChangeFocus(name: string)"
+                },
+                "file": "types.lua",
+                "finish": [
+                    291,
+                    34
+                ],
+                "name": "ChangeFocus",
+                "rawdesc": " Change focus to another UI element.",
+                "start": [
+                    291,
+                    9
+                ],
+                "type": "setmethod",
+                "view": "function",
+                "visible": "public"
+            },
+            {
+                "async": false,
+                "deprecated": false,
+                "desc": " Get an element from the UI View.",
+                "extends": {
+                    "args": [
+                        {
+                            "finish": [
+                                287,
+                                8
+                            ],
+                            "name": "self",
+                            "start": [
+                                287,
+                                8
+                            ],
+                            "type": "self",
+                            "view": "InterfaceView"
+                        },
+                        {
+                            "finish": [
+                                287,
+                                37
+                            ],
+                            "name": "name",
+                            "start": [
+                                287,
+                                33
+                            ],
+                            "type": "local",
+                            "view": "string"
+                        }
+                    ],
+                    "desc": " Get an element from the UI View.",
+                    "finish": [
+                        287,
+                        42
+                    ],
+                    "rawdesc": " Get an element from the UI View.",
+                    "returns": [
+                        {
+                            "type": "function.return",
+                            "view": "UIElement"
+                        }
+                    ],
+                    "start": [
+                        287,
+                        0
+                    ],
+                    "type": "function",
+                    "view": "(method) InterfaceView:GetEntity(name: string)\n  -> UIElement"
+                },
+                "file": "types.lua",
+                "finish": [
+                    287,
+                    32
+                ],
+                "name": "GetEntity",
+                "rawdesc": " Get an element from the UI View.",
+                "start": [
+                    287,
+                    9
+                ],
+                "type": "setmethod",
+                "view": "function",
+                "visible": "public"
+            },
+            {
+                "async": false,
+                "deprecated": false,
+                "desc": " Reset the elements to their original positions and sizes.",
+                "extends": {
+                    "args": [
+                        {
+                            "finish": [
+                                294,
+                                8
+                            ],
+                            "name": "self",
+                            "start": [
+                                294,
+                                8
+                            ],
+                            "type": "self",
+                            "view": "InterfaceView"
+                        }
+                    ],
+                    "desc": " Reset the elements to their original positions and sizes.",
+                    "finish": [
+                        294,
+                        34
+                    ],
+                    "rawdesc": " Reset the elements to their original positions and sizes.",
+                    "start": [
+                        294,
+                        0
+                    ],
+                    "type": "function",
+                    "view": "(method) InterfaceView:Reset()"
+                },
+                "file": "types.lua",
+                "finish": [
+                    294,
+                    28
+                ],
+                "name": "Reset",
+                "rawdesc": " Reset the elements to their original positions and sizes.",
+                "start": [
+                    294,
+                    9
+                ],
+                "type": "setmethod",
+                "view": "function",
+                "visible": "public"
+            }
+        ],
+        "name": "InterfaceView",
+        "type": "type",
+        "view": "InterfaceView"
+    },
+    {
+        "DOC": "/home/nikodev/Documents/Projects/rpgpp/luasrc",
         "defines": [],
         "fields": [],
         "name": "LuaLS",
@@ -3577,6 +3923,154 @@
     {
         "defines": [
             {
+                "desc": "```lua\n{\n    Linear: integer = 0,\n    InSine: integer = 1,\n    OutSine: integer = 2,\n    InOutSine: integer = 3,\n    InQuad: integer = 4,\n    OutQuad: integer = 5,\n    InOutQuad: integer = 6,\n    InCubic: integer = 7,\n    OutCubic: integer = 8,\n    InOutCubic: integer = 9,\n    InQuart: integer = 10,\n    OutQuart: integer = 11,\n    InOutQuart: integer = 12,\n    OutQuint: integer = 14,\n    InOutQuint: integer = 15,\n    InExpo: integer = 16,\n    OutExpo: integer = 17,\n    InOutExpo: integer = 18,\n    InCirc: integer = 19,\n    OutCirc: integer = 20,\n    InOutCirc: integer = 21,\n    InBack: integer = 22,\n    OutBack: integer = 23,\n    InOutBack: integer = 24,\n    InElastic: integer = 25,\n    OutElastic: integer = 26,\n    InOutElastic: integer = 27,\n    InBounce: integer = 28,\n    OutBounce: integer = 29,\n    InOutBounce: integer = 30,\n}\n```",
+                "file": "types.lua",
+                "finish": [
+                    246,
+                    19
+                ],
+                "rawdesc": "```lua\n{\n    Linear: integer = 0,\n    InSine: integer = 1,\n    OutSine: integer = 2,\n    InOutSine: integer = 3,\n    InQuad: integer = 4,\n    OutQuad: integer = 5,\n    InOutQuad: integer = 6,\n    InCubic: integer = 7,\n    OutCubic: integer = 8,\n    InOutCubic: integer = 9,\n    InQuart: integer = 10,\n    OutQuart: integer = 11,\n    InOutQuart: integer = 12,\n    OutQuint: integer = 14,\n    InOutQuint: integer = 15,\n    InExpo: integer = 16,\n    OutExpo: integer = 17,\n    InOutExpo: integer = 18,\n    InCirc: integer = 19,\n    OutCirc: integer = 20,\n    InOutCirc: integer = 21,\n    InBack: integer = 22,\n    OutBack: integer = 23,\n    InOutBack: integer = 24,\n    InElastic: integer = 25,\n    OutElastic: integer = 26,\n    InOutElastic: integer = 27,\n    InBounce: integer = 28,\n    OutBounce: integer = 29,\n    InOutBounce: integer = 30,\n}\n```",
+                "start": [
+                    246,
+                    10
+                ],
+                "type": "doc.enum",
+                "view": "TweenType"
+            }
+        ],
+        "fields": [],
+        "name": "TweenType",
+        "type": "type",
+        "view": "TweenType"
+    },
+    {
+        "defines": [
+            {
+                "async": false,
+                "deprecated": false,
+                "file": "types.lua",
+                "finish": [
+                    296,
+                    20
+                ],
+                "start": [
+                    296,
+                    11
+                ],
+                "type": "doc.class",
+                "view": "UIElement",
+                "visible": "public"
+            }
+        ],
+        "fields": [
+            {
+                "async": false,
+                "deprecated": false,
+                "desc": " Tween this element.",
+                "extends": {
+                    "args": [
+                        {
+                            "finish": [
+                                304,
+                                8
+                            ],
+                            "name": "self",
+                            "start": [
+                                304,
+                                8
+                            ],
+                            "type": "self",
+                            "view": "UIElement"
+                        },
+                        {
+                            "finish": [
+                                304,
+                                33
+                            ],
+                            "name": "property",
+                            "start": [
+                                304,
+                                25
+                            ],
+                            "type": "local",
+                            "view": "string"
+                        },
+                        {
+                            "finish": [
+                                304,
+                                40
+                            ],
+                            "name": "value",
+                            "start": [
+                                304,
+                                35
+                            ],
+                            "type": "local",
+                            "view": "any"
+                        },
+                        {
+                            "finish": [
+                                304,
+                                50
+                            ],
+                            "name": "duration",
+                            "start": [
+                                304,
+                                42
+                            ],
+                            "type": "local",
+                            "view": "number"
+                        },
+                        {
+                            "finish": [
+                                304,
+                                61
+                            ],
+                            "name": "tweenType",
+                            "start": [
+                                304,
+                                52
+                            ],
+                            "type": "local",
+                            "view": "TweenType"
+                        }
+                    ],
+                    "desc": " Tween this element.",
+                    "finish": [
+                        304,
+                        66
+                    ],
+                    "rawdesc": " Tween this element.",
+                    "start": [
+                        304,
+                        0
+                    ],
+                    "type": "function",
+                    "view": "(method) UIElement:Tween(property: string, value: any, duration: number, tweenType: TweenType)"
+                },
+                "file": "types.lua",
+                "finish": [
+                    304,
+                    24
+                ],
+                "name": "Tween",
+                "rawdesc": " Tween this element.",
+                "start": [
+                    304,
+                    9
+                ],
+                "type": "setmethod",
+                "view": "function",
+                "visible": "public"
+            }
+        ],
+        "name": "UIElement",
+        "type": "type",
+        "view": "UIElement"
+    },
+    {
+        "defines": [
+            {
                 "async": false,
                 "deprecated": false,
                 "file": "types.lua",
@@ -3759,7 +4253,7 @@
                 "file": "worldService.lua",
                 "finish": [
                     2,
-                    23
+                    16
                 ],
                 "rawdesc": " The WorldService is responsible for containing and drawing the Room.\n",
                 "start": [
@@ -3767,7 +4261,7 @@
                     11
                 ],
                 "type": "doc.class",
-                "view": "WorldService",
+                "view": "World",
                 "visible": "public"
             }
         ],
@@ -3782,7 +4276,7 @@
                     "desc": " Get the Player.",
                     "finish": [
                         7,
-                        37
+                        30
                     ],
                     "rawdesc": " Get the Player.",
                     "returns": [
@@ -3796,12 +4290,12 @@
                         0
                     ],
                     "type": "function",
-                    "view": "function WorldService.GetPlayer()\n  -> Player"
+                    "view": "function World.GetPlayer()\n  -> Player"
                 },
                 "file": "worldService.lua",
                 "finish": [
                     7,
-                    31
+                    24
                 ],
                 "name": "GetPlayer",
                 "rawdesc": " Get the Player.",
@@ -3822,7 +4316,7 @@
                     "desc": " Get the current Room",
                     "finish": [
                         15,
-                        35
+                        28
                     ],
                     "rawdesc": " Get the current Room",
                     "returns": [
@@ -3836,12 +4330,12 @@
                         0
                     ],
                     "type": "function",
-                    "view": "function WorldService.GetRoom()\n  -> Room"
+                    "view": "function World.GetRoom()\n  -> Room"
                 },
                 "file": "worldService.lua",
                 "finish": [
                     15,
-                    29
+                    22
                 ],
                 "name": "GetRoom",
                 "rawdesc": " Get the current Room",
@@ -3862,12 +4356,12 @@
                         {
                             "finish": [
                                 11,
-                                34
+                                27
                             ],
                             "name": "room",
                             "start": [
                                 11,
-                                30
+                                23
                             ],
                             "type": "local",
                             "view": "string"
@@ -3876,7 +4370,7 @@
                     "desc": " Set the current room using a room title in the game.",
                     "finish": [
                         11,
-                        39
+                        32
                     ],
                     "rawdesc": " Set the current room using a room title in the game.",
                     "start": [
@@ -3884,12 +4378,12 @@
                         0
                     ],
                     "type": "function",
-                    "view": "function WorldService.SetRoom(room: string)"
+                    "view": "function World.SetRoom(room: string)"
                 },
                 "file": "worldService.lua",
                 "finish": [
                     11,
-                    29
+                    22
                 ],
                 "name": "SetRoom",
                 "rawdesc": " Set the current room using a room title in the game.",
@@ -3902,9 +4396,9 @@
                 "visible": "public"
             }
         ],
-        "name": "WorldService",
+        "name": "World",
         "rawdesc": " The WorldService is responsible for containing and drawing the Room.\n",
         "type": "type",
-        "view": "WorldService"
+        "view": "World"
     }
 ]

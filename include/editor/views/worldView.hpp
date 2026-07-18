@@ -56,7 +56,7 @@ public:
 
 	void drawOrigin();
 
-	void update() override;
+	virtual void update() override;
 	static std::shared_ptr<IUpdatable> asUpdatable(const std::shared_ptr<WorldView> &ptr);
 
 	void setTool(RoomTool newTool);

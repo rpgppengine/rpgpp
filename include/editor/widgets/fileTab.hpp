@@ -2,12 +2,14 @@
 #define _RPGPP_FILETAB_H
 
 #include <cstddef>
+#include <string>
 
 #include "TGUI/Signal.hpp"
 #include "TGUI/Widget.hpp"
 #include "TGUI/Widgets/Tabs.hpp"
 #include "components/tooltip.hpp"
 #include "fileTabRenderer.hpp"
+#include "fileViews/fileView.hpp"
 
 class FileTab : public tgui::Tabs {
 private:
@@ -28,9 +30,10 @@ private:
 
 	bool cursorModified = false;
 
-	void renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &states, int idx, bool roundedCorners,
-				   float borderWidth, float usableHeight, tgui::Sprite &close) const;
+	void renderTab(tgui::BackendRenderTarget &target, tgui::RenderStates &states, int idx, float borderWidth,
+				   float usableHeight, tgui::Sprite &close) const;
 	void closeAndOpenNextTab(std::size_t idx);
+	std::map<std::string, FileView *> m_fileViews;
 
 public:
 	bool useExternalMouseEvent = false;
@@ -61,7 +64,10 @@ public:
 
 	bool select(std::size_t i);
 
-	size_t addFileTab(const std::string &path, const std::string &fileName);
+	tgui::TabsBase::Tab *getTabId(const std::string id);
+	tgui::TabsBase::Tab *getTabName(const std::string fileName);
+	size_t addFileTab(const std::string &path, const std::string &fileName, FileView *fileView);
+	void closeTabFilename(std::string fileName);
 	void closeCurrentTab();
 
 protected:

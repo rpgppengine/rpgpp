@@ -148,6 +148,5 @@ std::shared_ptr<IUpdatable> WorldView::asUpdatable(const std::shared_ptr<WorldVi
 void WorldView::setTool(RoomTool newTool) { this->tool = newTool; }
 
 bool WorldView::isInView() {
-	// return isMouseOnWidget({GetMousePosition().x, GetMousePosition().y});
 	return CheckCollisionPointRec(GetMousePosition(), {getPosition().x, getPosition().y, getSize().x, getSize().y});
 }

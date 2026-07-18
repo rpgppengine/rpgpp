@@ -10,7 +10,7 @@
 #include "TGUI/String.hpp"
 #include "variant.hpp"
 
-#define FILETYPE_MAX 12
+#define FILETYPE_MAX 13
 
 enum class EngineFileType {
 	FILE_TILESET,
@@ -24,6 +24,7 @@ enum class EngineFileType {
 	FILE_MUSIC,
 	FILE_PROP,
 	FILE_INTERACTABLE,
+	FILE_INTERFACEVIEW,
 	FILE_EMPTY,
 };
 

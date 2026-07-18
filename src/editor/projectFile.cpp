@@ -45,3 +45,7 @@ void ProjectFile::saveFile(const std::string &path) {
 }
 
 FileView &ProjectFile::getView() { return *view; }
+
+FileView *ProjectFile::getViewPtr() { return view.get(); }
+
+EngineFileType ProjectFile::getFileType() { return fileType; }

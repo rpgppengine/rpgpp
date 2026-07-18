@@ -41,6 +41,8 @@ void EditorGuiService::init() {
 	InitWindow(BASE_WINDOW_WIDTH, BASE_WINDOW_HEIGHT, "RPG++ Editor");
 	InitAudioDevice();
 
+	font = LoadFontEx("resources/LanaPixel.ttf", 13, 0, 256);
+
 	auto &cfgs = Editor::instance->getConfiguration();
 	auto &hks = Editor::instance->getHotkeyService();
 
@@ -293,3 +295,7 @@ void EditorGuiService::alert(tgui::String title, tgui::String content) {
 	gui->add(dialog);
 	centerWidget(dialog);
 }
+
+Font EditorGuiService::getFont() { return font; }
+
+void EditorGuiService::unload() { UnloadFont(font); }

@@ -61,6 +61,8 @@ public:
 	Vector2 getCollisionPos() const;
 	/** Get the center position of the player's collision. */
 	Vector2 getCollisionCenterPos() const;
+	/** Set whether the Player should be able to move or not. */
+	void setMovementLock(bool value);
 };
 
 #endif

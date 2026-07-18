@@ -1,6 +1,7 @@
 #ifndef RPGPP_ACTORFILEVIEW_H
 #define RPGPP_ACTORFILEVIEW_H
 
+#include <functional>
 #include "fileViews/fileView.hpp"
 #include "views/actorView.hpp"
 #include "widgets/frameEditor.hpp"

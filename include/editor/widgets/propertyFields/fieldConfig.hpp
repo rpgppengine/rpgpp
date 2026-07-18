@@ -1,1 +1,6 @@
+#ifndef _RPGPP_PROPERTYFIELDS_FIELDCONFIG_H
+#define _RPGPP_PROPERTYFIELDS_FIELDCONFIG_H
+
 static const int PADDING = 8;
+
+#endif

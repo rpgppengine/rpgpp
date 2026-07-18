@@ -246,3 +246,5 @@ Vector2 Player::getCollisionCenterPos() const {
 
 	return actor->getCollisionCenter();
 }
+
+void Player::setMovementLock(bool value) { lock = value; }

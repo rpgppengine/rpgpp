@@ -8,3 +8,4 @@ Resource Types
     resourcetypes/dialogue
     resourcetypes/prop
     resourcetypes/interactable
+    resourcetypes/interfaceview

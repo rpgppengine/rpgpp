@@ -4,12 +4,10 @@
 #include <memory>
 #include <vector>
 
-#include "TGUI/SubwidgetContainer.hpp"
+#include "TGUI/Signal.hpp"
 #include "TGUI/Widget.hpp"
-#include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Widgets/ComboBox.hpp"
 #include "TGUI/Widgets/GrowHorizontalLayout.hpp"
-#include "TGUI/Widgets/Panel.hpp"
 #include "TGUI/Widgets/ScrollablePanel.hpp"
 #include "TGUI/Widgets/ToggleButton.hpp"
 #include "components/frameButton.hpp"
@@ -32,6 +30,7 @@ public:
 
 	typedef std::shared_ptr<FrameEditor> Ptr;
 	static FrameEditor::Ptr create(ActorFileView *fileView);
+	tgui::Signal onAttributeChanged = {"OnAttributeChanged"};
 
 	void init();
 

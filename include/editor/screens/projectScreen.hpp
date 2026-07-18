@@ -13,7 +13,6 @@
 #include "projectFile.hpp"
 #include "projectFileVisitor.hpp"
 #include "services/fileSystemService.hpp"
-#include "services/translationService.hpp"
 #include "widgets/fileTab.hpp"
 
 namespace screens {

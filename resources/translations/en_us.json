@@ -55,6 +55,9 @@
 		},
 		"project": {
 			"create_new_resource": "New Resource",
+			"filenotexist": {
+				"notice": "This file doesn't exist anymore!"
+			},
 			"emptyview": {
 				"notice": "No file opened or view not defined yet!"
 			},
@@ -132,6 +135,9 @@
 				"script": "Script",
 				"on_touch": "On Touch?"
 			},
+			"viewsview": {
+				"create": "Create"
+			},
 			"toolbar": {
 				"play": "Play",
 				"build": "Build"
@@ -170,7 +176,7 @@
 			},
 			"game": {
 				"_label": "Game",
-				"default_room": "Default Room",
+				"default_load": "Default Room/UI View",
 				"player_actor": "Player Actor",
 				"tile_size": "Tile Size",
 				"debug_draw": "Debug Draw",
@@ -222,6 +228,14 @@
 			"title": "Edit List..",
 			"add": "Add..",
 			"close": "Close"
+		},
+		"init_element": {
+			"title": "Create Element",
+			"elm_name": "Element Name"
+		},
+		"rename_element": {
+			"title": "Rename Element",
+			"rename": "Rename"
 		}
 	},
 	"widget": {
@@ -240,7 +254,8 @@
 	"button": {
 		"go_back": "Go Back",
 		"restart": "Restart",
-		"restart_later": "Restart Later"
+		"restart_later": "Restart Later",
+		"okay": "Okay"
 	},
 	"context_menu": {
 		"copy_full_path": "Copy full path",

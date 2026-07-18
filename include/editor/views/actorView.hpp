@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "TGUI/Signal.hpp"
 #include "actor.hpp"
 #include "components/resizableCanvasBox.hpp"
 #include "raylib.h"
@@ -23,6 +24,7 @@ public:
 	ActorView(ActorFileView *actorFileView);
 
 	Actor *actor{nullptr};
+	tgui::Signal onAttributeChanged = {"OnFrameChanged"};
 
 	// Animation Settings
 	bool isPlaying{false};

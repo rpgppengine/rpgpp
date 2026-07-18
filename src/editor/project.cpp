@@ -2,12 +2,9 @@
 
 #include <raylib.h>
 
-#include <algorithm>
 #include <array>
 #include <cassert>
-#include <cstddef>
 #include <cstdio>
-#include <cstdlib>
 #include <filesystem>
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -22,6 +19,7 @@
 #include "editor.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"
+#include "interfaceView.hpp"
 #include "room.hpp"
 #include "screens/projectScreen.hpp"
 #include "services/fileSystemService.hpp"
@@ -60,10 +58,11 @@ Project::Project(const std::string &path) {
 	programSet.windowStateFlag = j.value("windowState", 0);
 	programSet.targetFPS = j.value("targetFPS", 60);
 
-	gameSet.defaultRoomPath = j.value("defaultRoom", "");
+	gameSet.defaultLoadingPath = j.value("defaultRoom", "");
 	gameSet.playerActorPath = j.value("playerActor", "");
 	gameSet.tileSize = j.value("tileSize", 16);
 	gameSet.debugDraw = j.value("debugDraw", false);
+	gameSet.isLoadUi = j.value("isLoadUi", false);
 	gameSet.exportImageScales = j.value("exportImageScales", std::vector<int>{1});
 	gameSet.exportFontSizes = j.value("exportFontSizes", std::vector<int>{13});
 
@@ -74,6 +73,9 @@ Project::Project(const std::string &path) {
 std::string Project::create(const std::string &dirPath, const std::string &title) {
 	Project p;
 	p.getProgramSettings().projectTitle = title;
+	p.getProgramSettings().programIconPath = "logo-sq.png";
+	p.getGameSettings().defaultLoadingPath = "mainmenu";
+	p.getGameSettings().isLoadUi = true;
 	json j = p.toJson();
 	std::string fileContent = j.dump();
 
@@ -120,7 +122,8 @@ json Project::toJson() {
 	j["windowState"] = programSet.windowStateFlag;
 	j["targetFPS"] = programSet.targetFPS;
 
-	j["defaultRoom"] = gameSet.defaultRoomPath;
+	j["defaultRoom"] = gameSet.defaultLoadingPath;
+	j["isLoadUi"] = gameSet.isLoadUi;
 	j["tileSize"] = gameSet.tileSize;
 	j["playerActor"] = gameSet.playerActorPath;
 	j["debugDraw"] = gameSet.debugDraw;
@@ -210,16 +213,6 @@ std::vector<std::string> Project::getPropsNames() {
 }
 
 GameData Project::generateStruct() {
-	pugi::xml_document xmlDoc;
-	auto result = xmlDoc.load_string("<text>Hello <red>RED!</red></text>");
-	if (result) {
-		for (auto item : xmlDoc.child("text").children()) {
-			std::cout << item.name() << " : ";
-			std::cout << item.text().as_string();
-			std::cout << std::endl;
-		}
-	}
-
 	GameData data;
 	data.title = programSet.projectTitle;
 	data.programSet = programSet;
@@ -562,6 +555,7 @@ GameData Project::generateStruct() {
 	}
 	UnloadDirectoryFiles(scriptsList);
 
+	// user scripts
 	auto userScriptsList = LoadDirectoryFiles("scripts/");
 	for (int i = 0; i < userScriptsList.count; i++) {
 		std::string scriptPath = userScriptsList.paths[i];
@@ -572,6 +566,28 @@ GameData Project::generateStruct() {
 
 		data.scripts[TextFormat("scripts/%s", GetFileName(scriptPath.c_str()))] = bin;
 		UnloadFileText(scriptText);
+	}
+
+	for (auto viewPath : getPaths(EngineFileType::FILE_INTERFACEVIEW)) {
+		InterfaceView view(viewPath);
+
+		InterfaceViewBin bin;
+
+		for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
+			auto element = view.getElement(i);
+
+			if (element != nullptr) {
+				UIElementBin elementBin;
+				elementBin.props = element->props;
+				elementBin.type = element->typeName;
+
+				bin.elements[view.getEntityName(i)] = elementBin;
+			}
+		}
+
+		bin.scriptSource = view.getScriptFile();
+
+		data.interfaceViews[GetFileNameWithoutExt(viewPath.c_str())] = bin;
 	}
 
 	return data;

@@ -41,46 +41,4 @@ struct DialogueBin {
 	std::vector<DialogueLine> lines;
 };
 
-class DialogueBalloon {
-private:
-	std::string fontName = "LanaPixel";
-	Font font;
-	Rectangle rect;
-	Rectangle textRect;
-	Rectangle textPortraitRect;
-	Rectangle optionsRect;
-	DialogueBin dialogue;
-	std::string text;
-	DialogueTextSection sectionText;
-
-	bool firstCharTyped;
-	bool finishedTyping = false;
-	bool active;
-	int frameCounter;
-	int charIndex;
-	int lineIndex;
-	int sectionIndex;
-	int lastSectionLen;
-
-	Color textColor;
-	Vector2 textPos;
-	bool delay = false;
-	float delayDuration = 0.0f;
-	int hoveredOption = 0;
-	float padding = 0.0f;
-	float maxLineHeight = 0.0f;
-	bool appliedTag = false;
-
-	void drawPortrait() const;
-
-public:
-	DialogueBalloon();
-	DialogueBalloon(Rectangle rect);
-	void update();
-	void draw();
-	void showDialogue(const DialogueBin &newDialogue);
-	void hideDialogue();
-	void charP(Vector2 charMeasure, const char *c, DialogueLine &textLine, DialogueTextSection &textSection);
-};
-
 #endif

@@ -95,14 +95,15 @@ tgui::Panel::Ptr DialogueFileView::makeLinePanel(DialogueBin &data, DialogueLine
 	}
 
 	std::weak_ptr<tgui::Picture> portraitWeak = portraitPic;
-	portraitPic->onClick([&data, i, portraitWeak] {
+	portraitPic->onClick([&data, this, i, portraitWeak] {
 		if (data.lines.at(i).hasPortrait) {
 			auto fileDialog = tgui::FileDialog::create();
 			fileDialog->setFileTypeFilters({{"Images", {"*.png", "*.jpg"}}});
-			fileDialog->onFileSelect([&data, i, portraitWeak](const tgui::String &path) {
+			fileDialog->onFileSelect([&data, this, i, portraitWeak](const tgui::String &path) {
 				data.lines.at(i).imageId = GetFileName(path.toStdString().c_str());
 				tgui::Texture texture(path);
 				portraitWeak.lock()->getRenderer()->setTexture(texture);
+				this->dirty = true;
 			});
 
 			Editor::instance->getGui().gui->add(fileDialog);
@@ -120,7 +121,10 @@ tgui::Panel::Ptr DialogueFileView::makeLinePanel(DialogueBin &data, DialogueLine
 	charNameEdit->setSize({"10%", 36});
 	charNameEdit->setText(line.characterName);
 	charNameEdit->onTextChange(
-		[&data, i](const tgui::String &text) { data.lines.at(i).characterName = text.toStdString(); });
+		[&data, this, i](const tgui::String &text) {
+			data.lines.at(i).characterName = text.toStdString();
+			this->dirty = true;
+		});
 	centerGroup->add(charNameEdit);
 
 	auto diagTextEdit = DialogueEditor::create();
@@ -128,7 +132,10 @@ tgui::Panel::Ptr DialogueFileView::makeLinePanel(DialogueBin &data, DialogueLine
 	diagTextEdit->setPosition({0, 40});
 	diagTextEdit->setSize("50%", "100% - 40");
 	diagTextEdit->setText(line.text);
-	diagTextEdit->onTextChange([&data, i](const tgui::String &text) { data.lines.at(i).text = text.toStdString(); });
+	diagTextEdit->onTextChange([&data, this, i](const tgui::String &text) {
+		data.lines.at(i).text = text.toStdString();
+		this->dirty = true;
+	});
 	dialogueBoxes.push_back(diagTextEdit);
 
 	centerGroup->add(diagTextEdit);
@@ -178,7 +185,7 @@ tgui::Panel::Ptr DialogueFileView::makeLinePanel(DialogueBin &data, DialogueLine
 	});
 
 	std::weak_ptr<tgui::ComboBox> weakFontBox = selectFontComboBox;
-	selectFontComboBox->onItemSelect.connect([weakEditor, weakFontBox](const tgui::String &selectedIndex) {
+	selectFontComboBox->onItemSelect.connect([weakEditor, this, weakFontBox](const tgui::String &selectedIndex) {
 		if (weakEditor.expired() || weakFontBox.expired()) {
 			return;
 		}
@@ -187,6 +194,7 @@ tgui::Panel::Ptr DialogueFileView::makeLinePanel(DialogueBin &data, DialogueLine
 		auto box = weakFontBox.lock();
 
 		editor->addXmlTagWithProperties("font", {{"font", selectedIndex.toStdString()}});
+		this->dirty = true;
 		box->deselectItem();
 	});
 	centerGroup->add(selectFontComboBox);
@@ -205,7 +213,7 @@ tgui::Panel::Ptr DialogueFileView::makeLinePanel(DialogueBin &data, DialogueLine
 									&tgui::ComboBox::setDefaultText);
 
 	std::weak_ptr<tgui::ComboBox> weakTextSizeBox = textSizeComboBox;
-	textSizeComboBox->onItemSelect.connect([weakEditor, weakTextSizeBox](const tgui::String &selectedIndex) {
+	textSizeComboBox->onItemSelect.connect([weakEditor, this, weakTextSizeBox](const tgui::String &selectedIndex) {
 		if (weakEditor.expired() || weakTextSizeBox.expired()) {
 			return;
 		}
@@ -215,6 +223,7 @@ tgui::Panel::Ptr DialogueFileView::makeLinePanel(DialogueBin &data, DialogueLine
 
 		editor->addXmlTagWithProperties("textSize", {{"size", selectedIndex.toStdString()}});
 		box->deselectItem();
+		this->dirty = true;
 	});
 	centerGroup->add(textSizeComboBox);
 
@@ -284,6 +293,7 @@ tgui::Panel::Ptr DialogueFileView::makeLinePanel(DialogueBin &data, DialogueLine
 		data.lines.erase(data.lines.begin() + i);
 		vertLayout->remove(linePanels.at(i));
 		linePanels.erase(linePanels.begin() + i);
+		this->dirty = true;
 	});
 	panel->add(deleteButton);
 
@@ -365,5 +375,6 @@ void DialogueFileView::init(tgui::Group::Ptr layout, VariantWrapper *variant) {
 		}
 
 		addWidgets(layout);
+		this->dirty = false;
 	}
 }

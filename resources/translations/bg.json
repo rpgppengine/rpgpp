@@ -55,6 +55,9 @@
 		},
 		"project": {
 			"create_new_resource": "Нов ресурс",
+			"filenotexist": {
+				"notice": "Този файл вече не съществува!"
+			},
 			"emptyview": {
 				"notice": "Няма отворен файл"
 			},
@@ -132,6 +135,9 @@
 				"script": "Скрипт",
 				"on_touch": "Извикай при допир?"
 			},
+			"viewsview": {
+				"create": "Създай"
+			},
 			"toolbar": {
 				"play": "Пусни игра",
 				"build": "Компилирай игра"
@@ -170,7 +176,7 @@
 			},
 			"game": {
 				"_label": "Игра",
-				"default_room": "Първоначална стая",
+				"default_load": "Първоначална стая",
 				"player_actor": "Актьор на играча",
 				"tile_size": "Размер на плочка",
 				"debug_draw": "Дебъгерно рисуване",
@@ -222,6 +228,14 @@
 			"title": "Редактиране на списък..",
 			"add": "Добави..",
 			"close": "Затвори"
+		},
+		"init_element": {
+			"title": "Създай елемент",
+			"elm_name": "Име"
+		},
+		"rename_element": {
+			"title": "Преименувай елемент",
+			"rename": "Преименувай"
 		}
 	},
 	"widget": {
@@ -240,7 +254,8 @@
 	"button": {
 		"go_back": "Върни се",
 		"restart": "Рестартирай",
-		"restart_later": "Рестартирай по-късно"
+		"restart_later": "Рестартирай по-късно",
+		"okay": "Ок"
 	},
 	"context_menu": {
 		"copy_full_path": "Копирай пълен път",

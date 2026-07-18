@@ -31,13 +31,19 @@ TileSetFileView::TileSetFileView() {
 	widthField = IntField::create();
 	bindTranslation(widthField->label, "screen.project.tilesetview.tile_width", &tgui::Label::setText);
 	widthField->value->onValueChange(
-		[this](const float &value) { this->worldView->getTileSet()->setTileWidth(static_cast<int>(value)); });
+		[this](const float &value) {
+			this->dirty = true;
+			this->worldView->getTileSet()->setTileWidth(static_cast<int>(value));
+		});
 	props->addIntField(widthField);
 
 	heightField = IntField::create();
 	bindTranslation(heightField->label, "screen.project.tilesetview.tile_height", &tgui::Label::setText);
 	heightField->value->onValueChange(
-		[this](const float &value) { this->worldView->getTileSet()->setTileHeight(static_cast<int>(value)); });
+		[this](const float &value) {
+			this->dirty = true;
+			this->worldView->getTileSet()->setTileHeight(static_cast<int>(value));
+		});
 
 	props->addButton("Square Tiles", [this] {
 		auto tileset = this->worldView->getTileSet();
@@ -47,6 +53,7 @@ TileSetFileView::TileSetFileView() {
 
 		widthField->value->setValue(min);
 		heightField->value->setValue(min);
+		this->dirty = true;
 	});
 
 	props->addIntField(widthField);
@@ -60,6 +67,7 @@ TileSetFileView::TileSetFileView() {
 	textureFile->callback = [this](const tgui::String &path) {
 		auto tileset = this->worldView->getTileSet();
 		tileset->setTextureSource(path.toStdString());
+		this->dirty = true;
 	};
 	props->addFileField(textureFile);
 
@@ -80,5 +88,6 @@ void TileSetFileView::init(tgui::Group::Ptr layout, VariantWrapper *variant) {
 		textureFile->setValue(GetFileName(tileset->getTextureSource().c_str()));
 
 		addWidgets(layout);
+		this->dirty = false;
 	}
 }

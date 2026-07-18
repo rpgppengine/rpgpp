@@ -8,10 +8,14 @@
 #include "childWindows/colorSelectWindow.hpp"
 #include "childWindows/editDialogueOptionWindow.hpp"
 #include "childWindows/editPropWindow.hpp"
+#include "childWindows/elementInitWindow.hpp"
+#include "childWindows/nPatchInfoWindow.hpp"
 #include "childWindows/newPropWindow.hpp"
 #include "childWindows/popupWindow.hpp"
 #include "childWindows/projectSettingsWindow.hpp"
 #include "childWindows/settingsWindow.hpp"
+#include "childWindows/uiElementRefWindow.hpp"
+#include "childWindows/elementRenameWindow.hpp"
 
 ChildWindowSubService::ChildWindowSubService() { this->createWindows(); }
 
@@ -35,6 +39,14 @@ void ChildWindowSubService::createWindows() {
 	this->childWindows.try_emplace("add_dialogue_option", std::make_unique<AddDialogueOptionWindow>());
 
 	this->childWindows.try_emplace("edit_dialogue_option", std::make_unique<EditDialogueOptionWindow>());
+
+	this->childWindows.try_emplace("element_ref", std::make_unique<UIElementRefWindow>());
+
+	this->childWindows.try_emplace("edit_npatch", std::make_unique<NPatchInfoWindow>());
+
+	this->childWindows.try_emplace("create_ui_element", std::make_unique<ElementInitWindow>());
+
+	this->childWindows.try_emplace("rename_ui_element", std::make_unique<ElementRenameWindow>());
 }
 
 void ChildWindowSubService::openWindow(const std::string &windowName) {

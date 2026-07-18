@@ -33,6 +33,7 @@ FileSystemService::FileSystemService() {
 	typeNames[static_cast<int>(EngineFileType::FILE_PROP)] = "Props";
 	typeNames[static_cast<int>(EngineFileType::FILE_SCRIPT)] = "Scripts";
 	typeNames[static_cast<int>(EngineFileType::FILE_INTERACTABLE)] = "Interactables";
+	typeNames[static_cast<int>(EngineFileType::FILE_INTERFACEVIEW)] = "Views";
 
 	typeNames[static_cast<int>(EngineFileType::FILE_EMPTY)] = "Project Directory";
 
@@ -48,6 +49,7 @@ FileSystemService::FileSystemService() {
 	typeExtensions[static_cast<int>(EngineFileType::FILE_PROP)] = {".rprop"};
 	typeExtensions[static_cast<int>(EngineFileType::FILE_SCRIPT)] = {".lua"};
 	typeExtensions[static_cast<int>(EngineFileType::FILE_INTERACTABLE)] = {".rinter"};
+	typeExtensions[static_cast<int>(EngineFileType::FILE_INTERFACEVIEW)] = {".rui"};
 }
 
 void FileSystemService::unload() {}

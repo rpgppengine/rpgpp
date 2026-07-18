@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 
+#include "sol/forward.hpp"
 #include "sol/state.hpp"
 #include "sol/state_view.hpp"
 
@@ -16,6 +17,7 @@ public:
 	sol::state &getState();
 	void setLua(sol::state_view lua);
 	void addToState(nlohmann::json &j);
+	sol::environment createEnvironment();
 };
 
 #endif

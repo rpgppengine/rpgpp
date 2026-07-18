@@ -1,6 +1,5 @@
 #include "fileViews/fileView.hpp"
 
-#include <cstdio>
 #include <memory>
 #include <utility>
 
@@ -20,6 +19,7 @@ void FileView::pushAction(std::unique_ptr<Action> action) {
 	if (action->executeOnAdd) {
 		action->execute();
 	}
+	dirty = true;
 
 	past.push(std::move(action));
 }
@@ -40,4 +40,12 @@ void FileView::redoAction() {
 		past.push(std::move(future.top()));
 		future.pop();
 	}
+}
+
+void FileView::setDirty(bool value) {
+	this->dirty = value;
+}
+
+bool FileView::getDirty() {
+	return dirty;
 }
