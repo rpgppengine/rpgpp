@@ -122,7 +122,7 @@ if is_plat("windows") then
 end
 set_languages("cxx17")
 add_includedirs("include/", "include/editor/", os.dirs(path.join(os.scriptdir())))
-add_files("src/editor/**.cpp")
+add_files("src/editor/**.cpp", "src/edui/**.cpp")
 add_deps("rpgpp")
 add_packages("raylib", "tgui", "nlohmann_json", "luajit", "pugixml", "rttr")
 after_build( function (target)
