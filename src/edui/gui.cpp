@@ -1,5 +1,6 @@
 #include "edui/gui.hpp"
 #include "edui/container.hpp"
+#include "raylib.h"
 
 using namespace edui;
 
@@ -11,6 +12,7 @@ void Gui::update() {
 			if (!widget->isContainer) {
 				notifyChild(&widget);
 			} else {
+				widget->scrolled(GetMouseWheelMove());
 				widget->as<Container>().notifyChildren(this);
 			}
 		}

@@ -13,17 +13,27 @@ struct Container : public Widget {
 
 	std::vector<std::shared_ptr<Widget>> widgets = {};
 
+	Rectangle contentRect;
+	Rectangle scissorRect = {0, 0, 0, 0};
 	Rectangle renderRect;
+
+	bool isScissor = true;
+	float scissorX = 0;
+	float scissorY = 0;
 
 	Container();
 	void update();
 	void draw();
 
-	void add(std::shared_ptr<Widget> widget);
+	virtual void add(std::shared_ptr<Widget> widget);
 
-	virtual void updateRenderRect();
+	virtual void updateContentRect();
 
 	void notifyChildren(edui::Gui* gui);
+
+	Widget::Ptr clone() {
+		return std::make_shared<Container>(*this);
+	}
 };
 
 }  // namespace edui

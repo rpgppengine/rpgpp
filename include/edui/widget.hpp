@@ -56,7 +56,14 @@ struct Widget {
 	Widget() = default;
 	virtual ~Widget() = default;
 	virtual void update() {};
-	virtual void draw() = 0;
+	virtual void draw() {};
+
+	Widget(Widget& other) {
+		rect = other.rect;
+		layout = other.layout;
+		isContainer = other.isContainer;
+		render = std::make_unique<WidgetRender>(*other.render.get());
+	}
 
 	void calcRect(Rectangle &base) {
 		this->rect.x = base.x + ((layout.x.scale * base.width) + layout.x.offset);
@@ -111,9 +118,19 @@ struct Widget {
 		printf("%c \n", c);
 	}
 
+	virtual void scrolled(float wheelMove) {
+		if (wheelMove > 0.0f) {
+			printf("%f \n", wheelMove);
+		}
+	}
+
 	template <typename T>
 	T &as() {
 		return static_cast<T &>(*this);
+	}
+
+	virtual Ptr clone() {
+		return std::make_shared<Widget>(*this);
 	}
 };
 }  // namespace edui
