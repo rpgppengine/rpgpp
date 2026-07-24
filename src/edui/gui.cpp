@@ -54,4 +54,11 @@ void Gui::notifyChild(std::shared_ptr<Widget>* widget) {
 	if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
 		widget->get()->rightMouseClicked();
 	}
+	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+		widget->get()->leftMouseReleased();
+	}
+}
+
+Rectangle Gui::getScreenRect() {
+	return {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
 }

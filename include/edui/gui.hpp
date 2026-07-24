@@ -11,6 +11,8 @@ struct Gui {
 
 	std::shared_ptr<Widget>* current = nullptr;
 
+	Rectangle screenRect;
+
 	/** Last KeyboardKey. */
 	KeyboardKey lastKey = KEY_NULL;
 
@@ -20,6 +22,8 @@ struct Gui {
 	void add(std::shared_ptr<Widget> widget);
 
 	void notifyChild(std::shared_ptr<Widget>* widget);
+
+	Rectangle getScreenRect();
 };
 }  // namespace edui
 

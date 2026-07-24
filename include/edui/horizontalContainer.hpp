@@ -12,11 +12,16 @@ struct HorizontalContainerRender : public ContainerRender {
 struct HorizontalContainer : public Container {
 	typedef std::shared_ptr<HorizontalContainer> Ptr;
 
+	bool overflown = false;
+
 	HorizontalContainer();
+	void draw() override;
 
 	void add(std::shared_ptr<Widget> widget) override;
 
 	void scrolled(float mouseWheel) override;
+
+	void updateContentRect() override;
 
 	Widget::Ptr clone() override {
 		return std::make_shared<HorizontalContainer>(*this);

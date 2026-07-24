@@ -50,7 +50,7 @@ struct Widget {
 
 	bool isContainer = false;
 
-	Rectangle rect;
+	Rectangle rect = {0, 0, 0, 0};
 	Layout2 layout;
 
 	Widget() = default;
@@ -112,6 +112,10 @@ struct Widget {
 
 	virtual void rightMouseClicked() {
 		printf("right mouse.. \n");
+	}
+
+	virtual void leftMouseReleased() {
+		printf("left mouse released.. \n");
 	}
 
 	virtual void charEntered(char c) {
