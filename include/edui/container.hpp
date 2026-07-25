@@ -18,6 +18,8 @@ struct ContainerRender : public WidgetRender {
 };
 
 struct Container : public Widget {
+	Gui* gui;
+
 	typedef std::shared_ptr<Container> Ptr;
 
 	std::vector<std::shared_ptr<Widget>> widgets = {};

@@ -56,6 +56,10 @@ void Container::draw() {
 }
 
 void Container::add(std::shared_ptr<Widget> widget) {
+	if (widget->isContainer) {
+		widget->as<Container>().gui = this->gui;
+	}
+	widget->render->font = &gui->font;
 	widget->unfocused();
 	widgets.push_back(widget);
 }

@@ -19,11 +19,12 @@ void HorizontalContainer::update() {
 		float upperLimit = scrollAreaRect.width - (scrollbarRect.width - scrollOffset.x);
 
 		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollAreaRect.x + lowerLimit, scrollbarRect.y});
-		if (offset.x >= 0 && offset.x < upperLimit - lowerLimit) {
-			float max = upperLimit - lowerLimit;
-			float fract = (offset.x / max);
-			scissorX = (fract * scrollMax);
-		}
+		float newOffsetX = constrain<float>(offset.x, 0, static_cast<float>(upperLimit - lowerLimit));
+		offset.x = newOffsetX;
+
+		float max = upperLimit - lowerLimit;
+		float fract = (offset.x / max);
+		scissorX = (fract * scrollMax);
 	}
 	Container::update();
 }
@@ -109,7 +110,7 @@ void HorizontalContainer::leftMouseClicked() {
 	if (CheckCollisionPointRec(GetMousePosition(), scrollAreaRect)) {
 		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollbarRect.x, scrollbarRect.y});
 		if (!CheckCollisionPointRec(GetMousePosition(), scrollbarRect)) {
-			offset.y = scrollbarRect.width / 2.0f;
+			offset.x = scrollbarRect.width / 2.0f;
 		}
 		this->scrollOffset = offset;
 		scrolling = true;

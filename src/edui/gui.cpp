@@ -44,12 +44,17 @@ void Gui::update() {
 }
 
 void Gui::draw() {
+	ClearBackground(background);
 	for (auto &widget : widgets) {
 		widget->draw();
 	}
 }
 
 void Gui::add(std::shared_ptr<Widget> widget) {
+	if (widget->isContainer) {
+		widget->as<Container>().gui = this;
+	}
+	widget->render->font = &this->font;
 	widget->unfocused();
 	widgets.push_back(widget);
 }
@@ -75,9 +80,22 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 	if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
 		widget->get()->rightMouseClicked();
 	}
-
 }
 
 Rectangle Gui::getScreenRect() {
 	return {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+}
+
+void Gui::setFont(const char *fileName, int fontSize, const int *codepoints, int codepointCount) {
+	if (IsFontValid(font)) {
+		UnloadFont(font);
+	}
+
+	font = LoadFontEx(fileName, fontSize, codepoints, codepointCount);
+}
+
+void Gui::unload() {
+	if (IsFontValid(font)) {
+		UnloadFont(font);
+	}
 }

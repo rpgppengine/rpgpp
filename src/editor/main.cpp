@@ -1,10 +1,14 @@
 #include <memory>
+
 #include "editor.hpp"
+#include "edui/button.hpp"
 #include "edui/colorRect.hpp"
-#include "edui/gui.hpp"
 #include "edui/container.hpp"
+#include "edui/gui.hpp"
 #include "edui/horizontalContainer.hpp"
+#include "edui/label.hpp"
 #include "edui/verticalContainer.hpp"
+#include "raylib.h"
 #include "services/editorGuiService.hpp"
 
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION
@@ -28,7 +32,7 @@ int main() {
 	colorRect->layout.height = {0.5f, 0};
 	gui.add(colorRect);
 
-	//auto container = std::make_shared<edui::Container>();
+	// auto container = std::make_shared<edui::Container>();
 	auto container = std::make_shared<edui::HorizontalContainer>();
 	container->setPosition({0, 0}, {0, 0});
 	container->setSize({0.5f, 0}, {0.5f, 0});
@@ -43,9 +47,9 @@ int main() {
 	container->add(newRect);
 
 	auto newRect2 = newRect->clone();
-	//newRect2->render->as<edui::ColorRectRender>().bgColor = GREEN;
-	//newRect2->setPosition({0, 0}, {0, 0});
-	//newRect2->setSize({0.25, 50}, {1, 50});
+	// newRect2->render->as<edui::ColorRectRender>().bgColor = GREEN;
+	// newRect2->setPosition({0, 0}, {0, 0});
+	// newRect2->setSize({0.25, 50}, {1, 50});
 	container->add(newRect2);
 
 	auto vert = std::make_shared<edui::VerticalContainer>();
@@ -64,7 +68,16 @@ int main() {
 	vert->add(newRect4);
 
 	for (int i = 0; i < 10; i++) {
-		auto clonedRect = newRect3->clone();
+		// auto clonedRect = newRect3->clone();
+		auto clonedRect = std::make_shared<edui::Button>();
+		clonedRect->clicked = [i] {
+			printf("Hello! %i \n", i);
+		};
+		clonedRect->rightClicked = [i] {
+			printf("Hello right click! %i \n", i);
+		};
+		clonedRect->setSize({0, 50}, {0, 50});
+		clonedRect->render->as<edui::LabelRender>().horiAlign = edui::HorizontalAlignment::TEXT_LEFT;
 		vert->add(clonedRect);
 	}
 
@@ -75,19 +88,21 @@ int main() {
 
 	InitWindow(800, 450, "raylib example - basic window");
 
-    while (!WindowShouldClose())
-    {
-    	gui.update();
+	gui.font = LoadFontEx("resources/LanaPixel.ttf", 13, nullptr, 256);
 
-        BeginDrawing();
+	while (!WindowShouldClose()) {
+		gui.update();
 
-        ClearBackground(RAYWHITE);
-        gui.draw();
+		BeginDrawing();
 
-        EndDrawing();
-    }
+		gui.draw();
 
-    CloseWindow();
+		EndDrawing();
+	}
+
+	gui.unload();
+
+	CloseWindow();
 
 	printf("Closing editor..\n");
 

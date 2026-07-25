@@ -20,11 +20,12 @@ void VerticalContainer::update() {
 		float upperLimit = scrollAreaRect.height - (scrollbarRect.height - scrollOffset.y);
 
 		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollbarRect.x, scrollAreaRect.y + lowerLimit});
-		if (offset.y >= 0 && offset.y < upperLimit - lowerLimit) {
-			float max = upperLimit - lowerLimit;
-			float fract = (offset.y / max);
-			scissorY = (fract * scrollMax);
-		}
+		float newOffsetY = constrain<float>(offset.y, 0, static_cast<float>(upperLimit - lowerLimit));
+		offset.y = newOffsetY;
+
+		float max = upperLimit - lowerLimit;
+		float fract = (offset.y / max);
+		scissorY = (fract * scrollMax);
 	}
 	Container::update();
 }

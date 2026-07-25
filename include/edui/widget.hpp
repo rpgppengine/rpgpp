@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <memory>
 
+#include "edui/signal.hpp"
 #include "raylib.h"
 
 namespace edui {
@@ -37,6 +38,8 @@ struct WidgetRender {
 	Color currentBgColor = RAYWHITE;
 	Color currentBorderColor = BLACK;
 
+	Font *font = nullptr;
+
 	template <typename T>
 	T &as() {
 		return static_cast<T &>(*this);
@@ -45,6 +48,9 @@ struct WidgetRender {
 
 struct Widget {
 	typedef std::shared_ptr<Widget> Ptr;
+
+	Signal clicked;
+	Signal rightClicked;
 
 	std::unique_ptr<WidgetRender> render;
 
@@ -116,15 +122,15 @@ struct Widget {
 		render->currentBorderColor = render->borderColor;
 	}
 
-	virtual void leftMouseClicked() { printf("left mouse.. \n"); }
+	virtual void leftMouseClicked() { clicked.invoke(); }
 
-	virtual void rightMouseClicked() { printf("right mouse.. \n"); }
+	virtual void rightMouseClicked() { rightClicked.invoke(); }
 
-	virtual void leftMouseReleased() { printf("left mouse released.. \n"); }
+	virtual void leftMouseReleased() {}
 
-	virtual void rightMouseReleased() { printf("right mouse released.. \n"); }
+	virtual void rightMouseReleased() {}
 
-	virtual void charEntered(char c) { printf("%c \n", c); }
+	virtual void charEntered(char c) {}
 
 	virtual void scrolled(float wheelMove) {
 		if (wheelMove > 0.0f) {
