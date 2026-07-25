@@ -1,8 +1,11 @@
 #include "edui/verticalContainer.hpp"
+
 #include <cmath>
+
 #include "edui/container.hpp"
 #include "edui/helper.hpp"
 #include "raylib.h"
+#include "raymath.h"
 
 using namespace edui;
 
@@ -11,27 +14,36 @@ VerticalContainer::VerticalContainer() {
 	render = std::make_unique<VerticalContainerRender>();
 }
 
+void VerticalContainer::update() {
+	if (scrolling) {
+		float lowerLimit = scrollOffset.y;
+		float upperLimit = scrollAreaRect.height - (scrollbarRect.height - scrollOffset.y);
+
+		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollbarRect.x, scrollAreaRect.y + lowerLimit});
+		if (offset.y >= 0 && offset.y < upperLimit - lowerLimit) {
+			float max = upperLimit - lowerLimit;
+			float fract = (offset.y / max);
+			scissorY = (fract * scrollMax);
+		}
+	}
+	Container::update();
+}
+
 void VerticalContainer::draw() {
 	Container::draw();
 	if (overflown) {
-		float flipped = -scissorY;
-		float fract = (flipped / -scrollMax);
-
-		Rectangle scrollbar = {scrollAreaRect.x, scrollAreaRect.y, ScrollbarSize, scrollbarHeight};
-		scrollbar.y -= fract * (scrollbarHeight - contentRect.height);
-		DrawRectangleRec(scrollbar, GRAY);
-
-		DrawRectangleLinesEx(scrollAreaRect, 1.0f, render->borderColor);
+		DrawRectangleRec(scrollbarRect, render->as<ContainerRender>().currentScrollbarColor);
+		DrawRectangleLinesEx(scrollAreaRect, 1.0f, render->currentBorderColor);
 	}
 }
 
 void VerticalContainer::add(std::shared_ptr<Widget> widget) {
-	auto& rend = render->as<VerticalContainerRender>();
+	auto &rend = render->as<VerticalContainerRender>();
 
 	int count = widgets.size();
 
 	int res = 0;
-	for (auto& widget : widgets) {
+	for (auto &widget : widgets) {
 		res += (widget->layout.height.offset) + rend.space;
 	}
 	int widgetHeight = widget->layout.height.offset;
@@ -50,7 +62,7 @@ void VerticalContainer::updateContentRect() {
 	this->contentRect = rect;
 	if (overflown) {
 		float old = contentRect.width;
-		contentRect.width  = old - ScrollbarSize;
+		contentRect.width = old - ScrollbarSize;
 	}
 	renderRect = paddingRect(contentRect, render->padding);
 	if (isScissor) {
@@ -62,6 +74,10 @@ void VerticalContainer::updateContentRect() {
 	scrollAreaRect.x += rect.width - ScrollbarSize;
 
 	this->scrollbarHeight = (contentRect.height / scissorRect.height) * contentRect.height;
+
+	float fract = (-scissorY / -scrollMax);
+	this->scrollbarRect = {scrollAreaRect.x, scrollAreaRect.y, ScrollbarSize, scrollbarHeight};
+	scrollbarRect.y -= fract * (scrollbarHeight - contentRect.height);
 
 	float content = contentRect.height;
 	float scissor = scissorRect.height;
@@ -88,4 +104,19 @@ void VerticalContainer::scrolled(float mouseWheel) {
 	}
 
 	scissorY += added;
+}
+
+void VerticalContainer::leftMouseClicked() {
+	if (CheckCollisionPointRec(GetMousePosition(), scrollAreaRect)) {
+		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollbarRect.x, scrollbarRect.y});
+		if (!CheckCollisionPointRec(GetMousePosition(), scrollbarRect)) {
+			offset.y = scrollbarRect.height / 2.0f;
+		}
+		this->scrollOffset = offset;
+		scrolling = true;
+	}
+}
+
+void VerticalContainer::leftMouseReleased() {
+	scrolling = false;
 }

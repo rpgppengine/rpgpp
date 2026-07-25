@@ -48,7 +48,9 @@ struct Widget {
 
 	std::unique_ptr<WidgetRender> render;
 
+	bool focusable = true;
 	bool isContainer = false;
+	bool notifiedMouseEnter = false;
 
 	Rectangle rect = {0, 0, 0, 0};
 	Layout2 layout;
@@ -58,7 +60,7 @@ struct Widget {
 	virtual void update() {};
 	virtual void draw() {};
 
-	Widget(Widget& other) {
+	Widget(Widget &other) {
 		rect = other.rect;
 		layout = other.layout;
 		isContainer = other.isContainer;
@@ -92,8 +94,16 @@ struct Widget {
 		return res;
 	}
 
-	bool mouseIsInRect() {
-		return CheckCollisionPointRec(GetMousePosition(), rect);
+	bool mouseIsInRect() { return CheckCollisionPointRec(GetMousePosition(), rect); }
+
+	virtual void mouseEntered() {
+		render->currentBgColor = render->focusBgColor;
+		render->currentBorderColor = render->focusBorderColor;
+	}
+
+	virtual void mouseLeft() {
+		render->currentBgColor = render->bgColor;
+		render->currentBorderColor = render->borderColor;
 	}
 
 	virtual void focused() {
@@ -106,21 +116,15 @@ struct Widget {
 		render->currentBorderColor = render->borderColor;
 	}
 
-	virtual void leftMouseClicked() {
-		printf("left mouse.. \n");
-	}
+	virtual void leftMouseClicked() { printf("left mouse.. \n"); }
 
-	virtual void rightMouseClicked() {
-		printf("right mouse.. \n");
-	}
+	virtual void rightMouseClicked() { printf("right mouse.. \n"); }
 
-	virtual void leftMouseReleased() {
-		printf("left mouse released.. \n");
-	}
+	virtual void leftMouseReleased() { printf("left mouse released.. \n"); }
 
-	virtual void charEntered(char c) {
-		printf("%c \n", c);
-	}
+	virtual void rightMouseReleased() { printf("right mouse released.. \n"); }
+
+	virtual void charEntered(char c) { printf("%c \n", c); }
 
 	virtual void scrolled(float wheelMove) {
 		if (wheelMove > 0.0f) {
@@ -133,9 +137,7 @@ struct Widget {
 		return static_cast<T &>(*this);
 	}
 
-	virtual Ptr clone() {
-		return std::make_shared<Widget>(*this);
-	}
+	virtual Ptr clone() { return std::make_shared<Widget>(*this); }
 };
 }  // namespace edui
 

@@ -12,9 +12,7 @@ struct ColorRect : public Widget {
 	ColorRect();
 	void draw();
 
-	Widget::Ptr clone() {
-		return std::make_shared<ColorRect>(*this);
-	}
+	Widget::Ptr clone() { return std::make_shared<ColorRect>(*this); }
 };
 }  // namespace edui
 

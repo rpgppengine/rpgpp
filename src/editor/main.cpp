@@ -57,6 +57,7 @@ int main() {
 
 	auto newRect3 = std::make_shared<edui::ColorRect>();
 	newRect3->setSize({0, 50}, {0, 50});
+	newRect3->render->focusBgColor = GRAY;
 	vert->add(newRect3);
 
 	auto newRect4 = newRect3->clone();
@@ -65,6 +66,11 @@ int main() {
 	for (int i = 0; i < 10; i++) {
 		auto clonedRect = newRect3->clone();
 		vert->add(clonedRect);
+	}
+
+	for (int i = 0; i < 10; i++) {
+		auto clonedRect = newRect->clone();
+		container->add(clonedRect);
 	}
 
 	InitWindow(800, 450, "raylib example - basic window");

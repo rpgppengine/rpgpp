@@ -6,11 +6,16 @@
 
 #include "edui/gui.hpp"
 #include "edui/widget.hpp"
+#include "raylib.h"
 namespace edui {
 const uint8_t ScrollSpeed = 36;
-const uint8_t ScrollbarSize = 8;
+const uint8_t ScrollbarSize = 12;
 
-struct ContainerRender : public WidgetRender {};
+struct ContainerRender : public WidgetRender {
+	Color scrollbarColor = GRAY;
+	Color focusScrollbarColor = DARKGRAY;
+	Color currentScrollbarColor = GRAY;
+};
 
 struct Container : public Widget {
 	typedef std::shared_ptr<Container> Ptr;
@@ -31,18 +36,19 @@ struct Container : public Widget {
 	float scrollMax;
 
 	Container();
-	void update();
+	virtual void update();
 	virtual void draw();
+
+	virtual void mouseEntered();
+	virtual void mouseLeft();
 
 	virtual void add(std::shared_ptr<Widget> widget);
 
 	virtual void updateContentRect();
 
-	void notifyChildren(edui::Gui* gui);
+	void notifyChildren(edui::Gui *gui);
 
-	Widget::Ptr clone() {
-		return std::make_shared<Container>(*this);
-	}
+	Widget::Ptr clone() { return std::make_shared<Container>(*this); }
 };
 
 }  // namespace edui

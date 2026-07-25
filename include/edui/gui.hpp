@@ -9,7 +9,8 @@ namespace edui {
 struct Gui {
 	std::vector<std::shared_ptr<Widget>> widgets;
 
-	std::shared_ptr<Widget>* current = nullptr;
+	std::shared_ptr<Widget> *current = nullptr;
+	std::shared_ptr<Widget> *leftClickedWidget = nullptr;
 
 	Rectangle screenRect;
 
@@ -21,7 +22,7 @@ struct Gui {
 
 	void add(std::shared_ptr<Widget> widget);
 
-	void notifyChild(std::shared_ptr<Widget>* widget);
+	void notifyChild(std::shared_ptr<Widget> *widget);
 
 	Rectangle getScreenRect();
 };
