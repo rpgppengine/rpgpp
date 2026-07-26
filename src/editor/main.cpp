@@ -25,70 +25,22 @@ int main() {
 
 	edui::Gui gui;
 
-	auto colorRect = std::make_shared<edui::ColorRect>();
-	colorRect->layout.x = {0.5f, 0};
-	colorRect->layout.y = {0, 0};
-	colorRect->layout.width = {0, 50};
-	colorRect->layout.height = {0.5f, 0};
-	gui.add(colorRect);
-
-	// auto container = std::make_shared<edui::Container>();
-	auto container = std::make_shared<edui::HorizontalContainer>();
-	container->setPosition({0, 0}, {0, 0});
-	container->setSize({0.5f, 0}, {0.5f, 0});
-	container->render->padding = 4.0f;
-	container->render->as<edui::HorizontalContainerRender>().space = 4;
-	gui.add(container);
-
-	auto newRect = std::make_shared<edui::ColorRect>();
-	newRect->render->as<edui::ColorRectRender>().bgColor = MAGENTA;
-	newRect->setPosition({0, 0}, {0, 0});
-	newRect->setSize({0.25f, 50}, {1.0f, 50});
-	container->add(newRect);
-
-	auto newRect2 = newRect->clone();
-	// newRect2->render->as<edui::ColorRectRender>().bgColor = GREEN;
-	// newRect2->setPosition({0, 0}, {0, 0});
-	// newRect2->setSize({0.25, 50}, {1, 50});
-	container->add(newRect2);
-
-	auto vert = std::make_shared<edui::VerticalContainer>();
-	vert->setPosition({0, 0}, {0.5f, 0});
-	vert->setSize({0.5f, 0}, {0.5f, 0});
-	vert->render->padding = 4.0f;
-	vert->scissorRect = {0, 0, 0, 280};
-	gui.add(vert);
-
-	auto newRect3 = std::make_shared<edui::ColorRect>();
-	newRect3->setSize({0, 50}, {0, 50});
-	newRect3->render->focusBgColor = GRAY;
-	vert->add(newRect3);
-
-	auto newRect4 = newRect3->clone();
-	vert->add(newRect4);
-
-	for (int i = 0; i < 10; i++) {
-		// auto clonedRect = newRect3->clone();
-		auto clonedRect = std::make_shared<edui::Button>();
-		clonedRect->clicked = [i] {
-			printf("Hello! %i \n", i);
-		};
-		clonedRect->rightClicked = [i] {
-			printf("Hello right click! %i \n", i);
-		};
-		clonedRect->setSize({0, 50}, {0, 50});
-		clonedRect->render->as<edui::LabelRender>().horiAlign = edui::HorizontalAlignment::TEXT_LEFT;
-		vert->add(clonedRect);
-	}
-
-	for (int i = 0; i < 10; i++) {
-		auto clonedRect = newRect->clone();
-		container->add(clonedRect);
-	}
-
 	InitWindow(800, 450, "raylib example - basic window");
 
-	gui.font = LoadFontEx("resources/LanaPixel.ttf", 13, nullptr, 256);
+	int codepoints[512 + 143 + 68] = { 0 };
+	for (int i = 0; i < 95; i++) codepoints[i] = 32 + i;
+	for (int i = 0; i < 255; i++) codepoints[96 + i] = 0x400 + i; // cyrillic
+	for (int i = 0; i < 143; i++) codepoints[256 + 96 + i] = 0x370 + i; // greek
+	for (int i = 0; i < 68; i++) codepoints[256 + 96 + 144 + i] = 0x5B0 + i; // hebrew
+	gui.font = LoadFontEx("resources/PixelCode.ttf", 12, codepoints, 512 + 143 + 68);
+
+	auto label = std::make_shared<edui::Label>();
+	label->setSize({0, 160}, {0, 26});
+	label->setText("Нека говорим на езици!");
+	label->render->as<edui::LabelRender>().padding = 2;
+	label->render->as<edui::LabelRender>().fontSize = 2;
+	label->render->as<edui::LabelRender>().border = 0;
+	gui.add(label);
 
 	while (!WindowShouldClose()) {
 		gui.update();

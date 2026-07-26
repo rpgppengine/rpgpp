@@ -1,14 +1,17 @@
 #include "edui/gui.hpp"
+#include <memory>
 
 #include "edui/container.hpp"
+#include "edui/widget.hpp"
 #include "raylib.h"
 
 using namespace edui;
 
-void Gui::update() {
-	Rectangle screenRect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+Gui* Gui::instance = nullptr;
 
-	for (auto &widget : widgets) {
+void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
+	int i = 0;
+	for (auto &widget : vec) {
 		if (widget->mouseIsInRect()) {
 			if (!widget->isContainer) {
 				notifyChild(&widget);
@@ -26,7 +29,20 @@ void Gui::update() {
 
 		widget->update();
 		widget->calcRect(screenRect);
+
+		if (widget->deleteFlag) {
+			vec.erase(vec.begin() + i);
+		}
+
+		i++;
 	}
+}
+
+void Gui::update() {
+	Rectangle screenRect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+
+	processVector(topLayer);
+	processVector(widgets);
 
 	if (current != nullptr) {
 		int c = GetCharPressed();
@@ -48,6 +64,9 @@ void Gui::draw() {
 	for (auto &widget : widgets) {
 		widget->draw();
 	}
+	for (auto &widget : topLayer) {
+		widget->draw();
+	}
 }
 
 void Gui::add(std::shared_ptr<Widget> widget) {
@@ -57,6 +76,15 @@ void Gui::add(std::shared_ptr<Widget> widget) {
 	widget->render->font = &this->font;
 	widget->unfocused();
 	widgets.push_back(widget);
+}
+
+void Gui::addTop(std::shared_ptr<Widget> widget) {
+	if (widget->isContainer) {
+		widget->as<Container>().gui = this;
+	}
+	widget->render->font = &this->font;
+	widget->unfocused();
+	topLayer.push_back(widget);
 }
 
 void Gui::notifyChild(std::shared_ptr<Widget> *widget) {

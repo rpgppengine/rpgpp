@@ -14,8 +14,8 @@ struct Layout {
 };
 
 struct Layout2 {
-	Layout x;
-	Layout y;
+	Layout x = {0, 0};
+	Layout y = {0, 0};
 	Layout width;
 	Layout height;
 };
@@ -51,8 +51,12 @@ struct Widget {
 
 	Signal clicked;
 	Signal rightClicked;
+	Signal onFocused;
+	Signal onUnfocused;
 
 	std::unique_ptr<WidgetRender> render;
+
+	bool deleteFlag = false;
 
 	bool focusable = true;
 	bool isContainer = false;
@@ -115,11 +119,13 @@ struct Widget {
 	virtual void focused() {
 		render->currentBgColor = render->focusBgColor;
 		render->currentBorderColor = render->focusBorderColor;
+		onFocused.invoke();
 	}
 
 	virtual void unfocused() {
 		render->currentBgColor = render->bgColor;
 		render->currentBorderColor = render->borderColor;
+		onUnfocused.invoke();
 	}
 
 	virtual void leftMouseClicked() { clicked.invoke(); }
@@ -144,6 +150,10 @@ struct Widget {
 	}
 
 	virtual Ptr clone() { return std::make_shared<Widget>(*this); }
+
+	void markDelete() {
+		deleteFlag = true;
+	}
 };
 }  // namespace edui
 

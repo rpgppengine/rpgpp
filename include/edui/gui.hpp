@@ -9,10 +9,13 @@
 
 namespace edui {
 struct Gui {
+	static Gui* instance;
+
 	Color background = RAYWHITE;
 	Font font;
 
 	std::vector<std::shared_ptr<Widget>> widgets;
+	std::vector<std::shared_ptr<Widget>> topLayer;
 
 	std::shared_ptr<Widget> *current = nullptr;
 	std::shared_ptr<Widget> *leftClickedWidget = nullptr;
@@ -22,10 +25,17 @@ struct Gui {
 	/** Last KeyboardKey. */
 	KeyboardKey lastKey = KEY_NULL;
 
+	Gui() {
+		Gui::instance = this;
+	}
+
 	void update();
 	void draw();
 
+	void processVector(std::vector<std::shared_ptr<Widget>>& vec);
+
 	void add(std::shared_ptr<Widget> widget);
+	void addTop(std::shared_ptr<Widget> widget);
 
 	void notifyChild(std::shared_ptr<Widget> *widget);
 
