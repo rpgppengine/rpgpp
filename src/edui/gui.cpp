@@ -2,6 +2,7 @@
 #include <memory>
 
 #include "edui/container.hpp"
+#include "edui/helper.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
 
@@ -114,12 +115,13 @@ Rectangle Gui::getScreenRect() {
 	return {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
 }
 
-void Gui::setFont(const char *fileName, int fontSize, const int *codepoints, int codepointCount) {
+void Gui::setFont(const char *fileName, int fontSize) {
 	if (IsFontValid(font)) {
 		UnloadFont(font);
 	}
 
-	font = LoadFontEx(fileName, fontSize, codepoints, codepointCount);
+	auto codepoints = loadFontCodepoints();
+	font = LoadFontEx(fileName, fontSize, codepoints.data(), codepoints.size());
 }
 
 void Gui::unload() {

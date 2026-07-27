@@ -27,19 +27,15 @@ int main() {
 
 	InitWindow(800, 450, "raylib example - basic window");
 
-	int codepoints[512 + 143 + 68] = { 0 };
-	for (int i = 0; i < 95; i++) codepoints[i] = 32 + i;
-	for (int i = 0; i < 255; i++) codepoints[96 + i] = 0x400 + i; // cyrillic
-	for (int i = 0; i < 143; i++) codepoints[256 + 96 + i] = 0x370 + i; // greek
-	for (int i = 0; i < 68; i++) codepoints[256 + 96 + 144 + i] = 0x5B0 + i; // hebrew
-	gui.font = LoadFontEx("resources/PixelCode.ttf", 12, codepoints, 512 + 143 + 68);
+	gui.setFont("resources/Silver.ttf", 21);
 
 	auto label = std::make_shared<edui::Label>();
 	label->setSize({0, 160}, {0, 26});
-	label->setText("Нека говорим на езици!");
+	label->setText("店ぽちラ隊政エネイノ");
+	//label->setText("The lazy fox jumped over the dog!");
 	label->render->as<edui::LabelRender>().padding = 2;
-	label->render->as<edui::LabelRender>().fontSize = 2;
-	label->render->as<edui::LabelRender>().border = 0;
+	label->render->as<edui::LabelRender>().fontSize = 2.0f;
+	//label->render->as<edui::LabelRender>().border = 0;
 	gui.add(label);
 
 	while (!WindowShouldClose()) {

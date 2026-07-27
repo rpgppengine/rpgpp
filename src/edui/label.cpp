@@ -49,18 +49,29 @@ void Label::setText(const std::string &text) {
 	float totalFontSize = rend.font->baseSize * rend.fontSize;
 	Vector2 textSize = MeasureTextEx(*rend.font, text.c_str(), totalFontSize, rend.spacing);
 
+	std::string copiedStr = text;
+	char* textPtr = copiedStr.data();
+	auto codepointCount = GetCodepointCount(text.data());
+
+	int codepointsTotal = 0;
+
 	if (textSize.x > paddingRect.width) {
 		int result = text.size() - 1;
-		for (int i = 1; i < text.size(); i++) {
-			std::string subStr = TextSubtext(text.c_str(), 0, i);
+		for (int i = 0; i < codepointCount; i++) {
+			int codepointSize = 0;
+			GetCodepointNext(textPtr, &codepointSize);
+			codepointsTotal += codepointSize;
+
+			std::string subStr = TextSubtext(text.c_str(), 0, codepointsTotal);
 			Vector2 testTextSize = MeasureTextEx(*rend.font, subStr.c_str(), totalFontSize, rend.spacing);
 			if (testTextSize.x > paddingRect.width) {
-				result = i - 1;
+				result = codepointsTotal - (codepointSize * 2);
+
 				break;
 			}
 		}
 
-		this->shownText = TextSubtext(text.c_str(), 0, result - 2);
+		this->shownText = TextSubtext(text.c_str(), 0, result);
 		this->shownText = this->shownText.append("...");
 
 		overflown = true;

@@ -40,7 +40,7 @@ struct Gui {
 	void notifyChild(std::shared_ptr<Widget> *widget);
 
 	Rectangle getScreenRect();
-	void setFont(const char *fileName, int fontSize, const int *codepoints, int codepointCount);
+	void setFont(const char *fileName, int fontSize);
 
 	void unload();
 };
