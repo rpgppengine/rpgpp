@@ -1,5 +1,6 @@
 #include "edui/label.hpp"
 
+#include <cstdio>
 #include <memory>
 
 #include "edui/gui.hpp"
@@ -50,12 +51,12 @@ void Label::setText(const std::string &text) {
 	Vector2 textSize = MeasureTextEx(*rend.font, text.c_str(), totalFontSize, rend.spacing);
 
 	std::string copiedStr = text;
-	char* textPtr = copiedStr.data();
+	char *textPtr = copiedStr.data();
 	auto codepointCount = GetCodepointCount(text.data());
 
 	int codepointsTotal = 0;
 
-	if (textSize.x > paddingRect.width) {
+	if (textSize.x > (paddingRect.width - 16)) {
 		int result = text.size() - 1;
 		for (int i = 0; i < codepointCount; i++) {
 			int codepointSize = 0;
@@ -64,8 +65,8 @@ void Label::setText(const std::string &text) {
 
 			std::string subStr = TextSubtext(text.c_str(), 0, codepointsTotal);
 			Vector2 testTextSize = MeasureTextEx(*rend.font, subStr.c_str(), totalFontSize, rend.spacing);
-			if (testTextSize.x > paddingRect.width) {
-				result = codepointsTotal - (codepointSize * 2);
+			if (testTextSize.x > (paddingRect.width - 16)) {
+				result = codepointsTotal - 1;
 
 				break;
 			}
