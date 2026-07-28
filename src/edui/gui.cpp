@@ -46,10 +46,25 @@ void Gui::update() {
 	processVector(widgets);
 
 	if (current != nullptr) {
-		int c = GetCharPressed();
-		while (c != 0) {
-			current->get()->charEntered(static_cast<char>(c));
-			c = GetCharPressed();
+		int codepoint = GetCharPressed();
+		while (codepoint != 0) {
+			int size = 0;
+			std::string codepointStr = CodepointToUTF8(codepoint, &size);
+			for (int i = 0; i < codepointStr.size(); i++) {
+				char chr = codepointStr.at(i);
+				current->get()->charEntered(chr);
+			}
+			codepoint = GetCharPressed();
+		}
+
+		KeyboardKey key = static_cast<KeyboardKey>(GetKeyPressed());
+		if (key != KEY_NULL) {
+			lastKey = key;
+			current->get()->keyPressed(key, false);
+		}
+
+		if (lastKey != KEY_NULL && IsKeyDown(lastKey)) {
+			current->get()->keyPressed(lastKey, true);
 		}
 	}
 

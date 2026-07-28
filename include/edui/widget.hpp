@@ -58,9 +58,10 @@ struct Widget {
 
 	bool deleteFlag = false;
 
-	bool focusable = true;
+	bool focusable = false;
 	bool isContainer = false;
 	bool notifiedMouseEnter = false;
+	bool isFocused = false;
 
 	Rectangle rect = {0, 0, 0, 0};
 	Layout2 layout;
@@ -117,12 +118,14 @@ struct Widget {
 	}
 
 	virtual void focused() {
+		isFocused = true;
 		render->currentBgColor = render->focusBgColor;
 		render->currentBorderColor = render->focusBorderColor;
 		onFocused.invoke();
 	}
 
 	virtual void unfocused() {
+		isFocused = false;
 		render->currentBgColor = render->bgColor;
 		render->currentBorderColor = render->borderColor;
 		onUnfocused.invoke();
@@ -137,6 +140,8 @@ struct Widget {
 	virtual void rightMouseReleased() {}
 
 	virtual void charEntered(char c) {}
+
+	virtual void keyPressed(KeyboardKey key, bool held = false) {}
 
 	virtual void scrolled(float wheelMove) {
 		if (wheelMove > 0.0f) {
