@@ -1,6 +1,7 @@
 #ifndef _EDUI_HELPER_H
 #define _EDUI_HELPER_H
 
+#include <string>
 #include <vector>
 #include "raylib.h"
 
@@ -24,5 +25,8 @@ void loadCodepointsBlock(std::vector<int>& vec, CharsBlock block);
 std::vector<int> loadFontCodepoints();
 
 Rectangle paddingRect(Rectangle &rect, float padding);
+
+/* Draw the text. Draws only part of it and returns true on overflown, otherwise draws the whole text and returns false. */
+bool drawOverflownText(Rectangle rect, Font* font, float fontSize, float spacing, const std::string& text, std::string* shownText);
 
 #endif

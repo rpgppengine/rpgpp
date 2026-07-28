@@ -37,3 +37,44 @@ std::vector<int> loadFontCodepoints() {
 
 	return codepoints;
 };
+
+bool drawOverflownText(Rectangle rect, Font* font, float fontSize, float spacing, const std::string& text, std::string* shownText) {
+	bool overflown = false;
+
+	float totalFontSize = font->baseSize * fontSize;
+	Vector2 textSize = MeasureTextEx(*font, text.c_str(), totalFontSize, spacing);
+
+	std::string copiedStr = text;
+	char *textPtr = copiedStr.data();
+	auto codepointCount = GetCodepointCount(text.data());
+
+	int codepointsTotal = 0;
+
+	if (textSize.x > rect.width) {
+		int result = text.size() - 1;
+		for (int i = 0; i < codepointCount; i++) {
+			int codepointSize = 0;
+			GetCodepointNext(textPtr, &codepointSize);
+			codepointsTotal += codepointSize;
+
+			std::string subStr = TextSubtext(text.c_str(), 0, codepointsTotal);
+			Vector2 testTextSize = MeasureTextEx(*font, subStr.c_str(), totalFontSize, spacing);
+			if (testTextSize.x > (rect.width - 16)) {
+				result = codepointsTotal - 1;
+
+				break;
+			}
+		}
+
+		*shownText = TextSubtext(text.c_str(), 0, result);
+		*shownText = shownText->append("...");
+
+		overflown = true;
+	} else {
+		*shownText = text;
+
+		overflown = false;
+	}
+
+	return overflown;
+}

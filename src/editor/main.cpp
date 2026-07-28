@@ -32,8 +32,9 @@ int main() {
 	auto label = std::make_shared<edui::Label>();
 	label->setSize({0, 160}, {0, 26});
 	//label->setText("японская транснациональная корпорация, специализирующаяся на разработке видеоигр и игровых систем.");
-	label->setText("者ノト塚15車し表二ね");
+	//label->setText("者ノト塚15車し表二ね");
 	//label->setText("The lazy fox jumped over the dog!");
+	label->setText("Hello World!abc");
 	label->render->as<edui::LabelRender>().padding = 2;
 	label->render->as<edui::LabelRender>().fontSize = 2.0f;
 	//label->render->as<edui::LabelRender>().border = 0;
