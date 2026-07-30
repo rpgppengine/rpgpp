@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <string_view>
 
 #include "edui/signal.hpp"
 #include "raylib.h"
@@ -24,6 +25,13 @@ struct Event {
 	Vector2 mousePos;
 	KeyboardKey key;
 	MouseButton mouseButton;
+};
+
+struct KeyModifier {
+	bool ctrl = false;
+	bool shift = false;
+	bool alt = false;
+	bool numlock = false;
 };
 
 struct WidgetRender {
@@ -139,9 +147,9 @@ struct Widget {
 
 	virtual void rightMouseReleased() {}
 
-	virtual void charEntered(char c) {}
+	virtual void charEntered(int codepoint, std::string_view str) {}
 
-	virtual void keyPressed(KeyboardKey key, bool held = false) {}
+	virtual void keyPressed(KeyboardKey key, KeyModifier mod, bool held = false) {}
 
 	virtual void scrolled(float wheelMove) {
 		if (wheelMove > 0.0f) {

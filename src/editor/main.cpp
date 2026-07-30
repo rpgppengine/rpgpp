@@ -27,6 +27,7 @@ int main() {
 	edui::Gui gui;
 
 	InitWindow(800, 450, "raylib example - basic window");
+	SetTargetFPS(60);
 
 	gui.setFont("resources/Silver.ttf", 21);
 
@@ -45,6 +46,7 @@ int main() {
 	textBox->setSize({0, 200}, {0, 26});
 	textBox->setPosition({0, 20}, {0, 50});
 	textBox->setText("Hello World! The lazy fox jumped over the dog!");
+	//textBox->setText("者ノト塚15車し表二ね");
 	textBox->render->as<edui::TextBoxRender>().fontSize = 2.0f;
 	gui.add(textBox);
 

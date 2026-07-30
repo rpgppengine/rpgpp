@@ -1,10 +1,13 @@
 #include "edui/gui.hpp"
 #include <memory>
+#include <string_view>
 
 #include "edui/container.hpp"
 #include "edui/helper.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
+
+#include "GLFW/glfw3.h"
 
 using namespace edui;
 
@@ -46,25 +49,36 @@ void Gui::update() {
 	processVector(widgets);
 
 	if (current != nullptr) {
+		KeyboardKey key = static_cast<KeyboardKey>(GetKeyPressed());
+		KeyModifier mod;
+		mod.alt = IsKeyDown(KEY_LEFT_ALT);
+		mod.ctrl = IsKeyDown(KEY_LEFT_CONTROL);
+		mod.shift = IsKeyDown(KEY_LEFT_SHIFT);
 		int codepoint = GetCharPressed();
-		while (codepoint != 0) {
-			int size = 0;
-			std::string codepointStr = CodepointToUTF8(codepoint, &size);
-			for (int i = 0; i < codepointStr.size(); i++) {
-				char chr = codepointStr.at(i);
-				current->get()->charEntered(chr);
-			}
-			codepoint = GetCharPressed();
+
+		if (key == KEY_KP_7 && codepoint == 0) {
+			mod.numlock = true;
+		}
+		if (key == KEY_KP_1 && codepoint == 0) {
+			mod.numlock = true;
 		}
 
-		KeyboardKey key = static_cast<KeyboardKey>(GetKeyPressed());
 		if (key != KEY_NULL) {
 			lastKey = key;
-			current->get()->keyPressed(key, false);
+			current->get()->keyPressed(key, mod, false);
 		}
 
 		if (lastKey != KEY_NULL && IsKeyDown(lastKey)) {
-			current->get()->keyPressed(lastKey, true);
+			current->get()->keyPressed(lastKey, mod, true);
+		}
+
+		while (codepoint != 0) {
+			int size = 0;
+			auto codepointStrC = CodepointToUTF8(codepoint, &size);
+			std::string_view view = codepointStrC;
+			current->get()->charEntered(codepoint, view);
+
+			codepoint = GetCharPressed();
 		}
 	}
 
