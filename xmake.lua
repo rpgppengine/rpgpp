@@ -1,45 +1,13 @@
-package("raylib")
--- set_sourcedir(path.join(os.scriptdir(), "libs/raylib/src"))
-add_urls("https://github.com/raysan5/raylib.git")
-add_versions("5.5.99", "13f9112d8c069ed333acf72c2c1b94a0533c6dc1")
-add_deps("cmake")
-set_license("Zlib")
 
-if is_plat("mingw", "linux", "macosx") then
-	add_syslinks("raylib")
-end
-if is_plat("macosx") then
-    add_frameworks("CoreVideo", "CoreGraphics", "AppKit", "IOKit", "CoreFoundation", "Foundation")
-elseif is_plat("mingw", "windows") then
-	add_syslinks("gdi32", "opengl32", "winmm", "shell32", "user32")
+
+includes("toolchain/*.lua")
+includes("packages/*.lua")
+if is_plat("switch") then
+	set_toolchains("devkita64")
+	set_arch("arm64")
 end
 
-on_install("linux", "macosx", "mingw", "windows", function (package)
-	-- os.cd(path.join(os.scriptdir(), "libs/raylib/"))
-	import("package.tools.cmake").install(package, { })
-end)
-package_end()
-
-package("tgui")
--- set_sourcedir(path.join(os.scriptdir(), "libs/tgui/"))
-add_urls("https://github.com/texus/TGUI.git")
-add_versions("1.12.99", "c6d138509f2aae33cbabb09a91c5857eba990657")
-add_versions("1.12.100", "9adfbabe2615a7617d86594a37bfb956ad907670")
-add_versions("1.12.101", "f70ad91e61843aa8c5f94478fc845b2921b3e4aa")
-add_deps("cmake", "raylib")
-set_license("Zlib")
-add_extsources("raylib")
-on_install("linux", "macosx", "mingw", "windows", function (package)
-	local configs = { }
-	table.insert(configs, "-DCMAKE_BUILD_TYPE=" .. (is_mode("debug") and "Debug" or "Release"))
-	table.insert(configs, "-DBUILD_SHARED_LIBS=OFF")
-	table.insert(configs, "-DTGUI_BACKEND=RAYLIB")
-	table.insert(configs, "-DTGUI_BUILD_GUI_BUILDER=OFF")
-	import("package.tools.cmake").install(package, configs)
-end)
-package_end()
-
-add_requires("raylib", "tgui", "nlohmann_json", "luajit", "pugixml", "rttr")
+add_requires("raylib", "tgui", "nlohmann_json", "luajit", "pugixml")
 add_rules("mode.debug", "mode.release")
 set_defaultmode("debug")
 
@@ -47,7 +15,7 @@ target("rpgpp")
 set_plat(os.host())
 set_arch(os.arch())
 set_kind("static")
-add_packages("rttr", "raylib", "nlohmann_json", "luajit", "pugixml")
+add_packages("raylib", "nlohmann_json", "luajit", "pugixml")
 set_languages("cxx17")
 add_includedirs("include/", "include/lua/", "include/ui_elements/")
 add_files("src/*.cpp", "src/lua/*.cpp", "src/ui_elements/*.cpp")
@@ -66,14 +34,14 @@ set_kind("shared")
 set_languages("cxx17")
 add_includedirs("include/")
 add_files("src/rpgpplua/*.cpp")
-add_packages("nlohmann_json", "raylib", "luajit", "rttr", { public = true })
+add_packages("nlohmann_json", "raylib", "luajit", { public = true })
 add_deps("rpgpp")
 
 target("game")
 set_kind("binary")
 add_deps("rpgpp")
 -- for some very cool bizarre reason, xmake didn't compile the game target without these.
-add_packages("nlohmann_json", "raylib", "luajit", "rttr")
+add_packages("nlohmann_json", "raylib", "luajit")
 set_languages("cxx17")
 add_includedirs("include/")
 add_files("src/game/main.cpp")
@@ -124,7 +92,7 @@ set_languages("cxx17")
 add_includedirs("include/", "include/editor/", os.dirs(path.join(os.scriptdir())))
 add_files("src/editor/**.cpp", "src/edui/**.cpp")
 add_deps("rpgpp")
-add_packages("raylib", "tgui", "nlohmann_json", "luajit", "pugixml", "rttr")
+add_packages("raylib", "tgui", "nlohmann_json", "luajit", "pugixml")
 after_build( function (target)
 	os.cp("$(curdir)/resources", "./build/$(plat)/$(arch)/$(mode)/", { async = true })
 	if is_plat("linux", "macosx") then

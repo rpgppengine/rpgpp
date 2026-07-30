@@ -7,8 +7,6 @@
 #include "edui/widget.hpp"
 #include "raylib.h"
 
-#include "GLFW/glfw3.h"
-
 using namespace edui;
 
 Gui* Gui::instance = nullptr;

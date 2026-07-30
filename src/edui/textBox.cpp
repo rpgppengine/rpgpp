@@ -4,7 +4,6 @@
 #include <cstdio>
 #include <memory>
 #include <string_view>
-#include "GLFW/glfw3.h"
 #include "edui/widget.hpp"
 #include "raylib.h"
 #include "raymath.h"
@@ -265,15 +264,7 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 
 	float totalFontSize = rend.font->baseSize * rend.fontSize;
 
-	bool val = false;
-	/*
-	if (held && debounce == 0) {
-		val = true;
-	} else if (!held) {
-		val = true;
-	}
-	*/
-	val = held && debounce == 0;
+	bool val = held && debounce == 0;
 
 	if (val) {
 		if (key == KEY_LEFT) {
