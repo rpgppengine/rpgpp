@@ -1,9 +1,11 @@
 #include "edui/textBox.hpp"
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdio>
 #include <memory>
 #include <string_view>
+
 #include "edui/widget.hpp"
 #include "raylib.h"
 #include "raymath.h"
@@ -13,6 +15,7 @@ using namespace edui;
 TextBox::TextBox() {
 	render = std::make_unique<TextBoxRender>();
 	render->padding = 2.0f;
+	render->focusBgColor = RAYWHITE;
 	focusable = true;
 }
 
@@ -109,7 +112,8 @@ void TextBox::draw() {
 
 	BeginScissorMode(paddingRect.x, rect.y, paddingRect.width, rect.height);
 
-	DrawTextEx(*rend.font, text.c_str(), {paddingRect.x - scroll, paddingRect.y}, totalFontSize, rend.spacing, rend.textColor);
+	DrawTextEx(*rend.font, text.c_str(), {paddingRect.x - scroll, paddingRect.y}, totalFontSize, rend.spacing,
+			   rend.textColor);
 	drawSelection();
 
 	EndScissorMode();
@@ -119,9 +123,7 @@ void TextBox::draw() {
 	}
 }
 
-void TextBox::setText(const std::string& text) {
-	this->text = text;
-}
+void TextBox::setText(const std::string &text) { this->text = text; }
 
 void TextBox::focused() {
 	auto &rend = render->as<TextBoxRender>();
@@ -137,6 +139,7 @@ void TextBox::focused() {
 }
 
 void TextBox::unfocused() {
+	selectStart = selectEnd;
 	Widget::unfocused();
 }
 
@@ -156,10 +159,10 @@ int TextBox::calcCursor() {
 	float offsetVal = offset.x + scroll;
 
 	auto end = GetCodepointCount(text.c_str());
-	char* ptr = text.data();
+	char *ptr = text.data();
 
 	std::string clonedStr = text;
-	char* b = clonedStr.data();
+	char *b = clonedStr.data();
 
 	int codepointSize = 0;
 	int len = 0;
@@ -216,7 +219,7 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 	if (text.empty()) return;
 
 	if (!held) {
-		//combos
+		// combos
 		if (key == KEY_C && mod.ctrl) {
 			if (selectStart != selectEnd) {
 				SelectionResult selection = getSelectionInfo();
@@ -249,13 +252,13 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 			calcCursorRect();
 		}
 
-		//home
+		// home
 		if (key == KEY_HOME || (key == KEY_KP_7 && mod.numlock)) {
 			cursorIndex = 0;
 			calcCursorRect();
 		}
 
-		//end
+		// end
 		if (key == KEY_END || (key == KEY_KP_1 && mod.numlock)) {
 			cursorIndex = text.size();
 			calcCursorRect();
@@ -270,7 +273,7 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 		if (key == KEY_LEFT) {
 			if (cursorIndex > 0) {
 				int size = 0;
-				char* ptr = text.data() + cursorIndex;
+				char *ptr = text.data() + cursorIndex;
 
 				GetCodepointPrevious(ptr, &size);
 				cursorIndex -= size;
@@ -283,7 +286,7 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 		if (key == KEY_RIGHT) {
 			if (cursorIndex < text.size()) {
 				int size = 0;
-				char* ptr = &text.at(cursorIndex);
+				char *ptr = &text.at(cursorIndex);
 
 				GetCodepoint(ptr, &size);
 				cursorIndex += size;
@@ -309,7 +312,7 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 				}
 
 				int size = 0;
-				char* ptr = text.data() + cursorIndex;
+				char *ptr = text.data() + cursorIndex;
 
 				GetCodepointPrevious(ptr, &size);
 				cursorIndex -= size;
@@ -318,11 +321,18 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 				text = text.erase(cursorIndex, size);
 				calcCursorRect();
 
+				auto paddingRect = getPaddingRect();
+
 				if (lastChar) {
-					auto paddingRect = getPaddingRect();
-					float diff = (paddingRect.x + paddingRect.width) - (cursorRect.x + cursorRect.width);
-					cursorRect.x += diff;
-					scroll -= diff;
+					auto &rend = render->as<TextBoxRender>();
+					float totalFontSize = rend.font->baseSize * rend.fontSize;
+					auto measure = MeasureTextEx(*rend.font, text.c_str(), totalFontSize, rend.spacing);
+					if (measure.x >= paddingRect.x + paddingRect.width) {
+						auto paddingRect = getPaddingRect();
+						float diff = (paddingRect.x + paddingRect.width) - (cursorRect.x + cursorRect.width);
+						cursorRect.x += diff;
+						scroll -= diff;
+					}
 				}
 			}
 		}
@@ -337,7 +347,7 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 			}
 
 			int size = 0;
-			char* ptr = text.data() + cursorIndex;
+			char *ptr = text.data() + cursorIndex;
 			GetCodepoint(ptr, &size);
 
 			text = text.erase(cursorIndex, size);
@@ -377,7 +387,7 @@ void TextBox::charEntered(int codepoint, std::string_view str) {
 	for (int i = 0; i < str.size(); i++) {
 		text.insert(text.begin() + cursorIndex + i, str.at(i));
 	}
-	cursorIndex+=str.size();
+	cursorIndex += str.size();
 
 	calcCursorRect();
 

@@ -17,8 +17,8 @@ struct Layout {
 struct Layout2 {
 	Layout x = {0, 0};
 	Layout y = {0, 0};
-	Layout width;
-	Layout height;
+	Layout width = {0, 50};
+	Layout height = {0, 50};
 };
 
 struct Event {
@@ -40,7 +40,7 @@ struct WidgetRender {
 	int border = 1;
 	Color borderColor = BLACK;
 
-	Color focusBgColor = RAYWHITE;
+	Color focusBgColor = LIGHTGRAY;
 	Color focusBorderColor = GRAY;
 
 	Color currentBgColor = RAYWHITE;
@@ -103,7 +103,7 @@ struct Widget {
 		this->layout.height = height;
 	}
 
-	Rectangle getPaddingRect() {
+	virtual Rectangle getPaddingRect() {
 		Rectangle res = rect;
 		res.x += render->padding;
 		res.y += render->padding;
@@ -124,6 +124,8 @@ struct Widget {
 		render->currentBgColor = render->bgColor;
 		render->currentBorderColor = render->borderColor;
 	}
+
+	virtual void mouseMoved(Vector2 mousePos, Vector2 relative) {}
 
 	virtual void focused() {
 		isFocused = true;
@@ -164,9 +166,7 @@ struct Widget {
 
 	virtual Ptr clone() { return std::make_shared<Widget>(*this); }
 
-	void markDelete() {
-		deleteFlag = true;
-	}
+	void markDelete() { deleteFlag = true; }
 };
 }  // namespace edui
 

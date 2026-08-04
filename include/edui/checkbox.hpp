@@ -17,6 +17,6 @@ struct Checkbox : public Widget {
 
 	void leftMouseClicked() override;
 };
-}
+}  // namespace edui
 
 #endif

@@ -7,6 +7,8 @@
 #include "edui/container.hpp"
 #include "edui/gui.hpp"
 #include "edui/horizontalContainer.hpp"
+#include "edui/intValue.hpp"
+#include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
 #include "edui/textBox.hpp"
 #include "edui/verticalContainer.hpp"
@@ -44,7 +46,7 @@ int main() {
 	textBox->setPosition({0, 20}, {0, 50});
 	textBox->setText("Hello World! The lazy fox jumped over the dog!");
 	textBox->render->as<edui::TextBoxRender>().fontSize = 2.0f;
-	gui.add(textBox);
+	//gui.add(textBox);
 
 	auto check = std::make_shared<edui::Checkbox>();
 	check->setSize({0, 200}, {0, 26});
@@ -53,6 +55,14 @@ int main() {
 		printf("%i, %i \n", previous, current);
 	};
 	gui.add(check);
+
+	auto intval = std::make_shared<edui::IntValue>();
+	intval->setSize({0, 200}, {0, 26});
+	intval->setPosition({0, 20}, {0, 150});
+	intval->valueChanged = [](int previous, int current) {
+		printf("%i, %i \n", previous, current);
+	};
+	gui.add(intval);
 
 	while (!WindowShouldClose()) {
 		gui.update();

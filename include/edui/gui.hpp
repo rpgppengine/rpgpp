@@ -14,6 +14,8 @@ struct Gui {
 	Color background = RAYWHITE;
 	Font font;
 
+	Vector2 lastMousePos;
+
 	std::vector<std::shared_ptr<Widget>> widgets;
 	std::vector<std::shared_ptr<Widget>> topLayer;
 
@@ -27,6 +29,7 @@ struct Gui {
 
 	Gui() {
 		Gui::instance = this;
+		font = GetFontDefault();
 	}
 
 	void update();

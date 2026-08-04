@@ -1,5 +1,7 @@
 #include "edui/checkbox.hpp"
+
 #include <memory>
+
 #include "edui/container.hpp"
 #include "edui/helper.hpp"
 #include "edui/widget.hpp"
@@ -8,12 +10,12 @@
 using namespace edui;
 
 Checkbox::Checkbox() {
-	render = std::make_unique<ContainerRender>();
+	render = std::make_unique<CheckboxRender>();
 	render->padding = 4;
 }
 
 void Checkbox::draw() {
-	auto& rend = render->as<ContainerRender>();
+	auto &rend = render->as<ContainerRender>();
 
 	Rectangle effective = rect;
 	if (rect.width > rect.height) {

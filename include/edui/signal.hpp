@@ -21,9 +21,9 @@ template <typename T>
 struct SignalT {
 	std::function<void(T)> func = nullptr;
 
-	void invoke() {
+	void invoke(T a) {
 		if (func != nullptr) {
-			func();
+			func(a);
 		}
 	};
 

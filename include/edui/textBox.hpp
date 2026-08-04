@@ -2,6 +2,7 @@
 #define _EDUI_TEXTBOX_H
 
 #include <string_view>
+
 #include "edui/label.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"

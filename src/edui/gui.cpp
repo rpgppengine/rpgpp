@@ -6,6 +6,7 @@
 #include "edui/helper.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
+#include "raymath.h"
 
 using namespace edui;
 
@@ -41,7 +42,7 @@ void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
 }
 
 void Gui::update() {
-	Rectangle screenRect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+	screenRect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
 
 	processVector(topLayer);
 	processVector(widgets);
@@ -100,6 +101,9 @@ void Gui::draw() {
 void Gui::add(std::shared_ptr<Widget> widget) {
 	if (widget->isContainer) {
 		widget->as<Container>().gui = this;
+		for (auto& subwidget : widget->as<Container>().widgets) {
+			subwidget->render->font = &this->font;
+		}
 	}
 	widget->render->font = &this->font;
 	widget->unfocused();
@@ -119,6 +123,14 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 	if (!widget->get()->notifiedMouseEnter) {
 		widget->get()->mouseEntered();
 		widget->get()->notifiedMouseEnter = true;
+	}
+
+	if (!FloatEquals(GetMouseDelta().x, 0.0f)) {
+		auto mousePos = GetMousePosition();
+		auto relative = mousePos;
+		relative.x -= widget->get()->rect.x;
+		relative.y -= widget->get()->rect.y;
+		widget->get()->mouseMoved(GetMousePosition(), relative);
 	}
 
 	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {

@@ -6,6 +6,7 @@
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/tooltip.hpp"
+#include "edui/widget.hpp"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -14,6 +15,7 @@ using namespace edui;
 Label::Label() {
 	render = std::make_unique<LabelRender>();
 	render->padding = 8;
+	render->focusBgColor = RAYWHITE;
 }
 
 void Label::draw() {
@@ -58,10 +60,12 @@ void Label::mouseEntered() {
 		tooltip->setPosition({0, static_cast<int>(GetMousePosition().x)}, {0, static_cast<int>(GetMousePosition().y)});
 		Gui::instance->addTop(tooltip);
 	}
+	Widget::mouseEntered();
 }
 
 void Label::mouseLeft() {
 	if (this->tooltip != nullptr) {
 		this->tooltip->markDelete();
 	}
+	Widget::mouseLeft();
 }
