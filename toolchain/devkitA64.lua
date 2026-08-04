@@ -53,6 +53,10 @@ toolchain("devkita64")
         return
     end
 
+    local LIBNX    = path.join(DEVKITPRO, "libnx")
+    local bin      = path.join(DKA64, "bin")
+    local portlibs = path.join(DEVKITPRO, "portlibs", "switch")
+
     set_toolset("cc", "aarch64-none-elf-gcc")
     set_toolset("cxx", "aarch64-none-elf-g++")
     set_toolset("ld", "aarch64-none-elf-g++")
@@ -82,4 +86,13 @@ toolchain("devkita64")
         toolchain:add("ldflags", "-specs=" .. path.join(DEVKITPRO, "/libnx/switch.specs"), "-g", "-W", "-fPIC","$(notdir $*.map)", {force = true})
 
         toolchain:add("syslinks", "gcc", "c", "m")
+
+        toolchain:add("includedirs", path.join(LIBNX, "include"))
+        toolchain:add("includedirs", path.join(portlibs, "include"))
+        for _, dir in ipairs(os.dirs(path.join(portlibs, "include", "*"))) do
+            toolchain:add("includedirs", dir)
+        end
+
+        toolchain:add("linkdirs", path.join(LIBNX, "lib"))
+        toolchain:add("linkdirs", path.join(portlibs, "lib"))
     end)

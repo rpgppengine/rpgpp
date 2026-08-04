@@ -2,6 +2,7 @@
 
 #include "editor.hpp"
 #include "edui/button.hpp"
+#include "edui/checkbox.hpp"
 #include "edui/colorRect.hpp"
 #include "edui/container.hpp"
 #include "edui/gui.hpp"
@@ -33,22 +34,25 @@ int main() {
 
 	auto label = std::make_shared<edui::Label>();
 	label->setSize({0, 160}, {0, 26});
-	//label->setText("японская транснациональная корпорация, специализирующаяся на разработке видеоигр и игровых систем.");
 	label->setText("者ノト塚15車し表二ね");
-	//label->setText("The lazy fox jumped over the dog!");
-	//label->setText("Hello World!abc");
 	label->render->as<edui::LabelRender>().padding = 2;
 	label->render->as<edui::LabelRender>().fontSize = 2.0f;
-	//label->render->as<edui::LabelRender>().border = 0;
 	gui.add(label);
 
 	auto textBox = std::make_shared<edui::TextBox>();
 	textBox->setSize({0, 200}, {0, 26});
 	textBox->setPosition({0, 20}, {0, 50});
 	textBox->setText("Hello World! The lazy fox jumped over the dog!");
-	//textBox->setText("者ノト塚15車し表二ね");
 	textBox->render->as<edui::TextBoxRender>().fontSize = 2.0f;
 	gui.add(textBox);
+
+	auto check = std::make_shared<edui::Checkbox>();
+	check->setSize({0, 200}, {0, 26});
+	check->setPosition({0, 20}, {0, 100});
+	check->valueChanged = [](bool previous, bool current) {
+		printf("%i, %i \n", previous, current);
+	};
+	gui.add(check);
 
 	while (!WindowShouldClose()) {
 		gui.update();

@@ -103,6 +103,11 @@ rule("switch")
         
             os.execv(nxlink, nxlink_args)
         else
+            local target_file = target:basename()
+            local executable = target_file .. ".nro"
+            local full_path = path.join(os.curdir(), target:targetdir(), executable)
+            cprint("Launching " .. full_path)
+
             if find_tool("ryujinx", {program = "ryujinx"}) then
                 ryujinx = "ryujinx"
             elseif find_tool("Ryujinx", {program = "Ryujinx"}) then
@@ -112,11 +117,6 @@ rule("switch")
                 return
             end
 
-            local target_file = target:targetfile()
-            local executable = target_file .. ".nro"
-
-
-            cprint("Launching " .. executable)
-            os.execv(ryujinx, {executable})
+            os.execv(ryujinx, {full_path})
         end
     end)
