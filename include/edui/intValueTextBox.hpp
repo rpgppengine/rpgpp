@@ -16,7 +16,10 @@ struct IntValueTextBox : public TextBox {
 	int min = 0;
 	int max = 100;
 
-	SignalT2<int, int> valueChanged;
+	SignalT2<int, int> intValueChanged;
+
+	void setInt(const int& val);
+	int getInt();
 
 	IntValueTextBox();
 

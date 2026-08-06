@@ -21,6 +21,16 @@ IntValueTextBox::IntValueTextBox() : TextBox() {
 	text = "0";
 }
 
+void IntValueTextBox::setInt(const int& val) {
+	text = TextFormat("%i", val);
+	processText();
+}
+
+int IntValueTextBox::getInt() {
+	int current = TextToInteger(text.c_str());
+	return current;
+}
+
 void IntValueTextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 	bool emit = false;
 	int previous = 0;
@@ -34,7 +44,7 @@ void IntValueTextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 		int current = TextToInteger(text.c_str());
 
 		if (previous != current) {
-			valueChanged.invoke(previous, current);
+			intValueChanged.invoke(previous, current);
 		}
 	}
 }
@@ -48,7 +58,7 @@ void IntValueTextBox::charEntered(int codepoint, std::string_view str) {
 		int current = TextToInteger(text.c_str());
 
 		if (previous != current) {
-			valueChanged.invoke(previous, current);
+			intValueChanged.invoke(previous, current);
 		}
 	}
 }
@@ -70,15 +80,25 @@ void IntValueTextBox::processText() {
 }
 
 void IntValueTextBox::increment() {
-	int current = TextToInteger(text.c_str());
-	current++;
+	int previous = TextToInteger(text.c_str());
+	int current = previous + 1;
 	text = TextFormat("%i", current);
 	processText();
+	current = TextToInteger(text.c_str());
+
+	if (previous != current) {
+		intValueChanged.invoke(previous, current);
+	}
 }
 
 void IntValueTextBox::decrement() {
-	int current = TextToInteger(text.c_str());
-	current--;
+	int previous = TextToInteger(text.c_str());
+	int current = previous - 1;
 	text = TextFormat("%i", current);
 	processText();
+	current = TextToInteger(text.c_str());
+
+	if (previous != current) {
+		intValueChanged.invoke(previous, current);
+	}
 }

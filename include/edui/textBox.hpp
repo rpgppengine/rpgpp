@@ -1,11 +1,14 @@
 #ifndef _EDUI_TEXTBOX_H
 #define _EDUI_TEXTBOX_H
 
+#include <string>
 #include <string_view>
 
 #include "edui/label.hpp"
 #include "edui/widget.hpp"
+#include "edui/valuewidget.hpp"
 #include "raylib.h"
+
 namespace edui {
 struct SelectionResult {
 	int start = 0;
@@ -15,24 +18,27 @@ struct SelectionResult {
 
 struct TextBoxRender : public LabelRender {};
 
-struct TextBox : public Widget {
+struct TextBox : public Widget, public ValueWidgetT<std::string> {
 	const float CursorWidth = 4.0f;
 	const short DebounceFrames = 5;
 
+	void setValue(const std::string &text) override;
+	std::string getValue() override;
+
 	TextBox();
-	void update();
-	void draw();
+	void update() override;
+	void draw() override;
 
 	void setText(const std::string &text);
 
-	void focused();
-	void unfocused();
-	void mouseEntered();
-	void mouseLeft();
-	void keyPressed(KeyboardKey key, KeyModifier mod, bool held);
-	void charEntered(int codepoint, std::string_view str);
-	void leftMouseClicked();
-	void leftMouseReleased();
+	void focused() override;
+	void unfocused() override;
+	void mouseEntered() override;
+	void mouseLeft() override;
+	void keyPressed(KeyboardKey key, KeyModifier mod, bool held) override;
+	void charEntered(int codepoint, std::string_view str) override;
+	void leftMouseClicked() override;
+	void leftMouseReleased() override;
 
 	float scroll = 0;
 	int cursorIndex = 0;

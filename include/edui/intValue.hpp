@@ -5,17 +5,20 @@
 #include "edui/container.hpp"
 #include "edui/intValueTextBox.hpp"
 #include "edui/signal.hpp"
+#include "edui/valuewidget.hpp"
+
 namespace edui {
 struct IntValueRender : public ContainerRender {
 	Color btnColor;
 };
 
-struct IntValue : public Container {
+struct IntValue : public Container, public ValueWidgetT<int> {
 	IntValueTextBox::Ptr intval;
 	Button::Ptr incButton;
 	Button::Ptr decButton;
 
-	SignalT2<int, int> valueChanged;
+	void setValue(const int &val) override;
+	int getValue() override;
 
 	IntValue();
 };

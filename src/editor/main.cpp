@@ -46,12 +46,15 @@ int main() {
 	textBox->setPosition({0, 20}, {0, 50});
 	textBox->setText("Hello World! The lazy fox jumped over the dog!");
 	textBox->render->as<edui::TextBoxRender>().fontSize = 2.0f;
-	//gui.add(textBox);
+	textBox->onValueChangedT = [](std::string a, std::string b) {
+		printf("%s \n%s \n ====\n", a.c_str(), b.c_str());
+	};
+	gui.add(textBox);
 
 	auto check = std::make_shared<edui::Checkbox>();
 	check->setSize({0, 200}, {0, 26});
 	check->setPosition({0, 20}, {0, 100});
-	check->valueChanged = [](bool previous, bool current) {
+	check->onValueChangedT = [](bool previous, bool current) {
 		printf("%i, %i \n", previous, current);
 	};
 	gui.add(check);
@@ -59,7 +62,7 @@ int main() {
 	auto intval = std::make_shared<edui::IntValue>();
 	intval->setSize({0, 200}, {0, 26});
 	intval->setPosition({0, 20}, {0, 150});
-	intval->valueChanged = [](int previous, int current) {
+	intval->onValueChangedT = [](int previous, int current) {
 		printf("%i, %i \n", previous, current);
 	};
 	gui.add(intval);

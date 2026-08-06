@@ -19,6 +19,12 @@ TextBox::TextBox() {
 	focusable = true;
 }
 
+void TextBox::setValue(const std::string &text) { this->text = text; }
+
+void TextBox::setText(const std::string &text) { setValue(text); }
+
+std::string TextBox::getValue() { return this->text; }
+
 void TextBox::update() {
 	if (debounce > 0) {
 		debounce--;
@@ -122,8 +128,6 @@ void TextBox::draw() {
 		DrawRectangleRec(cursorRect, BLACK);
 	}
 }
-
-void TextBox::setText(const std::string &text) { this->text = text; }
 
 void TextBox::focused() {
 	auto &rend = render->as<TextBoxRender>();
@@ -241,9 +245,12 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 				selectStart = selectEnd;
 			}
 
+			auto previous = text;
 			text = text.insert(cursorIndex, clipboard);
 			cursorIndex += clipboard.size();
 			calcCursorRect();
+
+			onValueChangedT.invoke(previous, text);
 		}
 		if (key == KEY_A && mod.ctrl) {
 			selectStart = 0;
@@ -318,8 +325,11 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 				cursorIndex -= size;
 				ptr -= size;
 
+				auto previous = text;
 				text = text.erase(cursorIndex, size);
 				calcCursorRect();
+
+				onValueChangedT.invoke(previous, text);
 
 				auto paddingRect = getPaddingRect();
 
@@ -350,7 +360,10 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 			char *ptr = text.data() + cursorIndex;
 			GetCodepoint(ptr, &size);
 
+			auto previous = text;
 			text = text.erase(cursorIndex, size);
+
+			onValueChangedT.invoke(previous, text);
 		}
 
 		debounce = DebounceFrames;
@@ -384,6 +397,8 @@ void TextBox::leftMouseReleased() {
 }
 
 void TextBox::charEntered(int codepoint, std::string_view str) {
+	std::string previous = text;
+
 	for (int i = 0; i < str.size(); i++) {
 		text.insert(text.begin() + cursorIndex + i, str.at(i));
 	}
@@ -392,6 +407,8 @@ void TextBox::charEntered(int codepoint, std::string_view str) {
 	calcCursorRect();
 
 	Widget::charEntered(codepoint, str);
+
+	onValueChangedT.invoke(previous, text);
 }
 
 void TextBox::mouseEntered() {

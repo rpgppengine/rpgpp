@@ -17,7 +17,7 @@ IntValue::IntValue() : Container() {
 	intval = std::make_shared<edui::IntValueTextBox>();
 	intval->setPosition({0, 0}, {0, 0});
 	intval->setSize({1.0f, -24}, {1, 0});
-	intval->valueChanged = [this](int a, int b) { valueChanged.invoke(a, b); };
+	intval->intValueChanged = [this](int a, int b) { onValueChangedT.invoke(a, b); };
 	add(intval);
 
 	std::weak_ptr<edui::IntValueTextBox> weakIntVal = intval;
@@ -43,4 +43,12 @@ IntValue::IntValue() : Container() {
 		}
 	};
 	add(decButton);
+}
+
+void IntValue::setValue(const int& val) {
+	intval->setInt(val);
+}
+
+int IntValue::getValue() {
+	return intval->getInt();
 }

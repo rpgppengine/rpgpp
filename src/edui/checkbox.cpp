@@ -14,6 +14,14 @@ Checkbox::Checkbox() {
 	render->padding = 4;
 }
 
+void Checkbox::setValue(const bool& val) {
+	this->checked = val;
+}
+
+bool Checkbox::getValue() {
+	return checked;
+}
+
 void Checkbox::draw() {
 	auto &rend = render->as<ContainerRender>();
 
@@ -34,6 +42,6 @@ void Checkbox::draw() {
 
 void Checkbox::leftMouseClicked() {
 	checked = !checked;
-	valueChanged.invoke(!checked, checked);
+	onValueChangedT.invoke(!checked, checked);
 	Widget::leftMouseClicked();
 }
