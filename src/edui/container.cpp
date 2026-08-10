@@ -85,3 +85,10 @@ void Container::mouseEntered() {
 void Container::mouseLeft() {
 	render->as<ContainerRender>().currentScrollbarColor = render->as<ContainerRender>().scrollbarColor;
 }
+
+void Container::markDelete() {
+	for (auto &widget : widgets) {
+		widget->markDelete();
+	}
+	Widget::markDelete();
+}

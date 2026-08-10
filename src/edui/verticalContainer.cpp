@@ -92,6 +92,8 @@ void VerticalContainer::updateContentRect() {
 }
 
 void VerticalContainer::scrolled(float mouseWheel) {
+	if (!overflown) return;
+
 	float added = (mouseWheel * ScrollSpeed);
 
 	if ((scissorY + added) >= 0.0f) {

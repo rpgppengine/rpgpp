@@ -51,6 +51,8 @@ struct Container : public Widget {
 	void notifyChildren(edui::Gui *gui);
 
 	Widget::Ptr clone() { return std::make_shared<Container>(*this); }
+
+	void markDelete();
 };
 
 }  // namespace edui

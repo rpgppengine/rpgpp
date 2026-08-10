@@ -5,6 +5,8 @@
 #include "edui/checkbox.hpp"
 #include "edui/colorRect.hpp"
 #include "edui/container.hpp"
+#include "edui/dropdown.hpp"
+#include "edui/dropdownList.hpp"
 #include "edui/gui.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/intValue.hpp"
@@ -12,8 +14,11 @@
 #include "edui/label.hpp"
 #include "edui/textBox.hpp"
 #include "edui/verticalContainer.hpp"
+#include "edui/dropdown.hpp"
 #include "raylib.h"
 #include "services/editorGuiService.hpp"
+
+#include "edui/rlicons.hpp"
 
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION
 
@@ -29,6 +34,7 @@ int main() {
 
 	edui::Gui gui;
 
+	SetConfigFlags(FLAG_WINDOW_HIGHDPI);
 	InitWindow(800, 450, "raylib example - basic window");
 	SetTargetFPS(60);
 
@@ -67,12 +73,30 @@ int main() {
 	};
 	gui.add(intval);
 
+	/*
+	auto dropmenu = std::make_shared<edui::DropdownList>();
+	dropmenu->setPosition({0, 20}, {0, 200});
+	dropmenu->setSize({0, 200}, {0, 200});
+	dropmenu->addItem("Hello");
+	gui.add(dropmenu);
+	*/
+
+	auto dropdown = std::make_shared<edui::Dropdown>();
+	dropdown->setPosition({0, 20}, {0, 200});
+	dropdown->setSize({0, 200}, {0, 32});
+	dropdown->addItem("Hello");
+	dropdown->addItem("Hello2");
+	gui.add(dropdown);
+
 	while (!WindowShouldClose()) {
 		gui.update();
 
 		BeginDrawing();
 
 		gui.draw();
+
+		//DrawRectangle(0, 200, 16, 16, GREEN);
+		//GuiDrawIcon(ICON_ARROW_DOWN_FILL, 0, 200, 1, BLACK);
 
 		EndDrawing();
 	}

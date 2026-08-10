@@ -61,15 +61,18 @@ struct Widget {
 	Signal rightClicked;
 	Signal onFocused;
 	Signal onUnfocused;
+	Signal onDeleted;
 
 	std::unique_ptr<WidgetRender> render;
 
 	bool deleteFlag = false;
+	bool deferFlag = false;
 
 	bool focusable = false;
 	bool isContainer = false;
 	bool notifiedMouseEnter = false;
 	bool isFocused = false;
+	bool deleteOnOutsideClick = false;
 
 	Rectangle rect = {0, 0, 0, 0};
 	Layout2 layout;
@@ -166,7 +169,7 @@ struct Widget {
 
 	virtual Ptr clone() { return std::make_shared<Widget>(*this); }
 
-	void markDelete() { deleteFlag = true; }
+	virtual void markDelete() { deleteFlag = true; }
 };
 }  // namespace edui
 
