@@ -3,6 +3,7 @@
 #include "editor.hpp"
 #include "edui/button.hpp"
 #include "edui/checkbox.hpp"
+#include "edui/childWindow.hpp"
 #include "edui/colorRect.hpp"
 #include "edui/container.hpp"
 #include "edui/dropdown.hpp"
@@ -87,6 +88,19 @@ int main() {
 	dropdown->addItem("Hello");
 	dropdown->addItem("Hello2");
 	gui.add(dropdown);
+
+	auto childWindow = std::make_shared<edui::ChildWindow>();
+	childWindow->setPosition({0, 240}, {0, 20});
+	childWindow->setSize({0, 200}, {0, 200});
+	childWindow->setTitle("ChildWindow");
+	gui.add(childWindow);
+
+	auto label2 = std::make_shared<edui::Label>();
+	label2->setSize({0, 160}, {0, 26});
+	label2->setText("hello");
+	label2->render->as<edui::LabelRender>().padding = 2;
+	label2->render->as<edui::LabelRender>().fontSize = 2.0f;
+	childWindow->add(label2);
 
 	while (!WindowShouldClose()) {
 		gui.update();

@@ -29,7 +29,7 @@ void Container::update() {
 }
 
 void Container::updateContentRect() {
-	this->contentRect = rect;
+	this->contentRect = getContentRect();
 	renderRect = paddingRect(contentRect, render->padding);
 	if (isScissor) {
 		renderRect.x += scissorX;

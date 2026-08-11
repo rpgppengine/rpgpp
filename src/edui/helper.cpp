@@ -78,3 +78,10 @@ bool drawOverflownText(Rectangle rect, Font* font, float fontSize, float spacing
 
 	return overflown;
 }
+
+void rectCenter(Rectangle &a, Rectangle *b) {
+	if (b->width > a.width || b->height > a.height) return;
+
+	b->x = a.x + ((a.width - b->width) / 2);
+	b->y = a.y + ((a.height - b->height) / 2);
+}

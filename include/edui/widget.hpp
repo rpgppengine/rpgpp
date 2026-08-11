@@ -5,6 +5,7 @@
 #include <memory>
 #include <string_view>
 
+#include "edui/helper.hpp"
 #include "edui/signal.hpp"
 #include "raylib.h"
 
@@ -39,6 +40,7 @@ struct WidgetRender {
 	Color bgColor = RAYWHITE;
 	int border = 1;
 	Color borderColor = BLACK;
+	Color secondaryColor = GRAY;
 
 	Color focusBgColor = LIGHTGRAY;
 	Color focusBorderColor = GRAY;
@@ -96,24 +98,23 @@ struct Widget {
 		this->rect.height = ((layout.height.scale * base.height) + layout.height.offset);
 	}
 
-	void setPosition(Layout x, Layout y) {
+	virtual void setPosition(Layout x, Layout y) {
 		this->layout.x = x;
 		this->layout.y = y;
 	}
 
-	void setSize(Layout width, Layout height) {
+	virtual void setSize(Layout width, Layout height) {
 		this->layout.width = width;
 		this->layout.height = height;
 	}
 
-	virtual Rectangle getPaddingRect() {
-		Rectangle res = rect;
-		res.x += render->padding;
-		res.y += render->padding;
-		res.height -= (render->padding * 2);
-		res.width -= (render->padding * 2);
+	virtual Rectangle getContentRect() {
+		return rect;
+	}
 
-		return res;
+	virtual Rectangle getPaddingRect() {
+		auto content = getContentRect();
+		return paddingRect(content, render->padding);
 	}
 
 	bool mouseIsInRect() { return CheckCollisionPointRec(GetMousePosition(), rect); }

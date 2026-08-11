@@ -92,6 +92,7 @@ void Dropdown::openDropdown() {
 	};
 	list->onDeleted = [this] {
 		opened = false;
+		deferFlag = true;
 	};
 
 	this->listPtr = list;

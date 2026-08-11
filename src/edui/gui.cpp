@@ -15,6 +15,11 @@ Gui* Gui::instance = nullptr;
 void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
 	int i = 0;
 	for (auto &widget : vec) {
+		if (widget->deferFlag) {
+			widget->deferFlag = false;
+			continue;
+		}
+
 		if (widget->mouseIsInRect()) {
 			if (!widget->isContainer) {
 				notifyChild(&widget);
@@ -49,8 +54,6 @@ void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
 			widget->onDeleted.invoke();
 			vec.erase(vec.begin() + i);
 		}
-
-		widget->deferFlag = true;
 
 		i++;
 	}

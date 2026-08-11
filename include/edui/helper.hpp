@@ -33,4 +33,6 @@ Rectangle paddingRect(Rectangle &rect, float padding);
 /* Draw the text. Draws only part of it and returns true on overflown, otherwise draws the whole text and returns false. */
 bool drawOverflownText(Rectangle rect, Font* font, float fontSize, float spacing, const std::string& text, std::string* shownText);
 
+void rectCenter(Rectangle& a, Rectangle* b);
+
 #endif
