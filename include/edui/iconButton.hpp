@@ -12,6 +12,6 @@ struct IconButton : public Widget {
 
 	void draw() override;
 };
-}
+}  // namespace edui
 
 #endif

@@ -10,12 +10,15 @@
 #include "edui/dropdownList.hpp"
 #include "edui/gui.hpp"
 #include "edui/horizontalContainer.hpp"
+#include "edui/iconTextButton.hpp"
 #include "edui/intValue.hpp"
 #include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
+#include "edui/rliconsarr.hpp"
 #include "edui/textBox.hpp"
 #include "edui/verticalContainer.hpp"
 #include "edui/dropdown.hpp"
+#include "gamedata.hpp"
 #include "raylib.h"
 #include "services/editorGuiService.hpp"
 
@@ -39,13 +42,14 @@ int main() {
 	InitWindow(800, 450, "raylib example - basic window");
 	SetTargetFPS(60);
 
-	gui.setFont("resources/Silver.ttf", 21);
+	gui.setFont("resources/BoldPixels.otf", 14);
 
 	auto label = std::make_shared<edui::Label>();
 	label->setSize({0, 160}, {0, 26});
-	label->setText("者ノト塚15車し表二ね");
+	label->setText("Hello world!");
 	label->render->as<edui::LabelRender>().padding = 2;
-	label->render->as<edui::LabelRender>().fontSize = 2.0f;
+	//label->render->as<edui::LabelRender>().vertAlign = edui::VerticalAlignment::TEXT_BOTTOM;
+	//label->render->as<edui::LabelRender>().fontSize = 2.0f;
 	gui.add(label);
 
 	auto textBox = std::make_shared<edui::TextBox>();
@@ -95,11 +99,13 @@ int main() {
 	childWindow->setTitle("ChildWindow");
 	gui.add(childWindow);
 
-	auto label2 = std::make_shared<edui::Label>();
+	auto label2 = std::make_shared<edui::IconTextButton>();
+	label2->anchor = {0.5f, 0.5f};
 	label2->setSize({0, 160}, {0, 26});
-	label2->setText("hello");
+	label2->iconId = ICON_FILETYPE_TEXT;
+	label2->setText("Hello");
 	label2->render->as<edui::LabelRender>().padding = 2;
-	label2->render->as<edui::LabelRender>().fontSize = 2.0f;
+	//label2->render->as<edui::LabelRender>().fontSize = 2.0f;
 	childWindow->add(label2);
 
 	while (!WindowShouldClose()) {

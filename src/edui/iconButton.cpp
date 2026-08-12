@@ -1,15 +1,16 @@
 #include "edui/iconButton.hpp"
+
 #include <memory>
+
 #include "edui/helper.hpp"
 #include "edui/rlicons.hpp"
 #include "edui/rliconsarr.hpp"
 #include "edui/widget.hpp"
+#include "raylib.h"
 
 using namespace edui;
 
-IconButton::IconButton() : Widget() {
-	render = std::make_unique<IconButtonRender>();
-}
+IconButton::IconButton() : Widget() { render = std::make_unique<IconButtonRender>(); }
 
 void IconButton::draw() {
 	auto &rend = render->as<IconButtonRender>();

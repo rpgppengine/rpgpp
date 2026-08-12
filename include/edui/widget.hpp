@@ -78,6 +78,7 @@ struct Widget {
 
 	Rectangle rect = {0, 0, 0, 0};
 	Layout2 layout;
+	Vector2 anchor = {0, 0};
 
 	Widget() = default;
 	virtual ~Widget() = default;
@@ -96,6 +97,9 @@ struct Widget {
 		this->rect.y = base.y + ((layout.y.scale * base.height) + layout.y.offset);
 		this->rect.width = ((layout.width.scale * base.width) + layout.width.offset);
 		this->rect.height = ((layout.height.scale * base.height) + layout.height.offset);
+
+		this->rect.x += anchor.x * (base.width - rect.width);
+		this->rect.y += anchor.y * (base.height - rect.height);
 	}
 
 	virtual void setPosition(Layout x, Layout y) {

@@ -18,6 +18,7 @@ struct LabelRender : public WidgetRender {
 	float fontSize = 1;
 	Color textColor = BLACK;
 	float spacing = 0.05f;
+	float fontYOffset = 0.0f;
 };
 
 struct Label : public Widget {

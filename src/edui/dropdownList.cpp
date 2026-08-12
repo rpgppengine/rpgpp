@@ -17,7 +17,7 @@ void DropdownList::addItem(const std::string& item, int scale) {
 
 	auto fontSize = Gui::instance->font.baseSize * scale;
 
-	newButton->setSize({1, 0}, {0, fontSize - 4});
+	newButton->setSize({1, 0}, {0, fontSize + 4});
 	newButton->setText(item);
 	newButton->render->padding = 2;
 	newButton->render->as<ButtonRender>().fontSize = scale;

@@ -181,6 +181,15 @@ void Gui::setFont(const char *fileName, int fontSize) {
 
 	auto codepoints = loadFontCodepoints();
 	font = LoadFontEx(fileName, fontSize, codepoints.data(), codepoints.size());
+
+	auto atlas = GenImageFontAtlas(font.glyphs, &font.recs, font.glyphCount, fontSize, 4, 0);
+	ExportImage(atlas, "atlas.png");
+
+	auto fontImg = LoadImageFromTexture(font.texture);
+	ExportImage(fontImg, "fontImg.png");
+
+	UnloadImage(atlas);
+	UnloadImage(fontImg);
 }
 
 void Gui::unload() {
