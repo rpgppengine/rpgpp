@@ -31,10 +31,6 @@ void Container::update() {
 void Container::updateContentRect() {
 	this->contentRect = getContentRect();
 	renderRect = paddingRect(contentRect, render->padding);
-	if (isScissor) {
-		renderRect.x += scissorX;
-		renderRect.y += scissorY;
-	}
 }
 
 void Container::draw() {
@@ -42,15 +38,9 @@ void Container::draw() {
 
 	DrawRectangleRec(rect, rend.bgColor);
 
-	if (isScissor) {
-		BeginScissorMode(contentRect.x, contentRect.y, contentRect.width, contentRect.height);
-	}
-
 	for (auto &widget : widgets) {
 		widget->draw();
 	}
-
-	if (isScissor) EndScissorMode();
 
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 }
@@ -76,14 +66,6 @@ void Container::notifyChildren(Gui *gui) {
 			}
 		}
 	}
-}
-
-void Container::mouseEntered() {
-	render->as<ContainerRender>().currentScrollbarColor = render->as<ContainerRender>().focusScrollbarColor;
-}
-
-void Container::mouseLeft() {
-	render->as<ContainerRender>().currentScrollbarColor = render->as<ContainerRender>().scrollbarColor;
 }
 
 void Container::markDelete() {

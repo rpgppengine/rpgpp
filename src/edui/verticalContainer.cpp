@@ -4,6 +4,7 @@
 
 #include "edui/container.hpp"
 #include "edui/helper.hpp"
+#include "edui/scrollableContainer.hpp"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -27,13 +28,13 @@ void VerticalContainer::update() {
 		float fract = (offset.y / max);
 		scissorY = (fract * scrollMax);
 	}
-	Container::update();
+	ScrollableContainer::update();
 }
 
 void VerticalContainer::draw() {
-	Container::draw();
+	ScrollableContainer::draw();
 	if (overflown) {
-		DrawRectangleRec(scrollbarRect, render->as<ContainerRender>().currentScrollbarColor);
+		DrawRectangleRec(scrollbarRect, render->as<VerticalContainerRender>().currentScrollbarColor);
 		DrawRectangleLinesEx(scrollAreaRect, 1.0f, render->currentBorderColor);
 	}
 }
@@ -56,7 +57,7 @@ void VerticalContainer::add(std::shared_ptr<Widget> widget) {
 
 	this->scissorRect.height = ((rend.padding * 2) + res + widgetHeight);
 
-	Container::add(widget);
+	ScrollableContainer::add(widget);
 }
 
 void VerticalContainer::updateContentRect() {

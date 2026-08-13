@@ -92,7 +92,7 @@ struct Widget {
 		render = std::make_unique<WidgetRender>(*other.render.get());
 	}
 
-	void calcRect(Rectangle &base) {
+	virtual void calcRect(Rectangle &base) {
 		this->rect.x = base.x + ((layout.x.scale * base.width) + layout.x.offset);
 		this->rect.y = base.y + ((layout.y.scale * base.height) + layout.y.offset);
 		this->rect.width = ((layout.width.scale * base.width) + layout.width.offset);
@@ -112,9 +112,7 @@ struct Widget {
 		this->layout.height = height;
 	}
 
-	virtual Rectangle getContentRect() {
-		return rect;
-	}
+	virtual Rectangle getContentRect() { return rect; }
 
 	virtual Rectangle getPaddingRect() {
 		auto content = getContentRect();
@@ -157,15 +155,15 @@ struct Widget {
 
 	virtual void rightMouseReleased() {}
 
+	virtual void middleMouseClicked() {}
+
+	virtual void middleMouseReleased() {}
+
 	virtual void charEntered(int codepoint, std::string_view str) {}
 
 	virtual void keyPressed(KeyboardKey key, KeyModifier mod, bool held = false) {}
 
-	virtual void scrolled(float wheelMove) {
-		if (wheelMove > 0.0f) {
-			printf("%f \n", wheelMove);
-		}
-	}
+	virtual void scrolled(float wheelMove) {}
 
 	template <typename T>
 	T &as() {

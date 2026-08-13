@@ -24,7 +24,6 @@ void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
 			if (!widget->isContainer) {
 				notifyChild(&widget);
 			} else {
-				widget->scrolled(GetMouseWheelMove());
 				notifyChild(&widget);
 				widget->as<Container>().notifyChildren(this);
 			}
@@ -106,6 +105,14 @@ void Gui::update() {
 			}
 		}
 	}
+
+	if (middleClickedWidget != nullptr) {
+		if (!middleClickedWidget->get()->deleteFlag) {
+			if (IsMouseButtonReleased(MOUSE_MIDDLE_BUTTON)) {
+				middleClickedWidget->get()->middleMouseReleased();
+			}
+		}
+	}
 }
 
 void Gui::draw() {
@@ -140,6 +147,8 @@ void Gui::addTop(std::shared_ptr<Widget> widget) {
 }
 
 void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
+	widget->get()->scrolled(GetMouseWheelMove());
+
 	if (!widget->get()->notifiedMouseEnter) {
 		widget->get()->mouseEntered();
 		widget->get()->notifiedMouseEnter = true;
@@ -168,6 +177,11 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 	if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
 		widget->get()->rightMouseClicked();
 	}
+
+	if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
+		middleClickedWidget = widget;
+		widget->get()->middleMouseClicked();
+	}
 }
 
 Rectangle Gui::getScreenRect() {
@@ -182,14 +196,8 @@ void Gui::setFont(const char *fileName, int fontSize) {
 	auto codepoints = loadFontCodepoints();
 	font = LoadFontEx(fileName, fontSize, codepoints.data(), codepoints.size());
 
-	auto atlas = GenImageFontAtlas(font.glyphs, &font.recs, font.glyphCount, fontSize, 4, 0);
-	ExportImage(atlas, "atlas.png");
-
-	auto fontImg = LoadImageFromTexture(font.texture);
-	ExportImage(fontImg, "fontImg.png");
-
-	UnloadImage(atlas);
-	UnloadImage(fontImg);
+	GenTextureMipmaps(&font.texture);
+	SetTextureFilter(font.texture, TEXTURE_FILTER_POINT);
 }
 
 void Gui::unload() {

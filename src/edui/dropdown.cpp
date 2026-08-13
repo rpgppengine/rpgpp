@@ -13,8 +13,8 @@ using namespace edui;
 Dropdown::Dropdown() {
 	render = std::make_unique<DropdownRender>();
 	render->padding = 2;
-	render->as<DropdownRender>().fontSize = 2;
 	render->as<DropdownRender>().horiAlign = HorizontalAlignment::TEXT_LEFT;
+	render->as<DropdownRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 }
 
 void Dropdown::setValue(const DropdownValue& val) {
@@ -52,9 +52,12 @@ void Dropdown::draw() {
 	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, rend.spacing, rend.textColor);
 
 	//draw arrow
+	Rectangle iconRect = {rect.x + rect.width - (RAYGUI_ICON_SIZE * rend.fontSize), rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
+	Rectangle iconDestRect = {rect.x + (rect.width - rect.height), rect.y, rect.height, rect.height};
+	rectCenter(iconDestRect, &iconRect);
+
 	int icon = (opened ? ICON_ARROW_UP_FILL : ICON_ARROW_DOWN_FILL);
-	Vector2 arrowPos = {rect.x + rect.width - (RAYGUI_ICON_SIZE * rend.fontSize), rect.y};
-	GuiDrawIcon(icon, static_cast<int>(arrowPos.x), static_cast<int>(arrowPos.y), rend.fontSize, rend.currentBorderColor);
+	GuiDrawIcon(icon, static_cast<int>(iconRect.x), static_cast<int>(iconRect.y), rend.fontSize, rend.currentBorderColor);
 }
 
 void Dropdown::leftMouseClicked() {

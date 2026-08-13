@@ -2,14 +2,15 @@
 #define _EDUI_HORIZONTALCONTAINER_H
 
 #include "edui/container.hpp"
+#include "edui/scrollableContainer.hpp"
 #include "edui/widget.hpp"
 
 namespace edui {
-struct HorizontalContainerRender : public ContainerRender {
+struct HorizontalContainerRender : public ScrollableContainerRender {
 	int space = 0;
 };
 
-struct HorizontalContainer : public Container {
+struct HorizontalContainer : public ScrollableContainer {
 	typedef std::shared_ptr<HorizontalContainer> Ptr;
 
 	bool overflown = false;

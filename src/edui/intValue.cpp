@@ -11,7 +11,6 @@
 using namespace edui;
 
 IntValue::IntValue() : Container() {
-	isScissor = false;
 	render = std::make_unique<IntValueRender>();
 
 	intval = std::make_shared<edui::IntValueTextBox>();

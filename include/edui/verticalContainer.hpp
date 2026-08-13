@@ -4,14 +4,15 @@
 #include <memory>
 
 #include "edui/container.hpp"
+#include "edui/scrollableContainer.hpp"
 #include "edui/widget.hpp"
 
 namespace edui {
-struct VerticalContainerRender : public ContainerRender {
+struct VerticalContainerRender : public ScrollableContainerRender {
 	int space = 0;
 };
 
-struct VerticalContainer : public Container {
+struct VerticalContainer : public ScrollableContainer {
 	typedef std::shared_ptr<VerticalContainer> Ptr;
 
 	bool overflown = false;

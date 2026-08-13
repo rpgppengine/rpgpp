@@ -99,15 +99,9 @@ void ChildWindow::draw() {
 
 	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, rend.spacing, rend.textColor);
 
-	if (isScissor) {
-		BeginScissorMode(contentRect.x, contentRect.y, contentRect.width, contentRect.height);
-	}
-
 	for (auto &widget : widgets) {
 		widget->draw();
 	}
-
-	if (isScissor) EndScissorMode();
 
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 

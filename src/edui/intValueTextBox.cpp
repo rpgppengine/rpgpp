@@ -13,7 +13,6 @@ using namespace edui;
 
 IntValueTextBox::IntValueTextBox() : TextBox() {
 	render = std::make_unique<IntValueTextBoxRender>();
-	render->as<IntValueTextBoxRender>().fontSize = 2.0f;
 	render->padding = 2.0f;
 	render->focusBgColor = RAYWHITE;
 	focusable = true;

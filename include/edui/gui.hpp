@@ -21,6 +21,7 @@ struct Gui {
 
 	std::shared_ptr<Widget> *current = nullptr;
 	std::shared_ptr<Widget> *leftClickedWidget = nullptr;
+	std::shared_ptr<Widget> *middleClickedWidget = nullptr;
 
 	Rectangle screenRect;
 

@@ -16,6 +16,7 @@ Label::Label() {
 	render = std::make_unique<LabelRender>();
 	render->padding = 8;
 	render->focusBgColor = RAYWHITE;
+	render->as<LabelRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 }
 
 void Label::draw() {

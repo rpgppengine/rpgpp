@@ -2,6 +2,7 @@
 
 #include "editor.hpp"
 #include "edui/button.hpp"
+#include "edui/canvas.hpp"
 #include "edui/checkbox.hpp"
 #include "edui/childWindow.hpp"
 #include "edui/colorRect.hpp"
@@ -42,21 +43,21 @@ int main() {
 	InitWindow(800, 450, "raylib example - basic window");
 	SetTargetFPS(60);
 
-	gui.setFont("resources/BoldPixels.otf", 14);
+	gui.setFont("resources/TerminusTTF-4.49.3.ttf", 20);
 
 	auto label = std::make_shared<edui::Label>();
 	label->setSize({0, 160}, {0, 26});
 	label->setText("Hello world!");
 	label->render->as<edui::LabelRender>().padding = 2;
 	//label->render->as<edui::LabelRender>().vertAlign = edui::VerticalAlignment::TEXT_BOTTOM;
-	//label->render->as<edui::LabelRender>().fontSize = 2.0f;
+	//label->render->as<edui::LabelRender>().fontSize = 0.25f;
 	gui.add(label);
 
 	auto textBox = std::make_shared<edui::TextBox>();
 	textBox->setSize({0, 200}, {0, 26});
 	textBox->setPosition({0, 20}, {0, 50});
 	textBox->setText("Hello World! The lazy fox jumped over the dog!");
-	textBox->render->as<edui::TextBoxRender>().fontSize = 2.0f;
+	//textBox->render->as<edui::TextBoxRender>().fontSize = 2.0f;
 	textBox->onValueChangedT = [](std::string a, std::string b) {
 		printf("%s \n%s \n ====\n", a.c_str(), b.c_str());
 	};
@@ -78,14 +79,6 @@ int main() {
 	};
 	gui.add(intval);
 
-	/*
-	auto dropmenu = std::make_shared<edui::DropdownList>();
-	dropmenu->setPosition({0, 20}, {0, 200});
-	dropmenu->setSize({0, 200}, {0, 200});
-	dropmenu->addItem("Hello");
-	gui.add(dropmenu);
-	*/
-
 	auto dropdown = std::make_shared<edui::Dropdown>();
 	dropdown->setPosition({0, 20}, {0, 200});
 	dropdown->setSize({0, 200}, {0, 32});
@@ -106,7 +99,11 @@ int main() {
 	label2->setText("Hello");
 	label2->render->as<edui::LabelRender>().padding = 2;
 	//label2->render->as<edui::LabelRender>().fontSize = 2.0f;
-	childWindow->add(label2);
+	//childWindow->add(label2);
+	//
+	auto canvas = std::make_shared<edui::Canvas>();
+	canvas->setSize({1, 0}, {1, 0});
+	childWindow->add(canvas);
 
 	while (!WindowShouldClose()) {
 		gui.update();
