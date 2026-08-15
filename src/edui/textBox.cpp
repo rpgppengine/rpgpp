@@ -6,6 +6,8 @@
 #include <memory>
 #include <string_view>
 
+#include "edui/gui.hpp"
+#include "edui/label.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
 #include "raymath.h"
@@ -16,6 +18,7 @@ TextBox::TextBox() {
 	render = std::make_unique<TextBoxRender>();
 	render->padding = 2.0f;
 	render->focusBgColor = RAYWHITE;
+	render->as<TextBoxRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 	focusable = true;
 }
 
@@ -91,13 +94,14 @@ void TextBox::drawSelection() {
 		}
 
 		auto paddingRect = getPaddingRect();
-		float totalFontSize = rend.font->baseSize * rend.fontSize;
+		float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+		float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
 
 		std::string stringA = TextSubtext(text.c_str(), 0, selection.start);
-		Vector2 measureA = MeasureTextEx(*rend.font, stringA.c_str(), totalFontSize, rend.spacing);
+		Vector2 measureA = MeasureTextEx(*rend.font, stringA.c_str(), totalFontSize, spacing);
 
 		std::string stringB = TextSubtext(text.c_str(), selection.start, selection.end - selection.start);
-		Vector2 measureB = MeasureTextEx(*rend.font, stringB.c_str(), totalFontSize, rend.spacing);
+		Vector2 measureB = MeasureTextEx(*rend.font, stringB.c_str(), totalFontSize, spacing);
 
 		Rectangle selectionRect = {paddingRect.x + measureA.x - scroll, paddingRect.y, measureB.x, paddingRect.height};
 
@@ -114,11 +118,19 @@ void TextBox::draw() {
 	if (rend.font == nullptr) return;
 
 	auto paddingRect = getPaddingRect();
-	float totalFontSize = rend.font->baseSize * rend.fontSize;
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
 
 	BeginScissorMode(paddingRect.x, rect.y, paddingRect.width, rect.height);
 
-	DrawTextEx(*rend.font, text.c_str(), {paddingRect.x - scroll, paddingRect.y}, totalFontSize, rend.spacing,
+	Vector2 textSize = MeasureTextEx(*rend.font, text.c_str(), totalFontSize, spacing);
+
+	Vector2 textPos;
+	textPos.x = paddingRect.x;
+	textPos.y =
+		paddingRect.y + Lerp(0.0f, paddingRect.height - textSize.y, (static_cast<float>(rend.vertAlign) * 0.5f));
+
+	DrawTextEx(*rend.font, text.c_str(), {textPos.x - scroll, textPos.y}, totalFontSize, spacing,
 			   rend.textColor);
 	drawSelection();
 
@@ -154,7 +166,8 @@ int TextBox::calcCursor() {
 	if (rend.font == nullptr) return res;
 	if (text.empty()) return res;
 
-	float totalFontSize = rend.font->baseSize * rend.fontSize;
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
 
 	auto mousePos = GetMousePosition();
 
@@ -183,7 +196,7 @@ int TextBox::calcCursor() {
 		}
 
 		subStr = TextSubtext(text.c_str(), 0, len);
-		measure = MeasureTextEx(*rend.font, subStr.c_str(), totalFontSize, rend.spacing);
+		measure = MeasureTextEx(*rend.font, subStr.c_str(), totalFontSize, spacing);
 
 		GetCodepoint(ptr, &codepointSize);
 		len += codepointSize;
@@ -198,11 +211,12 @@ int TextBox::calcCursor() {
 void TextBox::calcCursorRect() {
 	auto &rend = render->as<TextBoxRender>();
 	if (rend.font == nullptr) return;
-	float totalFontSize = rend.font->baseSize * rend.fontSize;
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
 	auto paddingRect = getPaddingRect();
 
 	std::string subStr = TextSubtext(text.c_str(), 0, cursorIndex);
-	auto measure = MeasureTextEx(*rend.font, subStr.c_str(), totalFontSize, rend.spacing);
+	auto measure = MeasureTextEx(*rend.font, subStr.c_str(), totalFontSize, spacing);
 	cursorRect = {measure.x - scroll + paddingRect.x, paddingRect.y, CursorWidth, paddingRect.height};
 
 	if (cursorRect.x + cursorRect.width > paddingRect.x + paddingRect.width) {
@@ -335,8 +349,9 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 
 				if (lastChar) {
 					auto &rend = render->as<TextBoxRender>();
-					float totalFontSize = rend.font->baseSize * rend.fontSize;
-					auto measure = MeasureTextEx(*rend.font, text.c_str(), totalFontSize, rend.spacing);
+					float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+					float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+					auto measure = MeasureTextEx(*rend.font, text.c_str(), totalFontSize, spacing);
 					if (measure.x >= paddingRect.x + paddingRect.width) {
 						auto paddingRect = getPaddingRect();
 						float diff = (paddingRect.x + paddingRect.width) - (cursorRect.x + cursorRect.width);

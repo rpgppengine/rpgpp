@@ -41,8 +41,7 @@ std::vector<int> loadFontCodepoints() {
 bool drawOverflownText(Rectangle rect, Font* font, float fontSize, float spacing, const std::string& text, std::string* shownText) {
 	bool overflown = false;
 
-	float totalFontSize = font->baseSize * fontSize;
-	Vector2 textSize = MeasureTextEx(*font, text.c_str(), totalFontSize, spacing);
+	Vector2 textSize = MeasureTextEx(*font, text.c_str(), fontSize, spacing);
 
 	std::string copiedStr = text;
 	char *textPtr = copiedStr.data();
@@ -58,7 +57,7 @@ bool drawOverflownText(Rectangle rect, Font* font, float fontSize, float spacing
 			codepointsTotal += codepointSize;
 
 			std::string subStr = TextSubtext(text.c_str(), 0, codepointsTotal);
-			Vector2 testTextSize = MeasureTextEx(*font, subStr.c_str(), totalFontSize, spacing);
+			Vector2 testTextSize = MeasureTextEx(*font, subStr.c_str(), fontSize, spacing);
 			if (testTextSize.x > (rect.width - 16)) {
 				result = codepointsTotal - 1;
 

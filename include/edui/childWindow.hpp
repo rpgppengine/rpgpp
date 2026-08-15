@@ -9,18 +9,12 @@
 #include "raylib.h"
 
 namespace edui {
-struct ChildWindowRender : public ContainerRender {
-	HorizontalAlignment horiAlign = HorizontalAlignment::TEXT_LEFT;
-	VerticalAlignment vertAlign = VerticalAlignment::TEXT_TOP;
-	float fontSize = 1;
-	Color textColor = BLACK;
-	float spacing = 0.05f;
-
+struct ChildWindowRender : public LabelRender {
 	float titlePadding = 2.0f;
 };
 
 struct ChildWindow : public Container {
-	const float EDUI_CHILDWINDOW_BARHEIGHT = 20.0f;
+	const float EDUI_CHILDWINDOW_BARHEIGHT = 26.0f;
 
 	std::string title = "";
 	std::string shownText = "";

@@ -13,6 +13,8 @@ struct Gui {
 
 	Color background = RAYWHITE;
 	Font font;
+	float labelFontSize = 16;
+	float fontSpacing = 0;
 
 	Vector2 lastMousePos;
 
@@ -44,7 +46,7 @@ struct Gui {
 	void notifyChild(std::shared_ptr<Widget> *widget);
 
 	Rectangle getScreenRect();
-	void setFont(const char *fileName, int fontSize);
+	void setFont(const char *fileName, int fontSize, int labelFontSize, int fontSpacing);
 
 	void unload();
 };

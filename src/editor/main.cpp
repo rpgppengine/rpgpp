@@ -7,6 +7,7 @@
 #include "edui/childWindow.hpp"
 #include "edui/colorRect.hpp"
 #include "edui/container.hpp"
+#include "edui/contextMenu.hpp"
 #include "edui/dropdown.hpp"
 #include "edui/dropdownList.hpp"
 #include "edui/gui.hpp"
@@ -39,18 +40,18 @@ int main() {
 
 	edui::Gui gui;
 
-	SetConfigFlags(FLAG_WINDOW_HIGHDPI);
+	SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_RESIZABLE);
 	InitWindow(800, 450, "raylib example - basic window");
 	SetTargetFPS(60);
 
-	gui.setFont("resources/TerminusTTF-4.49.3.ttf", 20);
+	gui.setFont("resources/TerminusTTF-4.49.3.ttf", 96, 18, 0);
 
 	auto label = std::make_shared<edui::Label>();
-	label->setSize({0, 160}, {0, 26});
+	label->setSize({1, -20}, {0, 26});
 	label->setText("Hello world!");
 	label->render->as<edui::LabelRender>().padding = 2;
 	//label->render->as<edui::LabelRender>().vertAlign = edui::VerticalAlignment::TEXT_BOTTOM;
-	//label->render->as<edui::LabelRender>().fontSize = 0.25f;
+	//label->render->as<edui::LabelRender>().fontSize = 0.125f;
 	gui.add(label);
 
 	auto textBox = std::make_shared<edui::TextBox>();
@@ -81,7 +82,7 @@ int main() {
 
 	auto dropdown = std::make_shared<edui::Dropdown>();
 	dropdown->setPosition({0, 20}, {0, 200});
-	dropdown->setSize({0, 200}, {0, 32});
+	dropdown->setSize({0, 200}, {0, 26});
 	dropdown->addItem("Hello");
 	dropdown->addItem("Hello2");
 	gui.add(dropdown);
@@ -105,15 +106,22 @@ int main() {
 	canvas->setSize({1, 0}, {1, 0});
 	childWindow->add(canvas);
 
+	auto context = std::make_shared<edui::ContextMenu>();
+	context->setPosition({0, 500}, {0, 20});
+	context->setSize({0, 200}, {0, 0});
+	context->addItem("Item1");
+	context->addItem("Item2");
+	context->onItemClicked = [](const std::string& item) {
+		printf("%s \n", item.c_str());
+	};
+	gui.add(context);
+
 	while (!WindowShouldClose()) {
 		gui.update();
 
 		BeginDrawing();
 
 		gui.draw();
-
-		//DrawRectangle(0, 200, 16, 16, GREEN);
-		//GuiDrawIcon(ICON_ARROW_DOWN_FILL, 0, 200, 1, BLACK);
 
 		EndDrawing();
 	}

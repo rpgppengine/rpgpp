@@ -15,9 +15,9 @@ enum class VerticalAlignment { TEXT_TOP, TEXT_CENTER, TEXT_BOTTOM };
 struct LabelRender : public WidgetRender {
 	HorizontalAlignment horiAlign = HorizontalAlignment::TEXT_LEFT;
 	VerticalAlignment vertAlign = VerticalAlignment::TEXT_TOP;
-	float fontSize = 1;
+	float fontSize = -1;
 	Color textColor = BLACK;
-	float spacing = 0.05f;
+	float spacing = -1;
 	float fontYOffset = 0.0f;
 };
 

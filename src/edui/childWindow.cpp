@@ -6,6 +6,7 @@
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/iconButton.hpp"
+#include "edui/label.hpp"
 #include "edui/rliconsarr.hpp"
 #include "edui/verticalContainer.hpp"
 #include "edui/widget.hpp"
@@ -16,6 +17,7 @@ using namespace edui;
 
 ChildWindow::ChildWindow() : Container() {
 	render = std::make_unique<ChildWindowRender>();
+	render->as<ChildWindowRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 	auto closeButton = std::make_shared<IconButton>();
 	closeButton->iconId = ICON_CROSS;
 	closeButton->setPosition({1, static_cast<int>(-EDUI_CHILDWINDOW_BARHEIGHT)}, {0, 0});
@@ -43,9 +45,10 @@ void ChildWindow::setTitle(const std::string &title) {
 
 	if (rend.font == nullptr) return;
 
-	float totalFontSize = rend.font->baseSize * rend.fontSize;
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
 
-	drawOverflownText(padding, rend.font, rend.fontSize, rend.spacing, title, &shownText);
+	drawOverflownText(padding, rend.font, totalFontSize, spacing, title, &shownText);
 }
 
 void ChildWindow::update() {
@@ -89,15 +92,16 @@ void ChildWindow::draw() {
 	DrawRectangleLinesEx(barRect, rend.border, rend.currentBorderColor);
 
 	// title
-	float totalFontSize = rend.font->baseSize * rend.fontSize;
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
 	Rectangle padding = paddingRect(barRect, rend.titlePadding);
 
-	Vector2 textSize = MeasureTextEx(*rend.font, shownText.c_str(), totalFontSize, rend.spacing);
+	Vector2 textSize = MeasureTextEx(*rend.font, shownText.c_str(), totalFontSize, spacing);
 	Vector2 textPos;
 	textPos.x = padding.x + Lerp(0.0f, padding.width - textSize.x, (static_cast<float>(rend.horiAlign) * 0.5f));
 	textPos.y = padding.y + Lerp(0.0f, padding.height - textSize.y, (static_cast<float>(rend.vertAlign) * 0.5f));
 
-	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, rend.spacing, rend.textColor);
+	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, spacing, rend.textColor);
 
 	for (auto &widget : widgets) {
 		widget->draw();

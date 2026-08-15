@@ -7,9 +7,9 @@
 
 namespace edui {
 struct TooltipRender : public WidgetRender {
-	float fontSize = 1;
+	float fontSize = -1;
 	Color textColor = BLACK;
-	float spacing = 0.05f;
+	float spacing = -1;
 };
 
 struct Tooltip : public Widget {

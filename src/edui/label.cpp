@@ -29,9 +29,10 @@ void Label::draw() {
 
 	auto paddingRect = getPaddingRect();
 
-	float totalFontSize = rend.font->baseSize * rend.fontSize;
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
 
-	Vector2 textSize = MeasureTextEx(*rend.font, shownText.c_str(), totalFontSize, rend.spacing);
+	Vector2 textSize = MeasureTextEx(*rend.font, shownText.c_str(), totalFontSize, spacing);
 
 	setText(this->text);
 
@@ -54,7 +55,10 @@ void Label::setText(const std::string &text) {
 
 	auto paddingRect = getPaddingRect();
 
-	overflown = drawOverflownText(paddingRect, rend.font, rend.fontSize, rend.spacing, text, &shownText);
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+
+	overflown = drawOverflownText(paddingRect, rend.font, totalFontSize, spacing, text, &shownText);
 }
 
 void Label::mouseEntered() {

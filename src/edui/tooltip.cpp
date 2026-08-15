@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 
+#include "edui/gui.hpp"
+
 using namespace edui;
 
 Tooltip::Tooltip() {
@@ -22,9 +24,10 @@ void Tooltip::draw() {
 
 	setText(this->text);
 
-	float totalFontSize = rend.font->baseSize * rend.fontSize;
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
 	Vector2 textPos = {paddingRect.x, paddingRect.y};
-	DrawTextEx(*rend.font, text.c_str(), textPos, totalFontSize, rend.spacing, rend.textColor);
+	DrawTextEx(*rend.font, text.c_str(), textPos, totalFontSize, spacing, rend.textColor);
 }
 
 void Tooltip::setText(const std::string &text) {
@@ -34,8 +37,9 @@ void Tooltip::setText(const std::string &text) {
 
 	if (rend.font == nullptr) return;
 
-	float totalFontSize = rend.font->baseSize * rend.fontSize;
-	Vector2 textSize = MeasureTextEx(*rend.font, text.c_str(), totalFontSize, rend.spacing);
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+	Vector2 textSize = MeasureTextEx(*rend.font, text.c_str(), totalFontSize, spacing);
 
 	layout.width.offset = textSize.x + (rend.padding * 2);
 	layout.height.offset = textSize.y + (rend.padding * 2);

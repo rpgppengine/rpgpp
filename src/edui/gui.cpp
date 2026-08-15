@@ -188,16 +188,19 @@ Rectangle Gui::getScreenRect() {
 	return {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
 }
 
-void Gui::setFont(const char *fileName, int fontSize) {
+void Gui::setFont(const char *fileName, int fontSize, int labelFontSize, int fontSpacing) {
 	if (IsFontValid(font)) {
 		UnloadFont(font);
 	}
 
+	this->labelFontSize = labelFontSize;
+	this->fontSpacing = fontSpacing;
+
 	auto codepoints = loadFontCodepoints();
 	font = LoadFontEx(fileName, fontSize, codepoints.data(), codepoints.size());
 
-	GenTextureMipmaps(&font.texture);
-	SetTextureFilter(font.texture, TEXTURE_FILTER_POINT);
+	//GenTextureMipmaps(&font.texture);
+	//SetTextureFilter(font.texture, TEXTURE_FILTER_POINT);
 }
 
 void Gui::unload() {

@@ -6,6 +6,7 @@
 #include "edui/rlicons.hpp"
 #include "edui/rliconsarr.hpp"
 #include "edui/widget.hpp"
+#include "raylib.h"
 #include "raymath.h"
 
 using namespace edui;
@@ -18,7 +19,7 @@ Dropdown::Dropdown() {
 }
 
 void Dropdown::setValue(const DropdownValue& val) {
-
+	currentItem = val.idx;
 };
 
 DropdownValue Dropdown::getValue() {
@@ -41,23 +42,24 @@ void Dropdown::draw() {
 	auto paddingRect = getPaddingRect();
 	drawOverflownText(paddingRect, rend.font, rend.fontSize, rend.spacing, items[currentItem], &shownText);
 
-	float totalFontSize = rend.font->baseSize * rend.fontSize;
-	Vector2 textSize = MeasureTextEx(*rend.font, shownText.c_str(), totalFontSize, rend.spacing);
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+	Vector2 textSize = MeasureTextEx(*rend.font, shownText.c_str(), totalFontSize, spacing);
 
 	Vector2 textPos;
 	textPos.x = paddingRect.x + Lerp(0.0f, paddingRect.width - textSize.x, (static_cast<float>(rend.horiAlign) * 0.5f));
 	textPos.y =
 		paddingRect.y + Lerp(0.0f, paddingRect.height - textSize.y, (static_cast<float>(rend.vertAlign) * 0.5f));
 
-	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, rend.spacing, rend.textColor);
+	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, spacing, rend.textColor);
 
 	//draw arrow
-	Rectangle iconRect = {rect.x + rect.width - (RAYGUI_ICON_SIZE * rend.fontSize), rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
+	Rectangle iconRect = {rect.x + rect.width - (RAYGUI_ICON_SIZE), rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
 	Rectangle iconDestRect = {rect.x + (rect.width - rect.height), rect.y, rect.height, rect.height};
 	rectCenter(iconDestRect, &iconRect);
 
 	int icon = (opened ? ICON_ARROW_UP_FILL : ICON_ARROW_DOWN_FILL);
-	GuiDrawIcon(icon, static_cast<int>(iconRect.x), static_cast<int>(iconRect.y), rend.fontSize, rend.currentBorderColor);
+	GuiDrawIcon(icon, static_cast<int>(iconRect.x), static_cast<int>(iconRect.y), 1, rend.currentBorderColor);
 }
 
 void Dropdown::leftMouseClicked() {
@@ -75,9 +77,11 @@ void Dropdown::openDropdown() {
 
 	Vector2 listPos = {rect.x, rect.y + rect.height};
 
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+
 	auto list = std::make_shared<edui::DropdownList>();
 	list->setPosition({0, static_cast<int>(listPos.x)}, {0, static_cast<int>(listPos.y)});
-	list->setSize({0, static_cast<int>(rect.width)}, {0, static_cast<int>(EDUI_DROPDOWNLIST_HEIGHT * rend.fontSize)});
+	list->setSize({0, static_cast<int>(rect.width)}, {0, EDUI_DROPDOWNLIST_HEIGHT});
 
 	Gui::instance->addTop(list);
 

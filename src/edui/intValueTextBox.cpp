@@ -15,6 +15,7 @@ IntValueTextBox::IntValueTextBox() : TextBox() {
 	render = std::make_unique<IntValueTextBoxRender>();
 	render->padding = 2.0f;
 	render->focusBgColor = RAYWHITE;
+	render->as<IntValueTextBoxRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 	focusable = true;
 
 	text = "0";
