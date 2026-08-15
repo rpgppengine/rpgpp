@@ -75,7 +75,7 @@ void Dropdown::leftMouseClicked() {
 void Dropdown::openDropdown() {
 	auto &rend = render->as<DropdownRender>();
 
-	Vector2 listPos = {rect.x, rect.y + rect.height};
+	Vector2 listPos = {static_cast<float>(layout.x.offset), layout.y.offset + rect.height};
 
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
 

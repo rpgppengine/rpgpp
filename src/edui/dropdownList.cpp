@@ -17,7 +17,7 @@ void DropdownList::addItem(const std::string& item, int scale) {
 
 	float fontSize = Gui::instance->labelFontSize;
 
-	newButton->setSize({1, 0}, {0, static_cast<int>(fontSize)});
+	newButton->setSize({1, 0}, {0, 22});
 	newButton->setText(item);
 	newButton->render->padding = 2;
 	newButton->render->as<ButtonRender>().horiAlign = HorizontalAlignment::TEXT_LEFT;

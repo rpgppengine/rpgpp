@@ -12,6 +12,37 @@ using namespace edui;
 
 Gui* Gui::instance = nullptr;
 
+void Gui::processWidget(std::shared_ptr<Widget>& widget) {
+	if (widget->mouseIsInRect()) {
+		if (!widget->isContainer) {
+			notifyChild(&widget);
+		} else {
+			notifyChild(&widget);
+			widget->as<Container>().notifyChildren(this);
+		}
+	} else {
+		if (widget->notifiedMouseEnter) {
+			widget->notifiedMouseEnter = false;
+			widget->mouseLeft();
+		}
+
+		if (widget->deleteOnOutsideClick) {
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+				widget->markDelete();
+			}
+		}
+	}
+
+	widget->update();
+	widget->calcRect(screenRect);
+
+	if (leftClickedWidget != nullptr) {
+		if (leftClickedWidget->get()->deleteFlag) {
+			leftClickedWidget = nullptr;
+		}
+	}
+}
+
 void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
 	int i = 0;
 	for (auto &widget : vec) {
@@ -20,34 +51,7 @@ void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
 			continue;
 		}
 
-		if (widget->mouseIsInRect()) {
-			if (!widget->isContainer) {
-				notifyChild(&widget);
-			} else {
-				notifyChild(&widget);
-				widget->as<Container>().notifyChildren(this);
-			}
-		} else {
-			if (widget->notifiedMouseEnter) {
-				widget->notifiedMouseEnter = false;
-				widget->mouseLeft();
-			}
-
-			if (widget->deleteOnOutsideClick) {
-				if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-					widget->markDelete();
-				}
-			}
-		}
-
-		widget->update();
-		widget->calcRect(screenRect);
-
-		if (leftClickedWidget != nullptr) {
-			if (leftClickedWidget->get()->deleteFlag) {
-				leftClickedWidget = nullptr;
-			}
-		}
+		processWidget(widget);
 
 		if (widget->deleteFlag) {
 			widget->onDeleted.invoke();
@@ -60,6 +64,18 @@ void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
 
 void Gui::update() {
 	screenRect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+	if (hasMenuBar && menuBar != nullptr) {
+		if (menuBar->deferFlag) {
+			menuBar->deferFlag = false;
+			return;
+		}
+
+		processWidget(menuBar);
+
+		float menuBarHeight = menuBar->rect.height;
+		screenRect.y += menuBarHeight;
+		screenRect.height -= menuBarHeight;
+	}
 
 	processVector(topLayer);
 	processVector(widgets);
@@ -117,6 +133,11 @@ void Gui::update() {
 
 void Gui::draw() {
 	ClearBackground(background);
+
+	if (hasMenuBar && menuBar != nullptr) {
+		menuBar->draw();
+	}
+
 	for (auto &widget : widgets) {
 		widget->draw();
 	}
@@ -140,6 +161,9 @@ void Gui::add(std::shared_ptr<Widget> widget) {
 void Gui::addTop(std::shared_ptr<Widget> widget) {
 	if (widget->isContainer) {
 		widget->as<Container>().gui = this;
+		for (auto& subwidget : widget->as<Container>().widgets) {
+			subwidget->render->font = &this->font;
+		}
 	}
 	widget->render->font = &this->font;
 	widget->unfocused();
@@ -184,6 +208,21 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 	}
 }
 
+void Gui::addMenuBar(std::shared_ptr<Widget> widget) {
+	if (widget->isContainer) {
+		widget->as<Container>().gui = this;
+		for (auto& subwidget : widget->as<Container>().widgets) {
+			subwidget->render->font = &this->font;
+		}
+	}
+	widget->render->font = &this->font;
+	widget->unfocused();
+
+	menuBar = widget;
+	menuBar->setSize({1, 0}, {0, 22});
+	hasMenuBar = true;
+}
+
 Rectangle Gui::getScreenRect() {
 	return {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
 }
@@ -198,9 +237,6 @@ void Gui::setFont(const char *fileName, int fontSize, int labelFontSize, int fon
 
 	auto codepoints = loadFontCodepoints();
 	font = LoadFontEx(fileName, fontSize, codepoints.data(), codepoints.size());
-
-	//GenTextureMipmaps(&font.texture);
-	//SetTextureFilter(font.texture, TEXTURE_FILTER_POINT);
 }
 
 void Gui::unload() {

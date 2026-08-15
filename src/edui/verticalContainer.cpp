@@ -111,6 +111,7 @@ void VerticalContainer::scrolled(float mouseWheel) {
 }
 
 void VerticalContainer::leftMouseClicked() {
+	if (!overflown) return;
 	if (CheckCollisionPointRec(GetMousePosition(), scrollAreaRect)) {
 		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollbarRect.x, scrollbarRect.y});
 		if (!CheckCollisionPointRec(GetMousePosition(), scrollbarRect)) {

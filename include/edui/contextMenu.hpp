@@ -2,10 +2,12 @@
 #define _EDUI_CONTEXTMENU_H
 
 #include <string>
+
 #include "edui/label.hpp"
 #include "edui/signal.hpp"
 #include "edui/verticalContainer.hpp"
 #include "edui/widget.hpp"
+
 namespace edui {
 struct ContextMenuRender : public VerticalContainerRender {};
 
@@ -15,8 +17,8 @@ struct ContextMenu : public VerticalContainer {
 	ContextMenu();
 
 	int idx = 0;
-	void addItem(const std::string& item);
+	void addItem(const std::string &item);
 };
-}
+}  // namespace edui
 
 #endif

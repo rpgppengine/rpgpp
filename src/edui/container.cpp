@@ -15,7 +15,13 @@ Container::Container() {
 void Container::update() {
 	updateContentRect();
 
+	int i = 0;
 	for (auto &widget : widgets) {
+		if (widget->deferFlag) {
+			widget->deferFlag = false;
+			continue;
+		}
+
 		widget->update();
 		widget->calcRect(renderRect);
 
@@ -25,6 +31,8 @@ void Container::update() {
 				widget->mouseLeft();
 			}
 		}
+
+		i++;
 	}
 }
 

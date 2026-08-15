@@ -1,4 +1,6 @@
+#include <cstdio>
 #include <memory>
+#include <string>
 
 #include "editor.hpp"
 #include "edui/button.hpp"
@@ -16,6 +18,7 @@
 #include "edui/intValue.hpp"
 #include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
+#include "edui/menuBar.hpp"
 #include "edui/rliconsarr.hpp"
 #include "edui/textBox.hpp"
 #include "edui/verticalContainer.hpp"
@@ -38,13 +41,20 @@ int main() {
 	editor->unload();
 	*/
 
-	edui::Gui gui;
-
 	SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_RESIZABLE);
 	InitWindow(800, 450, "raylib example - basic window");
 	SetTargetFPS(60);
 
+	edui::Gui gui;
+
 	gui.setFont("resources/TerminusTTF-4.49.3.ttf", 96, 18, 0);
+
+	auto menuBar = std::make_shared<edui::MenuBar>();
+	gui.addMenuBar(menuBar);
+	menuBar->addItem("Menu1", {"Item1", "Item2"});
+	menuBar->onItemClicked = [] (const std::string& title, const std::string& option) {
+		printf("%s %s \n", title.c_str(), option.c_str());
+	};
 
 	auto label = std::make_shared<edui::Label>();
 	label->setSize({1, -20}, {0, 26});

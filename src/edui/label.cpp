@@ -42,9 +42,7 @@ void Label::draw() {
 		paddingRect.y + Lerp(0.0f, paddingRect.height - textSize.y, (static_cast<float>(rend.vertAlign) * 0.5f));
 	textPos.y += rend.fontYOffset;
 
-	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, rend.spacing, rend.textColor);
-
-	//DrawRectangleLinesEx({textPos.x, textPos.y, textSize.x, 21}, 2.0f, GREEN);
+	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, spacing, rend.textColor);
 }
 
 void Label::setText(const std::string &text) {

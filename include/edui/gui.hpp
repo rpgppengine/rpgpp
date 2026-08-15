@@ -16,6 +16,9 @@ struct Gui {
 	float labelFontSize = 16;
 	float fontSpacing = 0;
 
+	bool hasMenuBar = false;
+	std::shared_ptr<Widget> menuBar = nullptr;
+
 	Vector2 lastMousePos;
 
 	std::vector<std::shared_ptr<Widget>> widgets;
@@ -39,6 +42,7 @@ struct Gui {
 	void draw();
 
 	void processVector(std::vector<std::shared_ptr<Widget>>& vec);
+	void processWidget(std::shared_ptr<Widget>& widget);
 
 	void add(std::shared_ptr<Widget> widget);
 	void addTop(std::shared_ptr<Widget> widget);
@@ -47,6 +51,8 @@ struct Gui {
 
 	Rectangle getScreenRect();
 	void setFont(const char *fileName, int fontSize, int labelFontSize, int fontSpacing);
+
+	void addMenuBar(std::shared_ptr<Widget> widget);
 
 	void unload();
 };

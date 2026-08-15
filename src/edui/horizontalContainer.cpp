@@ -92,6 +92,8 @@ void HorizontalContainer::updateContentRect() {
 }
 
 void HorizontalContainer::scrolled(float mouseWheel) {
+	if (!overflown) return;
+
 	float added = (mouseWheel * ScrollSpeed);
 
 	if ((scissorX + added) >= 0.0f) {
@@ -108,6 +110,7 @@ void HorizontalContainer::scrolled(float mouseWheel) {
 }
 
 void HorizontalContainer::leftMouseClicked() {
+	if (!overflown) return;
 	if (CheckCollisionPointRec(GetMousePosition(), scrollAreaRect)) {
 		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollbarRect.x, scrollbarRect.y});
 		if (!CheckCollisionPointRec(GetMousePosition(), scrollbarRect)) {
