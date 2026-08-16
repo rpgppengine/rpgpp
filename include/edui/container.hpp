@@ -23,6 +23,10 @@ struct Container : public Widget {
 	Rectangle contentRect = {0, 0, 0, 0};
 	Rectangle renderRect;
 
+	bool mouseIsInContent() {
+		return CheckCollisionPointRec(GetMousePosition(), contentRect);
+	}
+
 	Container();
 	virtual void update();
 	virtual void draw();

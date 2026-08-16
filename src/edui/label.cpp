@@ -14,7 +14,7 @@ using namespace edui;
 
 Label::Label() {
 	render = std::make_unique<LabelRender>();
-	render->padding = 8;
+	render->padding = 2;
 	render->focusBgColor = RAYWHITE;
 	render->as<LabelRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 }

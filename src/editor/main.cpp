@@ -20,9 +20,11 @@
 #include "edui/label.hpp"
 #include "edui/menuBar.hpp"
 #include "edui/rliconsarr.hpp"
+#include "edui/tabBar.hpp"
 #include "edui/textBox.hpp"
 #include "edui/verticalContainer.hpp"
 #include "edui/dropdown.hpp"
+#include "edui/widget.hpp"
 #include "gamedata.hpp"
 #include "raylib.h"
 #include "services/editorGuiService.hpp"
@@ -57,11 +59,9 @@ int main() {
 	};
 
 	auto label = std::make_shared<edui::Label>();
-	label->setSize({1, -20}, {0, 26});
+	label->setSize({0, 70}, {0, 26});
 	label->setText("Hello world!");
 	label->render->as<edui::LabelRender>().padding = 2;
-	//label->render->as<edui::LabelRender>().vertAlign = edui::VerticalAlignment::TEXT_BOTTOM;
-	//label->render->as<edui::LabelRender>().fontSize = 0.125f;
 	gui.add(label);
 
 	auto textBox = std::make_shared<edui::TextBox>();
@@ -97,34 +97,29 @@ int main() {
 	dropdown->addItem("Hello2");
 	gui.add(dropdown);
 
-	auto childWindow = std::make_shared<edui::ChildWindow>();
-	childWindow->setPosition({0, 240}, {0, 20});
-	childWindow->setSize({0, 200}, {0, 200});
-	childWindow->setTitle("ChildWindow");
-	gui.add(childWindow);
+	auto tabContent = std::make_shared<edui::Container>();
+	tabContent->setPosition({0, 300}, {0, 44});
+	tabContent->setSize({0, 300}, {0, 300});
+	gui.add(tabContent);
 
-	auto label2 = std::make_shared<edui::IconTextButton>();
-	label2->anchor = {0.5f, 0.5f};
-	label2->setSize({0, 160}, {0, 26});
-	label2->iconId = ICON_FILETYPE_TEXT;
-	label2->setText("Hello");
-	label2->render->as<edui::LabelRender>().padding = 2;
-	//label2->render->as<edui::LabelRender>().fontSize = 2.0f;
-	//childWindow->add(label2);
-	//
-	auto canvas = std::make_shared<edui::Canvas>();
-	canvas->setSize({1, 0}, {1, 0});
-	childWindow->add(canvas);
+	auto tabBar = std::make_shared<edui::TabBar>();
+	tabBar->contentBase = tabContent;
+	tabBar->setPosition({0, 300}, {0, 22});
+	tabBar->setSize({0, 300}, {0, 22});
+	gui.add(tabBar);
+	auto screenRect = gui.getScreenRect();
+	tabBar->calcRect(screenRect);
 
-	auto context = std::make_shared<edui::ContextMenu>();
-	context->setPosition({0, 500}, {0, 20});
-	context->setSize({0, 200}, {0, 0});
-	context->addItem("Item1");
-	context->addItem("Item2");
-	context->onItemClicked = [](const std::string& item) {
-		printf("%s \n", item.c_str());
-	};
-	gui.add(context);
+	auto page1 = tabBar->addItem("Hello", ICON_FILE);
+	page1->add(label->clone());
+
+	auto pageLabel = std::make_shared<edui::Label>();
+	pageLabel->setSize({0.5f, 0}, {0, 22});
+	page1->add(pageLabel);
+
+	tabBar->addItem("Hello2", ICON_FILETYPE_BINARY);
+	tabBar->addItem("Hello3", 0);
+	tabBar->addItem("Test Settings", ICON_INFO);
 
 	while (!WindowShouldClose()) {
 		gui.update();

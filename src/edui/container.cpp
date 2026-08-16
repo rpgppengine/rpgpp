@@ -17,6 +17,8 @@ void Container::update() {
 
 	int i = 0;
 	for (auto &widget : widgets) {
+		if (!widget->visible) continue;
+
 		if (widget->deferFlag) {
 			widget->deferFlag = false;
 			continue;
@@ -25,7 +27,7 @@ void Container::update() {
 		widget->update();
 		widget->calcRect(renderRect);
 
-		if (!widget->mouseIsInRect() || !mouseIsInRect()) {
+		if (!widget->mouseIsInRect() || !mouseIsInContent()) {
 			if (widget->notifiedMouseEnter) {
 				widget->notifiedMouseEnter = false;
 				widget->mouseLeft();
@@ -47,7 +49,9 @@ void Container::draw() {
 	DrawRectangleRec(rect, rend.bgColor);
 
 	for (auto &widget : widgets) {
-		widget->draw();
+		if (widget->visible) {
+			widget->draw();
+		}
 	}
 
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);

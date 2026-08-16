@@ -139,10 +139,14 @@ void Gui::draw() {
 	}
 
 	for (auto &widget : widgets) {
-		widget->draw();
+		if (widget->visible) {
+			widget->draw();
+		}
 	}
 	for (auto &widget : topLayer) {
-		widget->draw();
+		if (widget->visible) {
+			widget->draw();
+		}
 	}
 }
 

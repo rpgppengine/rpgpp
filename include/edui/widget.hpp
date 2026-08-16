@@ -70,6 +70,7 @@ struct Widget {
 	bool deleteFlag = false;
 	bool deferFlag = false;
 
+	bool visible = true;
 	bool focusable = false;
 	bool isContainer = false;
 	bool notifiedMouseEnter = false;
