@@ -13,11 +13,13 @@ struct IconTextButton : public Label {
 	int iconId = 0;
 	int iconRectSize = 22;
 
+	int tabId = 0;
+
 	void draw() override;
 	void calcRect(Rectangle &base) override;
 	Rectangle getContentRect() override;
 
-	void resizeToFit();
+	virtual void resizeToFit();
 };
 }  // namespace edui
 

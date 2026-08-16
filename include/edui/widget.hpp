@@ -64,6 +64,8 @@ struct Widget {
 	Signal onFocused;
 	Signal onUnfocused;
 	Signal onDeleted;
+	Signal onMouseEntered;
+	Signal onMouseLeft;
 
 	std::unique_ptr<WidgetRender> render;
 
@@ -80,6 +82,8 @@ struct Widget {
 	Rectangle rect = {0, 0, 0, 0};
 	Layout2 layout;
 	Vector2 anchor = {0, 0};
+
+	int referId = 0;
 
 	Widget() = default;
 	virtual ~Widget() = default;
@@ -123,11 +127,13 @@ struct Widget {
 	bool mouseIsInRect() { return CheckCollisionPointRec(GetMousePosition(), rect); }
 
 	virtual void mouseEntered() {
+		onMouseEntered.invoke();
 		render->currentBgColor = render->focusBgColor;
 		render->currentBorderColor = render->focusBorderColor;
 	}
 
 	virtual void mouseLeft() {
+		onMouseLeft.invoke();
 		render->currentBgColor = render->bgColor;
 		render->currentBorderColor = render->borderColor;
 	}

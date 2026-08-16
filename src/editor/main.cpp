@@ -12,6 +12,7 @@
 #include "edui/contextMenu.hpp"
 #include "edui/dropdown.hpp"
 #include "edui/dropdownList.hpp"
+#include "edui/fileTabBar.hpp"
 #include "edui/gui.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/iconTextButton.hpp"
@@ -102,7 +103,7 @@ int main() {
 	tabContent->setSize({0, 300}, {0, 300});
 	gui.add(tabContent);
 
-	auto tabBar = std::make_shared<edui::TabBar>();
+	auto tabBar = std::make_shared<edui::FileTabBar>();
 	tabBar->contentBase = tabContent;
 	tabBar->setPosition({0, 300}, {0, 22});
 	tabBar->setSize({0, 300}, {0, 22});
@@ -111,15 +112,23 @@ int main() {
 	tabBar->calcRect(screenRect);
 
 	auto page1 = tabBar->addItem("Hello", ICON_FILE);
-	page1->add(label->clone());
 
 	auto pageLabel = std::make_shared<edui::Label>();
 	pageLabel->setSize({0.5f, 0}, {0, 22});
 	page1->add(pageLabel);
 
-	tabBar->addItem("Hello2", ICON_FILETYPE_BINARY);
-	tabBar->addItem("Hello3", 0);
+	auto page2 = tabBar->addItem("Hello2", ICON_FILETYPE_BINARY);
+	auto pageLabel2 = std::make_shared<edui::Label>();
+	pageLabel2->setText("Page 2");
+	pageLabel2->setSize({0.5f, 0}, {0, 22});
+	page2->add(pageLabel2);
+
+	auto page3 = tabBar->addItem("Hello3", 0);
 	tabBar->addItem("Test Settings", ICON_INFO);
+	auto pageLabel3 = std::make_shared<edui::Label>();
+	pageLabel3->setText("Page 3");
+	pageLabel3->setSize({0.5f, 0}, {0, 22});
+	page3->add(pageLabel3);
 
 	while (!WindowShouldClose()) {
 		gui.update();

@@ -16,9 +16,7 @@ IconTextButton::IconTextButton() {
 	rend.vertAlign = VerticalAlignment::TEXT_CENTER;
 }
 
-void IconTextButton::calcRect(Rectangle &base) {
-	Label::calcRect(base);
-}
+void IconTextButton::calcRect(Rectangle &base) { Label::calcRect(base); }
 
 Rectangle IconTextButton::getContentRect() {
 	if (iconId == 0) {

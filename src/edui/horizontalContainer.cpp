@@ -15,6 +15,14 @@ HorizontalContainer::HorizontalContainer() {
 }
 
 void HorizontalContainer::update() {
+	this->scissorRect.width = 0;
+	for (auto &widget : widgets) {
+		if (widget->visible && !widget->deleteFlag) {
+			widget->layout.x.offset = this->scissorRect.width;
+			this->scissorRect.width += widget->rect.width;
+		}
+	}
+
 	if (scrolling) {
 		float lowerLimit = scrollOffset.x;
 		float upperLimit = scrollAreaRect.width - (scrollbarRect.width - scrollOffset.x);
@@ -31,7 +39,23 @@ void HorizontalContainer::update() {
 }
 
 void HorizontalContainer::draw() {
-	ScrollableContainer::draw();
+	//ScrollableContainer::draw();
+	//
+	auto &rend = render->as<ContainerRender>();
+
+	DrawRectangleRec(rect, rend.bgColor);
+
+	//this->scissorRect.width = 0;
+	for (auto &widget : widgets) {
+		if (widget->visible && !widget->deleteFlag) {
+			//widget->layout.x.offset = scissorRect.width;
+			//this->scissorRect.width += widget->rect.width;
+			widget->draw();
+		}
+	}
+
+	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
+
 	if (overflown) {
 		DrawRectangleRec(scrollbarRect, render->as<HorizontalContainerRender>().currentScrollbarColor);
 		DrawRectangleLinesEx(scrollAreaRect, 1.0f, render->currentBorderColor);
@@ -54,7 +78,19 @@ void HorizontalContainer::add(std::shared_ptr<Widget> widget) {
 	widget->layout.height = {1.0f, 0};
 	widget->layout.width = {0, widgetWidth};
 
+	/*
 	this->scissorRect.width = ((rend.padding * 2) + res + widgetWidth);
+
+	int size = widgets.size();
+
+	widget->onDeleted = [this, size, widgetWidth] {
+		deferFlag = true;
+		for (int i = (size - 1); i < widgets.size(); i++) {
+			widgets.at(i)->layout.x.offset -= widgetWidth;
+		}
+		this->scissorRect.width -= widgetWidth;
+	};
+	*/
 
 	ScrollableContainer::add(widget);
 }

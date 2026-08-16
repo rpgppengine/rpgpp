@@ -27,15 +27,11 @@ TabBar::TabBar() : HorizontalContainer() {
 	rightButtonPtr->setSize({0, 0}, {1, 0});
 	rightButtonPtr->iconId = ICON_ARROW_RIGHT_FILL;
 
-	leftButtonPtr->clicked = [this] {
-		scrolled(1.0f);
-	};
-	rightButtonPtr->clicked = [this] {
-		scrolled(-1.0f);
-	};
+	leftButtonPtr->clicked = [this] { scrolled(1.0f); };
+	rightButtonPtr->clicked = [this] { scrolled(-1.0f); };
 }
 
-void TabBar::processWidget(std::shared_ptr<Widget>& widget) {
+void TabBar::processWidget(std::shared_ptr<Widget> &widget) {
 	if (widget->mouseIsInRect()) {
 		Gui::instance->notifyChild(&widget);
 	} else {
@@ -112,8 +108,10 @@ std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) 
 	if (size >= 20) return std::make_shared<Container>();
 
 	auto content = std::make_shared<Container>();
+	content->referId = size;
 
 	auto button = std::make_shared<IconTextButton>();
+	button->referId = size;
 	button->setSize({0, 0}, {1, 0});
 	button->setText(item);
 	button->iconId = iconId;
@@ -134,35 +132,60 @@ std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) 
 
 	size++;
 
+	button->onDeleted = [this] {
+		updateContentRect();
+
+		if (this->scissorX > scrollMax) {
+			scissorX = 0;
+		}
+	};
+
 	return content;
 }
 
 void TabBar::removeItem(int index) {
-	tabTitles[index] = "";
-	auto &elem = tabTitles[index + 1];
-	while (!elem.empty()) {
-		tabTitles[index].swap(elem);
+	printf("%i \n", index);
+	if (index >= (size - 1)) return;
 
-		index++;
-		elem = tabTitles[index + 1];
+	int i = index;
+	tabTitles[index] = "";
+	auto &elem = tabTitles[i + 1];
+	while (!elem.empty()) {
+		tabTitles[i].swap(elem);
+
+		i++;
+		elem = tabTitles[i + 1];
 	}
 
-	int i = 0;
-	for (auto it = tabPages.cbegin(); it != tabPages.cend();) {
-		if (i == index) {
-			tabPages.erase(it);
+	printf("===\n");
+
+	i = 0;
+	for (auto it = tabPages.begin(); it != tabPages.end();) {
+		printf("%i \n", i);
+		if (it->get()->referId == index) {
+			it->get()->markDelete();
+			it = tabPages.erase(it);
+			break;
 		} else {
 			it++;
 			i++;
 		}
 	}
+
+	for (auto it = tabPages.begin(); it != tabPages.end();) {
+		printf("widgets count: %zu\n", it->get()->widgets.size());
+
+		it++;
+	}
 }
 
 void TabBar::showTabContent(int index) {
 	int i = 0;
-	for (auto it = tabPages.cbegin(); it != tabPages.cend();) {
-		if (i == index) {
+	for (auto it = tabPages.begin(); it != tabPages.end();) {
+		if (it->get()->referId == index) {
+			printf("shown %i \n", index);
 			it->get()->visible = true;
+			currentPage = index;
 		} else {
 			it->get()->visible = false;
 		}

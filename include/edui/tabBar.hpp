@@ -24,6 +24,8 @@ struct TabBar : public HorizontalContainer {
 	std::shared_ptr<IconButton> leftButtonPtr = nullptr;
 	std::shared_ptr<IconButton> rightButtonPtr = nullptr;
 
+	int currentPage = 0;
+
 	TabBar();
 
 	void update() override;
@@ -34,12 +36,12 @@ struct TabBar : public HorizontalContainer {
 	void leftMouseClicked() override;
 	void leftMouseReleased() override;
 
-	std::shared_ptr<Container> addItem(const std::string &item, int iconId);
+	virtual std::shared_ptr<Container> addItem(const std::string &item, int iconId);
 	void removeItem(int index);
 	void showTabContent(int index);
 
 private:
-	void processWidget(std::shared_ptr<Widget>& widget);
+	void processWidget(std::shared_ptr<Widget> &widget);
 };
 }  // namespace edui
 

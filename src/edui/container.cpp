@@ -17,6 +17,8 @@ void Container::update() {
 
 	int i = 0;
 	for (auto &widget : widgets) {
+		if (widget == nullptr) continue;
+
 		if (!widget->visible) continue;
 
 		if (widget->deferFlag) {
@@ -32,6 +34,11 @@ void Container::update() {
 				widget->notifiedMouseEnter = false;
 				widget->mouseLeft();
 			}
+		}
+
+		if (widget->deleteFlag) {
+			widget->onDeleted.invoke();
+			widgets.erase(widgets.begin() + i);
 		}
 
 		i++;
