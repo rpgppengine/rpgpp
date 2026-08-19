@@ -93,3 +93,11 @@ void Container::markDelete() {
 	}
 	Widget::markDelete();
 }
+
+void Container::deleteChildren() {
+	int i = 0;
+	for (auto &widget : widgets) {
+		widgets.erase(widgets.begin() + i);
+		i++;
+	}
+}

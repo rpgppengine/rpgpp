@@ -8,6 +8,8 @@
 #include "raylib.h"
 
 namespace edui {
+const float EDUI_DEFAULT_HEIGHT = 16;
+
 struct Gui {
 	static Gui* instance;
 
@@ -25,8 +27,8 @@ struct Gui {
 	std::vector<std::shared_ptr<Widget>> topLayer;
 
 	std::shared_ptr<Widget> *current = nullptr;
-	std::shared_ptr<Widget> *leftClickedWidget = nullptr;
-	std::shared_ptr<Widget> *middleClickedWidget = nullptr;
+	std::weak_ptr<Widget> leftClickedWidget;
+	std::weak_ptr<Widget> middleClickedWidget;
 
 	Rectangle screenRect;
 

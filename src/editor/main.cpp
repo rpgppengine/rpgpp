@@ -20,8 +20,10 @@
 #include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
 #include "edui/menuBar.hpp"
+#include "edui/messageBox.hpp"
 #include "edui/rliconsarr.hpp"
 #include "edui/tabBar.hpp"
+#include "edui/textArea.hpp"
 #include "edui/textBox.hpp"
 #include "edui/verticalContainer.hpp"
 #include "edui/dropdown.hpp"
@@ -101,13 +103,13 @@ int main() {
 	auto tabContent = std::make_shared<edui::Container>();
 	tabContent->setPosition({0, 300}, {0, 44});
 	tabContent->setSize({0, 300}, {0, 300});
-	gui.add(tabContent);
+	//gui.add(tabContent);
 
 	auto tabBar = std::make_shared<edui::FileTabBar>();
 	tabBar->contentBase = tabContent;
 	tabBar->setPosition({0, 300}, {0, 22});
 	tabBar->setSize({0, 300}, {0, 22});
-	gui.add(tabBar);
+	//gui.add(tabBar);
 	auto screenRect = gui.getScreenRect();
 	tabBar->calcRect(screenRect);
 
@@ -129,6 +131,16 @@ int main() {
 	pageLabel3->setText("Page 3");
 	pageLabel3->setSize({0.5f, 0}, {0, 22});
 	page3->add(pageLabel3);
+
+	auto msg = std::make_shared<edui::MessageBox>();
+	msg->setTitle("MessageBox");
+	msg->setText("I have a message.");
+	msg->setPosition({0, 250}, {0, 20});
+	msg->setSize({0, 200}, {0, 180});
+	msg->onOkPressed = [] {
+		printf("clicked ok..\n");
+	};
+	gui.add(msg);
 
 	while (!WindowShouldClose()) {
 		gui.update();

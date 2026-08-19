@@ -40,6 +40,7 @@ struct Container : public Widget {
 	Widget::Ptr clone() { return std::make_shared<Container>(*this); }
 
 	void markDelete();
+	void deleteChildren();
 };
 
 }  // namespace edui

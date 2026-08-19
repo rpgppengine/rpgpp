@@ -36,9 +36,9 @@ void Gui::processWidget(std::shared_ptr<Widget>& widget) {
 	widget->update();
 	widget->calcRect(screenRect);
 
-	if (leftClickedWidget != nullptr) {
-		if (leftClickedWidget->get()->deleteFlag) {
-			leftClickedWidget = nullptr;
+	if (auto leftPtr = leftClickedWidget.lock()) {
+		if (leftPtr->deleteFlag) {
+			leftClickedWidget.reset();
 		}
 	}
 }
@@ -55,6 +55,9 @@ void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
 
 		if (widget->deleteFlag) {
 			widget->onDeleted.invoke();
+			if (widget->isContainer) {
+				widget->as<Container>().deleteChildren();
+			}
 			vec.erase(vec.begin() + i);
 		}
 
@@ -114,18 +117,18 @@ void Gui::update() {
 		}
 	}
 
-	if (leftClickedWidget != nullptr) {
-		if (!leftClickedWidget->get()->deleteFlag) {
+	if (auto leftPtr = leftClickedWidget.lock()) {
+		if (!leftPtr->deleteFlag) {
 			if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-				leftClickedWidget->get()->leftMouseReleased();
+				leftPtr->leftMouseReleased();
 			}
 		}
 	}
 
-	if (middleClickedWidget != nullptr) {
-		if (!middleClickedWidget->get()->deleteFlag) {
+	if (auto middlePtr = leftClickedWidget.lock()) {
+		if (!middlePtr->deleteFlag) {
 			if (IsMouseButtonReleased(MOUSE_MIDDLE_BUTTON)) {
-				middleClickedWidget->get()->middleMouseReleased();
+				middlePtr->leftMouseReleased();
 			}
 		}
 	}
@@ -191,7 +194,7 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 	}
 
 	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-		leftClickedWidget = widget;
+		leftClickedWidget = *widget;
 		widget->get()->leftMouseClicked();
 
 		if (widget->get()->focusable) {
@@ -207,7 +210,7 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 	}
 
 	if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
-		middleClickedWidget = widget;
+		middleClickedWidget = *widget;
 		widget->get()->middleMouseClicked();
 	}
 }
