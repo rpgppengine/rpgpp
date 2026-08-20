@@ -21,6 +21,8 @@ struct IntValue : public Container, public ValueWidgetT<int> {
 	int getValue() override;
 
 	IntValue();
+
+	void draw() override;
 };
 }  // namespace edui
 

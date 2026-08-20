@@ -8,6 +8,7 @@
 #include "edui/checkbox.hpp"
 #include "edui/childWindow.hpp"
 #include "edui/colorRect.hpp"
+#include "edui/confirmDialog.hpp"
 #include "edui/container.hpp"
 #include "edui/contextMenu.hpp"
 #include "edui/dropdown.hpp"
@@ -61,30 +62,6 @@ int main() {
 		printf("%s %s \n", title.c_str(), option.c_str());
 	};
 
-	auto label = std::make_shared<edui::Label>();
-	label->setSize({0, 70}, {0, 26});
-	label->setText("Hello world!");
-	label->render->as<edui::LabelRender>().padding = 2;
-	gui.add(label);
-
-	auto textBox = std::make_shared<edui::TextBox>();
-	textBox->setSize({0, 200}, {0, 26});
-	textBox->setPosition({0, 20}, {0, 50});
-	textBox->setText("Hello World! The lazy fox jumped over the dog!");
-	//textBox->render->as<edui::TextBoxRender>().fontSize = 2.0f;
-	textBox->onValueChangedT = [](std::string a, std::string b) {
-		printf("%s \n%s \n ====\n", a.c_str(), b.c_str());
-	};
-	gui.add(textBox);
-
-	auto check = std::make_shared<edui::Checkbox>();
-	check->setSize({0, 200}, {0, 26});
-	check->setPosition({0, 20}, {0, 100});
-	check->onValueChangedT = [](bool previous, bool current) {
-		printf("%i, %i \n", previous, current);
-	};
-	gui.add(check);
-
 	auto intval = std::make_shared<edui::IntValue>();
 	intval->setSize({0, 200}, {0, 26});
 	intval->setPosition({0, 20}, {0, 150});
@@ -92,13 +69,6 @@ int main() {
 		printf("%i, %i \n", previous, current);
 	};
 	gui.add(intval);
-
-	auto dropdown = std::make_shared<edui::Dropdown>();
-	dropdown->setPosition({0, 20}, {0, 200});
-	dropdown->setSize({0, 200}, {0, 26});
-	dropdown->addItem("Hello");
-	dropdown->addItem("Hello2");
-	gui.add(dropdown);
 
 	auto tabContent = std::make_shared<edui::Container>();
 	tabContent->setPosition({0, 300}, {0, 44});
@@ -132,8 +102,8 @@ int main() {
 	pageLabel3->setSize({0.5f, 0}, {0, 22});
 	page3->add(pageLabel3);
 
-	auto msg = std::make_shared<edui::MessageBox>();
-	msg->setTitle("MessageBox");
+	auto msg = std::make_shared<edui::ConfirmDialog>();
+	msg->setTitle("ConfirmDialog");
 	msg->setText("I have a message.");
 	msg->setPosition({0, 250}, {0, 20});
 	msg->setSize({0, 200}, {0, 180});
@@ -141,6 +111,17 @@ int main() {
 		printf("clicked ok..\n");
 	};
 	gui.add(msg);
+
+	auto hori = std::make_shared<edui::HorizontalContainer>();
+	hori->render->as<edui::HorizontalContainerRender>().space = 2;
+	hori->setSize({0, 200}, {0, 30});
+	auto item1 = std::make_shared<edui::Label>();
+	item1->setSize({0, 30}, {1, 0});
+	hori->add(item1);
+	auto item2 = std::make_shared<edui::Label>();
+	item2->setSize({0, 30}, {1, 0});
+	hori->add(item2);
+	gui.add(hori);
 
 	while (!WindowShouldClose()) {
 		gui.update();

@@ -46,6 +46,8 @@ void Gui::processWidget(std::shared_ptr<Widget>& widget) {
 void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
 	int i = 0;
 	for (auto &widget : vec) {
+		if (widget == nullptr) continue;
+
 		if (widget->deferFlag) {
 			widget->deferFlag = false;
 			continue;

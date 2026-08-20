@@ -18,6 +18,8 @@ struct HorizontalContainer : public ScrollableContainer {
 	bool scrolling = false;
 	Vector2 scrollOffset = {0, 0};
 
+	bool reverse = false;
+
 	HorizontalContainer();
 	void update() override;
 	void draw() override;

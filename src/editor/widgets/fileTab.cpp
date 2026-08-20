@@ -53,13 +53,7 @@ tgui::TabsBase::Tab *FileTab::getTabId(const std::string fileName) {
 							[fileName](const tgui::TabsBase::Tab tab) { return tab.id == fileName; });
 	if (tab == m_tabs.end()) return nullptr;
 
-#if defined(__WIN64)
-	return tab._Ptr;
-#elif defined(__linux__)
-	return tab.base();
-#else
-	return nullptr;
-#endif
+	return &*tab;
 }
 
 tgui::TabsBase::Tab *FileTab::getTabName(const std::string fileName) {
@@ -67,13 +61,7 @@ tgui::TabsBase::Tab *FileTab::getTabName(const std::string fileName) {
 							[fileName](const tgui::TabsBase::Tab tab) { return tab.text.getString() == fileName; });
 	if (tab == m_tabs.end()) return nullptr;
 
-#if defined(__WIN64)
-	return tab._Ptr;
-#elif defined(__linux__)
-	return tab.base();
-#else
-	return nullptr;
-#endif
+	return &*tab;
 }
 
 void FileTab::closeTabFilename(const std::string fileName) {

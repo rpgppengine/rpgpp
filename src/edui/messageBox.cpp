@@ -22,7 +22,9 @@ MessageBox::MessageBox() : ChildWindow() {
 	add(textArea);
 
 	layout = std::make_shared<edui::HorizontalContainer>();
+	layout->reverse = true;
 	layout->render->border = 0;
+	layout->render->as<edui::HorizontalContainerRender>().space = 4;
 	layout->gui = Gui::instance;
 	layout->setSize({1, 0}, {1, 0});
 

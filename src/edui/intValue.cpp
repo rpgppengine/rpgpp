@@ -4,8 +4,11 @@
 
 #include "edui/button.hpp"
 #include "edui/container.hpp"
+#include "edui/helper.hpp"
 #include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
+#include "edui/rlicons.hpp"
+#include "edui/rliconsarr.hpp"
 #include "edui/widget.hpp"
 
 using namespace edui;
@@ -50,4 +53,17 @@ void IntValue::setValue(const int& val) {
 
 int IntValue::getValue() {
 	return intval->getInt();
+}
+
+void IntValue::draw() {
+	auto& rend = render->as<ContainerRender>();
+
+	Container::draw();
+
+	Rectangle iconRect = {rect.x + rect.width - 24, rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
+	Rectangle iconDestRect = { rect.x + rect.width - 24, rect.y, 24, 24 };
+
+	rectCenter(iconDestRect, &iconRect);
+
+	GuiDrawIcon(ICON_UP_DOWN, iconRect.x, iconRect.y, 1, rend.currentBorderColor);
 }

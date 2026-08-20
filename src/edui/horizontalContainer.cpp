@@ -15,11 +15,19 @@ HorizontalContainer::HorizontalContainer() {
 }
 
 void HorizontalContainer::update() {
+	auto& rend = render->as<HorizontalContainerRender>();
+
 	this->scissorRect.width = 0;
 	for (auto &widget : widgets) {
 		if (widget->visible && !widget->deleteFlag) {
 			widget->layout.x.offset = this->scissorRect.width;
 			this->scissorRect.width += widget->rect.width;
+
+			if (reverse) {
+				widget->layout.x.offset = rect.width - this->scissorRect.width;
+			}
+
+			this->scissorRect.width += rend.space;
 		}
 	}
 
@@ -45,11 +53,8 @@ void HorizontalContainer::draw() {
 
 	DrawRectangleRec(rect, rend.bgColor);
 
-	//this->scissorRect.width = 0;
 	for (auto &widget : widgets) {
 		if (widget->visible && !widget->deleteFlag) {
-			//widget->layout.x.offset = scissorRect.width;
-			//this->scissorRect.width += widget->rect.width;
 			widget->draw();
 		}
 	}
