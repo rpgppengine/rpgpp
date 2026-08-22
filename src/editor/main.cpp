@@ -22,18 +22,17 @@
 #include "edui/label.hpp"
 #include "edui/menuBar.hpp"
 #include "edui/messageBox.hpp"
+#include "edui/rlicons.hpp"
 #include "edui/rliconsarr.hpp"
 #include "edui/tabBar.hpp"
 #include "edui/textArea.hpp"
 #include "edui/textBox.hpp"
+#include "edui/vector2Value.hpp"
 #include "edui/verticalContainer.hpp"
-#include "edui/dropdown.hpp"
 #include "edui/widget.hpp"
 #include "gamedata.hpp"
 #include "raylib.h"
 #include "services/editorGuiService.hpp"
-
-#include "edui/rlicons.hpp"
 
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION
 
@@ -58,28 +57,25 @@ int main() {
 	auto menuBar = std::make_shared<edui::MenuBar>();
 	gui.addMenuBar(menuBar);
 	menuBar->addItem("Menu1", {"Item1", "Item2"});
-	menuBar->onItemClicked = [] (const std::string& title, const std::string& option) {
-		printf("%s %s \n", title.c_str(), option.c_str());
-	};
+	menuBar->onItemClicked.connect(
+		[](const std::string &title, const std::string &option) { printf("%s %s \n", title.c_str(), option.c_str()); });
 
 	auto intval = std::make_shared<edui::IntValue>();
 	intval->setSize({0, 200}, {0, 26});
 	intval->setPosition({0, 20}, {0, 150});
-	intval->onValueChangedT = [](int previous, int current) {
-		printf("%i, %i \n", previous, current);
-	};
+	intval->onValueChangedT.connect([](int previous, int current) { printf("%i, %i \n", previous, current); });
 	gui.add(intval);
 
 	auto tabContent = std::make_shared<edui::Container>();
 	tabContent->setPosition({0, 300}, {0, 44});
 	tabContent->setSize({0, 300}, {0, 300});
-	//gui.add(tabContent);
+	// gui.add(tabContent);
 
 	auto tabBar = std::make_shared<edui::FileTabBar>();
 	tabBar->contentBase = tabContent;
 	tabBar->setPosition({0, 300}, {0, 22});
 	tabBar->setSize({0, 300}, {0, 22});
-	//gui.add(tabBar);
+	// gui.add(tabBar);
 	auto screenRect = gui.getScreenRect();
 	tabBar->calcRect(screenRect);
 
@@ -107,21 +103,17 @@ int main() {
 	msg->setText("I have a message.");
 	msg->setPosition({0, 250}, {0, 20});
 	msg->setSize({0, 200}, {0, 180});
-	msg->onOkPressed = [] {
-		printf("clicked ok..\n");
-	};
+	msg->onOkPressed.connect([] { printf("clicked ok..\n"); });
 	gui.add(msg);
 
-	auto hori = std::make_shared<edui::HorizontalContainer>();
-	hori->render->as<edui::HorizontalContainerRender>().space = 2;
-	hori->setSize({0, 200}, {0, 30});
-	auto item1 = std::make_shared<edui::Label>();
-	item1->setSize({0, 30}, {1, 0});
-	hori->add(item1);
-	auto item2 = std::make_shared<edui::Label>();
-	item2->setSize({0, 30}, {1, 0});
-	hori->add(item2);
-	gui.add(hori);
+	auto vec2 = std::make_shared<edui::Vector2Value>();
+	vec2->setSize({0, 200}, {0, 26});
+	vec2->setPosition({0, 20}, {0, 190});
+	vec2->onValueChangedT.connect([](Vector2 old, Vector2 newVec) {
+		printf("old: %f, %f \n", old.x, old.y);
+		printf("new: %f, %f \n", newVec.x, newVec.y);
+	});
+	gui.add(vec2);
 
 	while (!WindowShouldClose()) {
 		gui.update();

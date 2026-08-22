@@ -36,7 +36,7 @@ void MenuBar::addItem(const std::string &title, std::vector<std::string> items) 
 
 	std::weak_ptr<edui::Button> weakButton = button;
 
-	button->clicked = [this, title, weakButton] {
+	button->onClicked.connect([this, title, weakButton] {
 		if (auto sharedButton = weakButton.lock()) {
 			printf("clicked.. \n");
 			deferFlag = true;
@@ -52,13 +52,12 @@ void MenuBar::addItem(const std::string &title, std::vector<std::string> items) 
 
 			context->deferFlag = true;
 
-			context->onItemClicked = [this, title] (const std::string& eventItem) {
-				onItemClicked.invoke(title, eventItem);
-			};
+			context->onItemClicked.connect(
+				[this, title](const std::string &eventItem) { onItemClicked.invoke(title, eventItem); });
 
 			gui->addTop(context);
 		}
-	};
+	});
 
 	add(button);
 }

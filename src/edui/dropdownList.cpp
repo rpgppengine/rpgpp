@@ -1,5 +1,7 @@
 #include "edui/dropdownList.hpp"
+
 #include <memory>
+
 #include "edui/button.hpp"
 #include "edui/gui.hpp"
 #include "edui/label.hpp"
@@ -12,7 +14,7 @@ DropdownList::DropdownList() : VerticalContainer() {
 	deleteOnOutsideClick = true;
 }
 
-void DropdownList::addItem(const std::string& item, int scale) {
+void DropdownList::addItem(const std::string &item, int scale) {
 	auto newButton = std::make_shared<edui::Button>();
 
 	float fontSize = Gui::instance->labelFontSize;
@@ -24,10 +26,10 @@ void DropdownList::addItem(const std::string& item, int scale) {
 	newButton->render->as<ButtonRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 
 	int curr = idx;
-	newButton->clicked = [this, curr] {
+	newButton->onClicked.connect([this, curr] {
 		onValueChanged.invoke(curr);
 		markDelete();
-	};
+	});
 
 	idx++;
 

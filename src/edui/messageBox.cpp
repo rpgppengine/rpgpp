@@ -33,11 +33,11 @@ MessageBox::MessageBox() : ChildWindow() {
 	btn->render->as<ButtonRender>().vertAlign = edui::VerticalAlignment::TEXT_CENTER;
 	btn->render->as<ButtonRender>().horiAlign = edui::HorizontalAlignment::TEXT_MIDDLE;
 
-	btn->clicked = [this] {
+	btn->onClicked.connect([this] {
 		onOkPressed.invoke();
 		markDelete();
 		layout->markDelete();
-	};
+	});
 
 	layout->add(btn);
 }

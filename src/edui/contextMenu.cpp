@@ -34,10 +34,10 @@ void ContextMenu::addItem(const std::string &item) {
 	newButton->render->as<ButtonRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 
 	int curr = idx;
-	newButton->clicked = [this, item] {
+	newButton->onClicked.connect([this, item] {
 		onItemClicked.invoke(item);
 		markDelete();
-	};
+	});
 
 	idx++;
 

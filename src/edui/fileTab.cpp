@@ -23,21 +23,19 @@ FileTab::FileTab() : IconTextButton() {
 	closeButtonPtr->setPosition({1, -iconRectSize}, {0, 0});
 	closeButtonPtr->setSize({0, iconRectSize}, {1, 0});
 
-	closeButtonPtr->onMouseEntered = [this] {
+	closeButtonPtr->onMouseEntered.connect([this] {
 		render->currentBgColor = render->bgColor;
 		render->currentBorderColor = render->borderColor;
-	};
+	});
 
-	closeButtonPtr->onMouseLeft = [this] {
+	closeButtonPtr->onMouseLeft.connect([this] {
 		if (mouseIsInRect()) {
 			render->currentBgColor = render->focusBgColor;
 			render->currentBorderColor = render->focusBorderColor;
 		}
-	};
+	});
 
-	closeButtonPtr->clicked = [this] {
-		markDelete();
-	};
+	closeButtonPtr->onClicked.connect([this] { markDelete(); });
 }
 
 void FileTab::processWidget(std::shared_ptr<Widget> &widget) {
@@ -65,7 +63,7 @@ void FileTab::draw() {
 	IconTextButton::draw();
 	closeButtonPtr->draw();
 
-	auto& rend = render->as<FileTabRender>();
+	auto &rend = render->as<FileTabRender>();
 
 	DrawRectangleLinesEx(rect, 1.0f, rend.currentBorderColor);
 }

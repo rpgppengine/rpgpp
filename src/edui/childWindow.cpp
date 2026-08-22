@@ -25,12 +25,12 @@ ChildWindow::ChildWindow() : Container() {
 						 {0, static_cast<int>(EDUI_CHILDWINDOW_BARHEIGHT)});
 
 	std::weak_ptr<IconButton> weakClose = closeButton;
-	closeButton->clicked = [this, weakClose] {
+	closeButton->onClicked.connect([this, weakClose] {
 		if (auto sharedClose = weakClose.lock()) {
 			sharedClose->markDelete();
 			markDelete();
 		}
-	};
+	});
 	closeButtonPtr = closeButton;
 }
 
@@ -117,9 +117,9 @@ Rectangle ChildWindow::getContentRect() {
 }
 
 void ChildWindow::leftMouseClicked() {
-	//dragging = true;
+	// dragging = true;
 }
 
 void ChildWindow::leftMouseReleased() {
-	//dragging = false;
+	// dragging = false;
 }

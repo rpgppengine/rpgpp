@@ -59,8 +59,8 @@ struct WidgetRender {
 struct Widget {
 	typedef std::shared_ptr<Widget> Ptr;
 
-	Signal clicked;
-	Signal rightClicked;
+	Signal onClicked;
+	Signal onRightClicked;
 	Signal onFocused;
 	Signal onUnfocused;
 	Signal onDeleted;
@@ -154,9 +154,9 @@ struct Widget {
 		onUnfocused.invoke();
 	}
 
-	virtual void leftMouseClicked() { clicked.invoke(); }
+	virtual void leftMouseClicked() { onClicked.invoke(); }
 
-	virtual void rightMouseClicked() { rightClicked.invoke(); }
+	virtual void rightMouseClicked() { onRightClicked.invoke(); }
 
 	virtual void leftMouseReleased() {}
 

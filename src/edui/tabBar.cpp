@@ -27,8 +27,8 @@ TabBar::TabBar() : HorizontalContainer() {
 	rightButtonPtr->setSize({0, 0}, {1, 0});
 	rightButtonPtr->iconId = ICON_ARROW_RIGHT_FILL;
 
-	leftButtonPtr->clicked = [this] { scrolled(1.0f); };
-	rightButtonPtr->clicked = [this] { scrolled(-1.0f); };
+	leftButtonPtr->onClicked.connect([this] { scrolled(1.0f); });
+	rightButtonPtr->onClicked.connect([this] { scrolled(-1.0f); });
 }
 
 void TabBar::processWidget(std::shared_ptr<Widget> &widget) {
@@ -118,7 +118,7 @@ std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) 
 	button->calcRect(rect);
 
 	int curr = size;
-	button->clicked = [this, curr] { showTabContent(curr); };
+	button->onClicked.connect([this, curr] { showTabContent(curr); });
 
 	button->resizeToFit();
 	add(button);
@@ -132,13 +132,13 @@ std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) 
 
 	size++;
 
-	button->onDeleted = [this] {
+	button->onDeleted.connect([this] {
 		updateContentRect();
 
 		if (this->scissorX > scrollMax) {
 			scissorX = 0;
 		}
-	};
+	});
 
 	return content;
 }

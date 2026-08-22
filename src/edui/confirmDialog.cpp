@@ -1,5 +1,7 @@
 #include "edui/confirmDialog.hpp"
+
 #include <memory>
+
 #include "edui/button.hpp"
 #include "edui/messageBox.hpp"
 
@@ -15,11 +17,11 @@ ConfirmDialog::ConfirmDialog() : MessageBox() {
 	cancel->render->as<ButtonRender>().vertAlign = edui::VerticalAlignment::TEXT_CENTER;
 	cancel->render->as<ButtonRender>().horiAlign = edui::HorizontalAlignment::TEXT_MIDDLE;
 
-	cancel->clicked = [this] {
+	cancel->onClicked.connect([this] {
 		onCancelPressed.invoke();
 		markDelete();
 		layout->markDelete();
-	};
+	});
 
 	layout->add(cancel);
 

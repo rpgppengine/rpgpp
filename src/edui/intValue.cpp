@@ -19,7 +19,7 @@ IntValue::IntValue() : Container() {
 	intval = std::make_shared<edui::IntValueTextBox>();
 	intval->setPosition({0, 0}, {0, 0});
 	intval->setSize({1.0f, -24}, {1, 0});
-	intval->intValueChanged = [this](int a, int b) { onValueChangedT.invoke(a, b); };
+	intval->intValueChanged.connect([this](int a, int b) { onValueChangedT.invoke(a, b); });
 	add(intval);
 
 	std::weak_ptr<edui::IntValueTextBox> weakIntVal = intval;
@@ -28,40 +28,36 @@ IntValue::IntValue() : Container() {
 	incButton->setText("");
 	incButton->setPosition({1.0f, -24}, {0, 0});
 	incButton->setSize({0, 24}, {0.5f, 0});
-	incButton->clicked = [weakIntVal] {
+	incButton->onClicked.connect([weakIntVal] {
 		if (auto sharedVal = weakIntVal.lock()) {
 			sharedVal->increment();
 		}
-	};
+	});
 	add(incButton);
 
 	decButton = std::make_shared<edui::Button>();
 	decButton->setText("");
 	decButton->setPosition({1.0f, -24}, {0.5f, 0});
 	decButton->setSize({0, 24}, {0.5f, 0});
-	decButton->clicked = [weakIntVal] {
+	decButton->onClicked.connect([weakIntVal] {
 		if (auto sharedVal = weakIntVal.lock()) {
 			sharedVal->decrement();
 		}
-	};
+	});
 	add(decButton);
 }
 
-void IntValue::setValue(const int& val) {
-	intval->setInt(val);
-}
+void IntValue::setValue(const int &val) { intval->setInt(val); }
 
-int IntValue::getValue() {
-	return intval->getInt();
-}
+int IntValue::getValue() { return intval->getInt(); }
 
 void IntValue::draw() {
-	auto& rend = render->as<ContainerRender>();
+	auto &rend = render->as<ContainerRender>();
 
 	Container::draw();
 
 	Rectangle iconRect = {rect.x + rect.width - 24, rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
-	Rectangle iconDestRect = { rect.x + rect.width - 24, rect.y, 24, 24 };
+	Rectangle iconDestRect = {rect.x + rect.width - 24, rect.y, 24, 24};
 
 	rectCenter(iconDestRect, &iconRect);
 

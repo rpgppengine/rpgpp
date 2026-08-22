@@ -1,5 +1,7 @@
 #include "edui/dropdown.hpp"
+
 #include <memory>
+
 #include "edui/dropdownList.hpp"
 #include "edui/helper.hpp"
 #include "edui/label.hpp"
@@ -18,15 +20,11 @@ Dropdown::Dropdown() {
 	render->as<DropdownRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 }
 
-void Dropdown::setValue(const DropdownValue& val) {
-	currentItem = val.idx;
-};
+void Dropdown::setValue(const DropdownValue &val) { currentItem = val.idx; };
 
-DropdownValue Dropdown::getValue() {
-	return {currentItem, items[currentItem]};
-};
+DropdownValue Dropdown::getValue() { return {currentItem, items[currentItem]}; };
 
-void Dropdown::addItem(const std::string& item) {
+void Dropdown::addItem(const std::string &item) {
 	items[lastItem] = item;
 	lastItem++;
 }
@@ -53,7 +51,7 @@ void Dropdown::draw() {
 
 	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, spacing, rend.textColor);
 
-	//draw arrow
+	// draw arrow
 	Rectangle iconRect = {rect.x + rect.width - (RAYGUI_ICON_SIZE), rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
 	Rectangle iconDestRect = {rect.x + (rect.width - rect.height), rect.y, rect.height, rect.height};
 	rectCenter(iconDestRect, &iconRect);
@@ -89,18 +87,18 @@ void Dropdown::openDropdown() {
 		list->addItem(items[i], rend.fontSize);
 	}
 
-	list->onValueChanged = [this](int idx) {
+	list->onValueChanged.connect([this](int idx) {
 		edui::DropdownValue previous = {currentItem, items[currentItem]};
 		edui::DropdownValue current = {idx, items[idx]};
 		onValueChangedT.invoke(previous, current);
 
 		currentItem = idx;
 		opened = false;
-	};
-	list->onDeleted = [this] {
+	});
+	list->onDeleted.connect([this] {
 		opened = false;
 		deferFlag = true;
-	};
+	});
 
 	this->listPtr = list;
 

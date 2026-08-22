@@ -1,13 +1,13 @@
 #include "edui/fileTabBar.hpp"
+
 #include <memory>
+
 #include "edui/fileTab.hpp"
 #include "edui/tabBar.hpp"
 
 using namespace edui;
 
-FileTabBar::FileTabBar() : TabBar() {
-	render = std::make_unique<FileTabBarRender>();
-}
+FileTabBar::FileTabBar() : TabBar() { render = std::make_unique<FileTabBarRender>(); }
 
 std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int iconId) {
 	if (size >= 20) return std::make_shared<Container>();
@@ -23,7 +23,7 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 	button->calcRect(rect);
 
 	int curr = size;
-	button->clicked = [this, curr] { showTabContent(curr); };
+	button->onClicked.connect([this, curr] { showTabContent(curr); });
 
 	button->resizeToFit();
 	add(button);
@@ -35,7 +35,7 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 		tabTitles[size] = item;
 	}
 
-	button->onDeleted = [this, curr] {
+	button->onDeleted.connect([this, curr] {
 		removeItem(curr);
 		updateContentRect();
 		size--;
@@ -47,7 +47,7 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 		if (currentPage == curr) {
 			showTabContent(tabPages.cbegin()->get()->referId);
 		}
-	};
+	});
 
 	size++;
 
