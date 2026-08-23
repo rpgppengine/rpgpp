@@ -25,6 +25,7 @@
 #include "edui/messageBox.hpp"
 #include "edui/rlicons.hpp"
 #include "edui/rliconsarr.hpp"
+#include "edui/slider.hpp"
 #include "edui/tabBar.hpp"
 #include "edui/textArea.hpp"
 #include "edui/textBox.hpp"
@@ -121,6 +122,12 @@ int main() {
 	colorWheel->setColor(PINK);
 	colorWheel->onColorChanged.connect([](Color c) { printf("%i %i %i \n", c.r, c.g, c.b); });
 	gui.add(colorWheel);
+
+	auto slider = std::make_shared<edui::Slider>();
+	slider->setPosition({0, 20}, {0, 120});
+	slider->setSize({0, 200}, {0, 26});
+	slider->onValueChanged.connect([](int newVal) { printf("slider change: %i \n", newVal); });
+	gui.add(slider);
 
 	while (!WindowShouldClose()) {
 		gui.update();
