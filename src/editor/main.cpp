@@ -8,6 +8,7 @@
 #include "edui/checkbox.hpp"
 #include "edui/childWindow.hpp"
 #include "edui/colorRect.hpp"
+#include "edui/colorWheel.hpp"
 #include "edui/confirmDialog.hpp"
 #include "edui/container.hpp"
 #include "edui/contextMenu.hpp"
@@ -114,6 +115,12 @@ int main() {
 		printf("new: %f, %f \n", newVec.x, newVec.y);
 	});
 	gui.add(vec2);
+
+	auto colorWheel = std::make_shared<edui::ColorWheel>();
+	colorWheel->setSize({0, 100}, {0, 100});
+	colorWheel->setColor(PINK);
+	colorWheel->onColorChanged.connect([](Color c) { printf("%i %i %i \n", c.r, c.g, c.b); });
+	gui.add(colorWheel);
 
 	while (!WindowShouldClose()) {
 		gui.update();

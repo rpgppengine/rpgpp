@@ -1,4 +1,5 @@
 #include "edui/gui.hpp"
+
 #include <memory>
 #include <string_view>
 
@@ -10,9 +11,9 @@
 
 using namespace edui;
 
-Gui* Gui::instance = nullptr;
+Gui *Gui::instance = nullptr;
 
-void Gui::processWidget(std::shared_ptr<Widget>& widget) {
+void Gui::processWidget(std::shared_ptr<Widget> &widget) {
 	if (widget->mouseIsInRect()) {
 		if (!widget->isContainer) {
 			notifyChild(&widget);
@@ -43,7 +44,7 @@ void Gui::processWidget(std::shared_ptr<Widget>& widget) {
 	}
 }
 
-void Gui::processVector(std::vector<std::shared_ptr<Widget>>& vec) {
+void Gui::processVector(std::vector<std::shared_ptr<Widget>> &vec) {
 	int i = 0;
 	for (auto &widget : vec) {
 		if (widget == nullptr) continue;
@@ -158,7 +159,7 @@ void Gui::draw() {
 void Gui::add(std::shared_ptr<Widget> widget) {
 	if (widget->isContainer) {
 		widget->as<Container>().gui = this;
-		for (auto& subwidget : widget->as<Container>().widgets) {
+		for (auto &subwidget : widget->as<Container>().widgets) {
 			subwidget->render->font = &this->font;
 		}
 	}
@@ -170,7 +171,7 @@ void Gui::add(std::shared_ptr<Widget> widget) {
 void Gui::addTop(std::shared_ptr<Widget> widget) {
 	if (widget->isContainer) {
 		widget->as<Container>().gui = this;
-		for (auto& subwidget : widget->as<Container>().widgets) {
+		for (auto &subwidget : widget->as<Container>().widgets) {
 			subwidget->render->font = &this->font;
 		}
 	}
@@ -220,7 +221,7 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 void Gui::addMenuBar(std::shared_ptr<Widget> widget) {
 	if (widget->isContainer) {
 		widget->as<Container>().gui = this;
-		for (auto& subwidget : widget->as<Container>().widgets) {
+		for (auto &subwidget : widget->as<Container>().widgets) {
 			subwidget->render->font = &this->font;
 		}
 	}
@@ -233,7 +234,14 @@ void Gui::addMenuBar(std::shared_ptr<Widget> widget) {
 }
 
 Rectangle Gui::getScreenRect() {
-	return {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+	Rectangle screenRect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+	if (hasMenuBar && menuBar != nullptr) {
+		float menuBarHeight = menuBar->rect.height;
+		screenRect.y += menuBarHeight;
+		screenRect.height -= menuBarHeight;
+	}
+
+	return screenRect;
 }
 
 void Gui::setFont(const char *fileName, int fontSize, int labelFontSize, int fontSpacing) {
