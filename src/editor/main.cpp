@@ -29,6 +29,7 @@
 #include "edui/tabBar.hpp"
 #include "edui/textArea.hpp"
 #include "edui/textBox.hpp"
+#include "edui/textEdit.hpp"
 #include "edui/vector2Value.hpp"
 #include "edui/verticalContainer.hpp"
 #include "edui/widget.hpp"
@@ -66,7 +67,7 @@ int main() {
 	intval->setSize({0, 200}, {0, 26});
 	intval->setPosition({0, 20}, {0, 150});
 	intval->onValueChangedT.connect([](int previous, int current) { printf("%i, %i \n", previous, current); });
-	gui.add(intval);
+	// gui.add(intval);
 
 	auto tabContent = std::make_shared<edui::Container>();
 	tabContent->setPosition({0, 300}, {0, 44});
@@ -103,7 +104,7 @@ int main() {
 	auto msg = std::make_shared<edui::ConfirmDialog>();
 	msg->setTitle("ConfirmDialog");
 	msg->setText("I have a message.");
-	msg->setPosition({0, 250}, {0, 20});
+	msg->setPosition({0, 350}, {0, 20});
 	msg->setSize({0, 200}, {0, 180});
 	msg->onOkPressed.connect([] { printf("clicked ok..\n"); });
 	gui.add(msg);
@@ -115,7 +116,7 @@ int main() {
 		printf("old: %f, %f \n", old.x, old.y);
 		printf("new: %f, %f \n", newVec.x, newVec.y);
 	});
-	gui.add(vec2);
+	// gui.add(vec2);
 
 	auto colorWheel = std::make_shared<edui::ColorWheel>();
 	colorWheel->setSize({0, 100}, {0, 100});
@@ -128,6 +129,12 @@ int main() {
 	slider->setSize({0, 200}, {0, 26});
 	slider->onValueChanged.connect([](int newVal) { printf("slider change: %i \n", newVal); });
 	gui.add(slider);
+
+	auto textEdit = std::make_shared<edui::TextEdit>();
+	textEdit->setPosition({0, 20}, {0, 150});
+	textEdit->setSize({0, 300}, {0, 250});
+	textEdit->setText("Hello world!\nLazy fox.\nThird way.");
+	gui.add(textEdit);
 
 	while (!WindowShouldClose()) {
 		gui.update();
