@@ -92,19 +92,8 @@ void TextEdit::setCursorFromMouse() {
 	cursorPos.row = row;
 	cursorPos.column = col;
 
-	std::string sub = TextSubtext(line.data(), 0, col);
-	Vector2 subMeasure = MeasureTextEx(*rend.font, sub.c_str(), totalFontSize, spacing);
-	cursorRect.x = rect.x + rend.padding + subMeasure.x;
-	cursorRect.y = rect.y + rend.padding + (totalFontSize * row);
-	cursorRect.height = totalFontSize;
-
 	this->charPos = calcCharPos(row, col);
-
-	if (charPos != text.size()) {
-		printf("%zu %c \n", charPos, text.at(charPos));
-	} else {
-		printf("end of text \n");
-	}
+	setCursorRect();
 }
 
 void TextEdit::setCursorRect() {
@@ -117,117 +106,204 @@ void TextEdit::setCursorRect() {
 	std::string sub = TextSubtext(line.data(), 0, cursorPos.column);
 	Vector2 subMeasure = MeasureTextEx(*rend.font, sub.c_str(), totalFontSize, spacing);
 	cursorRect.x = rect.x + rend.padding + subMeasure.x;
-	cursorRect.y = rect.y + rend.padding + (totalFontSize * cursorPos.row);
+	cursorRect.y = rect.y + rend.padding + ((totalFontSize + 2) * cursorPos.row);
 	cursorRect.height = totalFontSize;
 }
 
 size_t TextEdit::calcCharPos(size_t row, size_t col) {
-	printf("%zu %zu \n", row, col);
 	int charPos = 0;
 	for (int i = 0; i < row; i++) {
 		charPos += TextLength(lines[i]) + 1;
 	}
 
 	std::string_view line = lines[row];
-	charPos += (line.size() > col ? col : line.size());
-	printf("%i \n", charPos);
+	int count = GetCodepointCount(line.data());
+
+	charPos += (count > col ? col : count);
 	return charPos;
+}
+
+void TextEdit::reloadLines() {
+	unload();
+	lines = LoadTextLines(this->text.c_str(), &rowCount);
 }
 
 void TextEdit::leftMouseClicked() { setCursorFromMouse(); }
 
 void TextEdit::leftMouseReleased() {}
 
+void TextEdit::handleArrowKeys(KeyboardKey key) {
+	auto &rend = render->as<TextEditRender>();
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+
+	Vector2 charMeasure = {0, 0};
+
+	// left key
+	if (key == KEY_LEFT) {
+		if (charPos > 0) {
+			int size = 0;
+			char *ptr = text.data() + charPos;
+
+			GetCodepointPrevious(ptr, &size);
+			charPos -= size;
+
+			cursorPos.column--;
+
+			std::string sub = TextSubtext(text.c_str(), charPos, size);
+			charMeasure = MeasureTextEx(*rend.font, sub.c_str(), totalFontSize, spacing);
+			charMeasure.x *= -1;
+
+			if (text.at(charPos) == '\n') {
+				cursorPos.row--;
+				cursorPos.column = TextLength(lines[cursorPos.row]);
+				setCursorRect();
+			}
+		}
+	}
+
+	// right key
+	if (key == KEY_RIGHT) {
+		if (charPos < text.size()) {
+			int size = 0;
+			char *ptr = &text.at(charPos);
+
+			GetCodepoint(ptr, &size);
+			charPos += size;
+
+			cursorPos.column++;
+
+			std::string sub = TextSubtext(text.c_str(), charPos - size, size);
+			charMeasure = MeasureTextEx(*rend.font, sub.c_str(), totalFontSize, spacing);
+
+			if (text.at(charPos - 1) == '\n') {
+				cursorPos.row++;
+				cursorPos.column = 0;
+				setCursorRect();
+			}
+		}
+	}
+
+	if (key == KEY_LEFT || key == KEY_RIGHT) {
+		cursorRect.x += charMeasure.x;
+	}
+
+	// up
+	if (key == KEY_UP) {
+		if (cursorPos.row > 0) {
+			cursorPos.row--;
+			charPos = calcCharPos(cursorPos.row, cursorPos.column);
+			setCursorRect();
+		}
+	}
+
+	// down
+	if (key == KEY_DOWN) {
+		if (cursorPos.row < (rowCount - 1)) {
+			cursorPos.row++;
+			charPos = calcCharPos(cursorPos.row, cursorPos.column);
+			setCursorRect();
+		}
+	}
+}
+
+void TextEdit::handleDeletionKeys(KeyboardKey key) {
+	if (key == KEY_BACKSPACE) {
+		if (charPos > 0) {
+			int size = 0;
+			char *ptr = text.data() + charPos;
+			GetCodepointPrevious(ptr, &size);
+
+			charPos -= size;
+			cursorPos.column--;
+
+			if (text.at(charPos) == '\n') {
+				cursorPos.row--;
+				std::string_view line = lines[cursorPos.row];
+				cursorPos.column = line.size();
+			}
+
+			text = text.erase(charPos, size);
+			reloadLines();
+			setCursorRect();
+		}
+	}
+
+	if (key == KEY_DELETE) {
+		if (charPos > 0) {
+			int size = 0;
+			char *ptr = text.data() + charPos;
+			GetCodepoint(ptr, &size);
+
+			text = text.erase(charPos, size);
+			reloadLines();
+		}
+	}
+}
+
+void TextEdit::handleEnterTab(KeyboardKey key) {
+	if (key == KEY_ENTER) {
+		int size = 0;
+		char *ptr = text.data() + charPos;
+		GetCodepoint(ptr, &size);
+		text.insert(text.begin() + charPos, '\n');
+
+		cursorPos.row++;
+		cursorPos.column = 0;
+		charPos++;
+
+		reloadLines();
+		setCursorRect();
+	}
+
+	if (key == KEY_TAB) {
+		text.insert(text.begin() + charPos, '\t');
+		cursorPos.column++;
+		charPos++;
+
+		reloadLines();
+		setCursorRect();
+	}
+}
+
 void TextEdit::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
+	if (!held) {
+		// home
+		if (key == KEY_HOME || (key == KEY_KP_7 && mod.numlock)) {
+			cursorPos.column = 0;
+			charPos = calcCharPos(cursorPos.row, cursorPos.column);
+			setCursorRect();
+		}
+
+		// end
+		if (key == KEY_END || (key == KEY_KP_1 && mod.numlock)) {
+			std::string_view line = lines[cursorPos.row];
+			cursorPos.column = line.size();
+			charPos = calcCharPos(cursorPos.row, cursorPos.column);
+			setCursorRect();
+		}
+	}
+
 	bool val = held && debounce == 0;
 
 	if (val) {
-		auto &rend = render->as<TextEditRender>();
-		float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
-		float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
-
-		Vector2 charMeasure = {0, 0};
-
-		// left key
-		if (key == KEY_LEFT) {
-			if (charPos > 0) {
-				int size = 0;
-				char *ptr = text.data() + charPos;
-
-				GetCodepointPrevious(ptr, &size);
-				charPos -= size;
-
-				cursorPos.column--;
-
-				std::string sub = TextSubtext(text.c_str(), charPos, size);
-				charMeasure = MeasureTextEx(*rend.font, sub.c_str(), totalFontSize, spacing);
-				charMeasure.x *= -1;
-
-				if (text.at(charPos) == '\n') {
-					cursorPos.row--;
-					cursorPos.column = TextLength(lines[cursorPos.row]);
-					setCursorRect();
-				}
-			}
-		}
-
-		// right key
-		if (key == KEY_RIGHT) {
-			if (charPos < text.size()) {
-				int size = 0;
-				char *ptr = &text.at(charPos);
-
-				GetCodepoint(ptr, &size);
-				charPos += size;
-
-				cursorPos.column++;
-
-				std::string sub = TextSubtext(text.c_str(), charPos - size, size);
-				charMeasure = MeasureTextEx(*rend.font, sub.c_str(), totalFontSize, spacing);
-
-				if (text.at(charPos - 1) == '\n') {
-					cursorPos.row++;
-					cursorPos.column = 0;
-					setCursorRect();
-				}
-			}
-		}
-
-		if (key == KEY_LEFT || key == KEY_RIGHT) {
-			cursorRect.x += charMeasure.x;
-		}
-
-		if (key == KEY_UP) {
-			if (cursorPos.row > 0) {
-				cursorPos.row--;
-				charPos = calcCharPos(cursorPos.row, cursorPos.column);
-				setCursorRect();
-			}
-		}
-
-		if (key == KEY_DOWN) {
-			if (cursorPos.row < (rowCount - 1)) {
-				cursorPos.row++;
-				charPos = calcCharPos(cursorPos.row, cursorPos.column);
-				setCursorRect();
-			}
-		}
+		handleArrowKeys(key);
+		handleDeletionKeys(key);
+		handleEnterTab(key);
 
 		debounce = EDUI_TEXTEDIT_DEBOUNCE;
 	}
 }
 
 void TextEdit::charEntered(int codepoint, std::string_view str) {
-	printf("%i \n", codepoint);
-
 	for (int i = 0; i < str.size(); i++) {
 		text.insert(text.begin() + charPos + i, str.at(i));
 	}
 
-	unload();
-	lines = LoadTextLines(this->text.c_str(), &rowCount);
+	reloadLines();
 
 	charPos += str.size();
+	cursorPos.column++;
 
 	auto &rend = render->as<TextEditRender>();
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
@@ -237,4 +313,14 @@ void TextEdit::charEntered(int codepoint, std::string_view str) {
 	cursorRect.x += measure.x;
 
 	Widget::charEntered(codepoint, str);
+}
+
+void TextEdit::mouseEntered() {
+	SetMouseCursor(MOUSE_CURSOR_IBEAM);
+	Widget::mouseEntered();
+}
+
+void TextEdit::mouseLeft() {
+	SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+	Widget::mouseLeft();
 }

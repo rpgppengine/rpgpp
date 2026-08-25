@@ -7,6 +7,7 @@
 
 #include "edui/label.hpp"
 #include "edui/widget.hpp"
+#include "raylib.h"
 
 namespace edui {
 struct CursorPosition {
@@ -34,6 +35,9 @@ struct TextEdit : public Widget {
 	void keyPressed(KeyboardKey key, KeyModifier mod, bool held) override;
 	void charEntered(int codepoint, std::string_view str) override;
 
+	void mouseEntered() override;
+	void mouseLeft() override;
+
 	void unload();
 
 private:
@@ -51,6 +55,11 @@ private:
 	void setCursorFromMouse();
 	size_t calcCharPos(size_t row, size_t col);
 	void setCursorRect();
+	void reloadLines();
+
+	void handleArrowKeys(KeyboardKey key);
+	void handleDeletionKeys(KeyboardKey key);
+	void handleEnterTab(KeyboardKey key);
 };
 }  // namespace edui
 
