@@ -20,6 +20,7 @@ struct TextEditRender : public LabelRender {};
 struct TextEdit : public Widget {
 	const float EDUI_TEXTEDIT_CURSOR_WIDTH = 4;
 	const short EDUI_TEXTEDIT_DEBOUNCE = 5;
+	const float EDUI_TEXTEDIT_SCROLLSCPEED = 8;
 
 	TextEdit();
 	~TextEdit();
@@ -38,10 +39,19 @@ struct TextEdit : public Widget {
 	void mouseEntered() override;
 	void mouseLeft() override;
 
+	void scrolled(float mouseWheel) override;
+
 	void unload();
 
 private:
 	short debounce = 0;
+
+	Rectangle scissorContentRect;
+	float scissorX = 0;
+	float scissorY = 0;
+
+	float scrollMax = 0.0f;
+	bool overflownY = false;
 
 	std::string text = "";
 	int rowCount = 0;
@@ -56,6 +66,8 @@ private:
 	size_t calcCharPos(size_t row, size_t col);
 	void setCursorRect();
 	void reloadLines();
+
+	void setOffset();
 
 	void handleArrowKeys(KeyboardKey key);
 	void handleDeletionKeys(KeyboardKey key);

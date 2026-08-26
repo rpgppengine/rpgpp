@@ -29,7 +29,7 @@ void TextEdit::unload() {
 
 void TextEdit::setText(const std::string &newText) {
 	this->text = newText;
-	lines = LoadTextLines(this->text.c_str(), &rowCount);
+	reloadLines();
 }
 
 void TextEdit::update() {
@@ -43,17 +43,36 @@ void TextEdit::draw() {
 
 	DrawRectangleRec(rect, rend.bgColor);
 
-	Vector2 textBegin = {rect.x + rend.padding, rect.y + rend.padding};
-
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
 	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+
+	scissorContentRect = getPaddingRect();
+	Vector2 textBegin = {rect.x + rend.padding - scissorX, rect.y + rend.padding - scissorY};
+	BeginScissorMode(scissorContentRect.x, scissorContentRect.y, scissorContentRect.width, scissorContentRect.height);
+
 	DrawTextEx(*rend.font, text.c_str(), textBegin, totalFontSize, spacing, rend.borderColor);
 
 	if (isFocused) {
 		drawCursor();
 	}
 
+	EndScissorMode();
+
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
+}
+
+void TextEdit::leftMouseClicked() { setCursorFromMouse(); }
+
+void TextEdit::leftMouseReleased() {}
+
+void TextEdit::mouseEntered() {
+	SetMouseCursor(MOUSE_CURSOR_IBEAM);
+	Widget::mouseEntered();
+}
+
+void TextEdit::mouseLeft() {
+	SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+	Widget::mouseLeft();
 }
 
 void TextEdit::drawCursor() {
@@ -71,7 +90,11 @@ void TextEdit::setCursorFromMouse() {
 
 	if (mousePos.x < 0 || mousePos.y < 0) return;
 
-	int row = static_cast<int>(floor(mousePos.y / totalFontSize));
+	mousePos.y += scissorY;
+	mousePos.x += scissorX;
+
+	int row = static_cast<int>((mousePos.y / (totalFontSize + 2)));
+	if (row >= rowCount) row = rowCount - 1;
 	std::string_view line = lines[row];
 
 	int col = 0;
@@ -105,9 +128,11 @@ void TextEdit::setCursorRect() {
 
 	std::string sub = TextSubtext(line.data(), 0, cursorPos.column);
 	Vector2 subMeasure = MeasureTextEx(*rend.font, sub.c_str(), totalFontSize, spacing);
-	cursorRect.x = rect.x + rend.padding + subMeasure.x;
-	cursorRect.y = rect.y + rend.padding + ((totalFontSize + 2) * cursorPos.row);
+	cursorRect.x = rect.x + rend.padding + subMeasure.x - scissorX;
+	cursorRect.y = rect.y + rend.padding + ((totalFontSize + 2) * cursorPos.row) - scissorY;
 	cursorRect.height = totalFontSize;
+
+	setOffset();
 }
 
 size_t TextEdit::calcCharPos(size_t row, size_t col) {
@@ -126,11 +151,45 @@ size_t TextEdit::calcCharPos(size_t row, size_t col) {
 void TextEdit::reloadLines() {
 	unload();
 	lines = LoadTextLines(this->text.c_str(), &rowCount);
+
+	auto &rend = render->as<TextEditRender>();
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	scrollMax = (rowCount * (totalFontSize + 2));
+	if (scrollMax > scissorContentRect.height) {
+		overflownY = true;
+		scrollMax -= scissorContentRect.height;
+	} else {
+		overflownY = false;
+	}
 }
 
-void TextEdit::leftMouseClicked() { setCursorFromMouse(); }
+void TextEdit::setOffset() {
+	auto paddingRect = scissorContentRect;
 
-void TextEdit::leftMouseReleased() {}
+	// x
+	if ((cursorRect.x + cursorRect.width) > (paddingRect.x + paddingRect.width)) {
+		float diff = (cursorRect.x + cursorRect.width) - (paddingRect.x + paddingRect.width);
+		scissorX += diff;
+		cursorRect.x -= diff;
+	}
+	if (cursorRect.x < paddingRect.x) {
+		float diff = paddingRect.x - cursorRect.x;
+		scissorX -= diff;
+		cursorRect.x += diff;
+	}
+
+	// y
+	if ((cursorRect.y + cursorRect.height) > (paddingRect.y + paddingRect.height)) {
+		float diff = (cursorRect.y + cursorRect.height) - (paddingRect.y + paddingRect.height);
+		scissorY += diff;
+		cursorRect.y -= diff;
+	}
+	if (cursorRect.y < paddingRect.y) {
+		float diff = paddingRect.y - cursorRect.y;
+		scissorY -= diff;
+		cursorRect.y += diff;
+	}
+}
 
 void TextEdit::handleArrowKeys(KeyboardKey key) {
 	auto &rend = render->as<TextEditRender>();
@@ -205,6 +264,8 @@ void TextEdit::handleArrowKeys(KeyboardKey key) {
 			setCursorRect();
 		}
 	}
+
+	setOffset();
 }
 
 void TextEdit::handleDeletionKeys(KeyboardKey key) {
@@ -312,15 +373,32 @@ void TextEdit::charEntered(int codepoint, std::string_view str) {
 	Vector2 measure = MeasureTextEx(*rend.font, str.data(), totalFontSize, spacing);
 	cursorRect.x += measure.x;
 
+	setOffset();
+
 	Widget::charEntered(codepoint, str);
 }
 
-void TextEdit::mouseEntered() {
-	SetMouseCursor(MOUSE_CURSOR_IBEAM);
-	Widget::mouseEntered();
-}
+void TextEdit::scrolled(float mouseWheel) {
+	if (!overflownY) return;
+	if (mouseWheel == 0) return;
 
-void TextEdit::mouseLeft() {
-	SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-	Widget::mouseLeft();
+	float added = (mouseWheel * EDUI_TEXTEDIT_SCROLLSCPEED);
+
+	auto &rend = render->as<TextEditRender>();
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+
+	if ((scissorY - added) < 0.0f) {
+		scissorY = 0;
+		cursorRect.y = rect.y + rend.padding + ((totalFontSize + 2) * cursorPos.row) - scissorY;
+		return;
+	}
+
+	if ((scissorY - added) > scrollMax) {
+		scissorY = scrollMax;
+		cursorRect.y = rect.y + rend.padding + ((totalFontSize + 2) * cursorPos.row) - scissorY;
+		return;
+	}
+
+	scissorY -= added;
+	cursorRect.y += added;
 }
