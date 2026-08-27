@@ -15,6 +15,16 @@ struct CursorPosition {
 	uint16_t column = 0;
 };
 
+struct CharsRange {
+	size_t start = 0;
+	size_t end = 0;
+};
+
+struct PosRange {
+	CursorPosition start;
+	CursorPosition end;
+};
+
 struct TextEditRender : public LabelRender {};
 
 struct TextEdit : public Widget {
@@ -38,6 +48,7 @@ struct TextEdit : public Widget {
 
 	void mouseEntered() override;
 	void mouseLeft() override;
+	void mouseMoved(Vector2 mousePos, Vector2 relative) override;
 
 	void scrolled(float mouseWheel) override;
 
@@ -61,17 +72,29 @@ private:
 	Rectangle cursorRect = {0, 0, EDUI_TEXTEDIT_CURSOR_WIDTH, 16};
 	size_t charPos = 0;
 
+	bool mouseHeld = false;
+	CursorPosition selectStart;
+	CursorPosition selectEnd;
+
 	void drawCursor();
 	void setCursorFromMouse();
+	CursorPosition getPositionFromMouse();
 	size_t calcCharPos(size_t row, size_t col);
 	void setCursorRect();
 	void reloadLines();
 
+	bool hasSelection();
+	PosRange normalizeSelection();
+	void drawSelectionLine(PosRange range);
+	void drawSelection();
+	void resetSelection();
+	void eraseSelection();
 	void setOffset();
 
 	void handleArrowKeys(KeyboardKey key);
 	void handleDeletionKeys(KeyboardKey key);
 	void handleEnterTab(KeyboardKey key);
+	void handleSelectionKeys(KeyboardKey key, KeyModifier mod);
 };
 }  // namespace edui
 

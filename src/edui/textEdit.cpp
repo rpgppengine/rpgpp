@@ -6,12 +6,35 @@
 #include <cstring>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 #include "edui/gui.hpp"
 #include "raylib.h"
 #include "raymath.h"
 
 using namespace edui;
+
+edui::CharsRange CodepointsToCharsRange(std::string_view str, size_t start, size_t end) {
+	edui::CharsRange range;
+
+	const char *ptr = str.data();
+	for (int i = 0; i < start; i++) {
+		int codepointSize = 0;
+		GetCodepoint(ptr, &codepointSize);
+		ptr += codepointSize;
+		range.start += codepointSize;
+	}
+
+	for (int i = start; i < end; i++) {
+		int codepointSize = 0;
+		GetCodepoint(ptr, &codepointSize);
+		ptr += codepointSize;
+		range.end += codepointSize;
+	}
+	range.end += range.start;
+
+	return range;
+}
 
 TextEdit::TextEdit() {
 	focusable = true;
@@ -52,6 +75,10 @@ void TextEdit::draw() {
 
 	DrawTextEx(*rend.font, text.c_str(), textBegin, totalFontSize, spacing, rend.borderColor);
 
+	if (hasSelection()) {
+		drawSelection();
+	}
+
 	if (isFocused) {
 		drawCursor();
 	}
@@ -61,9 +88,12 @@ void TextEdit::draw() {
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 }
 
-void TextEdit::leftMouseClicked() { setCursorFromMouse(); }
+void TextEdit::leftMouseClicked() {
+	setCursorFromMouse();
+	mouseHeld = true;
+}
 
-void TextEdit::leftMouseReleased() {}
+void TextEdit::leftMouseReleased() { mouseHeld = false; }
 
 void TextEdit::mouseEntered() {
 	SetMouseCursor(MOUSE_CURSOR_IBEAM);
@@ -75,12 +105,33 @@ void TextEdit::mouseLeft() {
 	Widget::mouseLeft();
 }
 
+void TextEdit::mouseMoved(Vector2 mousePos, Vector2 relative) {
+	if (mouseHeld) {
+		auto pos = getPositionFromMouse();
+		auto range = CodepointsToCharsRange(lines[pos.row], 0, pos.column);
+		this->selectEnd = pos;
+		this->cursorPos = pos;
+		setCursorRect();
+		calcCharPos(cursorPos.row, cursorPos.column);
+	}
+}
+
 void TextEdit::drawCursor() {
 	auto &rend = render->as<TextEditRender>();
 	DrawRectangleRec(cursorRect, rend.borderColor);
 }
 
 void TextEdit::setCursorFromMouse() {
+	this->cursorPos = getPositionFromMouse();
+	this->selectStart = cursorPos;
+	this->selectEnd = cursorPos;
+	this->charPos = calcCharPos(cursorPos.row, cursorPos.column);
+	setCursorRect();
+}
+
+CursorPosition TextEdit::getPositionFromMouse() {
+	CursorPosition cursorPos = {0, 0};
+
 	auto &rend = render->as<TextEditRender>();
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
 	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
@@ -88,7 +139,7 @@ void TextEdit::setCursorFromMouse() {
 	Vector2 mousePos = GetMousePosition();
 	mousePos = Vector2Subtract(mousePos, {rect.x + rend.padding, rect.y + rend.padding});
 
-	if (mousePos.x < 0 || mousePos.y < 0) return;
+	if (mousePos.x < 0 || mousePos.y < 0) return CursorPosition{0, 0};
 
 	mousePos.y += scissorY;
 	mousePos.x += scissorX;
@@ -115,8 +166,7 @@ void TextEdit::setCursorFromMouse() {
 	cursorPos.row = row;
 	cursorPos.column = col;
 
-	this->charPos = calcCharPos(row, col);
-	setCursorRect();
+	return cursorPos;
 }
 
 void TextEdit::setCursorRect() {
@@ -163,6 +213,85 @@ void TextEdit::reloadLines() {
 	}
 }
 
+bool TextEdit::hasSelection() { return (selectStart.row != selectEnd.row) || (selectStart.column != selectEnd.column); }
+
+PosRange TextEdit::normalizeSelection() {
+	PosRange result = {selectStart, selectEnd};
+
+	if (selectStart.row == selectEnd.row) {
+		if (selectEnd.column < selectStart.column) std::swap(result.start, result.end);
+	} else if (selectEnd.row < selectStart.row) {
+		std::swap(result.start, result.end);
+	}
+
+	return result;
+}
+
+void TextEdit::drawSelectionLine(PosRange range) {
+	auto &rend = render->as<TextEditRender>();
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+
+	auto bytes = CodepointsToCharsRange(lines[range.start.row], range.start.column, range.end.column);
+
+	std::string subA = TextSubtext(lines[range.start.row], 0, bytes.start);
+	Vector2 measureA = MeasureTextEx(*rend.font, subA.c_str(), totalFontSize, spacing);
+
+	std::string subB = TextSubtext(lines[range.start.row], bytes.start, bytes.end - bytes.start);
+	Vector2 measureB = MeasureTextEx(*rend.font, subB.c_str(), totalFontSize, spacing);
+
+	Rectangle selectionRect = {(rect.x + rend.padding + measureA.x - scissorX),
+							   (rect.y + rend.padding + ((totalFontSize + 2) * range.start.row) - scissorY),
+							   (measureB.x), (totalFontSize + 2)};
+	DrawRectangleRec(selectionRect, Fade(GRAY, 0.5f));
+}
+
+void TextEdit::drawSelection() {
+	auto &rend = render->as<TextEditRender>();
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+
+	auto range = normalizeSelection();
+
+	size_t firstLineEnd =
+		(range.start.row == range.end.row) ? range.end.column : GetCodepointCount(lines[range.start.row]);
+	PosRange firstRange = {range.start, {range.start.row, static_cast<uint16_t>(firstLineEnd)}};
+	drawSelectionLine(firstRange);
+
+	for (size_t iRow = (range.start.row + 1); iRow < (range.end.row); iRow++) {
+		PosRange iRange = {{static_cast<uint16_t>(iRow), 0},
+						   {static_cast<uint16_t>(iRow), static_cast<uint16_t>(GetCodepointCount(lines[iRow]))}};
+		drawSelectionLine(iRange);
+	}
+
+	if (range.start.row != range.end.row) {
+		PosRange lastRange = {{range.end.row, 0}, range.end};
+		drawSelectionLine(lastRange);
+	}
+}
+
+void TextEdit::resetSelection() {
+	selectStart = {0, 0};
+	selectEnd = {0, 0};
+}
+
+void TextEdit::eraseSelection() {
+	auto selectNormalized = normalizeSelection();
+
+	size_t selectStartByte = calcCharPos(selectNormalized.start.row, selectNormalized.start.column);
+	size_t selectEndByte = calcCharPos(selectNormalized.end.row, selectNormalized.end.column);
+
+	charPos = selectStartByte;
+	cursorPos = selectNormalized.start;
+
+	text = text.erase(selectStartByte, selectEndByte - selectStartByte);
+
+	reloadLines();
+	setCursorRect();
+
+	resetSelection();
+}
+
 void TextEdit::setOffset() {
 	auto paddingRect = scissorContentRect;
 
@@ -188,6 +317,11 @@ void TextEdit::setOffset() {
 		float diff = paddingRect.y - cursorRect.y;
 		scissorY -= diff;
 		cursorRect.y += diff;
+	}
+
+	if (scissorY > scrollMax) {
+		float diff = (paddingRect.y + paddingRect.height) - (cursorRect.y + cursorRect.height);
+		scissorY -= diff;
 	}
 }
 
@@ -245,6 +379,7 @@ void TextEdit::handleArrowKeys(KeyboardKey key) {
 
 	if (key == KEY_LEFT || key == KEY_RIGHT) {
 		cursorRect.x += charMeasure.x;
+		resetSelection();
 	}
 
 	// up
@@ -254,6 +389,7 @@ void TextEdit::handleArrowKeys(KeyboardKey key) {
 			charPos = calcCharPos(cursorPos.row, cursorPos.column);
 			setCursorRect();
 		}
+		resetSelection();
 	}
 
 	// down
@@ -263,6 +399,7 @@ void TextEdit::handleArrowKeys(KeyboardKey key) {
 			charPos = calcCharPos(cursorPos.row, cursorPos.column);
 			setCursorRect();
 		}
+		resetSelection();
 	}
 
 	setOffset();
@@ -271,6 +408,11 @@ void TextEdit::handleArrowKeys(KeyboardKey key) {
 void TextEdit::handleDeletionKeys(KeyboardKey key) {
 	if (key == KEY_BACKSPACE) {
 		if (charPos > 0) {
+			if (hasSelection()) {
+				eraseSelection();
+				return;
+			}
+
 			int size = 0;
 			char *ptr = text.data() + charPos;
 			GetCodepointPrevious(ptr, &size);
@@ -292,6 +434,11 @@ void TextEdit::handleDeletionKeys(KeyboardKey key) {
 
 	if (key == KEY_DELETE) {
 		if (charPos > 0) {
+			if (hasSelection()) {
+				eraseSelection();
+				return;
+			}
+
 			int size = 0;
 			char *ptr = text.data() + charPos;
 			GetCodepoint(ptr, &size);
@@ -304,6 +451,10 @@ void TextEdit::handleDeletionKeys(KeyboardKey key) {
 
 void TextEdit::handleEnterTab(KeyboardKey key) {
 	if (key == KEY_ENTER) {
+		if (hasSelection()) {
+			eraseSelection();
+		}
+
 		int size = 0;
 		char *ptr = text.data() + charPos;
 		GetCodepoint(ptr, &size);
@@ -318,12 +469,73 @@ void TextEdit::handleEnterTab(KeyboardKey key) {
 	}
 
 	if (key == KEY_TAB) {
+		if (hasSelection()) {
+			eraseSelection();
+		}
+
 		text.insert(text.begin() + charPos, '\t');
 		cursorPos.column++;
 		charPos++;
 
 		reloadLines();
 		setCursorRect();
+	}
+}
+
+void TextEdit::handleSelectionKeys(KeyboardKey key, KeyModifier mod) {
+	auto selectNormalized = normalizeSelection();
+
+	size_t selectStartByte = calcCharPos(selectNormalized.start.row, selectNormalized.start.column);
+	size_t selectEndByte = calcCharPos(selectNormalized.end.row, selectNormalized.end.column);
+
+	std::string selectionText = TextSubtext(text.c_str(), selectStartByte, selectEndByte - selectStartByte);
+
+	if (key == KEY_C && mod.ctrl) {
+		if (hasSelection()) {
+			SetClipboardText(selectionText.c_str());
+		}
+	}
+	if (key == KEY_V && mod.ctrl) {
+		if (GetClipboardText() == NULL) return;
+
+		if (hasSelection()) {
+			eraseSelection();
+		}
+
+		std::string clipboard = GetClipboardText();
+		text = text.insert(charPos, clipboard);
+
+		auto oldCharPos = charPos;
+		charPos += clipboard.size();
+
+		for (size_t i = oldCharPos; i < charPos; i++) {
+			cursorPos.column++;
+			if (text.at(i) == '\n') {
+				cursorPos.column = 0;
+				cursorPos.row++;
+			}
+		}
+
+		reloadLines();
+		setCursorRect();
+	}
+	if (key == KEY_X && mod.ctrl) {
+		if (hasSelection()) {
+			SetClipboardText(selectionText.c_str());
+
+			eraseSelection();
+		}
+	}
+	if (key == KEY_A && mod.ctrl) {
+		selectStart.row = 0;
+		selectStart.column = 0;
+
+		selectEnd.row = rowCount - 1;
+		selectEnd.column = GetCodepointCount(lines[rowCount - 1]);
+
+		cursorPos = selectEnd;
+		setCursorRect();
+		charPos = calcCharPos(cursorPos.row, cursorPos.column);
 	}
 }
 
@@ -343,6 +555,8 @@ void TextEdit::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 			charPos = calcCharPos(cursorPos.row, cursorPos.column);
 			setCursorRect();
 		}
+
+		handleSelectionKeys(key, mod);
 	}
 
 	bool val = held && debounce == 0;
