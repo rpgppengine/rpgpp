@@ -8,6 +8,7 @@ struct SliderRender : public WidgetRender {};
 
 struct Slider : public Widget {
 	const float EDUI_SLIDER_WIDTH = 16.0f;
+	const float EDUI_SLIDER_BAR_OFFSET = 2.0f;
 
 	SignalT<int> onValueChanged;
 
@@ -20,12 +21,13 @@ struct Slider : public Widget {
 
 	void setMinValue(int newMinValue);
 	void setMaxValue(int newMaxValue);
+	void setValue(int newValue);
 
 	void draw() override;
+	void update() override;
 
 	void leftMouseClicked() override;
 	void leftMouseReleased() override;
-	void mouseMoved(Vector2 mousePos, Vector2 relative) override;
 
 private:
 	int minValue = 0;

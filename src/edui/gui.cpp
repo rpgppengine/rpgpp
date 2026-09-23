@@ -14,13 +14,19 @@ using namespace edui;
 Gui *Gui::instance = nullptr;
 
 void Gui::processWidget(std::shared_ptr<Widget> &widget) {
+	if (widget == nullptr) return;
+
 	if (widget->mouseIsInRect()) {
-		if (!widget->isContainer) {
-			notifyChild(&widget);
-		} else {
-			notifyChild(&widget);
-			widget->as<Container>().notifyChildren(this);
+		if (!notified) {
+			notified = true;
+			if (!widget->isContainer) {
+				notifyChild(&widget);
+			} else {
+				notifyChild(&widget);
+				widget->as<Container>().notifyChildren(this);
+			}
 		}
+
 	} else {
 		if (widget->notifiedMouseEnter) {
 			widget->notifiedMouseEnter = false;
@@ -47,10 +53,14 @@ void Gui::processWidget(std::shared_ptr<Widget> &widget) {
 void Gui::processVector(std::vector<std::shared_ptr<Widget>> &vec) {
 	int i = 0;
 	for (auto &widget : vec) {
-		if (widget == nullptr) continue;
+		if (widget == nullptr) {
+			i++;
+			continue;
+		}
 
 		if (widget->deferFlag) {
 			widget->deferFlag = false;
+			i++;
 			continue;
 		}
 
@@ -83,6 +93,7 @@ void Gui::update() {
 		screenRect.height -= menuBarHeight;
 	}
 
+	notified = false;
 	processVector(topLayer);
 	processVector(widgets);
 
@@ -166,6 +177,7 @@ void Gui::add(std::shared_ptr<Widget> widget) {
 	widget->render->font = &this->font;
 	widget->unfocused();
 	widgets.push_back(widget);
+	widget->onAdded();
 }
 
 void Gui::addTop(std::shared_ptr<Widget> widget) {
@@ -178,6 +190,7 @@ void Gui::addTop(std::shared_ptr<Widget> widget) {
 	widget->render->font = &this->font;
 	widget->unfocused();
 	topLayer.push_back(widget);
+	widget->onAdded();
 }
 
 void Gui::notifyChild(std::shared_ptr<Widget> *widget) {

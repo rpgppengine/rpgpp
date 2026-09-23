@@ -59,6 +59,19 @@ void Label::setText(const std::string &text) {
 	overflown = drawOverflownText(paddingRect, rend.font, totalFontSize, spacing, text, &shownText);
 }
 
+void Label::setWidthFit() {
+	auto &rend = render->as<LabelRender>();
+	if (rend.font == nullptr) return;
+
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+
+	Vector2 measure = MeasureTextEx(*rend.font, text.c_str(), totalFontSize, spacing);
+
+	layout.width.scale = 0;
+	layout.width.offset = measure.x + (rend.padding * 2);
+}
+
 void Label::mouseEntered() {
 	if (overflown) {
 		this->tooltip = std::make_shared<Tooltip>();

@@ -16,7 +16,7 @@ struct MessageBox : public ChildWindow {
 	Signal onOkPressed;
 
 	std::shared_ptr<edui::TextArea> textArea = nullptr;
-	std::shared_ptr<edui::HorizontalContainer> layout = nullptr;
+	std::shared_ptr<edui::HorizontalContainer> footerLayout = nullptr;
 
 	MessageBox();
 

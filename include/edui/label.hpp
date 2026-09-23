@@ -30,6 +30,7 @@ struct Label : public Widget {
 	void draw();
 
 	void setText(const std::string &text);
+	void setWidthFit();
 
 	void mouseEntered();
 	void mouseLeft();

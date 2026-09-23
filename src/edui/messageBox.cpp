@@ -21,12 +21,12 @@ MessageBox::MessageBox() : ChildWindow() {
 	textArea->setSize({1, 0}, {1, 0});
 	add(textArea);
 
-	layout = std::make_shared<edui::HorizontalContainer>();
-	layout->reverse = true;
-	layout->render->border = 0;
-	layout->render->as<edui::HorizontalContainerRender>().space = 4;
-	layout->gui = Gui::instance;
-	layout->setSize({1, 0}, {1, 0});
+	footerLayout = std::make_shared<edui::HorizontalContainer>();
+	footerLayout->reverse = true;
+	footerLayout->render->border = 0;
+	footerLayout->render->as<edui::HorizontalContainerRender>().space = 4;
+	footerLayout->gui = Gui::instance;
+	footerLayout->setSize({1, 0}, {1, 0});
 
 	auto btn = std::make_shared<edui::Button>();
 	btn->setText("OK");
@@ -36,16 +36,17 @@ MessageBox::MessageBox() : ChildWindow() {
 	btn->onClicked.connect([this] {
 		onOkPressed.invoke();
 		markDelete();
-		layout->markDelete();
+		footerLayout->markDelete();
 	});
 
-	layout->add(btn);
+	footerLayout->add(btn);
+	// btn->setWidthFit();
 }
 
 void MessageBox::update() {
 	ChildWindow::update();
 
-	layout->update();
+	footerLayout->update();
 
 	auto &rend = render->as<MessageBoxRender>();
 
@@ -54,16 +55,16 @@ void MessageBox::update() {
 	footerRect.y -= rend.padding;
 	footerRect.height += rend.padding;
 	Rectangle paddingFooter = paddingRect(footerRect, rend.padding);
-	layout->calcRect(paddingFooter);
+	footerLayout->calcRect(paddingFooter);
 
-	if (layout->mouseIsInRect()) {
-		std::shared_ptr<Widget> widgetPtr = layout;
+	if (footerLayout->mouseIsInRect()) {
+		std::shared_ptr<Widget> widgetPtr = footerLayout;
 		Gui::instance->notifyChild(&widgetPtr);
-		layout->notifyChildren(Gui::instance);
+		footerLayout->notifyChildren(Gui::instance);
 	} else {
-		if (layout->notifiedMouseEnter) {
-			layout->notifiedMouseEnter = false;
-			layout->mouseLeft();
+		if (footerLayout->notifiedMouseEnter) {
+			footerLayout->notifiedMouseEnter = false;
+			footerLayout->mouseLeft();
 		}
 	}
 }
@@ -71,7 +72,7 @@ void MessageBox::update() {
 void MessageBox::draw() {
 	ChildWindow::draw();
 
-	layout->draw();
+	footerLayout->draw();
 }
 
 Rectangle MessageBox::getContentRect() {

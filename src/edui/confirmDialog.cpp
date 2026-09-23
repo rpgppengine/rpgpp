@@ -20,10 +20,10 @@ ConfirmDialog::ConfirmDialog() : MessageBox() {
 	cancel->onClicked.connect([this] {
 		onCancelPressed.invoke();
 		markDelete();
-		layout->markDelete();
+		footerLayout->markDelete();
 	});
 
-	layout->add(cancel);
+	footerLayout->add(cancel);
 
-	layout->widgets[0].swap(layout->widgets[1]);
+	footerLayout->widgets[0].swap(footerLayout->widgets[1]);
 }

@@ -18,6 +18,7 @@ struct ContextMenu : public VerticalContainer {
 
 	int idx = 0;
 	void addItem(const std::string &item);
+	void moveToMouse();
 };
 }  // namespace edui
 

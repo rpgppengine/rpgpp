@@ -9,6 +9,8 @@ struct ColorRectRender : public WidgetRender {};
 struct ColorRect : public Widget {
 	typedef std::shared_ptr<ColorRect> Ptr;
 
+	Color color = WHITE;
+
 	ColorRect();
 	void draw();
 

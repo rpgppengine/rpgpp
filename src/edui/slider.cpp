@@ -21,12 +21,15 @@ void Slider::setMaxValue(int newMaxValue) {
 	value = constrain(value, minValue, maxValue);
 }
 
+void Slider::setValue(int newValue) { value = constrain(newValue, minValue, maxValue); }
+
 Rectangle Slider::getSliderRect() {
 	float sliderMaxPos = rect.x + (rect.width - EDUI_SLIDER_WIDTH);
 
 	float sliderPos = rect.x + ((sliderMaxPos - rect.x) / (maxValue - minValue)) * (value - minValue);
 
-	Rectangle sliderRect = {sliderPos, rect.y, EDUI_SLIDER_WIDTH, rect.height};
+	Rectangle sliderRect = {sliderPos, rect.y - EDUI_SLIDER_BAR_OFFSET, EDUI_SLIDER_WIDTH,
+							rect.height + (EDUI_SLIDER_BAR_OFFSET * 2)};
 
 	return sliderRect;
 }
@@ -52,15 +55,23 @@ void Slider::setValueByMouse() {
 	}
 }
 
+void Slider::update() {
+	if (holdingMouse) {
+		setValueByMouse();
+	}
+}
+
 void Slider::draw() {
 	auto &rend = render->as<SliderRender>();
 
+	// border
+	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
+
+	// slider bar
 	auto sliderRect = getSliderRect();
 
 	DrawRectangleRec(sliderRect, rend.currentBgColor);
 	DrawRectangleLinesEx(sliderRect, rend.border, rend.currentBorderColor);
-
-	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 }
 
 void Slider::leftMouseClicked() {
@@ -75,11 +86,7 @@ void Slider::leftMouseClicked() {
 void Slider::leftMouseReleased() {
 	holdingMouse = false;
 
-	setValueByMouse();
-}
-
-void Slider::mouseMoved(Vector2 mousePos, Vector2 relative) {
-	if (holdingMouse) {
+	if (mouseIsInRect()) {
 		setValueByMouse();
 	}
 }

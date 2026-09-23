@@ -97,6 +97,8 @@ struct Widget {
 		render = std::make_unique<WidgetRender>(*other.render.get());
 	}
 
+	virtual void onAdded() {}
+
 	virtual void calcRect(Rectangle &base) {
 		this->rect.x = base.x + ((layout.x.scale * base.width) + layout.x.offset);
 		this->rect.y = base.y + ((layout.y.scale * base.height) + layout.y.offset);

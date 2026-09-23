@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "edui/button.hpp"
+#include "edui/gui.hpp"
 #include "edui/verticalContainer.hpp"
 #include "raylib.h"
 
@@ -43,4 +44,18 @@ void ContextMenu::addItem(const std::string &item) {
 
 	add(newButton);
 	layout.height.offset += itemHeight;
+}
+
+void ContextMenu::moveToMouse() {
+	Vector2 mousePos = GetMousePosition();
+
+	layout.x.offset = mousePos.x;
+	layout.x.scale = 0;
+
+	layout.y.offset = mousePos.y;
+	layout.y.scale = 0;
+
+	if (Gui::instance->hasMenuBar) {
+		layout.y.offset -= EDUI_DEFAULT_HEIGHT;
+	}
 }

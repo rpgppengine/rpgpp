@@ -9,9 +9,10 @@
 
 namespace edui {
 const float EDUI_DEFAULT_HEIGHT = 16;
+const float EDUI_SECONDARY_HEIGHT = 26;
 
 struct Gui {
-	static Gui* instance;
+	static Gui *instance;
 
 	Color background = RAYWHITE;
 	Font font;
@@ -26,6 +27,7 @@ struct Gui {
 	std::vector<std::shared_ptr<Widget>> widgets;
 	std::vector<std::shared_ptr<Widget>> topLayer;
 
+	bool notified = false;
 	std::shared_ptr<Widget> *current = nullptr;
 	std::weak_ptr<Widget> leftClickedWidget;
 	std::weak_ptr<Widget> middleClickedWidget;
@@ -43,8 +45,8 @@ struct Gui {
 	void update();
 	void draw();
 
-	void processVector(std::vector<std::shared_ptr<Widget>>& vec);
-	void processWidget(std::shared_ptr<Widget>& widget);
+	void processVector(std::vector<std::shared_ptr<Widget>> &vec);
+	void processWidget(std::shared_ptr<Widget> &widget);
 
 	void add(std::shared_ptr<Widget> widget);
 	void addTop(std::shared_ptr<Widget> widget);

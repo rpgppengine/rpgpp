@@ -7,7 +7,9 @@
 #include "edui/canvas.hpp"
 #include "edui/checkbox.hpp"
 #include "edui/childWindow.hpp"
+#include "edui/colorPanel.hpp"
 #include "edui/colorRect.hpp"
+#include "edui/colorValue.hpp"
 #include "edui/colorWheel.hpp"
 #include "edui/confirmDialog.hpp"
 #include "edui/container.hpp"
@@ -107,7 +109,7 @@ int main() {
 	msg->setPosition({0, 350}, {0, 20});
 	msg->setSize({0, 200}, {0, 180});
 	msg->onOkPressed.connect([] { printf("clicked ok..\n"); });
-	gui.add(msg);
+	// gui.add(msg);
 
 	auto vec2 = std::make_shared<edui::Vector2Value>();
 	vec2->setSize({0, 200}, {0, 26});
@@ -135,6 +137,19 @@ int main() {
 	textEdit->setSize({0, 300}, {0, 250});
 	textEdit->setText("Hello world!\nLazy fox.\nThird way.");
 	gui.add(textEdit);
+
+	auto colorPanel = std::make_shared<edui::ColorPanel>();
+	colorPanel->setPosition({0, 350}, {0, 20});
+	colorPanel->setSize({0, 320}, {0, 250});
+	// gui.add(colorPanel);
+
+	auto colorValue = std::make_shared<edui::ColorValue>();
+	colorValue->setPosition({0, 350}, {0, 300});
+	colorValue->setSize({0, 50}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	colorValue->onValueChangedT([](Color old, Color newColor) {
+		printf("%u, %u, %u ; %u, %u, %u\n", old.r, old.g, old.b, newColor.r, newColor.g, newColor.b);
+	});
+	gui.add(colorValue);
 
 	while (!WindowShouldClose()) {
 		gui.update();

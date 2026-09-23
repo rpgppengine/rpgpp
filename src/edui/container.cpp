@@ -99,7 +99,12 @@ void Container::markDelete() {
 void Container::deleteChildren() {
 	int i = 0;
 	for (auto &widget : widgets) {
-		widgets.erase(widgets.begin() + i);
-		i++;
+		if (widget != nullptr) {
+			if (widget->isContainer) {
+				widget->as<Container>().deleteChildren();
+			}
+			widgets.erase(widgets.begin() + i);
+			i++;
+		}
 	}
 }
