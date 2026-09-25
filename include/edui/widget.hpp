@@ -84,6 +84,7 @@ struct Widget {
 	Vector2 anchor = {0, 0};
 
 	int referId = 0;
+	int layerId = 0;
 
 	Widget() = default;
 	virtual ~Widget() = default;

@@ -77,7 +77,7 @@ void Label::mouseEntered() {
 		this->tooltip = std::make_shared<Tooltip>();
 		tooltip->setText(text);
 		tooltip->setPosition({0, static_cast<int>(GetMousePosition().x)}, {0, static_cast<int>(GetMousePosition().y)});
-		Gui::instance->addTop(tooltip);
+		Gui::instance->add(tooltip, layerId + 1);
 	}
 	Widget::mouseEntered();
 }

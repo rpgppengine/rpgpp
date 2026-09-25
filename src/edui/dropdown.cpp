@@ -81,7 +81,7 @@ void Dropdown::openDropdown() {
 	list->setPosition({0, static_cast<int>(listPos.x)}, {0, static_cast<int>(listPos.y)});
 	list->setSize({0, static_cast<int>(rect.width)}, {0, EDUI_DROPDOWNLIST_HEIGHT});
 
-	Gui::instance->addTop(list);
+	Gui::instance->add(list, layerId + 1);
 
 	for (int i = 0; i < lastItem; i++) {
 		list->addItem(items[i], rend.fontSize);

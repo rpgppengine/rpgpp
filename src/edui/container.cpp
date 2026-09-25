@@ -72,6 +72,7 @@ void Container::add(std::shared_ptr<Widget> widget) {
 
 	widget->render->font = &gui->font;
 	widget->unfocused();
+	widget->layerId = layerId;
 	widgets.push_back(widget);
 }
 

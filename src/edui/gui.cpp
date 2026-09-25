@@ -94,8 +94,9 @@ void Gui::update() {
 	}
 
 	notified = false;
-	processVector(topLayer);
-	processVector(widgets);
+	for (int i = (EDUI_MAX_LAYERS - 1); i >= 0; i--) {
+		processVector(arr[i]);
+	}
 
 	if (current != nullptr) {
 		KeyboardKey key = static_cast<KeyboardKey>(GetKeyPressed());
@@ -155,19 +156,18 @@ void Gui::draw() {
 		menuBar->draw();
 	}
 
-	for (auto &widget : widgets) {
-		if (widget->visible) {
-			widget->draw();
-		}
-	}
-	for (auto &widget : topLayer) {
-		if (widget->visible) {
-			widget->draw();
+	for (int i = 0; i < EDUI_MAX_LAYERS; i++) {
+		for (auto &widget : arr[i]) {
+			if (widget->visible) {
+				widget->draw();
+			}
 		}
 	}
 }
 
-void Gui::add(std::shared_ptr<Widget> widget) {
+void Gui::add(std::shared_ptr<Widget> widget, int layerId) {
+	if (layerId < 0 && layerId >= EDUI_MAX_LAYERS) return;
+
 	if (widget->isContainer) {
 		widget->as<Container>().gui = this;
 		for (auto &subwidget : widget->as<Container>().widgets) {
@@ -176,20 +176,8 @@ void Gui::add(std::shared_ptr<Widget> widget) {
 	}
 	widget->render->font = &this->font;
 	widget->unfocused();
-	widgets.push_back(widget);
-	widget->onAdded();
-}
-
-void Gui::addTop(std::shared_ptr<Widget> widget) {
-	if (widget->isContainer) {
-		widget->as<Container>().gui = this;
-		for (auto &subwidget : widget->as<Container>().widgets) {
-			subwidget->render->font = &this->font;
-		}
-	}
-	widget->render->font = &this->font;
-	widget->unfocused();
-	topLayer.push_back(widget);
+	widget->layerId = layerId;
+	arr[layerId].push_back(widget);
 	widget->onAdded();
 }
 

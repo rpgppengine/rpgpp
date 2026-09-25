@@ -25,7 +25,7 @@ ColorValue::ColorValue() : Widget() {
 
 		colorDialog->setColor(color);
 
-		Gui::instance->addTop(colorDialog);
+		Gui::instance->add(colorDialog, layerId + 1);
 	});
 }
 

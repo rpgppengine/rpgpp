@@ -11,6 +11,7 @@ using namespace edui;
 
 ContextMenu::ContextMenu() : VerticalContainer() {
 	render = std::make_unique<ContextMenuRender>();
+	setSize({0, 50}, {0, 0});
 	deleteOnOutsideClick = true;
 }
 

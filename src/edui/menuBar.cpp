@@ -55,7 +55,7 @@ void MenuBar::addItem(const std::string &title, std::vector<std::string> items) 
 			context->onItemClicked.connect(
 				[this, title](const std::string &eventItem) { onItemClicked.invoke(title, eventItem); });
 
-			gui->addTop(context);
+			gui->add(context, EDUI_MAX_LAYERS - 1);
 		}
 	});
 

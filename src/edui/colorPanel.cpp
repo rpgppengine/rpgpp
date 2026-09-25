@@ -189,7 +189,7 @@ void ColorPanel::openContextMenu() {
 			SetClipboardText(colorString.c_str());
 		}
 	});
-	// edui::Gui::instance->addTop(contextMenu);
+	edui::Gui::instance->add(contextMenu, layerId + 1);
 	// will not add for now
 }
 

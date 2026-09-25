@@ -8,6 +8,7 @@
 #include "raylib.h"
 
 namespace edui {
+const int EDUI_MAX_LAYERS = 5;
 const float EDUI_DEFAULT_HEIGHT = 16;
 const float EDUI_SECONDARY_HEIGHT = 26;
 
@@ -24,8 +25,7 @@ struct Gui {
 
 	Vector2 lastMousePos;
 
-	std::vector<std::shared_ptr<Widget>> widgets;
-	std::vector<std::shared_ptr<Widget>> topLayer;
+	std::array<std::vector<std::shared_ptr<Widget>>, EDUI_MAX_LAYERS> arr = {};
 
 	bool notified = false;
 	std::shared_ptr<Widget> *current = nullptr;
@@ -48,8 +48,7 @@ struct Gui {
 	void processVector(std::vector<std::shared_ptr<Widget>> &vec);
 	void processWidget(std::shared_ptr<Widget> &widget);
 
-	void add(std::shared_ptr<Widget> widget);
-	void addTop(std::shared_ptr<Widget> widget);
+	void add(std::shared_ptr<Widget> widget, int layerId = 0);
 
 	void notifyChild(std::shared_ptr<Widget> *widget);
 
