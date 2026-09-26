@@ -189,6 +189,12 @@ int main() {
 	testDrop->addItem("two");
 	langWindow->add(testDrop);
 
+	auto anotherWindow = std::make_shared<edui::MessageBox>();
+	anotherWindow->translationId = "Editor.another";
+	anotherWindow->setPosition({0, 560}, {0, 20});
+	anotherWindow->setSize({0, 200}, {0, 180});
+	gui.add(anotherWindow);
+
 	while (!WindowShouldClose()) {
 		gui.update();
 

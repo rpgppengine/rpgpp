@@ -48,6 +48,9 @@ MessageBox::MessageBox() : ChildWindow() {
 void MessageBox::translate() {
 	ChildWindow::translate();
 
+	std::string textTranslationId = std::string(translationId.c_str()) + ".Text";
+	textArea->setText(getTranslation(textTranslationId, textArea->text));
+
 	auto &cancel = footerLayout->widgets[0];
 	std::string cancelTranslationId = std::string(builtinTranslation.c_str()) + ".Ok";
 	cancel->as<edui::Button>().setText(getTranslation(cancelTranslationId, "Ok"));
