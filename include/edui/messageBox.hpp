@@ -20,6 +20,8 @@ struct MessageBox : public ChildWindow {
 
 	MessageBox();
 
+	void translate() override;
+
 	void update() override;
 	void draw() override;
 

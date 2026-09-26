@@ -2,6 +2,7 @@
 #define _EDUI_DROPDOWN_H
 
 #include <memory>
+
 #include "edui/dropdownList.hpp"
 #include "edui/label.hpp"
 #include "edui/valuewidget.hpp"
@@ -23,7 +24,7 @@ struct Dropdown : public Widget, public ValueWidgetT<DropdownValue> {
 
 	Dropdown();
 
-	virtual void setValue(const DropdownValue& val) override;
+	virtual void setValue(const DropdownValue &val) override;
 	virtual DropdownValue getValue() override;
 
 	int currentItem = 0;
@@ -36,9 +37,12 @@ struct Dropdown : public Widget, public ValueWidgetT<DropdownValue> {
 
 	void leftMouseClicked() override;
 
-	void addItem(const std::string& item);
-private:
-	void openDropdown();
+	void addItem(const std::string &item);
+
+protected:
+	bool translated = true;
+
+	virtual void openDropdown();
 	void closeDropdown();
 };
 }  // namespace edui

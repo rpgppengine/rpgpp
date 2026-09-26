@@ -23,13 +23,11 @@ struct Container : public Widget {
 	Rectangle contentRect = {0, 0, 0, 0};
 	Rectangle renderRect;
 
-	bool mouseIsInContent() {
-		return CheckCollisionPointRec(GetMousePosition(), contentRect);
-	}
+	bool mouseIsInContent() { return CheckCollisionPointRec(GetMousePosition(), contentRect); }
 
 	Container();
-	virtual void update();
-	virtual void draw();
+	virtual void update() override;
+	virtual void draw() override;
 
 	virtual void add(std::shared_ptr<Widget> widget);
 
@@ -37,10 +35,12 @@ struct Container : public Widget {
 
 	void notifyChildren(edui::Gui *gui);
 
-	Widget::Ptr clone() { return std::make_shared<Container>(*this); }
+	Widget::Ptr clone() override { return std::make_shared<Container>(*this); }
 
-	void markDelete();
+	void markDelete() override;
 	void deleteChildren();
+
+	void translate() override;
 };
 
 }  // namespace edui

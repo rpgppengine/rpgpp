@@ -34,6 +34,11 @@ ChildWindow::ChildWindow() : Container() {
 	closeButtonPtr = closeButton;
 }
 
+void ChildWindow::translate() {
+	Container::translate();
+	setTitle(getTranslation(translationId.c_str(), title));
+}
+
 Rectangle ChildWindow::getBarRect() { return {rect.x, rect.y, rect.width, EDUI_CHILDWINDOW_BARHEIGHT}; }
 
 void ChildWindow::setTitle(const std::string &title) {

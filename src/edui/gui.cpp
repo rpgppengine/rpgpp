@@ -6,6 +6,7 @@
 #include "edui/container.hpp"
 #include "edui/helper.hpp"
 #include "edui/widget.hpp"
+#include "ini.h"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -34,7 +35,8 @@ void Gui::processWidget(std::shared_ptr<Widget> &widget) {
 		}
 
 		if (widget->deleteOnOutsideClick) {
-			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+			bool mouseIsInException = CheckCollisionPointRec(GetMousePosition(), widget->outsideClickException);
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !mouseIsInException) {
 				widget->markDelete();
 			}
 		}
@@ -179,6 +181,7 @@ void Gui::add(std::shared_ptr<Widget> widget, int layerId) {
 	widget->layerId = layerId;
 	arr[layerId].push_back(widget);
 	widget->onAdded();
+	widget->translate();
 }
 
 void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
@@ -255,6 +258,32 @@ void Gui::setFont(const char *fileName, int fontSize, int labelFontSize, int fon
 
 	auto codepoints = loadFontCodepoints();
 	font = LoadFontEx(fileName, fontSize, codepoints.data(), codepoints.size());
+}
+
+void Gui::loadTranslation(const std::string &filePath) {
+	mINI::INIFile file(filePath);
+	file.read(translationStruct);
+
+	for (auto &layer : arr) {
+		for (auto &widget : layer) {
+			widget->translate();
+		}
+	}
+	if (hasMenuBar) {
+		menuBar->translate();
+	}
+}
+
+void Gui::loadTranslationNames(const std::string &filePath) {
+	mINI::INIFile file(filePath);
+	mINI::INIStructure struc;
+	file.read(struc);
+
+	languageNamesCount = 0;
+	for (auto &pair : struc.get("Languages")) {
+		languageNames[languageNamesCount] = {pair.first, pair.second};
+		languageNamesCount++;
+	}
 }
 
 void Gui::unload() {

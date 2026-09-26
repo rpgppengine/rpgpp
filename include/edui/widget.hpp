@@ -5,6 +5,7 @@
 #include <memory>
 #include <string_view>
 
+#include "Str.h"
 #include "edui/helper.hpp"
 #include "edui/signal.hpp"
 #include "raylib.h"
@@ -78,6 +79,7 @@ struct Widget {
 	bool notifiedMouseEnter = false;
 	bool isFocused = false;
 	bool deleteOnOutsideClick = false;
+	Rectangle outsideClickException = {0, 0, 0, 0};
 
 	Rectangle rect = {0, 0, 0, 0};
 	Layout2 layout;
@@ -85,11 +87,17 @@ struct Widget {
 
 	int referId = 0;
 	int layerId = 0;
+	Str256 translationId = "";
 
 	Widget() = default;
 	virtual ~Widget() = default;
 	virtual void update() {};
 	virtual void draw() {};
+
+	Widget(const std::string &typeId, const std::string &translationId) {
+		this->widgetTypeId.set(typeId);
+		this->translationId.set(translationId);
+	}
 
 	Widget(Widget &other) {
 		rect = other.rect;
@@ -97,6 +105,8 @@ struct Widget {
 		isContainer = other.isContainer;
 		render = std::make_unique<WidgetRender>(*other.render.get());
 	}
+
+	virtual void translate() {}
 
 	virtual void onAdded() {}
 
@@ -183,6 +193,9 @@ struct Widget {
 	virtual Ptr clone() { return std::make_shared<Widget>(*this); }
 
 	virtual void markDelete() { deleteFlag = true; }
+
+protected:
+	Str256 widgetTypeId;
 };
 }  // namespace edui
 

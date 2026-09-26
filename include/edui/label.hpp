@@ -27,13 +27,15 @@ struct Label : public Widget {
 	bool overflown = false;
 
 	Label();
-	void draw();
+	void translate() override;
+
+	void draw() override;
 
 	void setText(const std::string &text);
 	void setWidthFit();
 
-	void mouseEntered();
-	void mouseLeft();
+	void mouseEntered() override;
+	void mouseLeft() override;
 
 protected:
 	std::string shownText = "Hello!";

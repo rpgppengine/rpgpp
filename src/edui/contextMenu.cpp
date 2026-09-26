@@ -1,9 +1,11 @@
 #include "edui/contextMenu.hpp"
 
 #include <memory>
+#include <string>
 
 #include "edui/button.hpp"
 #include "edui/gui.hpp"
+#include "edui/helper.hpp"
 #include "edui/verticalContainer.hpp"
 #include "raylib.h"
 
@@ -13,6 +15,24 @@ ContextMenu::ContextMenu() : VerticalContainer() {
 	render = std::make_unique<ContextMenuRender>();
 	setSize({0, 50}, {0, 0});
 	deleteOnOutsideClick = true;
+}
+
+void ContextMenu::translate() {
+	layout.width.offset = 0;
+
+	for (auto &widget : widgets) {
+		std::string widgetTranslationId =
+			std::string(translationId.c_str()) + '.' + std::string(widget->translationId.c_str());
+		std::string widgetText = getTranslation(widgetTranslationId, widget->translationId.c_str());
+		widget->as<edui::Button>().setText(widgetText);
+
+		float fontSize = Gui::instance->labelFontSize;
+		float spacing = Gui::instance->fontSpacing;
+		auto textSize = MeasureTextEx(Gui::instance->font, widgetText.c_str(), fontSize, spacing);
+		if (layout.width.offset < (textSize.x + 4)) {
+			layout.width.offset = textSize.x + 4;
+		}
+	}
 }
 
 void ContextMenu::addItem(const std::string &item) {
@@ -28,6 +48,8 @@ void ContextMenu::addItem(const std::string &item) {
 		layout.width.offset = textSize.x + 4;
 	}
 
+	newButton->translationId = item;
+
 	newButton->setSize({1, 0}, {0, static_cast<int>(itemHeight)});
 	newButton->setText(item);
 	newButton->render->padding = 2;
@@ -36,8 +58,8 @@ void ContextMenu::addItem(const std::string &item) {
 	newButton->render->as<ButtonRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 
 	int curr = idx;
-	newButton->onClicked.connect([this, item] {
-		onItemClicked.invoke(item);
+	newButton->onClicked.connect([this, item, curr] {
+		onItemClicked.invoke(item, curr);
 		markDelete();
 	});
 

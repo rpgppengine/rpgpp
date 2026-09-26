@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+
+#include "ini.h"
 #include "raylib.h"
 
 /* Constrain a value between lower nad upper limit. */
@@ -22,7 +24,7 @@ struct CharsBlock {
 };
 
 /* Load an UTF-8 Block. */
-void loadCodepointsBlock(std::vector<int>& vec, CharsBlock block);
+void loadCodepointsBlock(std::vector<int> &vec, CharsBlock block);
 
 /* Load all needed UTF-8 blocks. */
 std::vector<int> loadFontCodepoints();
@@ -30,9 +32,13 @@ std::vector<int> loadFontCodepoints();
 /* Calculate a Rectangle with inner padding. */
 Rectangle paddingRect(Rectangle &rect, float padding);
 
-/* Draw the text. Draws only part of it and returns true on overflown, otherwise draws the whole text and returns false. */
-bool drawOverflownText(Rectangle rect, Font* font, float fontSize, float spacing, const std::string& text, std::string* shownText);
+/* Draw the text. Draws only part of it and returns true on overflown, otherwise draws the whole text and returns false.
+ */
+bool drawOverflownText(Rectangle rect, Font *font, float fontSize, float spacing, const std::string &text,
+					   std::string *shownText);
 
-void rectCenter(Rectangle& a, Rectangle* b);
+void rectCenter(Rectangle &a, Rectangle *b);
+
+std::string getTranslation(const std::string &id, const std::string &def);
 
 #endif

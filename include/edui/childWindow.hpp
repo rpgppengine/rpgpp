@@ -2,6 +2,7 @@
 #define _EDUI_WINDOW_H
 
 #include <memory>
+
 #include "edui/container.hpp"
 #include "edui/iconButton.hpp"
 #include "edui/label.hpp"
@@ -25,7 +26,9 @@ struct ChildWindow : public Container {
 
 	ChildWindow();
 
-	void setTitle(const std::string& title);
+	void translate() override;
+
+	void setTitle(const std::string &title);
 
 	void update() override;
 	void draw() override;
@@ -37,6 +40,6 @@ struct ChildWindow : public Container {
 private:
 	Rectangle getBarRect();
 };
-}
+}  // namespace edui
 
 #endif

@@ -1,11 +1,15 @@
 #include "edui/confirmDialog.hpp"
 
 #include <memory>
+#include <string>
 
 #include "edui/button.hpp"
+#include "edui/helper.hpp"
 #include "edui/messageBox.hpp"
 
 using namespace edui;
+
+static const std::string builtinTranslation = "Widgets.ConfirmDialog";
 
 ConfirmDialog::ConfirmDialog() : MessageBox() {
 	render = std::make_unique<ConfirmDialogRender>();
@@ -26,4 +30,20 @@ ConfirmDialog::ConfirmDialog() : MessageBox() {
 	footerLayout->add(cancel);
 
 	footerLayout->widgets[0].swap(footerLayout->widgets[1]);
+}
+
+void ConfirmDialog::translate() {
+	MessageBox::translate();
+
+	// ok button
+	auto &ok = footerLayout->widgets[1];
+	std::string okTranslationId = std::string(builtinTranslation.c_str()) + ".Ok";
+	ok->as<edui::Button>().setText(getTranslation(okTranslationId, "OK"));
+	ok->as<edui::Button>().setWidthFit();
+
+	// cancel button
+	auto &cancel = footerLayout->widgets[0];
+	std::string cancelTranslationId = std::string(builtinTranslation.c_str()) + ".Cancel";
+	cancel->as<edui::Button>().setText(getTranslation(cancelTranslationId, "Cancel"));
+	cancel->as<edui::Button>().setWidthFit();
 }

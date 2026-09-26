@@ -12,9 +12,11 @@ namespace edui {
 struct ContextMenuRender : public VerticalContainerRender {};
 
 struct ContextMenu : public VerticalContainer {
-	SignalT<std::string> onItemClicked;
+	SignalT2<std::string, size_t> onItemClicked;
 
 	ContextMenu();
+
+	void translate();
 
 	int idx = 0;
 	void addItem(const std::string &item);

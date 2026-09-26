@@ -9,6 +9,7 @@
 #include "edui/confirmDialog.hpp"
 #include "edui/contextMenu.hpp"
 #include "edui/gui.hpp"
+#include "edui/helper.hpp"
 #include "edui/intValue.hpp"
 #include "edui/label.hpp"
 #include "edui/messageBox.hpp"
@@ -17,8 +18,11 @@
 
 using namespace edui;
 
+static const std::string builtinTranslation = "Widgets.ColorPanel";
+
 ColorPanel::ColorPanel() : ConfirmDialog() {
-	// deleteOnOutsideClick = true;
+	deleteOnOutsideClick = true;
+
 	render = std::make_unique<ColorPanelRender>();
 	render->padding = 4;
 
@@ -59,6 +63,11 @@ ColorPanel::ColorPanel() : ConfirmDialog() {
 	// init color
 	color = WHITE;
 	setColor(color);
+}
+
+void ColorPanel::translate() {
+	ConfirmDialog::translate();
+	setTitle(getTranslation(builtinTranslation, "Select Color.."));
 }
 
 void ColorPanel::setColor(Color color) {
@@ -176,17 +185,20 @@ void ColorPanel::openContextMenu() {
 		contextMenu->markDelete();
 	}
 	contextMenu = std::make_shared<edui::ContextMenu>();
+	contextMenu->translationId = builtinTranslation;
 	contextMenu->moveToMouse();
-	contextMenu->addItem("Copy RGB");
-	contextMenu->addItem("Copy Hex");
-	contextMenu->onItemClicked([this](const std::string &item) {
-		if (item == "Copy RGB") {
-			std::string colorString = TextFormat("%u, %u, %u", color.r, color.g, color.b);
-			SetClipboardText(colorString.c_str());
-		}
-		if (item == "Copy Hex") {
-			std::string colorString = TextFormat("#%x", ColorToInt(color));
-			SetClipboardText(colorString.c_str());
+	contextMenu->addItem("CopyRGB");
+	contextMenu->addItem("CopyHex");
+	contextMenu->onItemClicked([this](const std::string &item, size_t index) {
+		switch (static_cast<ColorPanelContextMenu>(index)) {
+			case ColorPanelContextMenu::CopyRGB: {
+				std::string colorString = TextFormat("%u, %u, %u", color.r, color.g, color.b);
+				SetClipboardText(colorString.c_str());
+			} break;
+			case ColorPanelContextMenu::CopyHSV: {
+				std::string colorString = TextFormat("#%x", ColorToInt(color));
+				SetClipboardText(colorString.c_str());
+			} break;
 		}
 	});
 	edui::Gui::instance->add(contextMenu, layerId + 1);

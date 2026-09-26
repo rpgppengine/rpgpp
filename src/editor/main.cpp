@@ -1,6 +1,9 @@
+#include <cstddef>
 #include <cstdio>
 #include <memory>
 #include <string>
+
+#define STR_IMPLEMENTATION
 
 #include "editor.hpp"
 #include "edui/button.hpp"
@@ -18,11 +21,13 @@
 #include "edui/dropdownList.hpp"
 #include "edui/fileTabBar.hpp"
 #include "edui/gui.hpp"
+#include "edui/helper.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/iconTextButton.hpp"
 #include "edui/intValue.hpp"
 #include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
+#include "edui/languageDropdown.hpp"
 #include "edui/menuBar.hpp"
 #include "edui/messageBox.hpp"
 #include "edui/rlicons.hpp"
@@ -57,13 +62,17 @@ int main() {
 
 	edui::Gui gui;
 
+	gui.loadTranslationNames("resources/langs.ini");
+	gui.loadTranslation("resources/en.ini");
 	gui.setFont("resources/TerminusTTF-4.49.3.ttf", 96, 18, 0);
 
 	auto menuBar = std::make_shared<edui::MenuBar>();
-	gui.addMenuBar(menuBar);
-	menuBar->addItem("Menu1", {"Item1", "Item2"});
+	menuBar->translationId = "Menu";
+	menuBar->addItem("file", {"one", "two"});
 	menuBar->onItemClicked.connect(
 		[](const std::string &title, const std::string &option) { printf("%s %s \n", title.c_str(), option.c_str()); });
+	menuBar->onItemClickedInt.connect([](size_t a, size_t b) { printf("%zu %zu \n", a, b); });
+	gui.addMenuBar(menuBar);
 
 	auto intval = std::make_shared<edui::IntValue>();
 	intval->setSize({0, 200}, {0, 26});
@@ -124,7 +133,12 @@ int main() {
 	colorWheel->setSize({0, 100}, {0, 100});
 	colorWheel->setColor(PINK);
 	colorWheel->onColorChanged.connect([](Color c) { printf("%i %i %i \n", c.r, c.g, c.b); });
-	gui.add(colorWheel);
+	// gui.add(colorWheel);
+
+	auto label = std::make_shared<edui::Label>();
+	label->translationId = "Widgets.hello";
+	label->setSize({0, 100}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	gui.add(label);
 
 	auto slider = std::make_shared<edui::Slider>();
 	slider->setPosition({0, 20}, {0, 120});
@@ -150,6 +164,30 @@ int main() {
 		printf("%u, %u, %u ; %u, %u, %u\n", old.r, old.g, old.b, newColor.r, newColor.g, newColor.b);
 	});
 	gui.add(colorValue);
+
+	auto langWindow = std::make_shared<edui::ChildWindow>();
+	langWindow->translationId = "Editor.window";
+	langWindow->setTitle("Choose Language..");
+	langWindow->setPosition({0, 350}, {0, 20});
+	langWindow->setSize({0, 200}, {0, 180});
+	gui.add(langWindow);
+
+	auto langBox = std::make_shared<edui::LanguageDropdown>();
+	langBox->setSize({1, 0}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	langBox->onValueChangedT([](edui::DropdownValue old, edui::DropdownValue newValue) {
+		auto langName = std::string(edui::Gui::instance->languageNames[newValue.idx].key.c_str());
+		std::string sourceFile = TextFormat("resources/%s.ini", langName.c_str());
+		edui::Gui::instance->loadTranslation(sourceFile);
+	});
+	langWindow->add(langBox);
+
+	auto testDrop = std::make_shared<edui::Dropdown>();
+	testDrop->translationId = "Editor.drop";
+	testDrop->setPosition({0, 0}, {0.5f, 0});
+	testDrop->setSize({1, 0}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	testDrop->addItem("one");
+	testDrop->addItem("two");
+	langWindow->add(testDrop);
 
 	while (!WindowShouldClose()) {
 		gui.update();

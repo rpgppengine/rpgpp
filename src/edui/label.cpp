@@ -19,6 +19,8 @@ Label::Label() {
 	render->as<LabelRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 }
 
+void Label::translate() { setText(getTranslation(translationId.c_str(), text)); }
+
 void Label::draw() {
 	auto &rend = render->as<LabelRender>();
 

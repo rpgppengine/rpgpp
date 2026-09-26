@@ -38,7 +38,12 @@ void Dropdown::draw() {
 	if (rend.font == nullptr) return;
 
 	auto paddingRect = getPaddingRect();
-	drawOverflownText(paddingRect, rend.font, rend.fontSize, rend.spacing, items[currentItem], &shownText);
+	std::string itemTranslationId = std::string(translationId.c_str()) + '.' + items[currentItem];
+	std::string itemTranslation = getTranslation(itemTranslationId, items[currentItem]);
+	if (!translated) {
+		itemTranslation = items[currentItem];
+	}
+	drawOverflownText(paddingRect, rend.font, rend.fontSize, rend.spacing, itemTranslation, &shownText);
 
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
 	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
@@ -73,11 +78,17 @@ void Dropdown::leftMouseClicked() {
 void Dropdown::openDropdown() {
 	auto &rend = render->as<DropdownRender>();
 
-	Vector2 listPos = {static_cast<float>(layout.x.offset), layout.y.offset + rect.height};
+	Vector2 listPos = {static_cast<float>(rect.x), rect.y + rect.height};
+	if (Gui::instance->hasMenuBar) {
+		listPos.y -= Gui::instance->menuBar->rect.height;
+	}
 
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
 
 	auto list = std::make_shared<edui::DropdownList>();
+	list->outsideClickException = rect;
+	list->translated = translated;
+	list->translationId = translationId;
 	list->setPosition({0, static_cast<int>(listPos.x)}, {0, static_cast<int>(listPos.y)});
 	list->setSize({0, static_cast<int>(rect.width)}, {0, EDUI_DROPDOWNLIST_HEIGHT});
 

@@ -10,7 +10,9 @@ struct ConfirmDialog : public MessageBox {
 	ConfirmDialog();
 
 	Signal onCancelPressed;
+
+	void translate() override;
 };
-}
+}  // namespace edui
 
 #endif

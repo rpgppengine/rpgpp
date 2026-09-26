@@ -74,6 +74,8 @@ void Container::add(std::shared_ptr<Widget> widget) {
 	widget->unfocused();
 	widget->layerId = layerId;
 	widgets.push_back(widget);
+	widget->onAdded();
+	widget->translate();
 }
 
 void Container::notifyChildren(Gui *gui) {
@@ -107,5 +109,11 @@ void Container::deleteChildren() {
 			widgets.erase(widgets.begin() + i);
 			i++;
 		}
+	}
+}
+
+void Container::translate() {
+	for (auto &widget : widgets) {
+		widget->translate();
 	}
 }

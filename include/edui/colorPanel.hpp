@@ -15,6 +15,8 @@
 #include "edui/slider.hpp"
 
 namespace edui {
+enum class ColorPanelContextMenu : size_t { CopyRGB, CopyHSV };
+
 struct ColorPanelRender : public ConfirmDialogRender {};
 
 struct ColorPanel : public ConfirmDialog {
@@ -38,6 +40,8 @@ struct ColorPanel : public ConfirmDialog {
 	std::shared_ptr<edui::ContextMenu> contextMenu = nullptr;
 
 	ColorPanel();
+
+	void translate() override;
 
 	void setColor(Color color);
 

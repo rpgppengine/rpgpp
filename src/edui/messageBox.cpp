@@ -12,6 +12,8 @@
 
 using namespace edui;
 
+static const std::string builtinTranslation = "Widgets.MessageBox";
+
 MessageBox::MessageBox() : ChildWindow() {
 	render = std::make_unique<MessageBoxRender>();
 	render->padding = 4;
@@ -41,6 +43,15 @@ MessageBox::MessageBox() : ChildWindow() {
 
 	footerLayout->add(btn);
 	// btn->setWidthFit();
+}
+
+void MessageBox::translate() {
+	ChildWindow::translate();
+
+	auto &cancel = footerLayout->widgets[0];
+	std::string cancelTranslationId = std::string(builtinTranslation.c_str()) + ".Ok";
+	cancel->as<edui::Button>().setText(getTranslation(cancelTranslationId, "Ok"));
+	cancel->as<edui::Button>().setWidthFit();
 }
 
 void MessageBox::update() {
