@@ -1,5 +1,6 @@
 #include "edui/gui.hpp"
 
+#include <filesystem>
 #include <memory>
 #include <string_view>
 
@@ -177,11 +178,26 @@ void Gui::add(std::shared_ptr<Widget> widget, int layerId) {
 		}
 	}
 	widget->render->font = &this->font;
-	widget->unfocused();
 	widget->layerId = layerId;
 	arr[layerId].push_back(widget);
+	widget->applyTheme(themeStruct);
 	widget->onAdded();
-	widget->translate();
+}
+
+void Gui::addMenuBar(std::shared_ptr<Widget> widget) {
+	if (widget->isContainer) {
+		widget->as<Container>().gui = this;
+		for (auto &subwidget : widget->as<Container>().widgets) {
+			subwidget->render->font = &this->font;
+		}
+	}
+	widget->render->font = &this->font;
+	widget->applyTheme(themeStruct);
+	widget->onAdded();
+
+	menuBar = widget;
+	menuBar->setSize({1, 0}, {0, 22});
+	hasMenuBar = true;
 }
 
 void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
@@ -220,21 +236,6 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 		middleClickedWidget = *widget;
 		widget->get()->middleMouseClicked();
 	}
-}
-
-void Gui::addMenuBar(std::shared_ptr<Widget> widget) {
-	if (widget->isContainer) {
-		widget->as<Container>().gui = this;
-		for (auto &subwidget : widget->as<Container>().widgets) {
-			subwidget->render->font = &this->font;
-		}
-	}
-	widget->render->font = &this->font;
-	widget->unfocused();
-
-	menuBar = widget;
-	menuBar->setSize({1, 0}, {0, 22});
-	hasMenuBar = true;
 }
 
 Rectangle Gui::getScreenRect() {
@@ -283,6 +284,60 @@ void Gui::loadTranslationNames(const std::string &filePath) {
 	for (auto &pair : struc.get("Languages")) {
 		languageNames[languageNamesCount] = {pair.first, pair.second};
 		languageNamesCount++;
+	}
+}
+
+void Gui::loadTheme(const std::string &name) {
+	std::string key = name;
+	for (int i = 0; i < themesCount; i++) {
+		auto entry = themeEntries[i];
+		if (entry.value.c_str() == name) {
+			key = std::string(entry.key.c_str());
+		}
+	}
+	std::filesystem::path fsPath = themesBaseDir;
+	fsPath /= key;
+	printf("%s \n", fsPath.c_str());
+	mINI::INIFile file(fsPath);
+	file.read(themeStruct);
+
+	background = parseColorString(themeStruct.get("Gui").get("Background"));
+	for (auto &layer : arr) {
+		for (auto &widget : layer) {
+			widget->as<edui::Widget>().applyTheme(themeStruct);
+			widget->unfocused();
+		}
+	}
+	if (hasMenuBar) {
+		menuBar->applyTheme(themeStruct);
+		menuBar->unfocused();
+	}
+}
+
+void Gui::loadThemesDir(const std::string &dirPath) {
+	themesBaseDir = dirPath;
+	themesCount = 0;
+	if (DirectoryExists(dirPath.c_str())) {
+		auto pathList = LoadDirectoryFilesEx(dirPath.c_str(), ".ini", false);
+		for (int i = 0; i < pathList.count; i++) {
+			std::string path = pathList.paths[i];
+			std::string key = GetFileName(path.c_str());
+
+			mINI::INIFile file(path);
+			mINI::INIStructure struc;
+			file.read(struc);
+
+			std::string name = struc.get("Theme").get("Name");
+			if (name.empty()) {
+				name = key;
+			}
+
+			themeEntries[i] = {key, name};
+			printf("%s %s\n", name.c_str(), key.c_str());
+
+			themesCount++;
+		}
+		UnloadDirectoryFiles(pathList);
 	}
 }
 

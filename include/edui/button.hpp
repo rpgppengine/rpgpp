@@ -15,6 +15,8 @@ struct Button : public Label {
 	typedef std::shared_ptr<Button> Ptr;
 
 	Button();
+
+	void draw() override;
 };
 }  // namespace edui
 

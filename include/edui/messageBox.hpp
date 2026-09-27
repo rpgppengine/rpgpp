@@ -19,7 +19,7 @@ struct MessageBox : public ChildWindow {
 	std::shared_ptr<edui::HorizontalContainer> footerLayout = nullptr;
 
 	MessageBox();
-
+	void applyTheme(const mINI::INIStructure &struc) override;
 	void translate() override;
 
 	void update() override;

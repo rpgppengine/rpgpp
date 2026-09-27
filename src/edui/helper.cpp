@@ -1,5 +1,7 @@
 #include "edui/helper.hpp"
 
+#include <cstdint>
+#include <string>
 #include <vector>
 
 #include "edui/gui.hpp"
@@ -104,4 +106,18 @@ std::string getTranslation(const std::string &id, const std::string &def) {
 		}
 	}
 	return res;
+}
+
+Color parseColorString(const std::string &str) {
+	int count = 0;
+	char **split = TextSplit(str.c_str(), ',', &count);
+	if (count < 3) {
+		return WHITE;
+	}
+
+	uint8_t red = std::stoul(split[0]);
+	uint8_t green = std::stoul(split[1]);
+	uint8_t blue = std::stoul(split[2]);
+
+	return {red, green, blue, 255};
 }

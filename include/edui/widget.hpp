@@ -3,11 +3,13 @@
 
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <string_view>
 
 #include "Str.h"
 #include "edui/helper.hpp"
 #include "edui/signal.hpp"
+#include "ini.h"
 #include "raylib.h"
 
 namespace edui {
@@ -36,6 +38,8 @@ struct KeyModifier {
 	bool numlock = false;
 };
 
+typedef mINI::INIMap<std::string> INISection;
+
 struct WidgetRender {
 	float padding = 0.0f;
 	Color bgColor = RAYWHITE;
@@ -54,6 +58,15 @@ struct WidgetRender {
 	template <typename T>
 	T &as() {
 		return static_cast<T &>(*this);
+	}
+
+	virtual void applyTheme(const mINI::INIStructure &struc) {
+		INISection section = struc.get("Widget");
+		bgColor = parseColorString(section.get("BackgroundColor"));
+		borderColor = parseColorString(section.get("BorderColor"));
+		focusBgColor = parseColorString(section.get("FocusBackgroundColor"));
+		focusBorderColor = parseColorString(section.get("FocusBorderColor"));
+		secondaryColor = parseColorString(section.get("SecondaryColor"));
 	}
 };
 
@@ -108,7 +121,12 @@ struct Widget {
 
 	virtual void translate() {}
 
-	virtual void onAdded() {}
+	virtual void applyTheme(const mINI::INIStructure &struc) { render->applyTheme(struc); }
+
+	virtual void onAdded() {
+		unfocused();
+		translate();
+	}
 
 	virtual void calcRect(Rectangle &base) {
 		this->rect.x = base.x + ((layout.x.scale * base.width) + layout.x.offset);

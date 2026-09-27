@@ -21,6 +21,12 @@ struct LanguageName {
 };
 const size_t EDUI_MAX_LANGUAGES = 128;
 
+struct ThemeEntry {
+	Str128 key;
+	Str128 value;
+};
+const size_t EDUI_MAX_THEMES = 16;
+
 struct Gui {
 	static Gui *instance;
 
@@ -50,6 +56,11 @@ struct Gui {
 	std::array<LanguageName, EDUI_MAX_LANGUAGES> languageNames = {};
 	size_t languageNamesCount = 0;
 
+	std::string themesBaseDir = "";
+	mINI::INIStructure themeStruct;
+	std::array<ThemeEntry, EDUI_MAX_THEMES> themeEntries = {};
+	size_t themesCount;
+
 	Gui() {
 		Gui::instance = this;
 		font = GetFontDefault();
@@ -72,6 +83,9 @@ struct Gui {
 
 	void loadTranslationNames(const std::string &filePath);
 	void loadTranslation(const std::string &filePath);
+
+	void loadTheme(const std::string &name);
+	void loadThemesDir(const std::string &dirPath);
 
 	void unload();
 };

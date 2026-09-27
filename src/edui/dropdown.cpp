@@ -20,6 +20,12 @@ Dropdown::Dropdown() {
 	render->as<DropdownRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
 }
 
+void Dropdown::applyTheme(const mINI::INIStructure &struc) {
+	Widget::applyTheme(struc);
+	printf("apply dropdown..\n");
+	render->applyTheme(struc);
+}
+
 void Dropdown::setValue(const DropdownValue &val) { currentItem = val.idx; };
 
 DropdownValue Dropdown::getValue() { return {currentItem, items[currentItem]}; };

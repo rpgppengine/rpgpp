@@ -6,10 +6,12 @@
 #include <vector>
 
 #include "edui/button.hpp"
+#include "edui/container.hpp"
 #include "edui/contextMenu.hpp"
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/horizontalContainer.hpp"
+#include "edui/widget.hpp"
 #include "raylib.h"
 
 using namespace edui;
@@ -21,6 +23,16 @@ MenuBar::MenuBar() : HorizontalContainer() {
 	render->padding = 0;
 }
 
+void MenuBar::applyTheme(const mINI::INIStructure &struc) {
+	Container::applyTheme(struc);
+	INISection section = struc.get("Widget");
+	for (auto &widget : widgets) {
+		widget->render->bgColor = parseColorString(section.get("SecondaryColor"));
+		widget->render->focusBgColor = parseColorString(section.get("TertiaryColor"));
+		widget->unfocused();
+	}
+}
+
 void MenuBar::translate() {
 	for (auto &widget : widgets) {
 		auto titleTranslationId = std::string(translationId.c_str()) + '.' + std::string(widget->translationId.c_str());
@@ -28,6 +40,16 @@ void MenuBar::translate() {
 		widget->as<edui::Button>().setText(titleText);
 		widget->as<edui::Button>().setWidthFit();
 	}
+}
+
+void MenuBar::draw() {
+	auto &rend = render->as<ContainerRender>();
+
+	DrawRectangleRec(rect, rend.secondaryColor);
+
+	drawChildren();
+
+	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 }
 
 void MenuBar::addItem(const std::string &title, std::vector<std::string> items) {

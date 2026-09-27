@@ -18,7 +18,9 @@ using namespace edui;
 ChildWindow::ChildWindow() : Container() {
 	render = std::make_unique<ChildWindowRender>();
 	render->as<ChildWindowRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
+	render->as<ChildWindowRender>().padding = 4.0f;
 	auto closeButton = std::make_shared<IconButton>();
+	closeButton->render->border = 0;
 	closeButton->iconId = ICON_CROSS;
 	closeButton->setPosition({1, static_cast<int>(-EDUI_CHILDWINDOW_BARHEIGHT)}, {0, 0});
 	closeButton->setSize({0, static_cast<int>(EDUI_CHILDWINDOW_BARHEIGHT)},
@@ -34,6 +36,17 @@ ChildWindow::ChildWindow() : Container() {
 	closeButtonPtr = closeButton;
 }
 
+void ChildWindow::applyTheme(const mINI::INIStructure &struc) {
+	Container::applyTheme(struc);
+
+	INISection section = struc.get("Widget");
+	closeButtonPtr->render->bgColor = parseColorString(section.get("SecondaryColor"));
+	closeButtonPtr->render->focusBgColor = parseColorString(section.get("TertiaryColor"));
+	closeButtonPtr->render->borderColor = parseColorString(section.get("BorderColor"));
+	closeButtonPtr->render->focusBorderColor = parseColorString(section.get("BorderColor"));
+	closeButtonPtr->unfocused();
+}
+
 void ChildWindow::translate() {
 	Container::translate();
 	setTitle(getTranslation(translationId.c_str(), title));
@@ -46,7 +59,8 @@ void ChildWindow::setTitle(const std::string &title) {
 
 	this->title = title;
 	auto barRect = getBarRect();
-	auto padding = paddingRect(barRect, rend.titlePadding);
+	Rectangle padding = paddingRect(barRect, rend.padding);
+	padding.width -= barRect.height;
 
 	if (rend.font == nullptr) return;
 
@@ -94,12 +108,14 @@ void ChildWindow::draw() {
 
 	// title bar
 	DrawRectangleRec(barRect, rend.secondaryColor);
+	closeButtonPtr->draw();
 	DrawRectangleLinesEx(barRect, rend.border, rend.currentBorderColor);
 
 	// title
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
 	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
-	Rectangle padding = paddingRect(barRect, rend.titlePadding);
+	Rectangle padding = paddingRect(barRect, rend.padding);
+	padding.width -= barRect.height;
 
 	Vector2 textSize = MeasureTextEx(*rend.font, shownText.c_str(), totalFontSize, spacing);
 	Vector2 textPos;
@@ -113,8 +129,6 @@ void ChildWindow::draw() {
 	}
 
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
-
-	closeButtonPtr->draw();
 }
 
 Rectangle ChildWindow::getContentRect() {

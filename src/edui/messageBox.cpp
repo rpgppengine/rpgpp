@@ -42,7 +42,12 @@ MessageBox::MessageBox() : ChildWindow() {
 	});
 
 	footerLayout->add(btn);
-	// btn->setWidthFit();
+}
+
+void MessageBox::applyTheme(const mINI::INIStructure &struc) {
+	ChildWindow::applyTheme(struc);
+
+	footerLayout->applyTheme(struc);
 }
 
 void MessageBox::translate() {

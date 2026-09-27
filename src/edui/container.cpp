@@ -13,6 +13,20 @@ Container::Container() {
 	gui = Gui::instance;
 }
 
+void Container::applyTheme(const mINI::INIStructure &struc) {
+	Widget::applyTheme(struc);
+	for (auto &widget : widgets) {
+		widget->as<edui::Widget>().applyTheme(struc);
+		widget->unfocused();
+	}
+}
+
+void Container::translate() {
+	for (auto &widget : widgets) {
+		widget->translate();
+	}
+}
+
 void Container::update() {
 	updateContentRect();
 
@@ -56,13 +70,17 @@ void Container::draw() {
 
 	DrawRectangleRec(rect, rend.bgColor);
 
+	drawChildren();
+
+	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
+}
+
+void Container::drawChildren() {
 	for (auto &widget : widgets) {
 		if (widget->visible) {
 			widget->draw();
 		}
 	}
-
-	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 }
 
 void Container::add(std::shared_ptr<Widget> widget) {
@@ -74,8 +92,8 @@ void Container::add(std::shared_ptr<Widget> widget) {
 	widget->unfocused();
 	widget->layerId = layerId;
 	widgets.push_back(widget);
+	widget->applyTheme(Gui::instance->themeStruct);
 	widget->onAdded();
-	widget->translate();
 }
 
 void Container::notifyChildren(Gui *gui) {
@@ -109,11 +127,5 @@ void Container::deleteChildren() {
 			widgets.erase(widgets.begin() + i);
 			i++;
 		}
-	}
-}
-
-void Container::translate() {
-	for (auto &widget : widgets) {
-		widget->translate();
 	}
 }

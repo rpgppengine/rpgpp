@@ -20,7 +20,10 @@ struct MenuBar : public HorizontalContainer {
 	size_t size = 0;
 
 	MenuBar();
+	void applyTheme(const mINI::INIStructure &struc);
 	void translate();
+
+	void draw();
 
 	void addItem(const std::string &title, std::vector<std::string> items);
 };

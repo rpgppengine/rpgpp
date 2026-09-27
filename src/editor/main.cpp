@@ -60,10 +60,17 @@ int main() {
 	InitWindow(800, 450, "raylib example - basic window");
 	SetTargetFPS(60);
 
+	Color out = parseColorString("245,50,50");
+	printf("%u, %u, %u\n", out.r, out.g, out.b);
+
 	edui::Gui gui;
+
+	gui.loadThemesDir("resources/themes");
+	gui.loadTheme("RPG++ Light");
 
 	gui.loadTranslationNames("resources/langs.ini");
 	gui.loadTranslation("resources/en.ini");
+
 	gui.setFont("resources/TerminusTTF-4.49.3.ttf", 96, 18, 0);
 
 	auto menuBar = std::make_shared<edui::MenuBar>();
@@ -188,6 +195,20 @@ int main() {
 	testDrop->addItem("one");
 	testDrop->addItem("two");
 	langWindow->add(testDrop);
+
+	auto themeDrop = std::make_shared<edui::Dropdown>();
+	themeDrop->setPosition({0, 0}, {0, 30});
+	themeDrop->setSize({1, 0}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	for (int i = 0; i < edui::Gui::instance->themesCount; i++) {
+		auto entry = edui::Gui::instance->themeEntries[i];
+		themeDrop->addItem(entry.value.c_str());
+		if (TextIsEqual(entry.key.c_str(), "theme.ini")) {
+			themeDrop->setValue({i, ""});
+		}
+	}
+	themeDrop->onValueChangedT(
+		[](edui::DropdownValue old, edui::DropdownValue newValue) { edui::Gui::instance->loadTheme(newValue.val); });
+	langWindow->add(themeDrop);
 
 	auto anotherWindow = std::make_shared<edui::MessageBox>();
 	anotherWindow->translationId = "Editor.another";

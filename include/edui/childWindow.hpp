@@ -25,7 +25,7 @@ struct ChildWindow : public Container {
 	bool dragging = false;
 
 	ChildWindow();
-
+	void applyTheme(const mINI::INIStructure &struc) override;
 	void translate() override;
 
 	void setTitle(const std::string &title);

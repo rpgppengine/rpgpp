@@ -23,6 +23,7 @@ struct Dropdown : public Widget, public ValueWidgetT<DropdownValue> {
 	std::weak_ptr<edui::DropdownList> listPtr = {};
 
 	Dropdown();
+	void applyTheme(const mINI::INIStructure &struc) override;
 
 	virtual void setValue(const DropdownValue &val) override;
 	virtual DropdownValue getValue() override;

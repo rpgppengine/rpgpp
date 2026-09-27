@@ -137,7 +137,7 @@ TextArea::TextArea() {
 void TextArea::draw() {
 	auto &rend = render->as<TextAreaRender>();
 
-	DrawRectangleRec(rect, rend.currentBgColor);
+	DrawRectangleRec(rect, rend.bgColor);
 
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
 	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;

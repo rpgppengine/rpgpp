@@ -24,8 +24,14 @@ void Label::translate() { setText(getTranslation(translationId.c_str(), text)); 
 void Label::draw() {
 	auto &rend = render->as<LabelRender>();
 
-	DrawRectangleRec(rect, rend.currentBgColor);
+	DrawRectangleRec(rect, rend.bgColor);
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
+
+	drawText();
+}
+
+void Label::drawText() {
+	auto &rend = render->as<LabelRender>();
 
 	if (rend.font == nullptr) return;
 

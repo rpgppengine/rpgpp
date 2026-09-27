@@ -26,6 +26,9 @@ struct Container : public Widget {
 	bool mouseIsInContent() { return CheckCollisionPointRec(GetMousePosition(), contentRect); }
 
 	Container();
+	void applyTheme(const mINI::INIStructure &struc) override;
+	void translate() override;
+
 	virtual void update() override;
 	virtual void draw() override;
 
@@ -40,7 +43,8 @@ struct Container : public Widget {
 	void markDelete() override;
 	void deleteChildren();
 
-	void translate() override;
+protected:
+	void drawChildren();
 };
 
 }  // namespace edui

@@ -19,6 +19,13 @@ struct LabelRender : public WidgetRender {
 	Color textColor = BLACK;
 	float spacing = -1;
 	float fontYOffset = 0.0f;
+
+	void applyTheme(const mINI::INIStructure &struc) {
+		WidgetRender::applyTheme(struc);
+
+		INISection section = struc.get("Label");
+		textColor = parseColorString(section.get("TextColor"));
+	};
 };
 
 struct Label : public Widget {
@@ -40,6 +47,7 @@ struct Label : public Widget {
 protected:
 	std::string shownText = "Hello!";
 	std::string text = "Hello!";
+	virtual void drawText();
 };
 }  // namespace edui
 
