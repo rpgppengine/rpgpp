@@ -11,7 +11,7 @@ namespace edui {
 struct MessageBoxRender : public ChildWindowRender {};
 
 struct MessageBox : public ChildWindow {
-	const float EDUI_MESSAGEBOX_FOOTER = EDUI_DEFAULT_HEIGHT + 8;
+	const float EDUI_MESSAGEBOX_FOOTER = EDUI_SECONDARY_HEIGHT + 8;
 
 	Signal onOkPressed;
 

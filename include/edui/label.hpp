@@ -39,6 +39,7 @@ struct Label : public Widget {
 	void draw() override;
 
 	void setText(const std::string &text);
+	std::string getText();
 	void setWidthFit();
 
 	void mouseEntered() override;

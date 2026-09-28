@@ -75,6 +75,8 @@ void ChildWindow::update() {
 		auto delta = GetMouseDelta();
 		layout.x.offset += delta.x;
 		layout.y.offset += delta.y;
+		auto screenRect = Gui::instance->getScreenRect();
+		calcRect(screenRect);
 	}
 
 	Container::update();
@@ -124,9 +126,7 @@ void ChildWindow::draw() {
 
 	DrawTextEx(*rend.font, shownText.c_str(), textPos, totalFontSize, spacing, rend.textColor);
 
-	for (auto &widget : widgets) {
-		widget->draw();
-	}
+	drawChildren();
 
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 }
@@ -136,9 +136,9 @@ Rectangle ChildWindow::getContentRect() {
 }
 
 void ChildWindow::leftMouseClicked() {
-	// dragging = true;
+	if (CheckCollisionPointRec(GetMousePosition(), getBarRect())) {
+		dragging = true;
+	}
 }
 
-void ChildWindow::leftMouseReleased() {
-	// dragging = false;
-}
+void ChildWindow::leftMouseReleased() { dragging = false; }

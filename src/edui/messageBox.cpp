@@ -32,6 +32,7 @@ MessageBox::MessageBox() : ChildWindow() {
 
 	auto btn = std::make_shared<edui::Button>();
 	btn->setText("OK");
+	btn->render->padding = 8;
 	btn->render->as<ButtonRender>().vertAlign = edui::VerticalAlignment::TEXT_CENTER;
 	btn->render->as<ButtonRender>().horiAlign = edui::HorizontalAlignment::TEXT_MIDDLE;
 
@@ -64,8 +65,10 @@ void MessageBox::translate() {
 
 void MessageBox::update() {
 	ChildWindow::update();
-
-	footerLayout->update();
+	if (dragging) {
+		auto screenRect = Gui::instance->getScreenRect();
+		calcRect(screenRect);
+	}
 
 	auto &rend = render->as<MessageBoxRender>();
 
@@ -75,6 +78,7 @@ void MessageBox::update() {
 	footerRect.height += rend.padding;
 	Rectangle paddingFooter = paddingRect(footerRect, rend.padding);
 	footerLayout->calcRect(paddingFooter);
+	footerLayout->update();
 
 	if (footerLayout->mouseIsInRect()) {
 		std::shared_ptr<Widget> widgetPtr = footerLayout;

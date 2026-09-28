@@ -2,10 +2,12 @@
 #define _EDUI_MENUBAR_H
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "edui/contextMenu.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/signal.hpp"
 
@@ -18,6 +20,7 @@ struct MenuBar : public HorizontalContainer {
 
 	std::unordered_map<std::string, std::vector<std::string>> items = {};
 	size_t size = 0;
+	std::shared_ptr<edui::ContextMenu> currentContextMenu = nullptr;
 
 	MenuBar();
 	void applyTheme(const mINI::INIStructure &struc);

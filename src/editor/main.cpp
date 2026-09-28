@@ -87,19 +87,23 @@ int main() {
 	intval->onValueChangedT.connect([](int previous, int current) { printf("%i, %i \n", previous, current); });
 	// gui.add(intval);
 
+	/*
 	auto tabContent = std::make_shared<edui::Container>();
 	tabContent->setPosition({0, 300}, {0, 44});
 	tabContent->setSize({0, 300}, {0, 300});
-	// gui.add(tabContent);
+	gui.add(tabContent);*/
 
+	/*
 	auto tabBar = std::make_shared<edui::FileTabBar>();
 	tabBar->contentBase = tabContent;
 	tabBar->setPosition({0, 300}, {0, 22});
 	tabBar->setSize({0, 300}, {0, 22});
-	// gui.add(tabBar);
+	gui.add(tabBar);
+	*/
 	auto screenRect = gui.getScreenRect();
-	tabBar->calcRect(screenRect);
+	// tabBar->calcRect(screenRect);
 
+	/*
 	auto page1 = tabBar->addItem("Hello", ICON_FILE);
 
 	auto pageLabel = std::make_shared<edui::Label>();
@@ -118,6 +122,7 @@ int main() {
 	pageLabel3->setText("Page 3");
 	pageLabel3->setSize({0.5f, 0}, {0, 22});
 	page3->add(pageLabel3);
+	*/
 
 	auto msg = std::make_shared<edui::ConfirmDialog>();
 	msg->setTitle("ConfirmDialog");
@@ -215,6 +220,32 @@ int main() {
 	anotherWindow->setPosition({0, 560}, {0, 20});
 	anotherWindow->setSize({0, 200}, {0, 180});
 	gui.add(anotherWindow);
+
+	auto fileContent = std::make_shared<edui::Container>();
+
+	auto fileList = std::make_shared<edui::FileTabBar>();
+	fileList->contentBase = fileContent;
+	fileList->setPosition({0, 560}, {0, 204});
+	fileList->setSize({0, 200}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	fileList->addItem("item1", 0);
+	fileList->addItem("item2", 0);
+	gui.add(fileList);
+
+	auto tabContent = std::make_shared<edui::Container>();
+	tabContent->setPosition({0, 560}, {0, 264});
+	tabContent->setSize({0, 200}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	gui.add(tabContent);
+
+	auto tabList = std::make_shared<edui::TabBar>();
+	tabList->translationId = "Editor.tabs";
+	tabList->contentBase = tabContent;
+	tabList->setPosition({0, 560}, {0, 234});
+	tabList->setSize({0, 200}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	tabList->addItem("item1", 0);
+	tabList->addItem("item2", 0);
+	gui.add(tabList);
+
+	tabList->showLastTab();
 
 	while (!WindowShouldClose()) {
 		gui.update();

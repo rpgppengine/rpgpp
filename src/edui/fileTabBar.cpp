@@ -23,10 +23,12 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 	button->calcRect(rect);
 
 	int curr = size;
+
 	button->onClicked.connect([this, curr] { showTabContent(curr); });
 
 	button->resizeToFit();
 	add(button);
+	showActiveTab(curr);
 
 	content->setSize({1, 0}, {1, 0});
 	if (auto sharedContentBase = contentBase.lock()) {
@@ -36,6 +38,8 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 	}
 
 	button->onDeleted.connect([this, curr] {
+		printf("curr: %i \n", curr);
+
 		removeItem(curr);
 		updateContentRect();
 		size--;
@@ -43,6 +47,8 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 		if (this->scissorX >= scrollMax) {
 			scissorX = 0;
 		}
+
+		if (size == 0) return;
 
 		if (currentPage == curr) {
 			showTabContent(tabPages.cbegin()->get()->referId);
@@ -52,4 +58,15 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 	size++;
 
 	return content;
+}
+
+void FileTabBar::showActiveTab(int index) {
+	for (int i = 0; i < widgets.size(); i++) {
+		FileTab &tab = widgets[i]->as<edui::FileTab>();
+		if (i == index) {
+			tab.setActive();
+		} else {
+			tab.setInactive();
+		}
+	}
 }

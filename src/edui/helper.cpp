@@ -34,6 +34,7 @@ std::vector<int> loadFontCodepoints() {
 	loadCodepointsBlock(codepoints, {0x370, 0x3FF});	// Greek and Coptic
 	loadCodepointsBlock(codepoints, {0x400, 0x4FF});	// Cyrillic
 	loadCodepointsBlock(codepoints, {0x1E00, 0x1EFF});	// Latin Extended Additional
+	loadCodepointsBlock(codepoints, {0x2000, 0x206F});	// General Punctuation
 	loadCodepointsBlock(codepoints, {0x3000, 0x303F});	// CJK Symbols and Punctuation
 	loadCodepointsBlock(codepoints, {0x3040, 0x309F});	// Hiragana
 	loadCodepointsBlock(codepoints, {0x30A0, 0x30FF});	// Katakana
@@ -74,7 +75,7 @@ bool drawOverflownText(Rectangle rect, Font *font, float fontSize, float spacing
 		}
 
 		*shownText = TextSubtext(text.c_str(), 0, result);
-		*shownText = shownText->append("...");
+		*shownText = shownText->append("…");
 
 		overflown = true;
 	} else {

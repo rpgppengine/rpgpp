@@ -27,6 +27,7 @@ struct TabBar : public HorizontalContainer {
 	int currentPage = 0;
 
 	TabBar();
+	void translate() override;
 
 	void update() override;
 	void draw() override;
@@ -39,6 +40,7 @@ struct TabBar : public HorizontalContainer {
 	virtual std::shared_ptr<Container> addItem(const std::string &item, int iconId);
 	void removeItem(int index);
 	void showTabContent(int index);
+	void showLastTab();
 
 private:
 	void processWidget(std::shared_ptr<Widget> &widget);

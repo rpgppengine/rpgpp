@@ -29,7 +29,10 @@ Rectangle IconTextButton::getContentRect() {
 void IconTextButton::draw() {
 	auto &rend = render->as<IconTextButtonRender>();
 
-	Label::draw();
+	DrawRectangleRec(rect, rend.currentBgColor);
+	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
+
+	drawText();
 
 	Rectangle iconRect = {rect.x, rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
 	Rectangle destIconRect = {rect.x, rect.y, static_cast<float>(iconRectSize), static_cast<float>(iconRectSize)};

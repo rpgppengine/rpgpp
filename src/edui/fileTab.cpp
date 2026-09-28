@@ -3,15 +3,17 @@
 #include <memory>
 
 #include "edui/gui.hpp"
+#include "edui/helper.hpp"
 #include "edui/iconButton.hpp"
 #include "edui/iconTextButton.hpp"
 #include "edui/rliconsarr.hpp"
+#include "edui/tab.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
 
 using namespace edui;
 
-FileTab::FileTab() : IconTextButton() {
+FileTab::FileTab() : Tab() {
 	render = std::make_unique<FileTabRender>();
 	render->padding = 2;
 	auto &rend = render->as<FileTabRender>();
@@ -36,6 +38,12 @@ FileTab::FileTab() : IconTextButton() {
 	});
 
 	closeButtonPtr->onClicked.connect([this] { markDelete(); });
+}
+
+void FileTab::applyTheme(const mINI::INIStructure &struc) {
+	IconTextButton::applyTheme(struc);
+	closeButtonPtr->applyTheme(struc);
+	closeButtonPtr->unfocused();
 }
 
 void FileTab::processWidget(std::shared_ptr<Widget> &widget) {
@@ -89,6 +97,7 @@ void FileTab::resizeToFit() {
 }
 
 void FileTab::mouseEntered() {
+	onMouseEntered.invoke();
 	if (!closeButtonPtr->mouseIsInRect()) {
 		render->currentBgColor = render->focusBgColor;
 		render->currentBorderColor = render->focusBorderColor;
@@ -96,6 +105,25 @@ void FileTab::mouseEntered() {
 }
 
 void FileTab::mouseLeft() {
+	onMouseLeft.invoke();
 	render->currentBgColor = render->bgColor;
 	render->currentBorderColor = render->borderColor;
+}
+
+void FileTab::setActive() {
+	Tab::setActive();
+
+	auto &rend = render->as<FileTabRender>();
+	closeButtonPtr->render->bgColor = rend.activeColor;
+	closeButtonPtr->render->focusBgColor = rend.activeFocusColor;
+	closeButtonPtr->unfocused();
+}
+
+void FileTab::setInactive() {
+	Tab::setInactive();
+
+	auto &rend = render->as<FileTabRender>();
+	closeButtonPtr->render->bgColor = rend.inactiveColor;
+	closeButtonPtr->render->focusBgColor = rend.inactiveFocusColor;
+	closeButtonPtr->unfocused();
 }

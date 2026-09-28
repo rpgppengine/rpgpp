@@ -55,6 +55,7 @@ void MenuBar::draw() {
 void MenuBar::addItem(const std::string &title, std::vector<std::string> items) {
 	this->items[title] = items;
 	size++;
+	int curr = size - 1;
 
 	auto button = std::make_shared<edui::Button>();
 	button->translationId = title;
@@ -73,12 +74,14 @@ void MenuBar::addItem(const std::string &title, std::vector<std::string> items) 
 
 	std::weak_ptr<edui::Button> weakButton = button;
 
-	button->onClicked.connect([this, title, weakButton, titleTranslationId] {
+	button->onClicked.connect([this, curr, title, weakButton, titleTranslationId] {
 		if (auto sharedButton = weakButton.lock()) {
-			deferFlag = true;
-			sharedButton->deferFlag = true;
+			if (currentContextMenu != nullptr) {
+				currentContextMenu->markDelete();
+			}
 
 			auto context = std::make_shared<ContextMenu>();
+			context->outsideClickException = widgets[curr]->rect;
 			context->setSize({0, 0}, {0, 0});
 			context->setPosition({0, static_cast<int>(sharedButton->rect.x)},
 								 {0, static_cast<int>(sharedButton->rect.y + sharedButton->rect.y)});
@@ -87,13 +90,12 @@ void MenuBar::addItem(const std::string &title, std::vector<std::string> items) 
 				context->addItem(getTranslation(itemTranslationId, item));
 			}
 
-			context->deferFlag = true;
-
 			context->onItemClicked.connect([this, title](const std::string &eventItem, size_t index) {
 				onItemClicked.invoke(title, eventItem);
 				onItemClickedInt.invoke(size - 1, index);
 			});
 
+			this->currentContextMenu = context;
 			gui->add(context, EDUI_MAX_LAYERS - 1);
 		}
 	});

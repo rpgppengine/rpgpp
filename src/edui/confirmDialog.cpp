@@ -18,6 +18,7 @@ ConfirmDialog::ConfirmDialog() : MessageBox() {
 	auto cancel = std::make_shared<edui::Button>();
 	cancel->setSize({0, 70}, {1, 0});
 	cancel->setText("Cancel");
+	cancel->render->padding = 8;
 	cancel->render->as<ButtonRender>().vertAlign = edui::VerticalAlignment::TEXT_CENTER;
 	cancel->render->as<ButtonRender>().horiAlign = edui::HorizontalAlignment::TEXT_MIDDLE;
 

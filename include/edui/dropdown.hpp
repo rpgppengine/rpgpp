@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "edui/dropdownList.hpp"
+#include "edui/gui.hpp"
 #include "edui/label.hpp"
 #include "edui/valuewidget.hpp"
 #include "edui/widget.hpp"
@@ -17,7 +18,6 @@ struct DropdownValue {
 struct DropdownRender : public LabelRender {};
 
 struct Dropdown : public Widget, public ValueWidgetT<DropdownValue> {
-	static const int EDUI_DROPDOWNLIST_HEIGHT = 50;
 	static const int EDUI_DROPDOWN_MAX = 20;
 
 	std::weak_ptr<edui::DropdownList> listPtr = {};

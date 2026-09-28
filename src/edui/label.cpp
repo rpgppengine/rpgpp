@@ -67,6 +67,8 @@ void Label::setText(const std::string &text) {
 	overflown = drawOverflownText(paddingRect, rend.font, totalFontSize, spacing, text, &shownText);
 }
 
+std::string Label::getText() { return text; }
+
 void Label::setWidthFit() {
 	auto &rend = render->as<LabelRender>();
 	if (rend.font == nullptr) return;

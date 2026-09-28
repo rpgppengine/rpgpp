@@ -9,6 +9,7 @@
 #include "edui/iconTextButton.hpp"
 #include "edui/rliconsarr.hpp"
 #include "edui/scrollableContainer.hpp"
+#include "edui/tab.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
 
@@ -29,6 +30,16 @@ TabBar::TabBar() : HorizontalContainer() {
 
 	leftButtonPtr->onClicked.connect([this] { scrolled(1.0f); });
 	rightButtonPtr->onClicked.connect([this] { scrolled(-1.0f); });
+}
+
+void TabBar::translate() {
+	for (auto &widget : widgets) {
+		std::string widgetTranslationId =
+			std::string(translationId.c_str()) + '.' + std::string(widget->translationId.c_str());
+		std::string widgetText = getTranslation(widgetTranslationId, widget->as<edui::Tab>().getText().c_str());
+		widget->as<edui::Tab>().setText(widgetText);
+		widget->as<edui::Tab>().resizeToFit();
+	}
 }
 
 void TabBar::processWidget(std::shared_ptr<Widget> &widget) {
@@ -110,7 +121,8 @@ std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) 
 	auto content = std::make_shared<Container>();
 	content->referId = size;
 
-	auto button = std::make_shared<IconTextButton>();
+	auto button = std::make_shared<Tab>();
+	button->translationId = item.c_str();
 	button->referId = size;
 	button->setSize({0, 0}, {1, 0});
 	button->setText(item);
@@ -181,16 +193,27 @@ void TabBar::removeItem(int index) {
 
 void TabBar::showTabContent(int index) {
 	int i = 0;
-	for (auto it = tabPages.begin(); it != tabPages.end();) {
-		if (it->get()->referId == index) {
-			printf("shown %i \n", index);
-			it->get()->visible = true;
+
+	for (auto &page : tabPages) {
+		int referId = page->referId;
+
+		if (referId == index) {
+			page->visible = true;
 			currentPage = index;
+			widgets[i]->as<Tab>().setActive();
+			widgets[i]->as<Tab>().unfocused();
 		} else {
-			it->get()->visible = false;
+			page->visible = false;
+			widgets[i]->as<Tab>().setInactive();
+			widgets[i]->as<Tab>().unfocused();
 		}
 
-		it++;
 		i++;
 	}
+}
+
+void TabBar::showLastTab() {
+	auto it = tabPages.rbegin();
+	int referId = it->get()->referId;
+	showTabContent(referId);
 }

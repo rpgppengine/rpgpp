@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "edui/dropdownList.hpp"
+#include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/label.hpp"
 #include "edui/rlicons.hpp"
@@ -89,6 +90,8 @@ void Dropdown::openDropdown() {
 		listPos.y -= Gui::instance->menuBar->rect.height;
 	}
 
+	int listHeight = EDUI_SECONDARY_HEIGHT * 3;
+
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
 
 	auto list = std::make_shared<edui::DropdownList>();
@@ -96,7 +99,7 @@ void Dropdown::openDropdown() {
 	list->translated = translated;
 	list->translationId = translationId;
 	list->setPosition({0, static_cast<int>(listPos.x)}, {0, static_cast<int>(listPos.y)});
-	list->setSize({0, static_cast<int>(rect.width)}, {0, EDUI_DROPDOWNLIST_HEIGHT});
+	list->setSize({0, static_cast<int>(rect.width)}, {0, listHeight});
 
 	Gui::instance->add(list, layerId + 1);
 

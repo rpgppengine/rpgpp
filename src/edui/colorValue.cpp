@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "edui/colorPanel.hpp"
+#include "edui/gui.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
 
