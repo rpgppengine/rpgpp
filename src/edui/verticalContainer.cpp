@@ -1,10 +1,13 @@
 #include "edui/verticalContainer.hpp"
 
 #include <cmath>
+#include <memory>
 
 #include "edui/container.hpp"
+#include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/scrollableContainer.hpp"
+#include "edui/verticalScrollbar.hpp"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -13,29 +16,41 @@ using namespace edui;
 VerticalContainer::VerticalContainer() {
 	this->isContainer = true;
 	render = std::make_unique<VerticalContainerRender>();
+
+	scrollbar = std::make_shared<edui::VerticalScrollbar>();
+	scrollbar->setPosition({1, static_cast<int>(-EDUI_DEFAULT_HEIGHT)}, {0, 0});
+	scrollbar->setSize({0, static_cast<int>(EDUI_DEFAULT_HEIGHT)}, {1, 0});
+
+	scrollbar->onValueChanged.connect([this](int newValue) { this->scissorY = -newValue; });
+}
+
+void VerticalContainer::applyTheme(const mINI::INIStructure &struc) {
+	ScrollableContainer::applyTheme(struc);
+	scrollbar->applyTheme(struc);
+	scrollbar->unfocused();
 }
 
 void VerticalContainer::update() {
-	if (scrolling) {
-		float lowerLimit = scrollOffset.y;
-		float upperLimit = scrollAreaRect.height - (scrollbarRect.height - scrollOffset.y);
-
-		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollbarRect.x, scrollAreaRect.y + lowerLimit});
-		float newOffsetY = constrain<float>(offset.y, 0, static_cast<float>(upperLimit - lowerLimit));
-		offset.y = newOffsetY;
-
-		float max = upperLimit - lowerLimit;
-		float fract = (offset.y / max);
-		scissorY = (fract * scrollMax);
-	}
 	ScrollableContainer::update();
+
+	scrollbar->calcRect(rect);
+	scrollbar->update();
+
+	if (scrollbar->mouseIsInRect()) {
+		std::shared_ptr<Widget> widgetPtr = scrollbar;
+		Gui::instance->notifyChild(&widgetPtr);
+	} else {
+		if (scrollbar->notifiedMouseEnter) {
+			scrollbar->notifiedMouseEnter = false;
+			scrollbar->mouseLeft();
+		}
+	}
 }
 
 void VerticalContainer::draw() {
 	ScrollableContainer::draw();
 	if (overflown) {
-		DrawRectangleRec(scrollbarRect, render->as<VerticalContainerRender>().currentScrollbarColor);
-		DrawRectangleLinesEx(scrollAreaRect, 1.0f, render->currentBorderColor);
+		scrollbar->draw();
 	}
 }
 
@@ -64,7 +79,7 @@ void VerticalContainer::updateContentRect() {
 	this->contentRect = rect;
 	if (overflown) {
 		float old = contentRect.width;
-		contentRect.width = old - ScrollbarSize;
+		contentRect.width = old - EDUI_DEFAULT_HEIGHT;
 	}
 	renderRect = paddingRect(contentRect, render->padding);
 	if (isScissor) {
@@ -72,18 +87,10 @@ void VerticalContainer::updateContentRect() {
 		renderRect.y += scissorY;
 	}
 
-	scrollAreaRect = {rect.x, rect.y, ScrollbarSize, rect.height};
-	scrollAreaRect.x += rect.width - ScrollbarSize;
-
-	this->scrollbarHeight = (contentRect.height / scissorRect.height) * contentRect.height;
-
-	float fract = (-scissorY / -scrollMax);
-	this->scrollbarRect = {scrollAreaRect.x, scrollAreaRect.y, ScrollbarSize, scrollbarHeight};
-	scrollbarRect.y -= fract * (scrollbarHeight - contentRect.height);
-
 	float content = contentRect.height;
 	float scissor = scissorRect.height;
 	scrollMax = (-scissor + content);
+	scrollbar->setMaxScroll(-scrollMax);
 
 	if (scissorRect.height > contentRect.height) {
 		overflown = true;
@@ -99,29 +106,16 @@ void VerticalContainer::scrolled(float mouseWheel) {
 
 	if ((scissorY + added) >= 0.0f) {
 		scissorY = 0;
+		scrollbar->setValue(-scissorY);
 		return;
 	}
 
 	if ((scissorY + added) < scrollMax) {
 		scissorY = scrollMax;
+		scrollbar->setValue(-scissorY);
 		return;
 	}
 
 	scissorY += added;
-}
-
-void VerticalContainer::leftMouseClicked() {
-	if (!overflown) return;
-	if (CheckCollisionPointRec(GetMousePosition(), scrollAreaRect)) {
-		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollbarRect.x, scrollbarRect.y});
-		if (!CheckCollisionPointRec(GetMousePosition(), scrollbarRect)) {
-			offset.y = scrollbarRect.height / 2.0f;
-		}
-		this->scrollOffset = offset;
-		scrolling = true;
-	}
-}
-
-void VerticalContainer::leftMouseReleased() {
-	scrolling = false;
+	scrollbar->setValue(-scissorY);
 }

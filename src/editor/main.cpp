@@ -39,6 +39,7 @@
 #include "edui/textEdit.hpp"
 #include "edui/vector2Value.hpp"
 #include "edui/verticalContainer.hpp"
+#include "edui/verticalScrollbar.hpp"
 #include "edui/widget.hpp"
 #include "gamedata.hpp"
 #include "raylib.h"
@@ -81,72 +82,6 @@ int main() {
 	menuBar->onItemClickedInt.connect([](size_t a, size_t b) { printf("%zu %zu \n", a, b); });
 	gui.addMenuBar(menuBar);
 
-	auto intval = std::make_shared<edui::IntValue>();
-	intval->setSize({0, 200}, {0, 26});
-	intval->setPosition({0, 20}, {0, 150});
-	intval->onValueChangedT.connect([](int previous, int current) { printf("%i, %i \n", previous, current); });
-	// gui.add(intval);
-
-	/*
-	auto tabContent = std::make_shared<edui::Container>();
-	tabContent->setPosition({0, 300}, {0, 44});
-	tabContent->setSize({0, 300}, {0, 300});
-	gui.add(tabContent);*/
-
-	/*
-	auto tabBar = std::make_shared<edui::FileTabBar>();
-	tabBar->contentBase = tabContent;
-	tabBar->setPosition({0, 300}, {0, 22});
-	tabBar->setSize({0, 300}, {0, 22});
-	gui.add(tabBar);
-	*/
-	auto screenRect = gui.getScreenRect();
-	// tabBar->calcRect(screenRect);
-
-	/*
-	auto page1 = tabBar->addItem("Hello", ICON_FILE);
-
-	auto pageLabel = std::make_shared<edui::Label>();
-	pageLabel->setSize({0.5f, 0}, {0, 22});
-	page1->add(pageLabel);
-
-	auto page2 = tabBar->addItem("Hello2", ICON_FILETYPE_BINARY);
-	auto pageLabel2 = std::make_shared<edui::Label>();
-	pageLabel2->setText("Page 2");
-	pageLabel2->setSize({0.5f, 0}, {0, 22});
-	page2->add(pageLabel2);
-
-	auto page3 = tabBar->addItem("Hello3", 0);
-	tabBar->addItem("Test Settings", ICON_INFO);
-	auto pageLabel3 = std::make_shared<edui::Label>();
-	pageLabel3->setText("Page 3");
-	pageLabel3->setSize({0.5f, 0}, {0, 22});
-	page3->add(pageLabel3);
-	*/
-
-	auto msg = std::make_shared<edui::ConfirmDialog>();
-	msg->setTitle("ConfirmDialog");
-	msg->setText("I have a message.");
-	msg->setPosition({0, 350}, {0, 20});
-	msg->setSize({0, 200}, {0, 180});
-	msg->onOkPressed.connect([] { printf("clicked ok..\n"); });
-	// gui.add(msg);
-
-	auto vec2 = std::make_shared<edui::Vector2Value>();
-	vec2->setSize({0, 200}, {0, 26});
-	vec2->setPosition({0, 20}, {0, 190});
-	vec2->onValueChangedT.connect([](Vector2 old, Vector2 newVec) {
-		printf("old: %f, %f \n", old.x, old.y);
-		printf("new: %f, %f \n", newVec.x, newVec.y);
-	});
-	// gui.add(vec2);
-
-	auto colorWheel = std::make_shared<edui::ColorWheel>();
-	colorWheel->setSize({0, 100}, {0, 100});
-	colorWheel->setColor(PINK);
-	colorWheel->onColorChanged.connect([](Color c) { printf("%i %i %i \n", c.r, c.g, c.b); });
-	// gui.add(colorWheel);
-
 	auto label = std::make_shared<edui::Label>();
 	label->translationId = "Widgets.hello";
 	label->setSize({0, 100}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
@@ -163,11 +98,6 @@ int main() {
 	textEdit->setSize({0, 300}, {0, 250});
 	textEdit->setText("Hello world!\nLazy fox.\nThird way.");
 	gui.add(textEdit);
-
-	auto colorPanel = std::make_shared<edui::ColorPanel>();
-	colorPanel->setPosition({0, 350}, {0, 20});
-	colorPanel->setSize({0, 320}, {0, 250});
-	// gui.add(colorPanel);
 
 	auto colorValue = std::make_shared<edui::ColorValue>();
 	colorValue->setPosition({0, 350}, {0, 300});
@@ -215,11 +145,21 @@ int main() {
 		[](edui::DropdownValue old, edui::DropdownValue newValue) { edui::Gui::instance->loadTheme(newValue.val); });
 	langWindow->add(themeDrop);
 
-	auto anotherWindow = std::make_shared<edui::MessageBox>();
-	anotherWindow->translationId = "Editor.another";
-	anotherWindow->setPosition({0, 560}, {0, 20});
-	anotherWindow->setSize({0, 200}, {0, 180});
-	gui.add(anotherWindow);
+	auto scrollbar = std::make_shared<edui::VerticalScrollbar>();
+	scrollbar->setPosition({0, 560}, {0, 20});
+	scrollbar->setSize({0, static_cast<int>(edui::EDUI_DEFAULT_HEIGHT)}, {0, 180});
+	scrollbar->setValue(20);
+	// gui.add(scrollbar);
+
+	auto verticalContainer = std::make_shared<edui::VerticalContainer>();
+	verticalContainer->setPosition({0, 560}, {0, 20});
+	verticalContainer->setSize({0, 200}, {0, 180});
+	for (int i = 0; i < 20; i++) {
+		auto newButton = std::make_shared<edui::Button>();
+		newButton->setSize({1, 0}, {0, 40});
+		verticalContainer->add(newButton);
+	}
+	gui.add(verticalContainer);
 
 	auto fileContent = std::make_shared<edui::Container>();
 

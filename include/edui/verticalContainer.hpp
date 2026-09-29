@@ -5,6 +5,7 @@
 
 #include "edui/container.hpp"
 #include "edui/scrollableContainer.hpp"
+#include "edui/verticalScrollbar.hpp"
 #include "edui/widget.hpp"
 
 namespace edui {
@@ -15,20 +16,22 @@ struct VerticalContainerRender : public ScrollableContainerRender {
 struct VerticalContainer : public ScrollableContainer {
 	typedef std::shared_ptr<VerticalContainer> Ptr;
 
+	std::shared_ptr<edui::VerticalScrollbar> scrollbar;
+
 	bool overflown = false;
 	Rectangle scrollbarRect = {0, 0, 0, 0};
 	bool scrolling = false;
 	Vector2 scrollOffset = {0, 0};
 
 	VerticalContainer();
+	void applyTheme(const mINI::INIStructure &struc) override;
+
 	void update() override;
 	void draw() override;
 
 	void add(std::shared_ptr<Widget> widget) override;
 
 	void scrolled(float mouseWheel) override;
-	void leftMouseClicked() override;
-	void leftMouseReleased() override;
 
 	void updateContentRect() override;
 

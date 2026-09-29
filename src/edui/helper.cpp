@@ -122,3 +122,8 @@ Color parseColorString(const std::string &str) {
 
 	return {red, green, blue, 255};
 }
+
+int mapRange(int in, int inMin, int inMax, int outMin, int outMax) {
+	int x = (in - inMin) / (inMax - inMin);
+	return outMin + (outMax - outMin) * x;
+}
