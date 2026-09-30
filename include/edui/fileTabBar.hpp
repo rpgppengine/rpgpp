@@ -8,6 +8,7 @@ struct FileTabBarRender : public TabBarRender {};
 
 struct FileTabBar : public TabBar {
 	FileTabBar();
+	void update() override;
 
 	std::shared_ptr<Container> addItem(const std::string &item, int iconId) override;
 	void showActiveTab(int index);

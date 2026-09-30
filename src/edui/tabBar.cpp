@@ -30,6 +30,18 @@ TabBar::TabBar() : HorizontalContainer() {
 
 	leftButtonPtr->onClicked.connect([this] { scrolled(1.0f); });
 	rightButtonPtr->onClicked.connect([this] { scrolled(-1.0f); });
+
+	scrollbar->visible = false;
+}
+
+void TabBar::applyTheme(const mINI::INIStructure &struc) {
+	ScrollableContainer::applyTheme(struc);
+
+	leftButtonPtr->applyTheme(struc);
+	leftButtonPtr->unfocused();
+
+	rightButtonPtr->applyTheme(struc);
+	rightButtonPtr->unfocused();
 }
 
 void TabBar::translate() {
@@ -58,22 +70,26 @@ void TabBar::update() {
 
 	leftButtonPtr->calcRect(rect);
 	rightButtonPtr->calcRect(rect);
+
+	leftButtonPtr->update();
+	rightButtonPtr->update();
+
+	std::shared_ptr<Widget> leftWidget = leftButtonPtr;
+	processWidget(leftWidget);
+
+	std::shared_ptr<Widget> rightWidget = rightButtonPtr;
+	processWidget(rightWidget);
 }
 
 void TabBar::draw() {
 	ScrollableContainer::draw();
 	if (overflown) {
-		DrawRectangleRec(scrollAreaRect, GREEN);
+		// DrawRectangleRec(scrollAreaRect, GREEN);
 
 		leftButtonPtr->draw();
 		rightButtonPtr->draw();
-
-		std::shared_ptr<Widget> leftWidget = leftButtonPtr;
-		processWidget(leftWidget);
-
-		std::shared_ptr<Widget> rightWidget = rightButtonPtr;
-		processWidget(rightWidget);
 	}
+	// DrawRectangleRec(contentRect, Fade(RED, 0.5f));
 }
 
 void TabBar::updateContentRect() {

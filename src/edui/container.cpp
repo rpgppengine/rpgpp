@@ -98,7 +98,7 @@ void Container::add(std::shared_ptr<Widget> widget) {
 
 void Container::notifyChildren(Gui *gui) {
 	for (auto &widget : widgets) {
-		if (widget->mouseIsInRect()) {
+		if (widget->mouseIsInRect() && mouseIsInContent()) {
 			if (!widget->isContainer) {
 				gui->notifyChild(&widget);
 			} else {

@@ -1,7 +1,10 @@
 #ifndef _EDUI_HORIZONTALCONTAINER_H
 #define _EDUI_HORIZONTALCONTAINER_H
 
+#include <memory>
+
 #include "edui/container.hpp"
+#include "edui/horizontalScrollbar.hpp"
 #include "edui/scrollableContainer.hpp"
 #include "edui/widget.hpp"
 
@@ -12,6 +15,8 @@ struct HorizontalContainerRender : public ScrollableContainerRender {
 
 struct HorizontalContainer : public ScrollableContainer {
 	typedef std::shared_ptr<HorizontalContainer> Ptr;
+
+	std::shared_ptr<HorizontalScrollbar> scrollbar;
 
 	bool overflown = false;
 	Rectangle scrollbarRect = {0, 0, 0, 0};

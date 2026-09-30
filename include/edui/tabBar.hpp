@@ -27,6 +27,7 @@ struct TabBar : public HorizontalContainer {
 	int currentPage = 0;
 
 	TabBar();
+	void applyTheme(const mINI::INIStructure &struc) override;
 	void translate() override;
 
 	void update() override;

@@ -14,6 +14,7 @@ struct FileTabRender : public TabRender {};
 struct FileTab : public Tab {
 	std::shared_ptr<IconButton> closeButtonPtr = nullptr;
 	bool active = false;
+	bool closeEnabled = true;
 
 	FileTab();
 	void applyTheme(const mINI::INIStructure &struc) override;

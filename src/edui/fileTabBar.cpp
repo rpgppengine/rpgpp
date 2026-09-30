@@ -9,6 +9,14 @@ using namespace edui;
 
 FileTabBar::FileTabBar() : TabBar() { render = std::make_unique<FileTabBarRender>(); }
 
+void FileTabBar::update() {
+	for (auto &widget : widgets) {
+		widget->as<FileTab>().closeEnabled = mouseIsInContent();
+	}
+
+	TabBar::update();
+}
+
 std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int iconId) {
 	if (size >= 20) return std::make_shared<Container>();
 
@@ -38,7 +46,7 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 	}
 
 	button->onDeleted.connect([this, curr] {
-		printf("curr: %i \n", curr);
+		printf("deletd file tab\ncurr: %i \n", curr);
 
 		removeItem(curr);
 		updateContentRect();

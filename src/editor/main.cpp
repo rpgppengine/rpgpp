@@ -23,6 +23,7 @@
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/horizontalContainer.hpp"
+#include "edui/horizontalScrollbar.hpp"
 #include "edui/iconTextButton.hpp"
 #include "edui/intValue.hpp"
 #include "edui/intValueTextBox.hpp"
@@ -151,15 +152,20 @@ int main() {
 	scrollbar->setValue(20);
 	// gui.add(scrollbar);
 
-	auto verticalContainer = std::make_shared<edui::VerticalContainer>();
-	verticalContainer->setPosition({0, 560}, {0, 20});
-	verticalContainer->setSize({0, 200}, {0, 180});
+	auto horizontalContainer = std::make_shared<edui::HorizontalContainer>();
+	horizontalContainer->setPosition({0, 560}, {0, 20});
+	horizontalContainer->setSize({0, 200}, {0, 180});
 	for (int i = 0; i < 20; i++) {
 		auto newButton = std::make_shared<edui::Button>();
-		newButton->setSize({1, 0}, {0, 40});
-		verticalContainer->add(newButton);
+		newButton->setSize({0, 40}, {1, 0});
+		horizontalContainer->add(newButton);
 	}
-	gui.add(verticalContainer);
+	gui.add(horizontalContainer);
+
+	auto horizontalScrollbar = std::make_shared<edui::HorizontalScrollbar>();
+	horizontalScrollbar->setPosition({0, 560}, {0, 20});
+	horizontalScrollbar->setSize({0, 200}, {0, static_cast<int>(edui::EDUI_DEFAULT_HEIGHT)});
+	// gui.add(horizontalScrollbar);
 
 	auto fileContent = std::make_shared<edui::Container>();
 
@@ -169,6 +175,7 @@ int main() {
 	fileList->setSize({0, 200}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
 	fileList->addItem("item1", 0);
 	fileList->addItem("item2", 0);
+	fileList->addItem("item3", 0);
 	gui.add(fileList);
 
 	auto tabContent = std::make_shared<edui::Container>();

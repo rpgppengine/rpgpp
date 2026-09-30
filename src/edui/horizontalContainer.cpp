@@ -3,7 +3,9 @@
 #include <memory>
 
 #include "edui/container.hpp"
+#include "edui/gui.hpp"
 #include "edui/helper.hpp"
+#include "edui/horizontalScrollbar.hpp"
 #include "edui/scrollableContainer.hpp"
 #include "raymath.h"
 
@@ -12,10 +14,33 @@ using namespace edui;
 HorizontalContainer::HorizontalContainer() {
 	this->isContainer = true;
 	render = std::make_unique<HorizontalContainerRender>();
+
+	scrollbar = std::make_shared<HorizontalScrollbar>();
+	scrollbar->setPosition({0, 0}, {1, static_cast<int>(-EDUI_DEFAULT_HEIGHT)});
+	scrollbar->setSize({1, 0}, {0, static_cast<int>(EDUI_DEFAULT_HEIGHT)});
+
+	scrollbar->onValueChanged.connect([this](int newValue) { this->scissorX = -newValue; });
 }
 
 void HorizontalContainer::update() {
-	auto& rend = render->as<HorizontalContainerRender>();
+	ScrollableContainer::update();
+
+	scrollbar->calcRect(rect);
+	scrollbar->update();
+
+	if (scrollbar->visible) {
+		if (scrollbar->mouseIsInRect()) {
+			std::shared_ptr<Widget> widgetPtr = scrollbar;
+			Gui::instance->notifyChild(&widgetPtr);
+		} else {
+			if (scrollbar->notifiedMouseEnter) {
+				scrollbar->notifiedMouseEnter = false;
+				scrollbar->mouseLeft();
+			}
+		}
+	}
+
+	auto &rend = render->as<HorizontalContainerRender>();
 
 	this->scissorRect.width = 0;
 	for (auto &widget : widgets) {
@@ -30,40 +55,13 @@ void HorizontalContainer::update() {
 			this->scissorRect.width += rend.space;
 		}
 	}
-
-	if (scrolling) {
-		float lowerLimit = scrollOffset.x;
-		float upperLimit = scrollAreaRect.width - (scrollbarRect.width - scrollOffset.x);
-
-		Vector2 offset = Vector2Subtract(GetMousePosition(), {scrollAreaRect.x + lowerLimit, scrollbarRect.y});
-		float newOffsetX = constrain<float>(offset.x, 0, static_cast<float>(upperLimit - lowerLimit));
-		offset.x = newOffsetX;
-
-		float max = upperLimit - lowerLimit;
-		float fract = (offset.x / max);
-		scissorX = (fract * scrollMax);
-	}
-	ScrollableContainer::update();
 }
 
 void HorizontalContainer::draw() {
-	//ScrollableContainer::draw();
-	//
-	auto &rend = render->as<ContainerRender>();
+	ScrollableContainer::draw();
 
-	DrawRectangleRec(rect, rend.bgColor);
-
-	for (auto &widget : widgets) {
-		if (widget->visible && !widget->deleteFlag) {
-			widget->draw();
-		}
-	}
-
-	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
-
-	if (overflown) {
-		DrawRectangleRec(scrollbarRect, render->as<HorizontalContainerRender>().currentScrollbarColor);
-		DrawRectangleLinesEx(scrollAreaRect, 1.0f, render->currentBorderColor);
+	if (overflown && scrollbar->visible) {
+		scrollbar->draw();
 	}
 }
 
@@ -104,7 +102,7 @@ void HorizontalContainer::updateContentRect() {
 	this->contentRect = rect;
 	if (overflown) {
 		float old = contentRect.height;
-		contentRect.height = old - ScrollbarSize;
+		contentRect.height = old - EDUI_DEFAULT_HEIGHT;
 	}
 	renderRect = paddingRect(contentRect, render->padding);
 	if (isScissor) {
@@ -112,18 +110,10 @@ void HorizontalContainer::updateContentRect() {
 		renderRect.y += scissorY;
 	}
 
-	scrollAreaRect = {rect.x, rect.y, rect.width, ScrollbarSize};
-	scrollAreaRect.y += rect.height - ScrollbarSize;
-
-	this->scrollbarHeight = (contentRect.width / scissorRect.width) * contentRect.width;
-
-	float fract = (-scissorX / -scrollMax);
-	this->scrollbarRect = {scrollAreaRect.x, scrollAreaRect.y, scrollbarHeight, ScrollbarSize};
-	scrollbarRect.x -= fract * (scrollbarHeight - contentRect.width);
-
 	float content = contentRect.width;
 	float scissor = scissorRect.width;
 	scrollMax = (-scissor + content);
+	scrollbar->setMaxScroll(-scrollMax);
 
 	if (scissorRect.width > contentRect.width) {
 		overflown = true;
@@ -139,15 +129,18 @@ void HorizontalContainer::scrolled(float mouseWheel) {
 
 	if ((scissorX + added) >= 0.0f) {
 		scissorX = 0;
+		scrollbar->setValue(-scissorX);
 		return;
 	}
 
 	if ((scissorX + added) < scrollMax) {
 		scissorX = scrollMax;
+		scrollbar->setValue(-scissorX);
 		return;
 	}
 
 	scissorX += added;
+	scrollbar->setValue(-scissorX);
 }
 
 void HorizontalContainer::leftMouseClicked() {
@@ -162,6 +155,4 @@ void HorizontalContainer::leftMouseClicked() {
 	}
 }
 
-void HorizontalContainer::leftMouseReleased() {
-	scrolling = false;
-}
+void HorizontalContainer::leftMouseReleased() { scrolling = false; }

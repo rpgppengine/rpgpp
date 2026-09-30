@@ -2,12 +2,8 @@
 #define _EDUI_SCROLLABLECONTAINER_H
 
 #include "edui/container.hpp"
-namespace edui{
-struct ScrollableContainerRender : public ContainerRender {
-	Color scrollbarColor = GRAY;
-	Color focusScrollbarColor = DARKGRAY;
-	Color currentScrollbarColor = GRAY;
-};
+namespace edui {
+struct ScrollableContainerRender : public ContainerRender {};
 
 struct ScrollableContainer : public Container {
 	ScrollableContainer();
@@ -24,10 +20,7 @@ struct ScrollableContainer : public Container {
 	float scrollMax;
 
 	void draw() override;
-
-	virtual void mouseEntered() override;
-	virtual void mouseLeft() override;
 };
-}
+}  // namespace edui
 
 #endif

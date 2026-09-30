@@ -63,8 +63,10 @@ void FileTab::update() {
 	closeButtonPtr->update();
 	closeButtonPtr->calcRect(rect);
 
-	std::shared_ptr<Widget> widgetPtr = closeButtonPtr;
-	processWidget(widgetPtr);
+	if (closeEnabled) {
+		std::shared_ptr<Widget> widgetPtr = closeButtonPtr;
+		processWidget(widgetPtr);
+	}
 }
 
 void FileTab::draw() {
