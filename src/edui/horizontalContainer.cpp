@@ -22,6 +22,12 @@ HorizontalContainer::HorizontalContainer() {
 	scrollbar->onValueChanged.connect([this](int newValue) { this->scissorX = -newValue; });
 }
 
+void HorizontalContainer::applyTheme(const mINI::INIStructure &struc) {
+	ScrollableContainer::applyTheme(struc);
+	scrollbar->applyTheme(struc);
+	scrollbar->unfocused();
+}
+
 void HorizontalContainer::update() {
 	ScrollableContainer::update();
 

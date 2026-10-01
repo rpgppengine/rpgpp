@@ -40,6 +40,32 @@ TextEdit::TextEdit() {
 	focusable = true;
 	render = std::make_unique<TextEditRender>();
 	render->padding = 2;
+
+	scrollbar = std::make_shared<edui::VerticalScrollbar>();
+	scrollbar->setPosition({1, static_cast<int>(-EDUI_DEFAULT_HEIGHT)}, {0, 0});
+	scrollbar->setSize({0, static_cast<int>(EDUI_DEFAULT_HEIGHT)}, {1, 0});
+
+	scrollbar->alternativeCalc = true;
+
+	scrollbar->onValueChanged.connect([this](int newValue) {
+		this->scissorY = newValue;
+		auto &rend = render->as<TextEditRender>();
+		float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+		cursorRect.y = rect.y + rend.padding + ((totalFontSize + 2) * cursorPos.row) - scissorY;
+	});
+
+	scrollbar->onMouseEntered.connect([this] { SetMouseCursor(MOUSE_CURSOR_DEFAULT); });
+	scrollbar->onMouseLeft.connect([this] {
+		auto checkRect = scissorContentRect;
+		checkRect.x -= render->padding;
+		checkRect.y -= render->padding;
+		checkRect.height += render->padding * 2;
+		checkRect.width += render->padding;
+
+		if (CheckCollisionPointRec(GetMousePosition(), checkRect)) {
+			SetMouseCursor(MOUSE_CURSOR_IBEAM);
+		}
+	});
 }
 
 TextEdit::~TextEdit() { unload(); }
@@ -59,6 +85,21 @@ void TextEdit::update() {
 	if (debounce > 0) {
 		debounce--;
 	}
+
+	scrollbar->calcRect(rect);
+	scrollbar->update();
+
+	if (overflownY) {
+		if (scrollbar->mouseIsInRect()) {
+			std::shared_ptr<Widget> widgetPtr = scrollbar;
+			Gui::instance->notifyChild(&widgetPtr);
+		} else {
+			if (scrollbar->notifiedMouseEnter) {
+				scrollbar->notifiedMouseEnter = false;
+				scrollbar->mouseLeft();
+			}
+		}
+	}
 }
 
 void TextEdit::draw() {
@@ -70,6 +111,9 @@ void TextEdit::draw() {
 	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
 
 	scissorContentRect = getPaddingRect();
+	if (overflownY) {
+		scissorContentRect.width -= EDUI_DEFAULT_HEIGHT;
+	}
 	Vector2 textBegin = {rect.x + rend.padding - scissorX, rect.y + rend.padding - scissorY};
 	BeginScissorMode(scissorContentRect.x, scissorContentRect.y, scissorContentRect.width, scissorContentRect.height);
 
@@ -86,17 +130,33 @@ void TextEdit::draw() {
 	EndScissorMode();
 
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
+	if (overflownY) {
+		scrollbar->draw();
+	}
 }
 
 void TextEdit::leftMouseClicked() {
-	setCursorFromMouse();
-	mouseHeld = true;
+	if (CheckCollisionPointRec(GetMousePosition(), scissorContentRect)) {
+		setCursorFromMouse();
+		mouseHeld = true;
+	}
 }
 
 void TextEdit::leftMouseReleased() { mouseHeld = false; }
 
 void TextEdit::mouseEntered() {
-	SetMouseCursor(MOUSE_CURSOR_IBEAM);
+	if (overflownY) {
+		auto checkRect = scissorContentRect;
+		checkRect.x -= render->padding;
+		checkRect.y -= render->padding;
+		checkRect.height += render->padding * 2;
+		checkRect.width += render->padding;
+		if (CheckCollisionPointRec(GetMousePosition(), scissorContentRect)) {
+			SetMouseCursor(MOUSE_CURSOR_IBEAM);
+		}
+	} else {
+		SetMouseCursor(MOUSE_CURSOR_IBEAM);
+	}
 	Widget::mouseEntered();
 }
 
@@ -205,12 +265,18 @@ void TextEdit::reloadLines() {
 	auto &rend = render->as<TextEditRender>();
 	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
 	scrollMax = (rowCount * (totalFontSize + 2));
+
+	// scrollbar
+	scrollbar->maxContent = scrollMax;
+
 	if (scrollMax > scissorContentRect.height) {
 		overflownY = true;
 		scrollMax -= scissorContentRect.height;
 	} else {
 		overflownY = false;
 	}
+
+	scrollbar->setMaxScroll(scrollMax);
 }
 
 bool TextEdit::hasSelection() { return (selectStart.row != selectEnd.row) || (selectStart.column != selectEnd.column); }
@@ -312,11 +378,15 @@ void TextEdit::setOffset() {
 		float diff = (cursorRect.y + cursorRect.height) - (paddingRect.y + paddingRect.height);
 		scissorY += diff;
 		cursorRect.y -= diff;
+
+		scrollbar->setValue(scissorY);
 	}
 	if (cursorRect.y < paddingRect.y) {
 		float diff = paddingRect.y - cursorRect.y;
 		scissorY -= diff;
 		cursorRect.y += diff;
+
+		scrollbar->setValue(scissorY);
 	}
 
 	if (scissorY > scrollMax) {
@@ -604,15 +674,21 @@ void TextEdit::scrolled(float mouseWheel) {
 	if ((scissorY - added) < 0.0f) {
 		scissorY = 0;
 		cursorRect.y = rect.y + rend.padding + ((totalFontSize + 2) * cursorPos.row) - scissorY;
+
+		scrollbar->setValue(scissorY);
 		return;
 	}
 
 	if ((scissorY - added) > scrollMax) {
 		scissorY = scrollMax;
 		cursorRect.y = rect.y + rend.padding + ((totalFontSize + 2) * cursorPos.row) - scissorY;
+
+		scrollbar->setValue(scissorY);
 		return;
 	}
 
 	scissorY -= added;
 	cursorRect.y += added;
+
+	scrollbar->setValue(scissorY);
 }

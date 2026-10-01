@@ -23,7 +23,6 @@ Dropdown::Dropdown() {
 
 void Dropdown::applyTheme(const mINI::INIStructure &struc) {
 	Widget::applyTheme(struc);
-	printf("apply dropdown..\n");
 	render->applyTheme(struc);
 }
 

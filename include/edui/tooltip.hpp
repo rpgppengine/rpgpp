@@ -10,6 +10,13 @@ struct TooltipRender : public WidgetRender {
 	float fontSize = -1;
 	Color textColor = BLACK;
 	float spacing = -1;
+
+	void applyTheme(const mINI::INIStructure &struc) {
+		WidgetRender::applyTheme(struc);
+
+		INISection section = struc.get("Label");
+		textColor = parseColorString(section.get("TextColor"));
+	};
 };
 
 struct Tooltip : public Widget {

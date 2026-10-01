@@ -3,9 +3,13 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 
+#include "edui/horizontalContainer.hpp"
+#include "edui/horizontalScrollbar.hpp"
 #include "edui/label.hpp"
+#include "edui/verticalScrollbar.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
 
@@ -31,6 +35,8 @@ struct TextEdit : public Widget {
 	const float EDUI_TEXTEDIT_CURSOR_WIDTH = 4;
 	const short EDUI_TEXTEDIT_DEBOUNCE = 5;
 	const float EDUI_TEXTEDIT_SCROLLSCPEED = 8;
+
+	std::shared_ptr<edui::VerticalScrollbar> scrollbar;
 
 	TextEdit();
 	~TextEdit();

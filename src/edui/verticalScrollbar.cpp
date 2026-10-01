@@ -31,10 +31,7 @@ void VerticalScrollbar::draw() {
 }
 
 Rectangle VerticalScrollbar::getBarRect() {
-	float scrollbarSize = (maxScroll / rect.height) * maxScroll;
-	if (rect.height < maxScroll) {
-		scrollbarSize = (rect.height / maxScroll) * rect.height;
-	}
+	float scrollbarSize = calcScrollbarSize();
 	float valueFraction = static_cast<float>(currentValue) / maxScroll;
 	float barOffset = valueFraction * (rect.height - scrollbarSize);
 
@@ -51,10 +48,7 @@ void VerticalScrollbar::drawBar() {
 }
 
 void VerticalScrollbar::setValueFromMouse() {
-	float scrollbarSize = (maxScroll / rect.height) * maxScroll;
-	if (rect.height < maxScroll) {
-		scrollbarSize = (rect.height / maxScroll) * rect.height;
-	}
+	float scrollbarSize = calcScrollbarSize();
 	float maxRelativeY = (rect.height - scrollbarSize);
 
 	auto barRect = getBarRect();
@@ -69,6 +63,19 @@ void VerticalScrollbar::setValueFromMouse() {
 	}
 
 	this->currentValue = result;
+}
+
+float VerticalScrollbar::calcScrollbarSize() {
+	float scrollbarSize = (maxScroll / rect.height) * rect.height;
+	if (rect.height < maxScroll) {
+		scrollbarSize = (rect.height / maxScroll) * rect.height;
+	}
+
+	if (alternativeCalc) {
+		scrollbarSize = (rect.height / maxContent) * rect.height;
+	}
+
+	return scrollbarSize;
 }
 
 void VerticalScrollbar::leftMouseClicked() {

@@ -26,6 +26,8 @@ struct HorizontalContainer : public ScrollableContainer {
 	bool reverse = false;
 
 	HorizontalContainer();
+	void applyTheme(const mINI::INIStructure &struc) override;
+
 	void update() override;
 	void draw() override;
 

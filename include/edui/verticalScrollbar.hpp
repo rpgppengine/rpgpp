@@ -11,6 +11,8 @@ struct VerticalScrollbar : public Widget {
 	SignalT<int> onValueChanged;
 
 	int maxScroll = 100;
+	float maxContent = 0;
+	bool alternativeCalc = false;
 
 	VerticalScrollbar();
 
@@ -29,6 +31,7 @@ private:
 	Rectangle getBarRect();
 	void drawBar();
 	void setValueFromMouse();
+	float calcScrollbarSize();
 };
 }  // namespace edui
 
