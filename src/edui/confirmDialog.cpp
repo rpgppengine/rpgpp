@@ -30,7 +30,7 @@ ConfirmDialog::ConfirmDialog() : MessageBox() {
 
 	footerLayout->add(cancel);
 
-	footerLayout->widgets[0].swap(footerLayout->widgets[1]);
+	// footerLayout->widgets[0].swap(footerLayout->widgets[1]);
 }
 
 void ConfirmDialog::translate() {
@@ -47,4 +47,6 @@ void ConfirmDialog::translate() {
 	std::string cancelTranslationId = std::string(builtinTranslation.c_str()) + ".Cancel";
 	cancel->as<edui::Button>().setText(getTranslation(cancelTranslationId, "Cancel"));
 	cancel->as<edui::Button>().setWidthFit();
+
+	footerLayout->updateWidgets();
 }

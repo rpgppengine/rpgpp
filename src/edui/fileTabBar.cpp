@@ -49,7 +49,9 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 		printf("deletd file tab\ncurr: %i \n", curr);
 
 		removeItem(curr);
+		updateWidgets();
 		updateContentRect();
+		fixScroll();
 		size--;
 
 		if (this->scissorX >= scrollMax) {

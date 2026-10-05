@@ -40,6 +40,9 @@ struct HorizontalContainer : public ScrollableContainer {
 	void updateContentRect() override;
 
 	Widget::Ptr clone() override { return std::make_shared<HorizontalContainer>(*this); }
+
+	void updateWidgets();
+	void fixScroll();
 };
 };	// namespace edui
 

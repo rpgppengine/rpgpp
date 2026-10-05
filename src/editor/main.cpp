@@ -158,6 +158,7 @@ int main() {
 	for (int i = 0; i < 20; i++) {
 		auto newButton = std::make_shared<edui::Button>();
 		newButton->setSize({0, 40}, {1, 0});
+		newButton->setText(TextFormat("Button%i", i));
 		horizontalContainer->add(newButton);
 	}
 	gui.add(horizontalContainer);

@@ -161,7 +161,9 @@ std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) 
 	size++;
 
 	button->onDeleted.connect([this] {
+		updateWidgets();
 		updateContentRect();
+		fixScroll();
 
 		if (this->scissorX > scrollMax) {
 			scissorX = 0;

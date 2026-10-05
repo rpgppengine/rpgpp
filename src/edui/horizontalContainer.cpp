@@ -48,6 +48,7 @@ void HorizontalContainer::update() {
 
 	auto &rend = render->as<HorizontalContainerRender>();
 
+	/*
 	this->scissorRect.width = 0;
 	for (auto &widget : widgets) {
 		if (widget->visible && !widget->deleteFlag) {
@@ -61,6 +62,7 @@ void HorizontalContainer::update() {
 			this->scissorRect.width += rend.space;
 		}
 	}
+	*/
 }
 
 void HorizontalContainer::draw() {
@@ -83,9 +85,14 @@ void HorizontalContainer::add(std::shared_ptr<Widget> widget) {
 	int widgetWidth = widget->layout.width.offset;
 
 	widget->layout.x = {0, res};
+	if (reverse) {
+		widget->layout.x = {1, static_cast<int>(-(widgetWidth + res))};
+	}
 	widget->layout.y = {0, 0};
 	widget->layout.height = {1.0f, 0};
 	widget->layout.width = {0, widgetWidth};
+
+	this->scissorRect.width = ((rend.padding * 2) + res + widgetWidth);
 
 	/*
 	this->scissorRect.width = ((rend.padding * 2) + res + widgetWidth);
@@ -162,3 +169,39 @@ void HorizontalContainer::leftMouseClicked() {
 }
 
 void HorizontalContainer::leftMouseReleased() { scrolling = false; }
+
+void HorizontalContainer::updateWidgets() {
+	auto &rend = render->as<HorizontalContainerRender>();
+
+	int res = 0;
+	for (auto &widget : widgets) {
+		if (!widget->deleteFlag) {
+			int widgetWidth = widget->layout.width.offset;
+
+			widget->layout.x = {0, res};
+			if (reverse) {
+				widget->layout.x = {1, static_cast<int>(-(widgetWidth + res))};
+			}
+
+			this->scissorRect.width = ((rend.padding * 2) + res + widgetWidth);
+
+			res += (widget->layout.width.offset) + rend.space;
+		}
+	}
+}
+
+void HorizontalContainer::fixScroll() {
+	if (scissorX >= 0.0f) {
+		scissorX = 0;
+		scrollbar->setValue(-scissorX);
+		return;
+	}
+
+	if (scissorX < scrollMax) {
+		scissorX = scrollMax;
+		scrollbar->setValue(-scissorX);
+		return;
+	}
+
+	scrollbar->setValue(-scissorX);
+}
