@@ -1,0 +1,5 @@
+add_rules("mode.debug", "mode.release")
+target("tree-sitter-lua")
+	set_kind("static")
+	add_files("src/*.c")
+	add_includedirs("src/tree_sitter")

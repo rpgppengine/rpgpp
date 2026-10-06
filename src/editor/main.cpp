@@ -1,7 +1,10 @@
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <memory>
 #include <string>
+
+#include "tree_sitter/api.h"
 
 #define STR_IMPLEMENTATION
 
@@ -45,8 +48,29 @@
 #include "gamedata.hpp"
 #include "raylib.h"
 #include "services/editorGuiService.hpp"
+#include "tree_sitter/tree-sitter-lua.h"
+#include "tree_sitter/ts_node.hpp"
+#include "tree_sitter/ts_parser.hpp"
+#include "tree_sitter/ts_query.hpp"
+#include "tree_sitter/ts_query_cursor.hpp"
+#include "tree_sitter/ts_tree.hpp"
+#include "tree_sitter/ts_tree_cursor.hpp"
 
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION
+
+void traverse(ts::Node &node) {
+	ts::TreeCursor cursor(node);
+
+	if (cursor.gotoFirstChild()) {
+		do {
+			auto current = cursor.currentNode();
+			if (current.isNamed()) {
+				printf("node: %s \n", current.string().c_str());
+				traverse(current);
+			}
+		} while (cursor.gotoNextSibling());
+	}
+}
 
 int main() {
 	/*
@@ -57,6 +81,28 @@ int main() {
 	gui.uiLoop();
 	editor->unload();
 	*/
+
+	ts::Parser parser;
+	parser.setLanguage(tree_sitter_lua());
+	auto tree = parser.parseString(nullptr, "a = 'hello' print(a)");
+	if (tree.tree == nullptr) {
+		printf("parsing failed.. \n");
+	}
+
+	auto rootNode = tree.rootNode();
+	printf("root node type: %s \n", rootNode.type().c_str());
+
+	TSInputEdit edit = {.start_byte = 0,
+						.old_end_byte = 1,
+						.new_end_byte = 1,
+						.start_point = {0, 0},
+						.old_end_point = {0, 0},
+						.new_end_point = {0, 0}};
+	tree.edit(&edit);
+
+	auto newTree = parser.parseString(&tree, "b = 'hello' print(a)");
+	auto newRoot = newTree.rootNode();
+	traverse(newRoot);
 
 	SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_RESIZABLE);
 	InitWindow(800, 450, "raylib example - basic window");

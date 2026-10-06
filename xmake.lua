@@ -1,5 +1,3 @@
-
-
 includes("toolchain/*.lua")
 includes("packages/*.lua")
 if is_plat("switch") then
@@ -7,7 +5,7 @@ if is_plat("switch") then
 	set_arch("arm64")
 end
 
-add_requires("raylib", "tgui", "nlohmann_json", "luajit", "pugixml")
+add_requires("raylib", "tgui", "nlohmann_json", "luajit", "pugixml", "tree-sitter", "tree-sitter-lua")
 add_rules("mode.debug", "mode.release")
 set_defaultmode("debug")
 
@@ -92,7 +90,7 @@ set_languages("cxx17")
 add_includedirs("include/", "include/editor/", os.dirs(path.join(os.scriptdir())))
 add_files("src/editor/**.cpp", "src/edui/**.cpp")
 add_deps("rpgpp")
-add_packages("raylib", "tgui", "nlohmann_json", "luajit", "pugixml")
+add_packages("raylib", "tgui", "nlohmann_json", "luajit", "pugixml", "tree-sitter", "tree-sitter-lua")
 after_build( function (target)
 	os.cp("$(curdir)/resources", "./build/$(plat)/$(arch)/$(mode)/", { async = true })
 	if is_plat("linux", "macosx") then
