@@ -4,8 +4,6 @@
 #include <memory>
 #include <string>
 
-#include "tree_sitter/api.h"
-
 #define STR_IMPLEMENTATION
 
 #include "editor.hpp"
@@ -13,6 +11,7 @@
 #include "edui/canvas.hpp"
 #include "edui/checkbox.hpp"
 #include "edui/childWindow.hpp"
+#include "edui/codeEdit.hpp"
 #include "edui/colorPanel.hpp"
 #include "edui/colorRect.hpp"
 #include "edui/colorValue.hpp"
@@ -48,6 +47,7 @@
 #include "gamedata.hpp"
 #include "raylib.h"
 #include "services/editorGuiService.hpp"
+#include "tree_sitter/api.h"
 #include "tree_sitter/tree-sitter-lua.h"
 #include "tree_sitter/ts_node.hpp"
 #include "tree_sitter/ts_parser.hpp"
@@ -129,21 +129,16 @@ int main() {
 	menuBar->onItemClickedInt.connect([](size_t a, size_t b) { printf("%zu %zu \n", a, b); });
 	gui.addMenuBar(menuBar);
 
-	auto label = std::make_shared<edui::Label>();
-	label->translationId = "Widgets.hello";
-	label->setSize({0, 100}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
-	gui.add(label);
-
 	auto slider = std::make_shared<edui::Slider>();
 	slider->setPosition({0, 20}, {0, 120});
 	slider->setSize({0, 200}, {0, 26});
 	slider->onValueChanged.connect([](int newVal) { printf("slider change: %i \n", newVal); });
 	gui.add(slider);
 
-	auto textEdit = std::make_shared<edui::TextEdit>();
+	auto textEdit = std::make_shared<edui::CodeEdit>();
 	textEdit->setPosition({0, 20}, {0, 150});
 	textEdit->setSize({0, 300}, {0, 250});
-	textEdit->setText("Hello world!\nLazy fox.\nThird way.");
+	textEdit->setText("print('hello')");
 	gui.add(textEdit);
 
 	auto colorValue = std::make_shared<edui::ColorValue>();
@@ -240,6 +235,12 @@ int main() {
 	gui.add(tabList);
 
 	tabList->showLastTab();
+
+	auto button = std::make_shared<edui::Button>();
+	button->translationId = "Widgets.hello";
+	button->setSize({0, 100}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	button->onClicked.connect([&textEdit] { textEdit->setText(LoadFileText("resources/assets.lua")); });
+	gui.add(button);
 
 	while (!WindowShouldClose()) {
 		gui.update();

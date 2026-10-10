@@ -41,7 +41,7 @@ struct TextEdit : public Widget {
 	TextEdit();
 	~TextEdit();
 
-	void setText(const std::string &newText);
+	virtual void setText(const std::string &newText);
 
 	void update() override;
 	void draw() override;
@@ -50,7 +50,7 @@ struct TextEdit : public Widget {
 	void leftMouseReleased() override;
 
 	void keyPressed(KeyboardKey key, KeyModifier mod, bool held) override;
-	void charEntered(int codepoint, std::string_view str) override;
+	virtual void charEntered(int codepoint, std::string_view str) override;
 
 	void mouseEntered() override;
 	void mouseLeft() override;
@@ -60,7 +60,7 @@ struct TextEdit : public Widget {
 
 	void unload();
 
-private:
+protected:
 	short debounce = 0;
 
 	Rectangle scissorContentRect;
@@ -82,6 +82,8 @@ private:
 	CursorPosition selectStart;
 	CursorPosition selectEnd;
 
+	virtual void drawText(Vector2 textBegin);
+
 	void drawCursor();
 	void setCursorFromMouse();
 	CursorPosition getPositionFromMouse();
@@ -99,7 +101,7 @@ private:
 
 	void handleArrowKeys(KeyboardKey key);
 	void handleDeletionKeys(KeyboardKey key);
-	void handleEnterTab(KeyboardKey key);
+	virtual void handleEnterTab(KeyboardKey key);
 	void handleSelectionKeys(KeyboardKey key, KeyModifier mod);
 };
 }  // namespace edui

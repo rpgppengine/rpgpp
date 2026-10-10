@@ -117,7 +117,7 @@ void TextEdit::draw() {
 	Vector2 textBegin = {rect.x + rend.padding - scissorX, rect.y + rend.padding - scissorY};
 	BeginScissorMode(scissorContentRect.x, scissorContentRect.y, scissorContentRect.width, scissorContentRect.height);
 
-	DrawTextEx(*rend.font, text.c_str(), textBegin, totalFontSize, spacing, rend.borderColor);
+	drawText(textBegin);
 
 	if (hasSelection()) {
 		drawSelection();
@@ -133,6 +133,15 @@ void TextEdit::draw() {
 	if (overflownY) {
 		scrollbar->draw();
 	}
+}
+
+void TextEdit::drawText(Vector2 textBegin) {
+	auto &rend = render->as<TextEditRender>();
+
+	float totalFontSize = rend.fontSize > 0 ? rend.fontSize : Gui::instance->labelFontSize;
+	float spacing = rend.spacing > 0 ? rend.spacing : Gui::instance->fontSpacing;
+
+	DrawTextEx(*rend.font, text.c_str(), textBegin, totalFontSize, spacing, rend.borderColor);
 }
 
 void TextEdit::leftMouseClicked() {
@@ -337,8 +346,9 @@ void TextEdit::drawSelection() {
 }
 
 void TextEdit::resetSelection() {
-	selectStart = {0, 0};
-	selectEnd = {0, 0};
+	// selectStart = {0, 0};
+	// selectEnd = selectStart;
+	selectStart = selectEnd;
 }
 
 void TextEdit::eraseSelection() {

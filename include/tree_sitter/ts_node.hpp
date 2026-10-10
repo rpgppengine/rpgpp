@@ -20,6 +20,8 @@ struct Node {
 	TSPoint startPoint() { return ts_node_start_point(node); }
 	bool isNamed() { return ts_node_is_named(node); }
 	std::string string() { return ts_node_string(node); }
+	uint32_t startByte() { return ts_node_start_byte(node); }
+	uint32_t endByte() { return ts_node_end_byte(node); }
 };
 }  // namespace ts
 
