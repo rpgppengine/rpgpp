@@ -181,6 +181,7 @@ void Gui::add(std::shared_ptr<Widget> widget, int layerId) {
 	widget->layerId = layerId;
 	arr[layerId].push_back(widget);
 	widget->applyTheme(themeStruct);
+	widget->calcRect(screenRect);
 	widget->onAdded();
 }
 

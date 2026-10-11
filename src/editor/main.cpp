@@ -124,6 +124,7 @@ int main() {
 	auto menuBar = std::make_shared<edui::MenuBar>();
 	menuBar->translationId = "Menu";
 	menuBar->addItem("file", {"one", "two"});
+	menuBar->addItem("edit", {"one, two"});
 	menuBar->onItemClicked.connect(
 		[](const std::string &title, const std::string &option) { printf("%s %s \n", title.c_str(), option.c_str()); });
 	menuBar->onItemClickedInt.connect([](size_t a, size_t b) { printf("%zu %zu \n", a, b); });
@@ -138,8 +139,8 @@ int main() {
 	auto textEdit = std::make_shared<edui::CodeEdit>();
 	textEdit->setPosition({0, 20}, {0, 150});
 	textEdit->setSize({0, 300}, {0, 250});
-	textEdit->setText("print('hello')");
 	gui.add(textEdit);
+	textEdit->setText("print('hello')");
 
 	auto colorValue = std::make_shared<edui::ColorValue>();
 	colorValue->setPosition({0, 350}, {0, 300});
@@ -239,7 +240,7 @@ int main() {
 	auto button = std::make_shared<edui::Button>();
 	button->translationId = "Widgets.hello";
 	button->setSize({0, 100}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
-	button->onClicked.connect([&textEdit] { textEdit->setText(LoadFileText("resources/assets.lua")); });
+	button->onClicked.connect([&textEdit] { textEdit->setText(LoadFileText("resources/battle.lua")); });
 	gui.add(button);
 
 	while (!WindowShouldClose()) {

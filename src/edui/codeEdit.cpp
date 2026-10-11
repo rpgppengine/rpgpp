@@ -14,9 +14,6 @@
 
 using namespace edui;
 
-static const std::vector<std::string> stringTypes = {"string", "string_content"};
-static const std::vector<std::string> commentTypes = {"comment", "comment_content"};
-
 /// Taken from raylib
 void DrawTextCode(Font font, const char *text, Vector2 position, float fontSize, float spacing,
 				  std::vector<Color> &tint) {
@@ -69,6 +66,16 @@ CodeEdit::CodeEdit() : TextEdit() {
 	tsTree = nullptr;
 }
 
+void CodeEdit::applyTheme(const mINI::INIStructure &struc) {
+	TextEdit::applyTheme(struc);
+	highlighter.colors.applyTheme(struc);
+
+	if (tsTree.tree != nullptr) {
+		auto node = tsTree.rootNode();
+		traverse(node);
+	}
+}
+
 void CodeEdit::setText(const std::string &newText) {
 	TextEdit::setText(newText);
 
@@ -82,34 +89,51 @@ void CodeEdit::setText(const std::string &newText) {
 	traverse(node);
 }
 
-bool stringInArr(const std::string &str, const std::vector<std::string> &vec) {
-	for (int i = 0; i < vec.size(); i++) {
-		if (TextIsEqual(vec[i].c_str(), str.c_str())) {
-			return true;
-		}
+TSInputEdit CodeEdit::beginTreeEdit(size_t *oldSize) {
+	*oldSize = text.size();
+
+	size_t startByte = charPos;
+	TSPoint startPoint = {cursorPos.row, cursorPos.column};
+
+	size_t oldEndByte = charPos;
+	TSPoint oldEndPoint = {cursorPos.row, cursorPos.column};
+
+	if (hasSelection()) {
+		auto range = normalizeSelection();
+
+		startByte = calcCharPos(range.start.row, range.start.column);
+		startPoint = {range.start.row, range.start.column};
+		oldEndPoint = {range.end.row, range.end.column};
 	}
-	return false;
+
+	TSInputEdit res;
+	res.start_byte = startByte;
+	res.start_point = startPoint;
+	res.old_end_byte = oldEndByte;
+	res.old_end_point = oldEndPoint;
+	return res;
 }
 
-Color getColor(const std::string &type, Color &defaultColor) {
-	if (type == "function_declaration") {
-		return RED;
+void CodeEdit::endTreeEdit(TSInputEdit &edit, size_t *oldSize) {
+	size_t newSize = text.size();
+	size_t added = newSize - *oldSize;
+
+	size_t newEndByte = charPos;
+	TSPoint newEndPoint = {cursorPos.row, cursorPos.column};
+
+	edit.new_end_byte = newEndByte;
+	edit.new_end_point = newEndPoint;
+
+	tsTree.edit(&edit);
+	tsTree = tsParser.parseString(&tsTree, text);
+
+	auto &rend = render->as<TextEditRender>();
+	if (newSize > *oldSize) {
+		codepointColors.insert(codepointColors.cend(), added, rend.textColor);
 	}
 
-	if (type == "identifier") {
-		return BLUE;
-	}
-	if (stringInArr(type, stringTypes)) {
-		return GREEN;
-	}
-	if (stringInArr(type, commentTypes)) {
-		return GRAY;
-	}
-	if (type == "number") {
-		return YELLOW;
-	}
-
-	return defaultColor;
+	auto root = tsTree.rootNode();
+	traverse(root);
 }
 
 void CodeEdit::traverse(ts::Node &node) {
@@ -122,7 +146,7 @@ void CodeEdit::traverse(ts::Node &node) {
 			auto current = cursor.currentNode();
 			if (current.isNamed()) {
 				printf("%s \n", current.type().c_str());
-				auto nodeColor = getColor(current.type(), rend.textColor);
+				auto nodeColor = highlighter.getColor(current.type(), rend.textColor);
 				for (int i = current.startByte(); i < current.endByte(); i++) {
 					codepointColors[i] = nodeColor;
 				}
@@ -143,69 +167,28 @@ void CodeEdit::drawText(Vector2 textBegin) {
 }
 
 void CodeEdit::handleEnterTab(KeyboardKey key) {
-	size_t startByte = charPos;
-	TSPoint startPoint = {cursorPos.row, cursorPos.column};
-
-	size_t oldEndByte = charPos;
-	TSPoint oldEndPoint = {cursorPos.row, cursorPos.column};
-
-	if (hasSelection()) {
-		auto range = normalizeSelection();
-
-		startByte = calcCharPos(range.start.row, range.start.column);
-		startPoint = {range.start.row, range.start.column};
-		oldEndPoint = {range.end.row, range.end.column};
-	}
+	size_t oldSize = 0;
+	auto edit = beginTreeEdit(&oldSize);
 
 	TextEdit::handleEnterTab(key);
 
-	size_t newEndByte = charPos;
-	TSPoint newEndPoint = {cursorPos.row, cursorPos.column};
+	endTreeEdit(edit, &oldSize);
+}
 
-	TSInputEdit edit = {.start_byte = static_cast<uint32_t>(startByte),
-						.old_end_byte = static_cast<uint32_t>(oldEndByte),
-						.new_end_byte = static_cast<uint32_t>(newEndByte),
-						.start_point = startPoint,
-						.old_end_point = oldEndPoint,
-						.new_end_point = newEndPoint};
-	tsTree.edit(&edit);
+void CodeEdit::handleSelectionKeys(KeyboardKey key, KeyModifier mod) {
+	size_t oldSize = 0;
+	auto edit = beginTreeEdit(&oldSize);
 
-	auto &rend = render->as<TextEditRender>();
-	codepointColors.push_back(rend.textColor);
+	TextEdit::handleSelectionKeys(key, mod);
 
-	tsTree = tsParser.parseString(&tsTree, text);
-	auto root = tsTree.rootNode();
-	traverse(root);
+	endTreeEdit(edit, &oldSize);
 }
 
 void CodeEdit::charEntered(int codepoint, std::string_view str) {
-	//-
-	size_t startByte = charPos;
-	TSPoint startPoint = {cursorPos.row, cursorPos.column};
-
-	size_t oldEndByte = charPos;
-	TSPoint oldEndPoint = {cursorPos.row, cursorPos.column};
-	//-
+	size_t oldSize = 0;
+	auto edit = beginTreeEdit(&oldSize);
 
 	TextEdit::charEntered(codepoint, str);
 
-	//-
-	size_t newEndByte = charPos;
-	TSPoint newEndPoint = {cursorPos.row, cursorPos.column};
-
-	TSInputEdit edit = {.start_byte = static_cast<uint32_t>(startByte),
-						.old_end_byte = static_cast<uint32_t>(oldEndByte),
-						.new_end_byte = static_cast<uint32_t>(newEndByte),
-						.start_point = startPoint,
-						.old_end_point = oldEndPoint,
-						.new_end_point = newEndPoint};
-	tsTree.edit(&edit);
-	//-
-	tsTree = tsParser.parseString(&tsTree, text);
-
-	auto &rend = render->as<TextEditRender>();
-	codepointColors.push_back(rend.textColor);
-
-	auto root = tsTree.rootNode();
-	traverse(root);
+	endTreeEdit(edit, &oldSize);
 }

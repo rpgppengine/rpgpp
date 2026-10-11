@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "edui/gui.hpp"
+#include "edui/widget.hpp"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -74,6 +75,13 @@ void TextEdit::unload() {
 	if (lines != nullptr) {
 		MemFree(lines);
 	}
+}
+
+void TextEdit::applyTheme(const mINI::INIStructure &struc) {
+	Widget::applyTheme(struc);
+
+	scrollbar->applyTheme(struc);
+	scrollbar->unfocused();
 }
 
 void TextEdit::setText(const std::string &newText) {
@@ -278,6 +286,7 @@ void TextEdit::reloadLines() {
 	// scrollbar
 	scrollbar->maxContent = scrollMax;
 
+	scissorContentRect = getPaddingRect();
 	if (scrollMax > scissorContentRect.height) {
 		overflownY = true;
 		scrollMax -= scissorContentRect.height;
@@ -285,7 +294,26 @@ void TextEdit::reloadLines() {
 		overflownY = false;
 	}
 
+	scrollbar->visible = overflownY;
 	scrollbar->setMaxScroll(scrollMax);
+
+	fixScroll();
+}
+
+void TextEdit::fixScroll() {
+	if (scissorY >= 0.0f) {
+		scissorY = 0;
+		scrollbar->setValue(-scissorX);
+		return;
+	}
+
+	if (scissorY < scrollMax) {
+		scissorY = scrollMax;
+		scrollbar->setValue(-scissorX);
+		return;
+	}
+
+	scrollbar->setValue(-scissorX);
 }
 
 bool TextEdit::hasSelection() { return (selectStart.row != selectEnd.row) || (selectStart.column != selectEnd.column); }
@@ -651,6 +679,10 @@ void TextEdit::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 }
 
 void TextEdit::charEntered(int codepoint, std::string_view str) {
+	if (hasSelection()) {
+		eraseSelection();
+	}
+
 	for (int i = 0; i < str.size(); i++) {
 		text.insert(text.begin() + charPos + i, str.at(i));
 	}

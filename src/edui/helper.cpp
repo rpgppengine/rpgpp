@@ -127,3 +127,12 @@ int mapRange(int in, int inMin, int inMax, int outMin, int outMax) {
 	int x = (in - inMin) / (inMax - inMin);
 	return outMin + (outMax - outMin) * x;
 }
+
+bool stringInArr(const std::string &str, const std::vector<std::string> &vec) {
+	for (int i = 0; i < vec.size(); i++) {
+		if (TextIsEqual(vec[i].c_str(), str.c_str())) {
+			return true;
+		}
+	}
+	return false;
+}

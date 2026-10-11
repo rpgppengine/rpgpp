@@ -40,6 +40,7 @@ struct TextEdit : public Widget {
 
 	TextEdit();
 	~TextEdit();
+	void applyTheme(const mINI::INIStructure &struc) override;
 
 	virtual void setText(const std::string &newText);
 
@@ -90,6 +91,7 @@ protected:
 	size_t calcCharPos(size_t row, size_t col);
 	void setCursorRect();
 	void reloadLines();
+	void fixScroll();
 
 	bool hasSelection();
 	PosRange normalizeSelection();
@@ -102,7 +104,7 @@ protected:
 	void handleArrowKeys(KeyboardKey key);
 	void handleDeletionKeys(KeyboardKey key);
 	virtual void handleEnterTab(KeyboardKey key);
-	void handleSelectionKeys(KeyboardKey key, KeyModifier mod);
+	virtual void handleSelectionKeys(KeyboardKey key, KeyModifier mod);
 };
 }  // namespace edui
 

@@ -34,7 +34,7 @@ void HorizontalContainer::update() {
 	scrollbar->calcRect(rect);
 	scrollbar->update();
 
-	if (scrollbar->visible) {
+	if (overflown && scrollbar->visible) {
 		if (scrollbar->mouseIsInRect()) {
 			std::shared_ptr<Widget> widgetPtr = scrollbar;
 			Gui::instance->notifyChild(&widgetPtr);

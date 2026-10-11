@@ -43,4 +43,6 @@ std::string getTranslation(const std::string &id, const std::string &def);
 
 Color parseColorString(const std::string &str);
 
+bool stringInArr(const std::string &str, const std::vector<std::string> &vec);
+
 #endif
