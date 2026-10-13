@@ -60,7 +60,7 @@ void MessageBox::translate() {
 	auto &cancel = footerLayout->widgets[0];
 	std::string cancelTranslationId = std::string(builtinTranslation.c_str()) + ".Ok";
 	cancel->as<edui::Button>().setText(getTranslation(cancelTranslationId, "Ok"));
-	cancel->as<edui::Button>().setWidthFit();
+	cancel->as<edui::Button>().resizeToFit();
 }
 
 void MessageBox::update() {

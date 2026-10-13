@@ -40,7 +40,7 @@ struct Label : public Widget {
 
 	void setText(const std::string &text);
 	std::string getText();
-	void setWidthFit();
+	virtual void resizeToFit();
 
 	void mouseEntered() override;
 	void mouseLeft() override;

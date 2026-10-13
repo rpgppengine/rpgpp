@@ -145,7 +145,6 @@ void CodeEdit::traverse(ts::Node &node) {
 		do {
 			auto current = cursor.currentNode();
 			if (current.isNamed()) {
-				printf("%s \n", current.type().c_str());
 				auto nodeColor = highlighter.getColor(current.type(), rend.textColor);
 				for (int i = current.startByte(); i < current.endByte(); i++) {
 					codepointColors[i] = nodeColor;

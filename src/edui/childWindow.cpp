@@ -136,7 +136,7 @@ Rectangle ChildWindow::getContentRect() {
 }
 
 void ChildWindow::leftMouseClicked() {
-	if (CheckCollisionPointRec(GetMousePosition(), getBarRect())) {
+	if (draggable && CheckCollisionPointRec(GetMousePosition(), getBarRect())) {
 		dragging = true;
 	}
 }

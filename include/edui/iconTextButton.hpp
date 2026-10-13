@@ -19,7 +19,7 @@ struct IconTextButton : public Label {
 	void calcRect(Rectangle &base) override;
 	Rectangle getContentRect() override;
 
-	virtual void resizeToFit();
+	void resizeToFit() override;
 };
 }  // namespace edui
 

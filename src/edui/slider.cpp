@@ -28,8 +28,7 @@ Rectangle Slider::getSliderRect() {
 
 	float sliderPos = rect.x + ((sliderMaxPos - rect.x) / (maxValue - minValue)) * (value - minValue);
 
-	Rectangle sliderRect = {sliderPos, rect.y - EDUI_SLIDER_BAR_OFFSET, EDUI_SLIDER_WIDTH,
-							rect.height + (EDUI_SLIDER_BAR_OFFSET * 2)};
+	Rectangle sliderRect = {sliderPos, rect.y, EDUI_SLIDER_WIDTH, rect.height};
 
 	return sliderRect;
 }
@@ -65,7 +64,9 @@ void Slider::draw() {
 	auto &rend = render->as<SliderRender>();
 
 	// border
-	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
+	Rectangle borderRect = {rect.x, rect.y + EDUI_SLIDER_BAR_OFFSET, rect.width,
+							rect.height - (EDUI_SLIDER_BAR_OFFSET * 2)};
+	DrawRectangleLinesEx(borderRect, rend.border, rend.currentBorderColor);
 
 	// slider bar
 	auto sliderRect = getSliderRect();

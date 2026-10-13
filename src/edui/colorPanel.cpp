@@ -22,6 +22,7 @@ static const std::string builtinTranslation = "Widgets.ColorPanel";
 
 ColorPanel::ColorPanel() : ConfirmDialog() {
 	deleteOnOutsideClick = true;
+	draggable = false;
 
 	render = std::make_unique<ColorPanelRender>();
 	render->padding = 4;
@@ -207,10 +208,10 @@ void ColorPanel::openContextMenu() {
 
 void ColorPanel::updateLabels() {
 	rgbLabel->setText(TextFormat("rgb(%u, %u, %u)", color.r, color.g, color.b));
-	rgbLabel->setWidthFit();
+	rgbLabel->resizeToFit();
 
 	hexLabel->setText(TextFormat("#%x", ColorToInt(color)));
-	hexLabel->setWidthFit();
+	hexLabel->resizeToFit();
 }
 
 void ColorPanel::updateSliders() {

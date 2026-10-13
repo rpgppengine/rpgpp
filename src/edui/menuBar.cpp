@@ -38,7 +38,7 @@ void MenuBar::translate() {
 		auto titleTranslationId = std::string(translationId.c_str()) + '.' + std::string(widget->translationId.c_str());
 		std::string titleText = getTranslation(titleTranslationId, widget->translationId.c_str());
 		widget->as<edui::Button>().setText(titleText);
-		widget->as<edui::Button>().setWidthFit();
+		widget->as<edui::Button>().resizeToFit();
 	}
 }
 

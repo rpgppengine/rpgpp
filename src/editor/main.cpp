@@ -1,10 +1,11 @@
+
+#define STR_IMPLEMENTATION
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <memory>
 #include <string>
-
-#define STR_IMPLEMENTATION
 
 #include "editor.hpp"
 #include "edui/button.hpp"
@@ -27,6 +28,7 @@
 #include "edui/horizontalContainer.hpp"
 #include "edui/horizontalScrollbar.hpp"
 #include "edui/iconTextButton.hpp"
+#include "edui/imageRect.hpp"
 #include "edui/intValue.hpp"
 #include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
@@ -40,6 +42,7 @@
 #include "edui/textArea.hpp"
 #include "edui/textBox.hpp"
 #include "edui/textEdit.hpp"
+#include "edui/toggleButton.hpp"
 #include "edui/vector2Value.hpp"
 #include "edui/verticalContainer.hpp"
 #include "edui/verticalScrollbar.hpp"
@@ -108,8 +111,7 @@ int main() {
 	InitWindow(800, 450, "raylib example - basic window");
 	SetTargetFPS(60);
 
-	Color out = parseColorString("245,50,50");
-	printf("%u, %u, %u\n", out.r, out.g, out.b);
+	auto texture = LoadTexture("resources/logo.png");
 
 	edui::Gui gui;
 
@@ -243,6 +245,18 @@ int main() {
 	button->onClicked.connect([&textEdit] { textEdit->setText(LoadFileText("resources/battle.lua")); });
 	gui.add(button);
 
+	auto imageRect = std::make_shared<edui::ImageRect>();
+	imageRect->setPosition({0, 0}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	imageRect->setTexture(texture);
+	imageRect->resizeToTexture();
+	gui.add(imageRect);
+
+	auto toggleButton = std::make_shared<edui::ToggleButton>();
+	toggleButton->setText("Toggle me!");
+	toggleButton->setSize({0, 100}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	toggleButton->setPosition({0, 0}, {0, 52});
+	gui.add(toggleButton);
+
 	while (!WindowShouldClose()) {
 		gui.update();
 
@@ -254,6 +268,7 @@ int main() {
 	}
 
 	gui.unload();
+	UnloadTexture(texture);
 
 	CloseWindow();
 

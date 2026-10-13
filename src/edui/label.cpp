@@ -69,7 +69,7 @@ void Label::setText(const std::string &text) {
 
 std::string Label::getText() { return text; }
 
-void Label::setWidthFit() {
+void Label::resizeToFit() {
 	auto &rend = render->as<LabelRender>();
 	if (rend.font == nullptr) return;
 

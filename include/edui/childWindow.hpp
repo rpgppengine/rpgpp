@@ -23,6 +23,7 @@ struct ChildWindow : public Container {
 	std::shared_ptr<IconButton> closeButtonPtr;
 
 	bool dragging = false;
+	bool draggable = true;
 
 	ChildWindow();
 	void applyTheme(const mINI::INIStructure &struc) override;
