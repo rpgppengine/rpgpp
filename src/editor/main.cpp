@@ -1,4 +1,3 @@
-
 #define STR_IMPLEMENTATION
 
 #include <cstddef>
@@ -43,6 +42,7 @@
 #include "edui/textBox.hpp"
 #include "edui/textEdit.hpp"
 #include "edui/toggleButton.hpp"
+#include "edui/toggleGroup.hpp"
 #include "edui/vector2Value.hpp"
 #include "edui/verticalContainer.hpp"
 #include "edui/verticalScrollbar.hpp"
@@ -251,11 +251,15 @@ int main() {
 	imageRect->resizeToTexture();
 	gui.add(imageRect);
 
-	auto toggleButton = std::make_shared<edui::ToggleButton>();
-	toggleButton->setText("Toggle me!");
-	toggleButton->setSize({0, 100}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
-	toggleButton->setPosition({0, 0}, {0, 52});
-	gui.add(toggleButton);
+	auto toggleGroup = std::make_shared<edui::ToggleGroup>();
+	toggleGroup->setSize({0.5f, 0}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	toggleGroup->setPosition({0, 0}, {0, 52});
+
+	toggleGroup->addItem("Hello", 0);
+	toggleGroup->addItem("Hello2", ICON_ALPHA_CLEAR);
+	toggleGroup->addItem("", ICON_FILETYPE_ALPHA);
+
+	gui.add(toggleGroup);
 
 	while (!WindowShouldClose()) {
 		gui.update();

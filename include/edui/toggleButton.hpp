@@ -21,6 +21,8 @@ struct ToggleButtonRender : public IconTextButtonRender {
 };
 
 struct ToggleButton : public IconTextButton {
+	bool eventLock = false;
+
 	ToggleButton();
 	void applyTheme(const mINI::INIStructure &struc) override;
 
@@ -29,11 +31,11 @@ struct ToggleButton : public IconTextButton {
 	void leftMouseClicked() override;
 
 	void toggle();
+	void setActive();
+	void setInactive();
 
 private:
 	bool active = false;
-	void setActive();
-	void setInactive();
 };
 }  // namespace edui
 

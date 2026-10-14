@@ -22,7 +22,7 @@ Rectangle IconTextButton::getContentRect() {
 	if (iconId == 0) {
 		return Label::getContentRect();
 	} else {
-		return {rect.x + rect.height, rect.y, rect.width - iconRectSize, static_cast<float>(iconRectSize)};
+		return {rect.x + rect.height, rect.y, rect.width - EDUI_SECONDARY_HEIGHT, EDUI_SECONDARY_HEIGHT};
 	}
 }
 
@@ -32,15 +32,19 @@ void IconTextButton::draw() {
 	DrawRectangleRec(rect, rend.currentBgColor);
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 
+	drawContent();
+}
+
+void IconTextButton::drawContent() {
+	auto &rend = render->as<IconTextButtonRender>();
+
 	drawText();
 
 	Rectangle iconRect = {rect.x, rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
-	Rectangle destIconRect = {rect.x, rect.y, static_cast<float>(iconRectSize), static_cast<float>(iconRectSize)};
+	Rectangle destIconRect = {rect.x, rect.y, EDUI_SECONDARY_HEIGHT, EDUI_SECONDARY_HEIGHT};
 	rectCenter(destIconRect, &iconRect);
 
 	GuiDrawIcon(iconId, static_cast<int>(iconRect.x), static_cast<int>(iconRect.y), 1, rend.currentBorderColor);
-
-	auto paddingRect = getPaddingRect();
 }
 
 void IconTextButton::resizeToFit() {

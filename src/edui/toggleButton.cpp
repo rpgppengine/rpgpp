@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "edui/gui.hpp"
 #include "edui/iconTextButton.hpp"
 #include "edui/rlicons.hpp"
 
@@ -30,20 +31,14 @@ void ToggleButton::draw() {
 	DrawRectangleRec(rect, rend.currentBgColor);
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 
-	drawText();
-
-	Rectangle iconRect = {rect.x, rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
-	Rectangle destIconRect = {rect.x, rect.y, static_cast<float>(iconRectSize), static_cast<float>(iconRectSize)};
-	rectCenter(destIconRect, &iconRect);
-
-	GuiDrawIcon(iconId, static_cast<int>(iconRect.x), static_cast<int>(iconRect.y), 1, rend.currentBorderColor);
-
-	auto paddingRect = getPaddingRect();
+	drawContent();
 }
 
 void ToggleButton::leftMouseClicked() {
 	IconTextButton::leftMouseClicked();
-	toggle();
+	if (!eventLock) {
+		toggle();
+	}
 }
 
 void ToggleButton::toggle() {
@@ -57,12 +52,14 @@ void ToggleButton::toggle() {
 }
 
 void ToggleButton::setActive() {
+	active = true;
 	auto &rend = render->as<ToggleButtonRender>();
 	rend.bgColor = rend.activeColor;
 	rend.focusBgColor = rend.activeFocusColor;
 }
 
 void ToggleButton::setInactive() {
+	active = false;
 	auto &rend = render->as<ToggleButtonRender>();
 	rend.bgColor = rend.inactiveColor;
 	rend.focusBgColor = rend.inactiveFocusColor;
