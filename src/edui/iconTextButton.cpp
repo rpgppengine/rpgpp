@@ -5,6 +5,7 @@
 #include "edui/gui.hpp"
 #include "edui/label.hpp"
 #include "edui/rlicons.hpp"
+#include "edui/widget.hpp"
 #include "raylib.h"
 
 using namespace edui;
@@ -64,3 +65,5 @@ void IconTextButton::resizeToFit() {
 	layout.width.offset = totalWidth;
 	layout.width.scale = 0;
 }
+
+Widget::Ptr IconTextButton::clone() { return std::make_shared<IconTextButton>(*this); }

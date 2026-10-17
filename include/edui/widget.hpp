@@ -75,6 +75,7 @@ struct Widget {
 
 	Signal onClicked;
 	Signal onRightClicked;
+	Signal onReleased;
 	Signal onFocused;
 	Signal onUnfocused;
 	Signal onDeleted;
@@ -189,7 +190,7 @@ struct Widget {
 
 	virtual void rightMouseClicked() { onRightClicked.invoke(); }
 
-	virtual void leftMouseReleased() {}
+	virtual void leftMouseReleased() { onReleased.invoke(); }
 
 	virtual void rightMouseReleased() {}
 

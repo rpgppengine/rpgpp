@@ -21,6 +21,8 @@ struct IconTextButton : public Label {
 
 	void resizeToFit() override;
 
+	Widget::Ptr clone() override;
+
 protected:
 	void drawContent();
 };

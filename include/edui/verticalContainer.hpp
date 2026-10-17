@@ -34,6 +34,7 @@ struct VerticalContainer : public ScrollableContainer {
 	void scrolled(float mouseWheel) override;
 
 	void updateContentRect() override;
+	void updateWidgets();
 
 	Widget::Ptr clone() override { return std::make_shared<VerticalContainer>(*this); }
 };

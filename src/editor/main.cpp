@@ -1,5 +1,4 @@
 #define STR_IMPLEMENTATION
-
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -32,6 +31,7 @@
 #include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
 #include "edui/languageDropdown.hpp"
+#include "edui/listView.hpp"
 #include "edui/menuBar.hpp"
 #include "edui/messageBox.hpp"
 #include "edui/rlicons.hpp"
@@ -108,7 +108,7 @@ int main() {
 	traverse(newRoot);
 
 	SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_RESIZABLE);
-	InitWindow(800, 450, "raylib example - basic window");
+	InitWindow(800, 600, "raylib example - basic window");
 	SetTargetFPS(60);
 
 	auto texture = LoadTexture("resources/logo.png");
@@ -196,16 +196,13 @@ int main() {
 	scrollbar->setValue(20);
 	// gui.add(scrollbar);
 
-	auto horizontalContainer = std::make_shared<edui::HorizontalContainer>();
-	horizontalContainer->setPosition({0, 560}, {0, 20});
-	horizontalContainer->setSize({0, 200}, {0, 180});
+	auto listView = std::make_shared<edui::ListView>();
+	listView->setPosition({0, 560}, {0, 20});
+	listView->setSize({0, 200}, {0, 180});
 	for (int i = 0; i < 20; i++) {
-		auto newButton = std::make_shared<edui::Button>();
-		newButton->setSize({0, 40}, {1, 0});
-		newButton->setText(TextFormat("Button%i", i));
-		horizontalContainer->add(newButton);
+		listView->addItem(TextFormat("Button%i", i), i);
 	}
-	gui.add(horizontalContainer);
+	gui.add(listView);
 
 	auto horizontalScrollbar = std::make_shared<edui::HorizontalScrollbar>();
 	horizontalScrollbar->setPosition({0, 560}, {0, 20});

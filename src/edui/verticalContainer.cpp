@@ -119,3 +119,20 @@ void VerticalContainer::scrolled(float mouseWheel) {
 	scissorY += added;
 	scrollbar->setValue(-scissorY);
 }
+
+void VerticalContainer::updateWidgets() {
+	auto &rend = render->as<VerticalContainerRender>();
+
+	int res = 0;
+	for (auto &widget : widgets) {
+		if (!widget->deleteFlag) {
+			int widgetHeight = widget->layout.height.offset;
+
+			widget->layout.y = {0, res};
+
+			this->scissorRect.height = ((rend.padding * 2) + res + widgetHeight);
+
+			res += (widget->layout.height.offset) + rend.space;
+		}
+	}
+}
