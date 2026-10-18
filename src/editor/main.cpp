@@ -218,7 +218,12 @@ int main() {
 	fileList->addItem("item1", 0);
 	fileList->addItem("item2", 0);
 	fileList->addItem("item3", 0);
+
+	fileList->onActiveTabChanged.connect([](int newId) { printf("File tab new active tab is %i \n", newId); });
+	fileList->onEmptied.connect([] { printf("File tab bar is now empty.\n"); });
+
 	gui.add(fileList);
+	fileList->showFirstTab();
 
 	auto tabContent = std::make_shared<edui::Container>();
 	tabContent->setPosition({0, 560}, {0, 264});

@@ -27,6 +27,8 @@ private:
 	std::weak_ptr<edui::IconTextButton> heldItem;
 	Vector2 mouseOffset = {0, 0};
 	float scrollDebounce = 0;
+
+	void onListReleaseMouse();
 };
 }  // namespace edui
 

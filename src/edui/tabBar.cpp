@@ -84,12 +84,9 @@ void TabBar::update() {
 void TabBar::draw() {
 	ScrollableContainer::draw();
 	if (overflown) {
-		// DrawRectangleRec(scrollAreaRect, GREEN);
-
 		leftButtonPtr->draw();
 		rightButtonPtr->draw();
 	}
-	// DrawRectangleRec(contentRect, Fade(RED, 0.5f));
 }
 
 void TabBar::updateContentRect() {
@@ -134,19 +131,23 @@ void TabBar::leftMouseReleased() {}
 std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) {
 	if (size >= 20) return std::make_shared<Container>();
 
+	int newReferId = size;
+
 	auto content = std::make_shared<Container>();
-	content->referId = size;
+	content->referId = newReferId;
 
 	auto button = std::make_shared<Tab>();
 	button->translationId = item.c_str();
-	button->referId = size;
+	button->referId = newReferId;
 	button->setSize({0, 0}, {1, 0});
 	button->setText(item);
 	button->iconId = iconId;
 	button->calcRect(rect);
 
-	int curr = size;
-	button->onClicked.connect([this, curr] { showTabContent(curr); });
+	button->onClicked.connect([this, newReferId] {
+		showTabContent(newReferId);
+		onActiveTabChanged.invoke(newReferId);
+	});
 
 	button->resizeToFit();
 	add(button);
@@ -174,43 +175,51 @@ std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) 
 }
 
 void TabBar::removeItem(int index) {
-	printf("%i \n", index);
-	if (index >= (size - 1)) return;
-
-	int i = index;
-	tabTitles[index] = "";
-	auto &elem = tabTitles[i + 1];
-	while (!elem.empty()) {
-		tabTitles[i].swap(elem);
-
-		i++;
-		elem = tabTitles[i + 1];
-	}
-
-	printf("===\n");
-
-	i = 0;
-	for (auto it = tabPages.begin(); it != tabPages.end();) {
-		printf("%i \n", i);
-		if (it->get()->referId == index) {
-			it->get()->markDelete();
-			it = tabPages.erase(it);
+	// remove the page content
+	for (auto pageIt = tabPages.begin(); pageIt != tabPages.end();) {
+		if (pageIt->get()->referId == index) {
+			pageIt->get()->markDelete();
+			pageIt = tabPages.erase(pageIt);
 			break;
 		} else {
-			it++;
-			i++;
+			pageIt++;
 		}
 	}
 
-	for (auto it = tabPages.begin(); it != tabPages.end();) {
-		printf("widgets count: %zu\n", it->get()->widgets.size());
+	// set new active page
+	if (!widgets.empty()) {
+		int newReferId = -1;
+		for (auto tabIt = widgets.begin(); tabIt != widgets.end();) {
+			if (!tabIt->get()->deleteFlag) {
+				newReferId = tabIt->get()->referId;
+				break;
+			} else {
+				tabIt++;
+			}
+		}
 
-		it++;
+		if (newReferId >= 0) {
+			showTabContent(newReferId);
+		} else {
+			onEmptied.invoke();
+		}
+	} else {
+		onEmptied.invoke();
 	}
 }
 
 void TabBar::showTabContent(int index) {
-	int i = 0;
+	for (auto tabIt = widgets.begin(); tabIt != widgets.end();) {
+		if (tabIt->get()->referId == index) {
+			tabIt->get()->as<Tab>().setActive();
+			tabIt->get()->as<Tab>().unfocused();
+		} else {
+			tabIt->get()->as<Tab>().setInactive();
+			tabIt->get()->as<Tab>().unfocused();
+		}
+
+		tabIt++;
+	}
 
 	for (auto &page : tabPages) {
 		int referId = page->referId;
@@ -218,16 +227,18 @@ void TabBar::showTabContent(int index) {
 		if (referId == index) {
 			page->visible = true;
 			currentPage = index;
-			widgets[i]->as<Tab>().setActive();
-			widgets[i]->as<Tab>().unfocused();
 		} else {
 			page->visible = false;
-			widgets[i]->as<Tab>().setInactive();
-			widgets[i]->as<Tab>().unfocused();
 		}
-
-		i++;
 	}
+
+	onActiveTabChanged.invoke(index);
+}
+
+void TabBar::showFirstTab() {
+	auto it = tabPages.begin();
+	int referId = it->get()->referId;
+	showTabContent(referId);
 }
 
 void TabBar::showLastTab() {

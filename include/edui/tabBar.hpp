@@ -10,11 +10,15 @@
 #include "edui/container.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/iconButton.hpp"
+#include "edui/signal.hpp"
 #include "edui/widget.hpp"
 namespace edui {
 struct TabBarRender : public HorizontalContainerRender {};
 
 struct TabBar : public HorizontalContainer {
+	SignalT<int> onActiveTabChanged;
+	Signal onEmptied;
+
 	std::weak_ptr<Container> contentBase;
 
 	int size = 0;
@@ -23,8 +27,6 @@ struct TabBar : public HorizontalContainer {
 
 	std::shared_ptr<IconButton> leftButtonPtr = nullptr;
 	std::shared_ptr<IconButton> rightButtonPtr = nullptr;
-
-	int currentPage = 0;
 
 	TabBar();
 	void applyTheme(const mINI::INIStructure &struc) override;
@@ -41,9 +43,12 @@ struct TabBar : public HorizontalContainer {
 	virtual std::shared_ptr<Container> addItem(const std::string &item, int iconId);
 	void removeItem(int index);
 	void showTabContent(int index);
+	void showFirstTab();
 	void showLastTab();
 
-private:
+protected:
+	int currentPage = 0;
+
 	void processWidget(std::shared_ptr<Widget> &widget);
 };
 }  // namespace edui

@@ -26,33 +26,7 @@ void ListView::update() {
 		notifiedMouseRelease = true;
 
 		if (notifiedMouseRelease) {
-			Vector2 listPos = {rect.x, rect.y};
-			Vector2 mousePos = GetMousePosition();
-			auto offset = Vector2Subtract(mousePos, listPos);
-			offset.y -= scissorY;
-
-			int res = offset.y / EDUI_SECONDARY_HEIGHT;
-
-			if (res < heldIndex) {
-				std::shared_ptr<edui::Widget> next = widgets[res];
-				for (int i = res + 1; i <= heldIndex; i++) {
-					auto temp = widgets[i];
-					widgets[i] = next;
-					next = temp;
-				}
-				widgets[res] = next;
-			} else if (res > heldIndex) {
-				std::shared_ptr<edui::Widget> next = widgets[res];
-
-				for (int i = res - 1; i >= heldIndex; i--) {
-					auto temp = widgets[i];
-					widgets[i] = next;
-					next = temp;
-				}
-				widgets[res] = next;
-			}
-
-			updateWidgets();
+			onListReleaseMouse();
 		}
 	}
 
@@ -121,4 +95,45 @@ void ListView::addItem(const std::string &title, int iconId) {
 void ListView::leftMouseReleased() {
 	VerticalContainer::leftMouseReleased();
 	holdingMouse = false;
+}
+
+void ListView::onListReleaseMouse() {
+	Vector2 listPos = {rect.x, rect.y};
+	Vector2 mousePos = GetMousePosition();
+
+	if (mousePos.y < rect.y) {
+		mousePos.y += (rect.y - mousePos.y) + mouseOffset.y;
+	} else if (mousePos.y > (rect.y + rect.height)) {
+		mousePos.y -= (mousePos.y - (rect.y + rect.height)) + mouseOffset.y;
+	}
+
+	auto offset = Vector2Subtract(mousePos, listPos);
+	offset.y -= scissorY;
+
+	int res = offset.y / EDUI_SECONDARY_HEIGHT;
+
+	if (res >= widgets.size()) {
+		res = widgets.size() - 1;
+	}
+
+	if (res < heldIndex) {
+		std::shared_ptr<edui::Widget> next = widgets[res];
+		for (int i = res + 1; i <= heldIndex; i++) {
+			auto temp = widgets[i];
+			widgets[i] = next;
+			next = temp;
+		}
+		widgets[res] = next;
+	} else if (res > heldIndex) {
+		std::shared_ptr<edui::Widget> next = widgets[res];
+
+		for (int i = res - 1; i >= heldIndex; i--) {
+			auto temp = widgets[i];
+			widgets[i] = next;
+			next = temp;
+		}
+		widgets[res] = next;
+	}
+
+	updateWidgets();
 }
