@@ -43,8 +43,8 @@ void Gui::processWidget(std::shared_ptr<Widget> &widget) {
 		}
 	}
 
-	widget->update();
 	widget->calcRect(screenRect);
+	widget->update();
 
 	if (auto leftPtr = leftClickedWidget.lock()) {
 		if (leftPtr->deleteFlag) {
@@ -132,6 +132,16 @@ void Gui::update() {
 			current->get()->charEntered(codepoint, view);
 
 			codepoint = GetCharPressed();
+		}
+
+		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !current->get()->mouseIsInRect()) {
+			current->get()->unfocused();
+			current = nullptr;
+		}
+
+		if (IsKeyReleased(KEY_ENTER) && current->get()->unfocusOnEnter) {
+			current->get()->unfocused();
+			current = nullptr;
 		}
 	}
 
@@ -345,5 +355,19 @@ void Gui::loadThemesDir(const std::string &dirPath) {
 void Gui::unload() {
 	if (IsFontValid(font)) {
 		UnloadFont(font);
+	}
+}
+
+void edui::processPseudoChild(Gui *gui, std::shared_ptr<edui::Widget> widget) {
+	if (widget->mouseIsInRect()) {
+		gui->notifyChild(&widget);
+		if (widget->isContainer) {
+			widget->as<edui::Container>().notifyChildren(gui);
+		}
+	} else {
+		if (widget->notifiedMouseEnter) {
+			widget->notifiedMouseEnter = false;
+			widget->mouseLeft();
+		}
 	}
 }

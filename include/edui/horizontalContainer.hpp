@@ -28,6 +28,8 @@ struct HorizontalContainer : public ScrollableContainer {
 	HorizontalContainer();
 	void applyTheme(const mINI::INIStructure &struc) override;
 
+	void onAdded() override;
+
 	void update() override;
 	void draw() override;
 

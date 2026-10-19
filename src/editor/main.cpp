@@ -1,4 +1,5 @@
 #define STR_IMPLEMENTATION
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -20,6 +21,7 @@
 #include "edui/contextMenu.hpp"
 #include "edui/dropdown.hpp"
 #include "edui/dropdownList.hpp"
+#include "edui/fileChooser.hpp"
 #include "edui/fileTabBar.hpp"
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
@@ -136,12 +138,12 @@ int main() {
 	slider->setPosition({0, 20}, {0, 120});
 	slider->setSize({0, 200}, {0, 26});
 	slider->onValueChanged.connect([](int newVal) { printf("slider change: %i \n", newVal); });
-	gui.add(slider);
+	// gui.add(slider);
 
 	auto textEdit = std::make_shared<edui::CodeEdit>();
 	textEdit->setPosition({0, 20}, {0, 150});
 	textEdit->setSize({0, 300}, {0, 250});
-	gui.add(textEdit);
+	// gui.add(textEdit);
 	textEdit->setText("print('hello')");
 
 	auto colorValue = std::make_shared<edui::ColorValue>();
@@ -245,13 +247,13 @@ int main() {
 	button->translationId = "Widgets.hello";
 	button->setSize({0, 100}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
 	button->onClicked.connect([&textEdit] { textEdit->setText(LoadFileText("resources/battle.lua")); });
-	gui.add(button);
+	// gui.add(button);
 
 	auto imageRect = std::make_shared<edui::ImageRect>();
 	imageRect->setPosition({0, 0}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
 	imageRect->setTexture(texture);
 	imageRect->resizeToTexture();
-	gui.add(imageRect);
+	// gui.add(imageRect);
 
 	auto toggleGroup = std::make_shared<edui::ToggleGroup>();
 	toggleGroup->setSize({0.5f, 0}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
@@ -261,7 +263,12 @@ int main() {
 	toggleGroup->addItem("Hello2", ICON_ALPHA_CLEAR);
 	toggleGroup->addItem("", ICON_FILETYPE_ALPHA);
 
-	gui.add(toggleGroup);
+	// gui.add(toggleGroup);
+
+	auto fileChooser = std::make_shared<edui::FileChooser>();
+	fileChooser->setSize({0, 600}, {0, 400});
+	fileChooser->onFileChosen.connect([](std::string chosenPath) { printf("%s \n", chosenPath.c_str()); });
+	gui.add(fileChooser);
 
 	while (!WindowShouldClose()) {
 		gui.update();

@@ -89,6 +89,8 @@ struct Gui {
 
 	void unload();
 };
+
+void processPseudoChild(Gui *gui, std::shared_ptr<edui::Widget> widget);
 }  // namespace edui
 
 #endif

@@ -31,6 +31,7 @@ MessageBox::MessageBox() : ChildWindow() {
 	footerLayout->setSize({1, 0}, {1, 0});
 
 	auto btn = std::make_shared<edui::Button>();
+	btn->referId = OK_BUTTON_ID;
 	btn->setText("OK");
 	btn->render->padding = 8;
 	btn->render->as<ButtonRender>().vertAlign = edui::VerticalAlignment::TEXT_CENTER;
@@ -72,8 +73,7 @@ void MessageBox::update() {
 
 	auto &rend = render->as<MessageBoxRender>();
 
-	Rectangle footerRect = {rect.x, rect.y + (rect.height - EDUI_MESSAGEBOX_FOOTER), rect.width,
-							EDUI_MESSAGEBOX_FOOTER};
+	footerRect = {rect.x, rect.y + (rect.height - EDUI_MESSAGEBOX_FOOTER), rect.width, EDUI_MESSAGEBOX_FOOTER};
 	footerRect.y -= rend.padding;
 	footerRect.height += rend.padding;
 	Rectangle paddingFooter = paddingRect(footerRect, rend.padding);
@@ -105,3 +105,8 @@ Rectangle MessageBox::getContentRect() {
 }
 
 void MessageBox::setText(const std::string &text) { textArea->setText(text); }
+
+edui::Button &MessageBox::getOkButton() {
+	edui::Button &btn = footerLayout->getWidgetById(OK_BUTTON_ID)->as<Button>();
+	return btn;
+}

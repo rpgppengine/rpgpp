@@ -20,6 +20,8 @@ struct ScrollableContainer : public Container {
 	float scrollMax;
 
 	void draw() override;
+
+	void resetScroll();
 };
 }  // namespace edui
 

@@ -107,11 +107,12 @@ void Dropdown::openDropdown() {
 	}
 
 	list->onValueChanged.connect([this](int idx) {
+		currentItem = idx;
+
 		edui::DropdownValue previous = {currentItem, items[currentItem]};
 		edui::DropdownValue current = {idx, items[idx]};
 		onValueChangedT.invoke(previous, current);
 
-		currentItem = idx;
 		opened = false;
 	});
 	list->onDeleted.connect([this] {

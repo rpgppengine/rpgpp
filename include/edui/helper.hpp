@@ -1,6 +1,7 @@
 #ifndef _EDUI_HELPER_H
 #define _EDUI_HELPER_H
 
+#include <memory>
 #include <string>
 #include <vector>
 

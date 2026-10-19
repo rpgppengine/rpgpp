@@ -16,6 +16,7 @@ ConfirmDialog::ConfirmDialog() : MessageBox() {
 	render->padding = 4;
 
 	auto cancel = std::make_shared<edui::Button>();
+	cancel->referId = CANCEL_BUTTON_ID;
 	cancel->setSize({0, 70}, {1, 0});
 	cancel->setText("Cancel");
 	cancel->render->padding = 8;
@@ -30,23 +31,28 @@ ConfirmDialog::ConfirmDialog() : MessageBox() {
 
 	footerLayout->add(cancel);
 
-	// footerLayout->widgets[0].swap(footerLayout->widgets[1]);
+	footerLayout->widgets[0].swap(footerLayout->widgets[1]);
 }
 
 void ConfirmDialog::translate() {
 	MessageBox::translate();
 
 	// ok button
-	auto &ok = footerLayout->widgets[1];
+	auto &ok = getOkButton();
 	std::string okTranslationId = std::string(builtinTranslation.c_str()) + ".Ok";
-	ok->as<edui::Button>().setText(getTranslation(okTranslationId, "OK"));
-	ok->as<edui::Button>().resizeToFit();
+	ok.setText(getTranslation(okTranslationId, "OK"));
+	ok.resizeToFit();
 
 	// cancel button
-	auto &cancel = footerLayout->widgets[0];
+	auto &cancel = getCancelButton();
 	std::string cancelTranslationId = std::string(builtinTranslation.c_str()) + ".Cancel";
-	cancel->as<edui::Button>().setText(getTranslation(cancelTranslationId, "Cancel"));
-	cancel->as<edui::Button>().resizeToFit();
+	cancel.setText(getTranslation(cancelTranslationId, "Cancel"));
+	cancel.resizeToFit();
 
 	footerLayout->updateWidgets();
+}
+
+edui::Button &ConfirmDialog::getCancelButton() {
+	edui::Button &btn = footerLayout->getWidgetById(CANCEL_BUTTON_ID)->as<Button>();
+	return btn;
 }

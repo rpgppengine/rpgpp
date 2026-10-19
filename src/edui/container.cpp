@@ -1,5 +1,7 @@
 #include "edui/container.hpp"
 
+#include <memory>
+
 #include "edui/helper.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
@@ -41,8 +43,8 @@ void Container::update() {
 			continue;
 		}
 
-		widget->update();
 		widget->calcRect(renderRect);
+		widget->update();
 
 		if (!widget->mouseIsInRect() || !mouseIsInContent()) {
 			if (widget->notifiedMouseEnter) {
@@ -77,7 +79,7 @@ void Container::draw() {
 
 void Container::drawChildren() {
 	for (auto &widget : widgets) {
-		if (widget->visible) {
+		if (widget->visible && !widget->deleteFlag) {
 			widget->draw();
 		}
 	}
@@ -110,6 +112,18 @@ void Container::notifyChildren(Gui *gui) {
 	}
 }
 
+std::shared_ptr<edui::Widget> Container::getWidgetById(int referId) {
+	std::shared_ptr<edui::Widget> result = widgets.front();
+	for (auto &widget : widgets) {
+		if (widget->referId == referId) {
+			result = widget;
+			return result;
+		}
+	}
+	printf("[EDUI] widget not found\n");
+	return result;
+}
+
 void Container::markDelete() {
 	for (auto &widget : widgets) {
 		widget->markDelete();
@@ -118,14 +132,13 @@ void Container::markDelete() {
 }
 
 void Container::deleteChildren() {
-	int i = 0;
 	for (auto &widget : widgets) {
 		if (widget != nullptr) {
 			if (widget->isContainer) {
 				widget->as<Container>().deleteChildren();
 			}
-			widgets.erase(widgets.begin() + i);
-			i++;
+			widget->markDelete();
 		}
 	}
+	widgets.clear();
 }

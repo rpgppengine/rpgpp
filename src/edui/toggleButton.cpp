@@ -49,6 +49,8 @@ void ToggleButton::toggle() {
 	} else {
 		setInactive();
 	}
+
+	onToggled.invoke(active);
 }
 
 void ToggleButton::setActive() {

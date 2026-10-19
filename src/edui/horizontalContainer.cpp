@@ -28,6 +28,11 @@ void HorizontalContainer::applyTheme(const mINI::INIStructure &struc) {
 	scrollbar->unfocused();
 }
 
+void HorizontalContainer::onAdded() {
+	ScrollableContainer::onAdded();
+	updateWidgets();
+}
+
 void HorizontalContainer::update() {
 	ScrollableContainer::update();
 
@@ -47,22 +52,6 @@ void HorizontalContainer::update() {
 	}
 
 	auto &rend = render->as<HorizontalContainerRender>();
-
-	/*
-	this->scissorRect.width = 0;
-	for (auto &widget : widgets) {
-		if (widget->visible && !widget->deleteFlag) {
-			widget->layout.x.offset = this->scissorRect.width;
-			this->scissorRect.width += widget->rect.width;
-
-			if (reverse) {
-				widget->layout.x.offset = rect.width - this->scissorRect.width;
-			}
-
-			this->scissorRect.width += rend.space;
-		}
-	}
-	*/
 }
 
 void HorizontalContainer::draw() {
@@ -82,7 +71,8 @@ void HorizontalContainer::add(std::shared_ptr<Widget> widget) {
 	for (auto &widget : widgets) {
 		res += (widget->layout.width.offset) + rend.space;
 	}
-	int widgetWidth = widget->layout.width.offset;
+	widget->calcRect(rect);
+	int widgetWidth = widget->rect.width;
 
 	widget->layout.x = {0, res};
 	if (reverse) {
@@ -90,25 +80,13 @@ void HorizontalContainer::add(std::shared_ptr<Widget> widget) {
 	}
 	widget->layout.y = {0, 0};
 	widget->layout.height = {1.0f, 0};
-	widget->layout.width = {0, widgetWidth};
+	// widget->layout.width = {0, widgetWidth};
 
 	this->scissorRect.width = ((rend.padding * 2) + res + widgetWidth);
-
-	/*
-	this->scissorRect.width = ((rend.padding * 2) + res + widgetWidth);
-
-	int size = widgets.size();
-
-	widget->onDeleted = [this, size, widgetWidth] {
-		deferFlag = true;
-		for (int i = (size - 1); i < widgets.size(); i++) {
-			widgets.at(i)->layout.x.offset -= widgetWidth;
-		}
-		this->scissorRect.width -= widgetWidth;
-	};
-	*/
 
 	ScrollableContainer::add(widget);
+
+	updateWidgets();
 }
 
 void HorizontalContainer::updateContentRect() {

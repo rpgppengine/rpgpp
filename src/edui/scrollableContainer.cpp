@@ -23,3 +23,8 @@ void ScrollableContainer::draw() {
 
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 }
+
+void ScrollableContainer::resetScroll() {
+	scissorX = 0;
+	scissorY = 0;
+}

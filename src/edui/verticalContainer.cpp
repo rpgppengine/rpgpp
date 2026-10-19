@@ -136,3 +136,23 @@ void VerticalContainer::updateWidgets() {
 		}
 	}
 }
+
+void VerticalContainer::fixScroll() {
+	if (scissorY >= 0.0f) {
+		scissorX = 0;
+		scrollbar->setValue(-scissorY);
+		return;
+	}
+
+	if (scissorY < scrollMax) {
+		scissorY = scrollMax;
+		scrollbar->setValue(-scissorY);
+		return;
+	}
+
+	scrollbar->setValue(-scissorY);
+
+	if (!overflown) {
+		scissorY = 0;
+	}
+}

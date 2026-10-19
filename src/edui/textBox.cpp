@@ -130,8 +130,7 @@ void TextBox::draw() {
 	textPos.y =
 		paddingRect.y + Lerp(0.0f, paddingRect.height - textSize.y, (static_cast<float>(rend.vertAlign) * 0.5f));
 
-	DrawTextEx(*rend.font, text.c_str(), {textPos.x - scroll, textPos.y}, totalFontSize, spacing,
-			   rend.textColor);
+	DrawTextEx(*rend.font, text.c_str(), {textPos.x - scroll, textPos.y}, totalFontSize, spacing, rend.textColor);
 	drawSelection();
 
 	EndScissorMode();
@@ -156,6 +155,7 @@ void TextBox::focused() {
 
 void TextBox::unfocused() {
 	selectStart = selectEnd;
+	scroll = 0;
 	Widget::unfocused();
 }
 

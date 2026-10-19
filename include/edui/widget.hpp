@@ -1,7 +1,6 @@
 #ifndef _EDUI_WIDGET_H
 #define _EDUI_WIDGET_H
 
-#include <cstdio>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -89,10 +88,13 @@ struct Widget {
 
 	bool visible = true;
 	bool focusable = false;
+	bool disabled = false;
+
 	bool isContainer = false;
 	bool notifiedMouseEnter = false;
 	bool isFocused = false;
 	bool deleteOnOutsideClick = false;
+	bool unfocusOnEnter = true;
 	Rectangle outsideClickException = {0, 0, 0, 0};
 
 	Rectangle rect = {0, 0, 0, 0};
@@ -160,8 +162,10 @@ struct Widget {
 
 	virtual void mouseEntered() {
 		onMouseEntered.invoke();
-		render->currentBgColor = render->focusBgColor;
-		render->currentBorderColor = render->focusBorderColor;
+		if (!disabled) {
+			render->currentBgColor = render->focusBgColor;
+			render->currentBorderColor = render->focusBorderColor;
+		}
 	}
 
 	virtual void mouseLeft() {
@@ -173,10 +177,12 @@ struct Widget {
 	virtual void mouseMoved(Vector2 mousePos, Vector2 relative) {}
 
 	virtual void focused() {
-		isFocused = true;
-		render->currentBgColor = render->focusBgColor;
-		render->currentBorderColor = render->focusBorderColor;
-		onFocused.invoke();
+		if (!disabled) {
+			isFocused = true;
+			render->currentBgColor = render->focusBgColor;
+			render->currentBorderColor = render->focusBorderColor;
+			onFocused.invoke();
+		}
 	}
 
 	virtual void unfocused() {
@@ -186,9 +192,17 @@ struct Widget {
 		onUnfocused.invoke();
 	}
 
-	virtual void leftMouseClicked() { onClicked.invoke(); }
+	virtual void leftMouseClicked() {
+		if (!disabled) {
+			onClicked.invoke();
+		}
+	}
 
-	virtual void rightMouseClicked() { onRightClicked.invoke(); }
+	virtual void rightMouseClicked() {
+		if (!disabled) {
+			onRightClicked.invoke();
+		}
+	}
 
 	virtual void leftMouseReleased() { onReleased.invoke(); }
 

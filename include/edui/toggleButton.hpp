@@ -21,6 +21,8 @@ struct ToggleButtonRender : public IconTextButtonRender {
 };
 
 struct ToggleButton : public IconTextButton {
+	SignalT<bool> onToggled;
+
 	bool eventLock = false;
 
 	ToggleButton();

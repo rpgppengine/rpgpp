@@ -2,6 +2,7 @@
 #define _EDUI_CONTAINER_H
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "edui/gui.hpp"
@@ -40,6 +41,7 @@ struct Container : public Widget {
 
 	Widget::Ptr clone() override { return std::make_shared<Container>(*this); }
 
+	std::shared_ptr<Widget> getWidgetById(int referId);
 	void markDelete() override;
 	void deleteChildren();
 

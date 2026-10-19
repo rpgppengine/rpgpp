@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "edui/button.hpp"
 #include "edui/childWindow.hpp"
 #include "edui/gui.hpp"
 #include "edui/horizontalContainer.hpp"
@@ -11,7 +12,8 @@ namespace edui {
 struct MessageBoxRender : public ChildWindowRender {};
 
 struct MessageBox : public ChildWindow {
-	const float EDUI_MESSAGEBOX_FOOTER = EDUI_SECONDARY_HEIGHT + 8;
+	const float EDUI_MESSAGEBOX_FOOTER = EDUI_SECONDARY_HEIGHT;
+	const int OK_BUTTON_ID = 1;
 
 	Signal onOkPressed;
 
@@ -28,6 +30,11 @@ struct MessageBox : public ChildWindow {
 	Rectangle getContentRect() override;
 
 	void setText(const std::string &text);
+
+	edui::Button &getOkButton();
+
+protected:
+	Rectangle footerRect = {0, 0, 0, 0};
 };
 }  // namespace edui
 

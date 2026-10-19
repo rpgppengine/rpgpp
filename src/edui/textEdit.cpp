@@ -39,6 +39,8 @@ edui::CharsRange CodepointsToCharsRange(std::string_view str, size_t start, size
 
 TextEdit::TextEdit() {
 	focusable = true;
+	unfocusOnEnter = false;
+
 	render = std::make_unique<TextEditRender>();
 	render->padding = 2;
 
