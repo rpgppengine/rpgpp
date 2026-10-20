@@ -23,6 +23,7 @@
 #include "edui/dropdownList.hpp"
 #include "edui/fileChooser.hpp"
 #include "edui/fileTabBar.hpp"
+#include "edui/fileValue.hpp"
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/horizontalContainer.hpp"
@@ -268,7 +269,12 @@ int main() {
 	auto fileChooser = std::make_shared<edui::FileChooser>();
 	fileChooser->setSize({0, 600}, {0, 400});
 	fileChooser->onFileChosen.connect([](std::string chosenPath) { printf("%s \n", chosenPath.c_str()); });
-	gui.add(fileChooser);
+	// gui.add(fileChooser);
+
+	auto fileValue = std::make_shared<edui::FileValue>();
+	fileValue->setSize({0, 150}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
+	fileValue->addImagesCategory();
+	gui.add(fileValue);
 
 	while (!WindowShouldClose()) {
 		gui.update();

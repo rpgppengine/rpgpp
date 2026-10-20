@@ -37,14 +37,8 @@ FileChooser::FileChooser() : ConfirmDialog() {
 		setDirectory(dirPath);
 	});
 
-	addDefaultCategories();
-	updateFileFilter();
-
 	getOkButton().disabled = true;
 	getOkButton().onClicked.connect([this] { onFileChosen.invoke(chosenPath); });
-
-	dirPath = GetApplicationDirectory();
-	setDirectory(dirPath);
 }
 
 void FileChooser::applyTheme(const mINI::INIStructure &struc) {
@@ -129,6 +123,11 @@ void FileChooser::draw() {
 void FileChooser::onAdded() {
 	ConfirmDialog::onAdded();
 	filterBox->render->font = this->render->font;
+
+	updateFileFilter();
+
+	dirPath = GetApplicationDirectory();
+	setDirectory(dirPath);
 }
 
 void FileChooser::addCategory(const std::string &title, std::vector<std::string> extensions, int iconId) {
@@ -146,11 +145,28 @@ void FileChooser::addCategory(const std::string &title, std::vector<std::string>
 	filterBox->addItem(title);
 }
 
+void FileChooser::addCategory(FileCategory &category) {
+	categories.push_back(category);
+	filterBox->addItem(category.title);
+}
+
+void FileChooser::clearCategories() {
+	categories.clear();
+	filterBox->clear();
+}
+
 void FileChooser::setDirectory(std::string fullPath) {
 	if (!DirectoryExists(fullPath.c_str())) {
 		pathBox->setText(dirPath);
 		return;
 	}
+
+	std::string last = fullPath.end().base();
+	if (fullPath.back() == '/') {
+		fullPath.pop_back();
+	}
+
+	getOkButton().disabled = true;
 
 	dirPath = fullPath;
 	pathBox->setText(fullPath);

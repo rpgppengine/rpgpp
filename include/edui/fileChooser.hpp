@@ -19,6 +19,7 @@ struct FileCategory {
 	std::string title;
 	std::array<std::string, FILE_CATEGORY_MAX_EXTENSIONS> extensions;
 	int iconId;
+	bool valid = false;
 };
 
 struct FileChooserRender : public ConfirmDialogRender {};
@@ -37,6 +38,8 @@ struct FileChooser : public ConfirmDialog {
 
 	void setDirectory(std::string fullPath);
 	void addCategory(const std::string &title, std::vector<std::string> extensions, int iconId = ICON_FILE);
+	void addCategory(FileCategory &category);
+	void clearCategories();
 
 private:
 	std::vector<FileCategory> categories = {};

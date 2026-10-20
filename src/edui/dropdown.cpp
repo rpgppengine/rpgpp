@@ -35,6 +35,8 @@ void Dropdown::addItem(const std::string &item) {
 	lastItem++;
 }
 
+void Dropdown::clear() { lastItem = 0; }
+
 void Dropdown::draw() {
 	auto &rend = render->as<DropdownRender>();
 

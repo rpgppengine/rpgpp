@@ -39,6 +39,7 @@ struct Dropdown : public Widget, public ValueWidgetT<DropdownValue> {
 	void leftMouseClicked() override;
 
 	void addItem(const std::string &item);
+	void clear();
 
 protected:
 	bool translated = true;

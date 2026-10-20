@@ -414,6 +414,14 @@ void TextBox::leftMouseReleased() {
 void TextBox::charEntered(int codepoint, std::string_view str) {
 	std::string previous = text;
 
+	if (selectStart != selectEnd) {
+		auto selection = getSelectionInfo();
+		text = text.erase(selection.start, selection.end - selection.start);
+		cursorIndex = selection.start;
+		calcCursorRect();
+		selectStart = selectEnd;
+	}
+
 	for (int i = 0; i < str.size(); i++) {
 		text.insert(text.begin() + cursorIndex + i, str.at(i));
 	}
