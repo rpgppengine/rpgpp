@@ -6,6 +6,7 @@
 namespace edui {
 struct ColorRectRender : public WidgetRender {};
 
+/* A widget which is filled with a single color. */
 struct ColorRect : public Widget {
 	typedef std::shared_ptr<ColorRect> Ptr;
 

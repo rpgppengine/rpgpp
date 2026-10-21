@@ -4,7 +4,6 @@
 #include "edui/button.hpp"
 #include "edui/container.hpp"
 #include "edui/intValueTextBox.hpp"
-#include "edui/signal.hpp"
 #include "edui/valuewidget.hpp"
 
 namespace edui {

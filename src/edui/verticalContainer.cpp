@@ -36,20 +36,15 @@ void VerticalContainer::update() {
 	scrollbar->calcRect(rect);
 	scrollbar->update();
 
-	if (scrollbar->mouseIsInRect()) {
-		std::shared_ptr<Widget> widgetPtr = scrollbar;
-		Gui::instance->notifyChild(&widgetPtr);
-	} else {
-		if (scrollbar->notifiedMouseEnter) {
-			scrollbar->notifiedMouseEnter = false;
-			scrollbar->mouseLeft();
-		}
+	if (overflown && scrollbar->visible) {
+		processPseudoChild(gui, scrollbar);
 	}
 }
 
 void VerticalContainer::draw() {
 	ScrollableContainer::draw();
-	if (overflown) {
+
+	if (overflown && scrollbar->visible) {
 		scrollbar->draw();
 	}
 }

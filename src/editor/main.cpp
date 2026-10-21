@@ -150,7 +150,7 @@ int main() {
 	auto colorValue = std::make_shared<edui::ColorValue>();
 	colorValue->setPosition({0, 350}, {0, 300});
 	colorValue->setSize({0, 50}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
-	colorValue->onValueChangedT([](Color old, Color newColor) {
+	colorValue->onValueChanged([](Color old, Color newColor) {
 		printf("%u, %u, %u ; %u, %u, %u\n", old.r, old.g, old.b, newColor.r, newColor.g, newColor.b);
 	});
 	gui.add(colorValue);
@@ -164,7 +164,7 @@ int main() {
 
 	auto langBox = std::make_shared<edui::LanguageDropdown>();
 	langBox->setSize({1, 0}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
-	langBox->onValueChangedT([](edui::DropdownValue old, edui::DropdownValue newValue) {
+	langBox->onValueChanged([](edui::DropdownValue old, edui::DropdownValue newValue) {
 		auto langName = std::string(edui::Gui::instance->languageNames[newValue.idx].key.c_str());
 		std::string sourceFile = TextFormat("resources/%s.ini", langName.c_str());
 		edui::Gui::instance->loadTranslation(sourceFile);
@@ -189,7 +189,7 @@ int main() {
 			themeDrop->setValue({i, ""});
 		}
 	}
-	themeDrop->onValueChangedT(
+	themeDrop->onValueChanged(
 		[](edui::DropdownValue old, edui::DropdownValue newValue) { edui::Gui::instance->loadTheme(newValue.val); });
 	langWindow->add(themeDrop);
 
@@ -274,6 +274,7 @@ int main() {
 	auto fileValue = std::make_shared<edui::FileValue>();
 	fileValue->setSize({0, 150}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
 	fileValue->addImagesCategory();
+	fileValue->addFontCategory();
 	gui.add(fileValue);
 
 	while (!WindowShouldClose()) {

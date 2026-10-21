@@ -7,10 +7,9 @@
 namespace edui {
 struct CheckboxRender : public WidgetRender {};
 
+/* A widget which displays a toggleable checkbox. */
 struct Checkbox : public Widget, public ValueWidgetT<bool> {
 	SignalT2<bool, bool> valueChanged;
-
-	bool checked = false;
 
 	void setValue(const bool &text) override;
 	bool getValue() override;
@@ -20,6 +19,9 @@ struct Checkbox : public Widget, public ValueWidgetT<bool> {
 	void draw() override;
 
 	void leftMouseClicked() override;
+
+private:
+	bool checked = false;
 };
 }  // namespace edui
 

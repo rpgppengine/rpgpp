@@ -4,6 +4,7 @@
 
 #include "edui/button.hpp"
 #include "edui/container.hpp"
+#include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
@@ -19,7 +20,7 @@ IntValue::IntValue() : Container() {
 	intval = std::make_shared<edui::IntValueTextBox>();
 	intval->setPosition({0, 0}, {0, 0});
 	intval->setSize({1.0f, -24}, {1, 0});
-	intval->intValueChanged.connect([this](int a, int b) { onValueChangedT.invoke(a, b); });
+	intval->intValueChanged.connect([this](int a, int b) { onValueChanged.invoke(a, b); });
 	add(intval);
 
 	std::weak_ptr<edui::IntValueTextBox> weakIntVal = intval;
@@ -56,8 +57,9 @@ void IntValue::draw() {
 
 	Container::draw();
 
-	Rectangle iconRect = {rect.x + rect.width - 24, rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
-	Rectangle iconDestRect = {rect.x + rect.width - 24, rect.y, 24, 24};
+	Rectangle iconRect = {rect.x + rect.width - EDUI_SECONDARY_HEIGHT, rect.y, RAYGUI_ICON_SIZE, RAYGUI_ICON_SIZE};
+	Rectangle iconDestRect = {rect.x + rect.width - EDUI_SECONDARY_HEIGHT, rect.y, EDUI_SECONDARY_HEIGHT,
+							  EDUI_SECONDARY_HEIGHT};
 
 	rectCenter(iconDestRect, &iconRect);
 

@@ -30,11 +30,13 @@ const size_t EDUI_MAX_THEMES = 16;
 struct Gui {
 	static Gui *instance;
 
+	/* The background color. */
 	Color background = RAYWHITE;
 	Font font;
 	float labelFontSize = 16;
 	float fontSpacing = 0;
 
+	/* Whether the Gui has a menu bar at the top of the window. */
 	bool hasMenuBar = false;
 	std::shared_ptr<Widget> menuBar = nullptr;
 
@@ -43,6 +45,8 @@ struct Gui {
 	std::array<std::vector<std::shared_ptr<Widget>>, EDUI_MAX_LAYERS> arr = {};
 
 	bool notified = false;
+
+	/* Currently focused widget. */
 	std::shared_ptr<Widget> *current = nullptr;
 	std::weak_ptr<Widget> leftClickedWidget;
 	std::weak_ptr<Widget> middleClickedWidget;
@@ -72,19 +76,26 @@ struct Gui {
 	void processVector(std::vector<std::shared_ptr<Widget>> &vec);
 	void processWidget(std::shared_ptr<Widget> &widget);
 
+	/* Add a widget to the Gui. */
 	void add(std::shared_ptr<Widget> widget, int layerId = 0);
 
 	void notifyChild(std::shared_ptr<Widget> *widget);
 
 	Rectangle getScreenRect();
+	/* Set the font that will be used. */
 	void setFont(const char *fileName, int fontSize, int labelFontSize, int fontSpacing);
 
+	/* Add a MenuBar. */
 	void addMenuBar(std::shared_ptr<Widget> widget);
 
+	/* Load the names of the languages from an ini file. */
 	void loadTranslationNames(const std::string &filePath);
+	/* Load a translation from an ini file. */
 	void loadTranslation(const std::string &filePath);
 
+	/* Load a theme with the specified theme. */
 	void loadTheme(const std::string &name);
+	/* Load a directory with theme ini files. */
 	void loadThemesDir(const std::string &dirPath);
 
 	void unload();

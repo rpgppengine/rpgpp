@@ -20,6 +20,7 @@ struct ToggleButtonRender : public IconTextButtonRender {
 	}
 };
 
+/* A button which acts as a toggle. */
 struct ToggleButton : public IconTextButton {
 	SignalT<bool> onToggled;
 

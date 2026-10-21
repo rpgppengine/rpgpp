@@ -9,9 +9,9 @@ struct ValueWidget {};
 
 template <typename T>
 struct ValueWidgetT : public ValueWidget {
-	SignalT2<T, T> onValueChangedT;
+	SignalT2<T, T> onValueChanged;
 
-	virtual void setValue(const T& val) = 0;
+	virtual void setValue(const T &val) = 0;
 	virtual T getValue() = 0;
 };
 }  // namespace edui

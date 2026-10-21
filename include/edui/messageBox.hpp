@@ -11,6 +11,7 @@
 namespace edui {
 struct MessageBoxRender : public ChildWindowRender {};
 
+/* A ChildWindow which has an 'OK' button. */
 struct MessageBox : public ChildWindow {
 	const float EDUI_MESSAGEBOX_FOOTER = EDUI_SECONDARY_HEIGHT;
 	const int OK_BUTTON_ID = 1;
@@ -29,8 +30,10 @@ struct MessageBox : public ChildWindow {
 
 	Rectangle getContentRect() override;
 
+	/* Set the text of the message. */
 	void setText(const std::string &text);
 
+	/* Get a reference to the 'OK' button. */
 	edui::Button &getOkButton();
 
 protected:

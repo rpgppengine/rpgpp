@@ -5,6 +5,7 @@
 namespace edui {
 struct IconButtonRender : public WidgetRender {};
 
+/* A button which only displays an icon. */
 struct IconButton : public Widget {
 	IconButton();
 

@@ -69,6 +69,7 @@ struct WidgetRender {
 	}
 };
 
+/* The base class of all widgets in edui. */
 struct Widget {
 	typedef std::shared_ptr<Widget> Ptr;
 
@@ -81,6 +82,7 @@ struct Widget {
 	Signal onMouseEntered;
 	Signal onMouseLeft;
 
+	/* Appearance settings for the Widget. */
 	std::unique_ptr<WidgetRender> render;
 
 	bool deleteFlag = false;
@@ -110,11 +112,6 @@ struct Widget {
 	virtual void update() {};
 	virtual void draw() {};
 
-	Widget(const std::string &typeId, const std::string &translationId) {
-		this->widgetTypeId.set(typeId);
-		this->translationId.set(translationId);
-	}
-
 	Widget(Widget &other) {
 		rect = other.rect;
 		layout = other.layout;
@@ -122,8 +119,10 @@ struct Widget {
 		render = std::make_unique<WidgetRender>(*other.render.get());
 	}
 
+	/* Translate this widget. */
 	virtual void translate() {}
 
+	/* Apply a theme to this widget using an INIStructure. */
 	virtual void applyTheme(const mINI::INIStructure &struc) { render->applyTheme(struc); }
 
 	virtual void onAdded() {
@@ -131,6 +130,7 @@ struct Widget {
 		translate();
 	}
 
+	/* Calculate the Rectangle for this widget. */
 	virtual void calcRect(Rectangle &base) {
 		this->rect.x = base.x + ((layout.x.scale * base.width) + layout.x.offset);
 		this->rect.y = base.y + ((layout.y.scale * base.height) + layout.y.offset);
@@ -141,11 +141,13 @@ struct Widget {
 		this->rect.y += anchor.y * (base.height - rect.height);
 	}
 
+	/* Set position using Layout structs. */
 	virtual void setPosition(Layout x, Layout y) {
 		this->layout.x = x;
 		this->layout.y = y;
 	}
 
+	/* Set size using Layout structs. */
 	virtual void setSize(Layout width, Layout height) {
 		this->layout.width = width;
 		this->layout.height = height;
@@ -153,13 +155,16 @@ struct Widget {
 
 	virtual Rectangle getContentRect() { return rect; }
 
+	/* Calculate the padded rect. */
 	virtual Rectangle getPaddingRect() {
 		auto content = getContentRect();
 		return paddingRect(content, render->padding);
 	}
 
+	/* Whether the mouse is inside this widget. */
 	bool mouseIsInRect() { return CheckCollisionPointRec(GetMousePosition(), rect); }
 
+	/* Called when the mouse enters this widget. */
 	virtual void mouseEntered() {
 		onMouseEntered.invoke();
 		if (!disabled) {
@@ -168,14 +173,17 @@ struct Widget {
 		}
 	}
 
+	/* Called when the mouse leaves this widget. */
 	virtual void mouseLeft() {
 		onMouseLeft.invoke();
 		render->currentBgColor = render->bgColor;
 		render->currentBorderColor = render->borderColor;
 	}
 
+	/* Called when the mouse moved while still within this widget. */
 	virtual void mouseMoved(Vector2 mousePos, Vector2 relative) {}
 
+	/* Called when the widget has been focused. */
 	virtual void focused() {
 		if (!disabled) {
 			isFocused = true;
@@ -185,6 +193,7 @@ struct Widget {
 		}
 	}
 
+	/* Called when the widget has been unfocused. Also resets appearance settings to match the current theme. */
 	virtual void unfocused() {
 		isFocused = false;
 		render->currentBgColor = render->bgColor;
@@ -192,20 +201,24 @@ struct Widget {
 		onUnfocused.invoke();
 	}
 
+	/* Called when the widget has been clicked with the left mouse button. */
 	virtual void leftMouseClicked() {
 		if (!disabled) {
 			onClicked.invoke();
 		}
 	}
 
+	/* Called when the widget has been clicked with the right mouse button. */
 	virtual void rightMouseClicked() {
 		if (!disabled) {
 			onRightClicked.invoke();
 		}
 	}
 
+	/* Called when the left mouse button has been released. */
 	virtual void leftMouseReleased() { onReleased.invoke(); }
 
+	/* Called when the right mouse button has been released. */
 	virtual void rightMouseReleased() {}
 
 	virtual void middleMouseClicked() {}
@@ -218,17 +231,17 @@ struct Widget {
 
 	virtual void scrolled(float wheelMove) {}
 
+	/* Cast this widget as another type of widget. */
 	template <typename T>
 	T &as() {
 		return static_cast<T &>(*this);
 	}
 
+	/* Clone this widget. */
 	virtual Ptr clone() { return std::make_shared<Widget>(*this); }
 
+	/* Mark this widget to be deleted on the next update cycle. */
 	virtual void markDelete() { deleteFlag = true; }
-
-protected:
-	Str256 widgetTypeId;
 };
 }  // namespace edui
 

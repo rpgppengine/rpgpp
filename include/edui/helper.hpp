@@ -1,11 +1,9 @@
 #ifndef _EDUI_HELPER_H
 #define _EDUI_HELPER_H
 
-#include <memory>
 #include <string>
 #include <vector>
 
-#include "ini.h"
 #include "raylib.h"
 
 /* Constrain a value between lower nad upper limit. */

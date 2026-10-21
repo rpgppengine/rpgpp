@@ -4,9 +4,9 @@
 #include <string>
 
 #include "edui/container.hpp"
+#include "edui/gui.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/iconButton.hpp"
-#include "edui/iconTextButton.hpp"
 #include "edui/rliconsarr.hpp"
 #include "edui/scrollableContainer.hpp"
 #include "edui/tab.hpp"
@@ -54,17 +54,6 @@ void TabBar::translate() {
 	}
 }
 
-void TabBar::processWidget(std::shared_ptr<Widget> &widget) {
-	if (widget->mouseIsInRect()) {
-		Gui::instance->notifyChild(&widget);
-	} else {
-		if (widget->notifiedMouseEnter) {
-			widget->notifiedMouseEnter = false;
-			widget->mouseLeft();
-		}
-	}
-}
-
 void TabBar::update() {
 	HorizontalContainer::update();
 
@@ -75,10 +64,10 @@ void TabBar::update() {
 	rightButtonPtr->update();
 
 	std::shared_ptr<Widget> leftWidget = leftButtonPtr;
-	processWidget(leftWidget);
+	processPseudoChild(gui, leftWidget);
 
 	std::shared_ptr<Widget> rightWidget = rightButtonPtr;
-	processWidget(rightWidget);
+	processPseudoChild(gui, rightWidget);
 }
 
 void TabBar::draw() {

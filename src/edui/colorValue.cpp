@@ -20,7 +20,7 @@ ColorValue::ColorValue() : Widget() {
 		colorDialog->layout.y.offset = layout.y.offset - colorDialog->layout.height.offset;
 
 		colorDialog->onColorConfirm([this](Color color) {
-			onValueChangedT.invoke(this->color, color);
+			onValueChanged.invoke(this->color, color);
 			this->color = color;
 		});
 

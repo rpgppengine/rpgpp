@@ -1,5 +1,7 @@
 #include "edui/canvas.hpp"
+
 #include <memory>
+
 #include "edui/rliconsarr.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
@@ -17,7 +19,7 @@ Canvas::Canvas() {
 	camera.zoom = 1.0f;
 }
 
-void Canvas::calcRect(Rectangle& base) {
+void Canvas::calcRect(Rectangle &base) {
 	Rectangle old = rect;
 	Widget::calcRect(base);
 
@@ -43,11 +45,12 @@ void Canvas::update() {
 }
 
 void Canvas::draw() {
-	Rectangle sourceRect = {0.0f, 0.0f, static_cast<float>(texture.texture.width), static_cast<float>(-texture.texture.height)};
-	//DrawTextureRec(texture.texture, rect, {rect.x, rect.y}, WHITE);
+	Rectangle sourceRect = {0.0f, 0.0f, static_cast<float>(texture.texture.width),
+							static_cast<float>(-texture.texture.height)};
+	// DrawTextureRec(texture.texture, rect, {rect.x, rect.y}, WHITE);
 	DrawTexturePro(texture.texture, sourceRect, rect, {0, 0}, 0.0f, WHITE);
 
-	auto& rend = render->as<CanvasRender>();
+	auto &rend = render->as<CanvasRender>();
 
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);
 }
@@ -57,9 +60,7 @@ void Canvas::drawCanvas() {
 	DrawRectangleRec({0, 0, 50, 50}, GREEN);
 }
 
-void Canvas::drawOverlay() {
-	DrawFPS(4, 4);
-}
+void Canvas::drawOverlay() { DrawFPS(4, 4); }
 
 void Canvas::mouseMoved(Vector2 mousePos, Vector2 relative) {
 	auto widgetPos = {rect.x, rect.y};
@@ -84,8 +85,6 @@ void Canvas::middleMouseReleased() {
 }
 
 void Canvas::scrolled(float wheelMove) {
-	printf("%f \n", wheelMove);
-
 	Vector2 widgetPos = {rect.x, rect.y};
 	Vector2 mousePos = Vector2Subtract(GetMousePosition(), widgetPos);
 

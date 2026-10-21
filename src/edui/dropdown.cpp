@@ -113,7 +113,7 @@ void Dropdown::openDropdown() {
 
 		edui::DropdownValue previous = {currentItem, items[currentItem]};
 		edui::DropdownValue current = {idx, items[idx]};
-		onValueChangedT.invoke(previous, current);
+		onValueChanged.invoke(previous, current);
 
 		opened = false;
 	});

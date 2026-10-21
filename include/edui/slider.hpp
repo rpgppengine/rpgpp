@@ -6,6 +6,7 @@
 namespace edui {
 struct SliderRender : public WidgetRender {};
 
+/* Widget, which displays a slider. */
 struct Slider : public Widget {
 	const float EDUI_SLIDER_WIDTH = 16.0f;
 	const float EDUI_SLIDER_BAR_OFFSET = 2.0f;

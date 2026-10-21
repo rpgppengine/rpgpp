@@ -76,6 +76,8 @@ void FileValue::addTextCategory() { addCategory("Text file", {".txt"}, ICON_FILE
 
 void FileValue::addAudioCategory() { addCategory("Audio", {".wav", ".mp4", ".ogg"}, ICON_FILETYPE_AUDIO); }
 
+void FileValue::addFontCategory() { addCategory("Font", {".ttf", ".otf"}, ICON_FILETYPE_FONT); }
+
 void FileValue::onButtonClicked() {
 	auto fileDialog = std::make_shared<FileChooser>();
 	fileDialog->setSize({0, FILE_CHOOSER_WIDTH}, {0, FILE_CHOOSER_HEIGHT});

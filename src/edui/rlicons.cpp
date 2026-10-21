@@ -1,5 +1,7 @@
 #include "edui/rlicons.hpp"
 
+#include "edui/rliconsarr.hpp"
+
 void GuiDrawIcon(int iconId, int posX, int posY, int pixelSize, Color color) {
 #define BIT_CHECK(a, b) ((a) & (1u << (b)))
 

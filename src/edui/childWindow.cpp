@@ -8,7 +8,6 @@
 #include "edui/iconButton.hpp"
 #include "edui/label.hpp"
 #include "edui/rliconsarr.hpp"
-#include "edui/verticalContainer.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
 #include "raymath.h"
@@ -86,15 +85,7 @@ void ChildWindow::update() {
 	auto barRect = getBarRect();
 	closeButtonPtr->calcRect(barRect);
 
-	if (closeButtonPtr->mouseIsInRect()) {
-		std::shared_ptr<Widget> widgetPtr = closeButtonPtr;
-		Gui::instance->notifyChild(&widgetPtr);
-	} else {
-		if (closeButtonPtr->notifiedMouseEnter) {
-			closeButtonPtr->notifiedMouseEnter = false;
-			closeButtonPtr->mouseLeft();
-		}
-	}
+	processPseudoChild(gui, closeButtonPtr);
 }
 
 void ChildWindow::draw() {

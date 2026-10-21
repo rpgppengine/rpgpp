@@ -4,9 +4,7 @@
 #include <memory>
 
 #include "edui/iconButton.hpp"
-#include "edui/iconTextButton.hpp"
 #include "edui/tab.hpp"
-#include "edui/widget.hpp"
 
 namespace edui {
 struct FileTabRender : public TabRender {};
@@ -28,9 +26,6 @@ struct FileTab : public Tab {
 
 	void setActive() override;
 	void setInactive() override;
-
-private:
-	void processWidget(std::shared_ptr<Widget> &widget);
 };
 }  // namespace edui
 

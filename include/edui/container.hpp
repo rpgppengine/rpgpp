@@ -14,6 +14,7 @@ const uint8_t ScrollbarSize = 12;
 
 struct ContainerRender : public WidgetRender {};
 
+/* Widget, which contains children widgets. */
 struct Container : public Widget {
 	Gui *gui;
 
@@ -33,6 +34,7 @@ struct Container : public Widget {
 	virtual void update() override;
 	virtual void draw() override;
 
+	/* Add a child widget. */
 	virtual void add(std::shared_ptr<Widget> widget);
 
 	virtual void updateContentRect();
@@ -41,6 +43,7 @@ struct Container : public Widget {
 
 	Widget::Ptr clone() override { return std::make_shared<Container>(*this); }
 
+	/* Get a child, identified by referId. */
 	std::shared_ptr<Widget> getWidgetById(int referId);
 	void markDelete() override;
 	void deleteChildren();

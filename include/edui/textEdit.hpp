@@ -6,8 +6,6 @@
 #include <memory>
 #include <string>
 
-#include "edui/horizontalContainer.hpp"
-#include "edui/horizontalScrollbar.hpp"
 #include "edui/label.hpp"
 #include "edui/verticalScrollbar.hpp"
 #include "edui/widget.hpp"
@@ -31,6 +29,7 @@ struct PosRange {
 
 struct TextEditRender : public LabelRender {};
 
+/* A widget which displays multiline text and allows input. Is not meant for handling larger files. */
 struct TextEdit : public Widget {
 	const float EDUI_TEXTEDIT_CURSOR_WIDTH = 4;
 	const short EDUI_TEXTEDIT_DEBOUNCE = 5;

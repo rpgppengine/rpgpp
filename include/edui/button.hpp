@@ -2,15 +2,13 @@
 #define _EDUI_BUTTON_H
 
 #include <memory>
-#include <string>
 
 #include "edui/label.hpp"
-#include "edui/signal.hpp"
-#include "edui/widget.hpp"
 
 namespace edui {
 struct ButtonRender : public LabelRender {};
 
+/* The Button widget is a clickable button with text inside it. */
 struct Button : public Label {
 	typedef std::shared_ptr<Button> Ptr;
 

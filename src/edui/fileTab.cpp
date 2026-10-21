@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "edui/gui.hpp"
-#include "edui/helper.hpp"
 #include "edui/iconButton.hpp"
 #include "edui/iconTextButton.hpp"
 #include "edui/rliconsarr.hpp"
@@ -46,17 +45,6 @@ void FileTab::applyTheme(const mINI::INIStructure &struc) {
 	closeButtonPtr->unfocused();
 }
 
-void FileTab::processWidget(std::shared_ptr<Widget> &widget) {
-	if (widget->mouseIsInRect()) {
-		Gui::instance->notifyChild(&widget);
-	} else {
-		if (widget->notifiedMouseEnter) {
-			widget->notifiedMouseEnter = false;
-			widget->mouseLeft();
-		}
-	}
-}
-
 void FileTab::update() {
 	IconTextButton::update();
 
@@ -65,7 +53,7 @@ void FileTab::update() {
 
 	if (closeEnabled) {
 		std::shared_ptr<Widget> widgetPtr = closeButtonPtr;
-		processWidget(widgetPtr);
+		processPseudoChild(Gui::instance, widgetPtr);
 	}
 }
 

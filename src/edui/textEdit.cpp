@@ -1,6 +1,5 @@
 #include "edui/textEdit.hpp"
 
-#include <cmath>
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
@@ -100,15 +99,7 @@ void TextEdit::update() {
 	scrollbar->update();
 
 	if (overflownY) {
-		if (scrollbar->mouseIsInRect()) {
-			std::shared_ptr<Widget> widgetPtr = scrollbar;
-			Gui::instance->notifyChild(&widgetPtr);
-		} else {
-			if (scrollbar->notifiedMouseEnter) {
-				scrollbar->notifiedMouseEnter = false;
-				scrollbar->mouseLeft();
-			}
-		}
+		processPseudoChild(Gui::instance, scrollbar);
 	}
 }
 

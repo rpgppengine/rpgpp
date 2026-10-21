@@ -28,6 +28,7 @@ struct LabelRender : public WidgetRender {
 	};
 };
 
+/* The Label widget displays text inside it. */
 struct Label : public Widget {
 	std::shared_ptr<Tooltip> tooltip = nullptr;
 

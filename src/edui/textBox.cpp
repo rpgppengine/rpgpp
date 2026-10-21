@@ -264,7 +264,7 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 			cursorIndex += clipboard.size();
 			calcCursorRect();
 
-			onValueChangedT.invoke(previous, text);
+			onValueChanged.invoke(previous, text);
 		}
 		if (key == KEY_A && mod.ctrl) {
 			selectStart = 0;
@@ -343,7 +343,7 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 				text = text.erase(cursorIndex, size);
 				calcCursorRect();
 
-				onValueChangedT.invoke(previous, text);
+				onValueChanged.invoke(previous, text);
 
 				auto paddingRect = getPaddingRect();
 
@@ -378,7 +378,7 @@ void TextBox::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 			auto previous = text;
 			text = text.erase(cursorIndex, size);
 
-			onValueChangedT.invoke(previous, text);
+			onValueChanged.invoke(previous, text);
 		}
 
 		debounce = DebounceFrames;
@@ -431,7 +431,7 @@ void TextBox::charEntered(int codepoint, std::string_view str) {
 
 	Widget::charEntered(codepoint, str);
 
-	onValueChangedT.invoke(previous, text);
+	onValueChanged.invoke(previous, text);
 }
 
 void TextBox::mouseEntered() {

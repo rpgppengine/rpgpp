@@ -35,6 +35,7 @@ struct FileValue : public Container, public ValueWidgetT<FileOption> {
 	void addImagesCategory();
 	void addTextCategory();
 	void addAudioCategory();
+	void addFontCategory();
 
 private:
 	std::vector<FileCategory> categories = {};

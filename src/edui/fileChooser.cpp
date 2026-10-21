@@ -8,7 +8,6 @@
 #include "edui/helper.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/iconButton.hpp"
-#include "edui/iconTextButton.hpp"
 #include "edui/rliconsarr.hpp"
 #include "edui/textBox.hpp"
 #include "edui/toggleButton.hpp"
@@ -32,7 +31,7 @@ FileChooser::FileChooser() : ConfirmDialog() {
 
 	filterBox = std::make_shared<edui::Dropdown>();
 	filterBox->setSize({0.5f, 0}, {1, 0});
-	filterBox->onValueChangedT.connect([this](DropdownValue old, DropdownValue newValue) {
+	filterBox->onValueChanged.connect([this](DropdownValue old, DropdownValue newValue) {
 		updateFileFilter();
 		setDirectory(dirPath);
 	});
@@ -186,10 +185,7 @@ void FileChooser::setDirectory(std::string fullPath) {
 
 		if (DirectoryExists(filePath.c_str())) {
 			fileButton->iconId = ICON_FOLDER;
-			fileButton->onClicked.connect([this, filePath] {
-				printf("%s \n", filePath.c_str());
-				queueDirectoryChange(filePath);
-			});
+			fileButton->onClicked.connect([this, filePath] { queueDirectoryChange(filePath); });
 		} else {
 			int iconId = ICON_FILE;
 			for (auto &cat : categories) {

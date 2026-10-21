@@ -42,6 +42,6 @@ void Checkbox::draw() {
 
 void Checkbox::leftMouseClicked() {
 	checked = !checked;
-	onValueChangedT.invoke(!checked, checked);
+	onValueChanged.invoke(!checked, checked);
 	Widget::leftMouseClicked();
 }

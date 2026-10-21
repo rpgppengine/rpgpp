@@ -6,7 +6,6 @@
 #include "edui/container.hpp"
 #include "edui/iconButton.hpp"
 #include "edui/label.hpp"
-#include "edui/widget.hpp"
 #include "raylib.h"
 
 namespace edui {
@@ -14,6 +13,7 @@ struct ChildWindowRender : public LabelRender {
 	float titlePadding = 2.0f;
 };
 
+/* A widget which has a title bar and close button. */
 struct ChildWindow : public Container {
 	const float EDUI_CHILDWINDOW_BARHEIGHT = 26.0f;
 
@@ -29,6 +29,7 @@ struct ChildWindow : public Container {
 	void applyTheme(const mINI::INIStructure &struc) override;
 	void translate() override;
 
+	/* Set the title of the window. */
 	void setTitle(const std::string &title);
 
 	void update() override;

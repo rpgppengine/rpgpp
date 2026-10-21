@@ -5,6 +5,7 @@
 namespace edui {
 struct LanguageDropdownRender : public DropdownRender {};
 
+/* A specialized dropdown which includes the names of the languages that are loaded. */
 struct LanguageDropdown : public Dropdown {
 	LanguageDropdown();
 

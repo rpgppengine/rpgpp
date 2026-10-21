@@ -4,11 +4,11 @@
 
 #include "edui/button.hpp"
 #include "edui/childWindow.hpp"
+#include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/label.hpp"
 #include "edui/textArea.hpp"
-#include "edui/verticalContainer.hpp"
 
 using namespace edui;
 
@@ -80,16 +80,7 @@ void MessageBox::update() {
 	footerLayout->calcRect(paddingFooter);
 	footerLayout->update();
 
-	if (footerLayout->mouseIsInRect()) {
-		std::shared_ptr<Widget> widgetPtr = footerLayout;
-		Gui::instance->notifyChild(&widgetPtr);
-		footerLayout->notifyChildren(Gui::instance);
-	} else {
-		if (footerLayout->notifiedMouseEnter) {
-			footerLayout->notifiedMouseEnter = false;
-			footerLayout->mouseLeft();
-		}
-	}
+	processPseudoChild(gui, footerLayout);
 }
 
 void MessageBox::draw() {

@@ -40,18 +40,8 @@ void HorizontalContainer::update() {
 	scrollbar->update();
 
 	if (overflown && scrollbar->visible) {
-		if (scrollbar->mouseIsInRect()) {
-			std::shared_ptr<Widget> widgetPtr = scrollbar;
-			Gui::instance->notifyChild(&widgetPtr);
-		} else {
-			if (scrollbar->notifiedMouseEnter) {
-				scrollbar->notifiedMouseEnter = false;
-				scrollbar->mouseLeft();
-			}
-		}
+		processPseudoChild(gui, scrollbar);
 	}
-
-	auto &rend = render->as<HorizontalContainerRender>();
 }
 
 void HorizontalContainer::draw() {

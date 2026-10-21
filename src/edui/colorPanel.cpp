@@ -117,7 +117,7 @@ void ColorPanel::initValueWidgets() {
 	redValue->intval->max = 255;
 	redValue->setPosition({1, -75}, {0, 2});
 	redValue->setSize({0, 75}, {0, static_cast<int>(EDUI_SECONDARY_HEIGHT)});
-	redValue->onValueChangedT([this](int old, int newValue) {
+	redValue->onValueChanged([this](int old, int newValue) {
 		color.r = newValue;
 		colorRect->color = color;
 		colorWheel->setColor(color);
@@ -144,7 +144,7 @@ void ColorPanel::initValueWidgets() {
 	greenValue->intval->max = 255;
 	greenValue->setPosition({1, -75}, {0, static_cast<int>(2 + EDUI_SECONDARY_HEIGHT + 4)});
 	greenValue->setSize({0, 75}, {0, static_cast<int>(EDUI_SECONDARY_HEIGHT)});
-	greenValue->onValueChangedT([this](int old, int newValue) {
+	greenValue->onValueChanged([this](int old, int newValue) {
 		color.g = newValue;
 		colorRect->color = color;
 		colorWheel->setColor(color);
@@ -171,7 +171,7 @@ void ColorPanel::initValueWidgets() {
 	blueValue->intval->max = 255;
 	blueValue->setPosition({1, -75}, {0, static_cast<int>(2 + EDUI_SECONDARY_HEIGHT * 2) + 8});
 	blueValue->setSize({0, 75}, {0, static_cast<int>(EDUI_SECONDARY_HEIGHT)});
-	blueValue->onValueChangedT([this](int old, int newValue) {
+	blueValue->onValueChanged([this](int old, int newValue) {
 		color.b = newValue;
 		colorRect->color = color;
 		colorWheel->setColor(color);

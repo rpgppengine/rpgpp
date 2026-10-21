@@ -120,7 +120,6 @@ std::shared_ptr<edui::Widget> Container::getWidgetById(int referId) {
 			return result;
 		}
 	}
-	printf("[EDUI] widget not found\n");
 	return result;
 }
 

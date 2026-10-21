@@ -6,6 +6,7 @@
 namespace edui {
 struct ImageRectRender : public WidgetRender {};
 
+/* A widget which displays a texture. */
 struct ImageRect : public Widget {
 	Texture texture;
 	Rectangle sourceRect;

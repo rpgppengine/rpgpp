@@ -7,6 +7,7 @@
 namespace edui {
 struct IconTextButtonRender : public LabelRender {};
 
+/* A button which displays an icon and text. */
 struct IconTextButton : public Label {
 	IconTextButton();
 

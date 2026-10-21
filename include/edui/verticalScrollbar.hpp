@@ -21,7 +21,9 @@ struct VerticalScrollbar : public Widget {
 	void leftMouseClicked() override;
 	void leftMouseReleased() override;
 
+	/* Set the maximum value. */
 	void setMaxScroll(int newValue);
+	/* Set the value. */
 	void setValue(int value);
 
 private:

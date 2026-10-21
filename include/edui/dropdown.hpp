@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "edui/dropdownList.hpp"
-#include "edui/gui.hpp"
 #include "edui/label.hpp"
 #include "edui/valuewidget.hpp"
 #include "edui/widget.hpp"
@@ -17,6 +16,7 @@ struct DropdownValue {
 
 struct DropdownRender : public LabelRender {};
 
+/* A widget which displays a dropdown element. */
 struct Dropdown : public Widget, public ValueWidgetT<DropdownValue> {
 	static const int EDUI_DROPDOWN_MAX = 20;
 

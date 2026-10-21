@@ -26,8 +26,6 @@
 
 #include <raylib.h>
 
-#include "edui/rliconsarr.hpp"
-
 #define RAYGUI_ICON_SIZE 16				  // Size of icons in pixels (squared)
 #define RAYGUI_ICON_MAX_FONT_BACKED 257	  // Maximum number of icons to back in font atlas
 #define RAYGUI_ICON_MAX_NAME_LENGTH 32	  // Maximum length of icon name id

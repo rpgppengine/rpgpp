@@ -308,7 +308,6 @@ void Gui::loadTheme(const std::string &name) {
 	}
 	std::filesystem::path fsPath = themesBaseDir;
 	fsPath /= key;
-	printf("%s \n", fsPath.c_str());
 	mINI::INIFile file(fsPath);
 	file.read(themeStruct);
 
@@ -344,7 +343,6 @@ void Gui::loadThemesDir(const std::string &dirPath) {
 			}
 
 			themeEntries[i] = {key, name};
-			printf("%s %s\n", name.c_str(), key.c_str());
 
 			themesCount++;
 		}

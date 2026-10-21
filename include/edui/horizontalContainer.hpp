@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include "edui/container.hpp"
 #include "edui/horizontalScrollbar.hpp"
 #include "edui/scrollableContainer.hpp"
 #include "edui/widget.hpp"
@@ -13,6 +12,7 @@ struct HorizontalContainerRender : public ScrollableContainerRender {
 	int space = 0;
 };
 
+/* A container which positions its children in a horizontal layout. */
 struct HorizontalContainer : public ScrollableContainer {
 	typedef std::shared_ptr<HorizontalContainer> Ptr;
 

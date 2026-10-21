@@ -26,20 +26,20 @@ Vector2Value::Vector2Value() : Container() {
 	std::weak_ptr<IntValue> weakX = valX;
 	std::weak_ptr<IntValue> weakY = valY;
 
-	valX->onValueChangedT.connect([this, weakY](int oldX, int newX) {
+	valX->onValueChanged.connect([this, weakY](int oldX, int newX) {
 		if (auto sharedY = weakY.lock()) {
 			int y = sharedY->getValue();
 
-			this->onValueChangedT.invoke({static_cast<float>(oldX), static_cast<float>(y)},
+			this->onValueChanged.invoke({static_cast<float>(oldX), static_cast<float>(y)},
 										 {static_cast<float>(newX), static_cast<float>(y)});
 		}
 	});
 
-	valY->onValueChangedT.connect([this, weakX](int oldY, int newY) {
+	valY->onValueChanged.connect([this, weakX](int oldY, int newY) {
 		if (auto sharedX = weakX.lock()) {
 			int x = sharedX->getValue();
 
-			this->onValueChangedT.invoke({static_cast<float>(x), static_cast<float>(oldY)},
+			this->onValueChanged.invoke({static_cast<float>(x), static_cast<float>(oldY)},
 										 {static_cast<float>(x), static_cast<float>(newY)});
 		}
 	});

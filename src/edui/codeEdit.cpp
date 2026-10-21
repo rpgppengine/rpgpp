@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "edui/gui.hpp"
 #include "edui/textEdit.hpp"
 #include "raylib.h"
 #include "tree_sitter/api.h"

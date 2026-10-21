@@ -5,6 +5,7 @@
 namespace edui {
 struct CanvasRender : public WidgetRender {};
 
+/* A widget which displays raylib's RenderTexture. */
 struct Canvas : public Widget {
 	Canvas();
 

@@ -3,7 +3,6 @@
 
 #include <array>
 #include <list>
-#include <map>
 #include <memory>
 #include <string>
 
@@ -11,7 +10,7 @@
 #include "edui/horizontalContainer.hpp"
 #include "edui/iconButton.hpp"
 #include "edui/signal.hpp"
-#include "edui/widget.hpp"
+
 namespace edui {
 struct TabBarRender : public HorizontalContainerRender {};
 
@@ -48,8 +47,6 @@ struct TabBar : public HorizontalContainer {
 
 protected:
 	int currentPage = 0;
-
-	void processWidget(std::shared_ptr<Widget> &widget);
 };
 }  // namespace edui
 
