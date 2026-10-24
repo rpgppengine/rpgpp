@@ -12,8 +12,8 @@
 
 namespace edui {
 const int EDUI_MAX_LAYERS = 5;
-const float EDUI_DEFAULT_HEIGHT = 16;
-const float EDUI_SECONDARY_HEIGHT = 26;
+const int EDUI_DEFAULT_HEIGHT = 16;
+const int EDUI_SECONDARY_HEIGHT = 26;
 
 struct LanguageName {
 	Str128 key;

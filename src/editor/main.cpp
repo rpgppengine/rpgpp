@@ -1,4 +1,4 @@
-#define STR_IMPLEMENTATION
+// #define STR_IMPLEMENTATION
 
 #include <cstddef>
 #include <cstdint>

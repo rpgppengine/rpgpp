@@ -8,7 +8,6 @@ struct ImageRectRender : public WidgetRender {};
 
 /* A widget which displays a texture. */
 struct ImageRect : public Widget {
-	Texture texture;
 	Rectangle sourceRect;
 
 	ImageRect();
@@ -17,6 +16,9 @@ struct ImageRect : public Widget {
 
 	void setTexture(Texture texture);
 	void resizeToTexture();
+
+private:
+	Texture texture;
 };
 }  // namespace edui
 

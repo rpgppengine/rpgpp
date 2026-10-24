@@ -137,8 +137,8 @@ struct Widget {
 		this->rect.width = ((layout.width.scale * base.width) + layout.width.offset);
 		this->rect.height = ((layout.height.scale * base.height) + layout.height.offset);
 
-		this->rect.x += anchor.x * (base.width - rect.width);
-		this->rect.y += anchor.y * (base.height - rect.height);
+		this->rect.x += static_cast<int>(anchor.x * (base.width - rect.width));
+		this->rect.y += static_cast<int>(anchor.y * (base.height - rect.height));
 	}
 
 	/* Set position using Layout structs. */
