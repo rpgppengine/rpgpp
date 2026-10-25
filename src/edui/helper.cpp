@@ -96,6 +96,7 @@ void rectCenter(Rectangle &a, Rectangle *b) {
 
 std::string getTranslation(const std::string &id, const std::string &def) {
 	int index = TextFindIndex(id.c_str(), ".");
+	if (index < 0) return def;
 	std::string section = TextSubtext(id.c_str(), 0, index);
 	std::string key = TextSubtext(id.c_str(), index + 1, id.size() - index);
 

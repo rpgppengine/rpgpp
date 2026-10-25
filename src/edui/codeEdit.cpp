@@ -43,7 +43,7 @@ void DrawTextCode(Font font, const char *text, Vector2 position, float fontSize,
 		} else {
 			if ((codepoint != ' ') && (codepoint != '\t')) {
 				Color pointTint = tint[codepointCounter];
-				DrawTextCodepoint(font, codepoint, (Vector2){position.x + textOffsetX, position.y + textOffsetY},
+				DrawTextCodepoint(font, codepoint, Vector2{position.x + textOffsetX, position.y + textOffsetY},
 								  fontSize, pointTint);
 			}
 

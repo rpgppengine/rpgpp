@@ -1,6 +1,7 @@
 #ifndef _EDUI_SIGNAL_H
 #define _EDUI_SIGNAL_H
 
+#include <array>
 #include <functional>
 
 namespace edui {

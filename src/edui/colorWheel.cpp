@@ -23,17 +23,17 @@ void ColorWheel::update() {
 		float distance = Vector2Distance(center, circlePosition) / pointScale;
 
 		float angle =
-			((Vector2Angle((Vector2){0.0f, -pointScale}, Vector2Subtract(center, circlePosition)) / PI + 1.0f) / 2.0f);
+			((Vector2Angle(Vector2{0.0f, -pointScale}, Vector2Subtract(center, circlePosition)) / PI + 1.0f) / 2.0f);
 		if (distance > 1.0f)
 			circlePosition = Vector2Add(
-				(Vector2){sinf(angle * (PI * 2.0f)) * pointScale, -cosf(angle * (PI * 2.0f)) * pointScale}, center);
+				Vector2{sinf(angle * (PI * 2.0f)) * pointScale, -cosf(angle * (PI * 2.0f)) * pointScale}, center);
 
 		float angle360 = angle * 360.0f;
 		float valueActual = Clamp(distance, 0.0f, 1.0f);
-		Color color = ColorLerp(
-			(Color){static_cast<unsigned char>((value * 255.0f)), static_cast<unsigned char>((value * 255.0f)),
-					static_cast<unsigned char>((value * 255.0f)), 255},
-			ColorFromHSV(angle360, Clamp(distance, 0.0f, 1.0f), 1.0f), valueActual);
+		Color color =
+			ColorLerp(Color{static_cast<unsigned char>((value * 255.0f)), static_cast<unsigned char>((value * 255.0f)),
+							static_cast<unsigned char>((value * 255.0f)), 255},
+					  ColorFromHSV(angle360, Clamp(distance, 0.0f, 1.0f), 1.0f), valueActual);
 
 		circlePosition = Vector2Subtract(circlePosition, {rect.x, rect.y});
 
@@ -56,10 +56,10 @@ void ColorWheel::draw() {
 		float angleOffset = ((PI * 2.0f) / (float)triangleCount);
 		float angle = angleOffset * (float)i;
 		float angleOffsetCalculated = ((float)i + 1) * angleOffset;
-		Vector2 scale = (Vector2){pointScale, pointScale};
+		Vector2 scale = Vector2{pointScale, pointScale};
 
-		Vector2 offset = Vector2Multiply((Vector2){sinf(angle), -cosf(angle)}, scale);
-		Vector2 offset2 = Vector2Multiply((Vector2){sinf(angleOffsetCalculated), -cosf(angleOffsetCalculated)}, scale);
+		Vector2 offset = Vector2Multiply(Vector2{sinf(angle), -cosf(angle)}, scale);
+		Vector2 offset2 = Vector2Multiply(Vector2{sinf(angleOffsetCalculated), -cosf(angleOffsetCalculated)}, scale);
 
 		Vector2 position = Vector2Add(center, offset);
 		Vector2 position2 = Vector2Add(center, offset2);
