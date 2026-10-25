@@ -92,7 +92,7 @@ void Canvas::scrolled(float wheelMove) {
 	camera.offset = mousePos;
 	camera.target = mouseWorldPos;
 
-	camera.zoom *= std::sqrt(exp(wheelMove * cameraZoomSpeed));
+	camera.zoom *= sqrt(exp(wheelMove * cameraZoomSpeed));
 	camera.zoom = Clamp(camera.zoom, cameraMinZoom, cameraMaxZoom);
 
 	Widget::scrolled(wheelMove);

@@ -160,7 +160,6 @@ void FileChooser::setDirectory(std::string fullPath) {
 		return;
 	}
 
-	std::string last = fullPath.end().base();
 	if (fullPath.back() == '/') {
 		fullPath.pop_back();
 	}

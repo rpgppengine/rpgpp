@@ -5,41 +5,36 @@ if is_plat("switch") then
 	set_arch("arm64")
 end
 
-add_requires("raylib", "tgui", "nlohmann_json", "luajit", "pugixml", "tree-sitter", "tree-sitter-lua")
+add_requires("raylib", "nlohmann_json", "luajit", "pugixml", "tree-sitter", "tree-sitter-lua")
 add_rules("mode.debug", "mode.release")
 set_defaultmode("debug")
 
+if is_plat("linux", "mingw") then
+	add_cxxflags("-fPIC")
+end
+if is_plat("mingw") then
+	add_cxxflags("-Wa,-mbig-obj")
+	add_ldflags("-static", "-static-libgcc", "-static-libstdc++")
+end
+
 target("rpgpp")
-set_plat(os.host())
-set_arch(os.arch())
 set_kind("static")
-add_packages("raylib", "nlohmann_json", "luajit", "pugixml")
+add_packages("raylib", "nlohmann_json", "luajit", "pugixml", { public = true })
 set_languages("cxx17")
 add_includedirs("include/", "include/lua/", "include/ui_elements/")
 add_files("src/*.cpp", "src/lua/*.cpp", "src/ui_elements/*.cpp")
 add_defines("SOL_LUAJIT")
-if is_plat("linux") then
-	add_cxxflags("-fPIC")
-end
 
--- !!!!!!! FIX MSVC ISSUE !!!!!!!
---
--- ATTENTION! The RPG++ LUA SOURCES ARE NOT INCLUDED YET. THIS IS CAUSING LINKER ISSUES!
--- ADD THEM TO THE PROJECT, THEN UNCOMMENT THIS PART!
---
 target("rpgpplua")
 set_kind("shared")
 set_languages("cxx17")
+add_deps("rpgpp")
 add_includedirs("include/")
 add_files("src/rpgpplua/*.cpp")
-add_packages("nlohmann_json", "raylib", "luajit", { public = true })
-add_deps("rpgpp")
 
 target("game")
 set_kind("binary")
 add_deps("rpgpp")
--- for some very cool bizarre reason, xmake didn't compile the game target without these.
-add_packages("nlohmann_json", "raylib", "luajit")
 set_languages("cxx17")
 add_includedirs("include/")
 add_files("src/game/main.cpp")
@@ -68,32 +63,26 @@ set_menu {
 	description = "Build the project's documentation."
 }
 
+target("edui")
+set_kind("static")
+set_languages("cxx17")
+add_packages("raylib", "tree-sitter", "tree-sitter-lua", { public = true })
+add_includedirs("include/", "include/edui/")
+add_files("src/edui/**.cpp")
+
 target("editor")
--- add_includedirs("include/", "include/editor/", "libs/raylib/src/", "libs/tgui/include/")
--- add_includedirs("libs/raylib/src/", "libs/tgui/include/")
-if is_plat("windows") then
-	add_defines("TGUI_STATIC")
-	-- Add the actual reference to this file, if necessary.
-	-- Since it doesn't work on my environment, it was removed.
-	-- If you need to add it, uncomment this part!
-	--
-	-- add_links("tgui-s-d")
-end
--- add_links("tree-sitter-lua", { kind = "static" })
 set_kind("binary")
--- FIX FOR MSVC !!!!
--- NOTE: DO NOT DELETE THIS LINE
 if is_plat("windows") then
 	add_cxxflags("/permissive-")
 end
 set_languages("cxx17")
-add_includedirs("include/", "include/editor-new/", os.dirs(path.join(os.scriptdir())))
-add_files("src/editor-new/**.cpp", "src/edui/**.cpp")
-add_deps("rpgpp")
-add_packages("raylib", "tgui", "nlohmann_json", "luajit", "pugixml", "tree-sitter", "tree-sitter-lua")
+add_includedirs("include/", "include/editor-new/")
+add_files("src/editor-new/**.cpp")
+add_deps("rpgpp", "edui")
+add_packages("raylib", "nlohmann_json", "luajit", "pugixml", "tree-sitter", "tree-sitter-lua")
 after_build( function (target)
 	os.cp("$(curdir)/resources", "./build/$(plat)/$(arch)/$(mode)/", { async = true })
-	if is_plat("linux", "macosx") then
+	if is_plat("linux", "macosx", "mingw") then
 		os.cp("./build/$(plat)/$(arch)/$(mode)/librpgpp.a", "$(curdir)/game-src/lib/librpgpp.a", { async = true })
 		os.cp("./build/$(plat)/$(arch)/$(mode)/librpgpplua.so", "$(curdir)/game-src/lib/librpgpplua.so",
 			{ async = true })
