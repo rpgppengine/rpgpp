@@ -153,6 +153,11 @@ struct Widget {
 		this->layout.height = height;
 	}
 
+	void centerLayout() {
+		this->anchor = {0.5f, 0.5f};
+		// this->setPosition({0.5f, 0}, {0.5f, 0});
+	}
+
 	virtual Rectangle getContentRect() { return rect; }
 
 	/* Calculate the padded rect. */

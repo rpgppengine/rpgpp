@@ -36,7 +36,11 @@ FileValue::FileValue() : Container() {
 void FileValue::translate() {
 	Container::translate();
 	if (!file.filled) {
-		button->setText(getTranslation(builtinTranslation, "Select file"));
+		if (!dirSelection) {
+			button->setText(getTranslation(builtinTranslation, "Select file"));
+		} else {
+			button->setText(getTranslation(builtinTranslation + ".Folder", "Select file"));
+		}
 	}
 }
 
@@ -47,13 +51,20 @@ FileOption FileValue::getValue() { return file; }
 void FileValue::setEmpty() {
 	file.filled = false;
 	translate();
+	fileValueEmptied.invoke();
 }
 
 void FileValue::setFromPath(const std::string &fullPath) {
-	if (IsPathFile(fullPath.c_str())) {
+	bool isFile = IsPathFile(fullPath.c_str()) && !dirSelection;
+	bool isDirectory = DirectoryExists(fullPath.c_str()) && dirSelection;
+	if (isFile || isDirectory) {
+		auto oldFile = file;
+
 		file.fullPath = fullPath;
 		file.filled = true;
 		button->setText(GetFileName(fullPath.c_str()));
+
+		onValueChanged.invoke(oldFile, file);
 	}
 }
 
@@ -78,13 +89,20 @@ void FileValue::addAudioCategory() { addCategory("Audio", {".wav", ".mp4", ".ogg
 
 void FileValue::addFontCategory() { addCategory("Font", {".ttf", ".otf"}, ICON_FILETYPE_FONT); }
 
+void FileValue::setDirSelection(bool val) {
+	this->dirSelection = val;
+	translate();
+}
+
 void FileValue::onButtonClicked() {
 	auto fileDialog = std::make_shared<FileChooser>();
 	fileDialog->setSize({0, FILE_CHOOSER_WIDTH}, {0, FILE_CHOOSER_HEIGHT});
 	fileDialog->onFileChosen.connect([this](std::string fullPath) { setFromPath(fullPath); });
 	fileDialog->clearCategories();
+	fileDialog->setDirSelection(dirSelection);
 	for (auto &category : categories) {
 		fileDialog->addCategory(category);
 	}
+	fileDialog->centerLayout();
 	gui->add(fileDialog, layerId + 1);
 }

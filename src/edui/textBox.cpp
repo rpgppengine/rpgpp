@@ -143,10 +143,11 @@ void TextBox::draw() {
 void TextBox::focused() {
 	auto &rend = render->as<TextBoxRender>();
 	if (rend.font == nullptr) return;
-	if (text.empty()) return;
 
 	int calcCursor = this->calcCursor();
-	if (calcCursor == -1) return;
+	if (calcCursor == -1 && !text.empty()) {
+		return;
+	}
 	this->cursorIndex = calcCursor;
 	calcCursorRect();
 
@@ -391,8 +392,12 @@ void TextBox::leftMouseClicked() {
 	mouseBtnHeld = true;
 	int calcCursor = this->calcCursor();
 	if (calcCursor == -1) {
-		Widget::leftMouseClicked();
-		return;
+		if (text.empty()) {
+			calcCursor = 0;
+		} else {
+			Widget::leftMouseClicked();
+			return;
+		}
 	}
 
 	selectStart = calcCursor;
@@ -412,6 +417,10 @@ void TextBox::leftMouseReleased() {
 }
 
 void TextBox::charEntered(int codepoint, std::string_view str) {
+	if (text.empty() && cursorIndex < 0) {
+		cursorIndex = 0;
+	}
+
 	std::string previous = text;
 
 	if (selectStart != selectEnd) {

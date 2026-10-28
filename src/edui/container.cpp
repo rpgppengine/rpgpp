@@ -88,13 +88,14 @@ void Container::drawChildren() {
 void Container::add(std::shared_ptr<Widget> widget) {
 	if (widget->isContainer) {
 		widget->as<Container>().gui = this->gui;
+		widget->as<Container>().setLayerId(layerId);
 	}
 
 	widget->render->font = &gui->font;
-	widget->unfocused();
 	widget->layerId = layerId;
 	widgets.push_back(widget);
 	widget->applyTheme(Gui::instance->themeStruct);
+	widget->unfocused();
 	widget->onAdded();
 }
 
@@ -140,4 +141,13 @@ void Container::deleteChildren() {
 		}
 	}
 	widgets.clear();
+}
+
+void Container::setLayerId(int layerId) {
+	for (auto &widget : widgets) {
+		widget->layerId = layerId;
+		if (widget->isContainer) {
+			widget->as<Container>().setLayerId(layerId);
+		}
+	}
 }

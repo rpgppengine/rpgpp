@@ -21,6 +21,8 @@ struct FileValue : public Container, public ValueWidgetT<FileOption> {
 	const int FILE_CHOOSER_WIDTH = 600;
 	const int FILE_CHOOSER_HEIGHT = 400;
 
+	Signal fileValueEmptied;
+
 	void setValue(const FileOption &newValue) override;
 	FileOption getValue() override;
 
@@ -37,7 +39,10 @@ struct FileValue : public Container, public ValueWidgetT<FileOption> {
 	void addAudioCategory();
 	void addFontCategory();
 
+	void setDirSelection(bool val = true);
+
 private:
+	bool dirSelection = false;
 	std::vector<FileCategory> categories = {};
 
 	FileOption file;

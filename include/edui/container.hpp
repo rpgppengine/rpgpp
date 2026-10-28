@@ -48,6 +48,8 @@ struct Container : public Widget {
 	void markDelete() override;
 	void deleteChildren();
 
+	void setLayerId(int layerId);
+
 protected:
 	void drawChildren();
 };

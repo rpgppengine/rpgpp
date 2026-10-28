@@ -43,6 +43,8 @@ void Gui::processWidget(std::shared_ptr<Widget> &widget) {
 		}
 	}
 
+	if (widget->deleteFlag) return;
+
 	widget->calcRect(screenRect);
 	widget->update();
 
@@ -54,30 +56,28 @@ void Gui::processWidget(std::shared_ptr<Widget> &widget) {
 }
 
 void Gui::processVector(std::vector<std::shared_ptr<Widget>> &vec) {
-	int i = 0;
-	for (auto &widget : vec) {
-		if (widget == nullptr) {
-			i++;
-			continue;
-		}
+	for (auto it = vec.begin(); it != vec.end();) {
+		auto &widget = *it;
 
-		if (widget->deferFlag) {
-			widget->deferFlag = false;
-			i++;
-			continue;
-		}
-
-		processWidget(widget);
-
-		if (widget->deleteFlag) {
+		if (widget == nullptr || widget->deleteFlag) {
 			widget->onDeleted.invoke();
 			if (widget->isContainer) {
 				widget->as<Container>().deleteChildren();
 			}
-			vec.erase(vec.begin() + i);
-		}
+			it = vec.erase(it);
+		} else {
+			if (widget->deferFlag) {
+				widget->deferFlag = false;
+				it++;
+				continue;
+			}
 
-		i++;
+			if (!widget->deleteFlag) {
+				processWidget(widget);
+			}
+
+			it++;
+		}
 	}
 }
 
@@ -183,8 +183,10 @@ void Gui::add(std::shared_ptr<Widget> widget, int layerId) {
 
 	if (widget->isContainer) {
 		widget->as<Container>().gui = this;
+		widget->as<Container>().setLayerId(layerId);
 		for (auto &subwidget : widget->as<Container>().widgets) {
 			subwidget->render->font = &this->font;
+			subwidget->layerId = layerId;
 		}
 	}
 	widget->render->font = &this->font;
@@ -357,6 +359,8 @@ void Gui::unload() {
 }
 
 void edui::processPseudoChild(Gui *gui, std::shared_ptr<edui::Widget> widget) {
+	if (!widget->visible) return;
+
 	if (widget->mouseIsInRect()) {
 		gui->notifyChild(&widget);
 		if (widget->isContainer) {

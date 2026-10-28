@@ -11,6 +11,7 @@
 #include "edui/verticalContainer.hpp"
 #include "services/interface.hpp"
 #include "widgets/recentProjectsList.hpp"
+#include "widgets/windows/newProjectWindow.hpp"
 
 using namespace editor;
 
@@ -54,6 +55,10 @@ void MainMenuContainer::initBottomContainer() {
 	newProjectButton->setText("New Project");
 	newProjectButton->translationId = "MainMenu.Options.New";
 	sideOptions->add(newProjectButton);
+	newProjectButton->onClicked.connect([this] {
+		auto window = std::make_shared<NewProjectWindow>();
+		gui->add(window, layerId + 1);
+	});
 
 	auto openProjectButton = std::make_shared<edui::Button>();
 	openProjectButton->render->as<edui::LabelRender>().vertAlign = edui::VerticalAlignment::TEXT_CENTER;

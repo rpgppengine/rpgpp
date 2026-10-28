@@ -37,7 +37,13 @@ FileChooser::FileChooser() : ConfirmDialog() {
 	});
 
 	getOkButton().disabled = true;
-	getOkButton().onClicked.connect([this] { onFileChosen.invoke(chosenPath); });
+	getOkButton().onClicked.connect([this] {
+		if (!dirSelection) {
+			onFileChosen.invoke(chosenPath);
+		} else {
+			onFileChosen.invoke(dirPath);
+		}
+	});
 }
 
 void FileChooser::applyTheme(const mINI::INIStructure &struc) {
@@ -49,7 +55,11 @@ void FileChooser::applyTheme(const mINI::INIStructure &struc) {
 void FileChooser::translate() {
 	ConfirmDialog::translate();
 	filterBox->translate();
-	setTitle(getTranslation(builtinTranslation, "Select file"));
+	if (!dirSelection) {
+		setTitle(getTranslation(builtinTranslation, "Select file"));
+	} else {
+		setTitle(getTranslation(builtinTranslation + ".Folder", "Select file"));
+	}
 }
 
 void FileChooser::initTopContainer() {
@@ -116,7 +126,9 @@ void FileChooser::update() {
 void FileChooser::draw() {
 	ConfirmDialog::draw();
 
-	filterBox->draw();
+	if (filterBox->visible) {
+		filterBox->draw();
+	}
 }
 
 void FileChooser::onAdded() {
@@ -154,6 +166,11 @@ void FileChooser::clearCategories() {
 	filterBox->clear();
 }
 
+void FileChooser::setDirSelection(bool val) {
+	this->dirSelection = val;
+	filterBox->visible = !val;
+}
+
 void FileChooser::setDirectory(std::string fullPath) {
 	if (!DirectoryExists(fullPath.c_str())) {
 		pathBox->setText(dirPath);
@@ -164,7 +181,7 @@ void FileChooser::setDirectory(std::string fullPath) {
 		fullPath.pop_back();
 	}
 
-	getOkButton().disabled = true;
+	getOkButton().disabled = !dirSelection;
 
 	dirPath = fullPath;
 	pathBox->setText(fullPath);
@@ -227,10 +244,12 @@ void FileChooser::queueDirectoryChange(const std::string &fullPath) {
 
 void FileChooser::updateFileFilter() {
 	fileFilter = "DIRS*";
-	int index = filterBox->getValue().idx;
-	FileCategory &category = categories[index];
-	for (auto &ext : category.extensions) {
-		fileFilter = fileFilter.append(";");
-		fileFilter = fileFilter.append(ext);
+	if (!dirSelection) {
+		int index = filterBox->getValue().idx;
+		FileCategory &category = categories[index];
+		for (auto &ext : category.extensions) {
+			fileFilter = fileFilter.append(";");
+			fileFilter = fileFilter.append(ext);
+		}
 	}
 }

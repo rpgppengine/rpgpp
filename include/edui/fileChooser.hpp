@@ -40,8 +40,10 @@ struct FileChooser : public ConfirmDialog {
 	void addCategory(const std::string &title, std::vector<std::string> extensions, int iconId = ICON_FILE);
 	void addCategory(FileCategory &category);
 	void clearCategories();
+	void setDirSelection(bool val = true);
 
 private:
+	bool dirSelection = false;
 	std::vector<FileCategory> categories = {};
 
 	std::string dirPath = "";

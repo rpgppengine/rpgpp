@@ -22,7 +22,6 @@ Editor::Editor() {
 Editor::~Editor() {}
 
 void Editor::initWindow() {
-	SetConfigFlags(FLAG_WINDOW_HIGHDPI);
 	InitWindow(EDITOR_WINDOW_WIDTH, EDITOR_WINDOW_HEIGHT, "Editor");
 
 	Image iconImage = LoadImage("resources/app-icon.png");

@@ -4,6 +4,7 @@
 
 #include "edui/container.hpp"
 #include "edui/menuBar.hpp"
+#include "raylib.h"
 #include "widgets/mainMenuContainer.hpp"
 
 using namespace editor;
@@ -48,6 +49,7 @@ void Interface::initMainScreen() {
 	auto mainScreen = std::make_shared<edui::Container>();
 	mainScreen->render->border = 0;
 	mainScreen->setSize({1, 0}, {1, 0});
+	this->mainContainer = mainScreen;
 
 	auto baseCont = std::make_shared<MainMenuContainer>();
 	baseCont->anchor = {0.5f, 0.5f};
@@ -55,4 +57,10 @@ void Interface::initMainScreen() {
 	mainScreen->add(baseCont);
 
 	gui.add(mainScreen);
+}
+
+void Interface::showProjectScreen() {
+	mainContainer->markDelete();
+	SetWindowState(FLAG_WINDOW_RESIZABLE);
+	MaximizeWindow();
 }
