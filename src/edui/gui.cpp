@@ -101,7 +101,7 @@ void Gui::update() {
 		processVector(arr[i]);
 	}
 
-	if (current != nullptr) {
+	if (auto sharedCurrent = current.lock()) {
 		KeyboardKey key = static_cast<KeyboardKey>(GetKeyPressed());
 		KeyModifier mod;
 		mod.alt = IsKeyDown(KEY_LEFT_ALT);
@@ -118,30 +118,30 @@ void Gui::update() {
 
 		if (key != KEY_NULL) {
 			lastKey = key;
-			current->get()->keyPressed(key, mod, false);
+			sharedCurrent->keyPressed(key, mod, false);
 		}
 
 		if (lastKey != KEY_NULL && IsKeyDown(lastKey)) {
-			current->get()->keyPressed(lastKey, mod, true);
+			sharedCurrent->keyPressed(lastKey, mod, true);
 		}
 
 		while (codepoint != 0) {
 			int size = 0;
 			auto codepointStrC = CodepointToUTF8(codepoint, &size);
 			std::string_view view = codepointStrC;
-			current->get()->charEntered(codepoint, view);
+			sharedCurrent->charEntered(codepoint, view);
 
 			codepoint = GetCharPressed();
 		}
 
-		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !current->get()->mouseIsInRect()) {
-			current->get()->unfocused();
-			current = nullptr;
+		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !sharedCurrent->mouseIsInRect()) {
+			sharedCurrent->unfocused();
+			current.reset();
 		}
 
-		if (IsKeyReleased(KEY_ENTER) && current->get()->unfocusOnEnter) {
-			current->get()->unfocused();
-			current = nullptr;
+		if (IsKeyReleased(KEY_ENTER) && sharedCurrent->unfocusOnEnter) {
+			sharedCurrent->unfocused();
+			current.reset();
 		}
 	}
 
@@ -234,11 +234,11 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 		widget->get()->leftMouseClicked();
 
 		if (widget->get()->focusable) {
-			if (current != nullptr) {
-				current->get()->unfocused();
+			if (!current.expired()) {
+				current.lock()->unfocused();
 			}
-			current = widget;
-			current->get()->focused();
+			current = *widget;
+			current.lock()->focused();
 		}
 	}
 	if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {

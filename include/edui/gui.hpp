@@ -47,7 +47,7 @@ struct Gui {
 	bool notified = false;
 
 	/* Currently focused widget. */
-	std::shared_ptr<Widget> *current = nullptr;
+	std::weak_ptr<Widget> current;
 	std::weak_ptr<Widget> leftClickedWidget;
 	std::weak_ptr<Widget> middleClickedWidget;
 
