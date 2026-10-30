@@ -65,6 +65,9 @@ struct Gui {
 	std::array<ThemeEntry, EDUI_MAX_THEMES> themeEntries = {};
 	size_t themesCount;
 
+	/* Whether to skip a whole frame */
+	bool deferFlag = false;
+
 	Gui() {
 		Gui::instance = this;
 		font = GetFontDefault();

@@ -1,26 +1,30 @@
-#include "widgets/mainMenuContainer.hpp"
+#include "widgets/mainMenuPanel.hpp"
 
 #include <memory>
 
 #include "editor.hpp"
 #include "edui/button.hpp"
 #include "edui/container.hpp"
+#include "edui/fileChooser.hpp"
+#include "edui/fileValue.hpp"
 #include "edui/gui.hpp"
 #include "edui/imageRect.hpp"
 #include "edui/label.hpp"
+#include "edui/rliconsarr.hpp"
 #include "edui/verticalContainer.hpp"
+#include "raylib.h"
 #include "services/interface.hpp"
 #include "widgets/recentProjectsList.hpp"
 #include "widgets/windows/newProjectWindow.hpp"
 
 using namespace editor;
 
-MainMenuContainer::MainMenuContainer() {
+MainMenuPanel::MainMenuPanel() {
 	initTopContainer();
 	initBottomContainer();
 }
 
-void MainMenuContainer::initTopContainer() {
+void MainMenuPanel::initTopContainer() {
 	auto topCont = std::make_shared<edui::Container>();
 	topCont->render->border = 0;
 	topCont->setSize({1, 0}, {0.4f, 0});
@@ -35,7 +39,7 @@ void MainMenuContainer::initTopContainer() {
 	topCont->add(logoImg);
 }
 
-void MainMenuContainer::initBottomContainer() {
+void MainMenuPanel::initBottomContainer() {
 	auto bottomCont = std::make_shared<edui::Container>();
 	bottomCont->render->border = 0;
 	bottomCont->setSize({1, 0}, {0.6f, 0});
@@ -55,10 +59,7 @@ void MainMenuContainer::initBottomContainer() {
 	newProjectButton->setText("New Project");
 	newProjectButton->translationId = "MainMenu.Options.New";
 	sideOptions->add(newProjectButton);
-	newProjectButton->onClicked.connect([this] {
-		auto window = std::make_shared<NewProjectWindow>();
-		gui->add(window, layerId + 1);
-	});
+	newProjectButton->onClicked.connect([this] { Editor::getInstance().getResources().onNewProject(); });
 
 	auto openProjectButton = std::make_shared<edui::Button>();
 	openProjectButton->render->as<edui::LabelRender>().vertAlign = edui::VerticalAlignment::TEXT_CENTER;
@@ -66,6 +67,7 @@ void MainMenuContainer::initBottomContainer() {
 	openProjectButton->setText("Open Project");
 	openProjectButton->translationId = "MainMenu.Options.Open";
 	sideOptions->add(openProjectButton);
+	openProjectButton->onClicked.connect([this] { this->onOpenProjectButton(); });
 
 	bottomCont->add(sideOptions);
 
@@ -83,3 +85,5 @@ void MainMenuContainer::initBottomContainer() {
 
 	bottomCont->add(list);
 }
+
+void MainMenuPanel::onOpenProjectButton() { Editor::getInstance().getResources().onOpenProject(); }

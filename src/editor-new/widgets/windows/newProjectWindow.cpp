@@ -96,6 +96,6 @@ void NewProjectWindow::onOkButton() {
 	edui::FileOption dir = dirValue->getValue();
 
 	if (isValid()) {
-		Editor::getInstance().getInterface().showProjectScreen();
+		Editor::getInstance().getResources().getProject().create(titleText, dir.fullPath);
 	}
 }

@@ -67,7 +67,6 @@ void MenuBar::addItem(const std::string &title, std::vector<std::string> items) 
 	float spacing = Gui::instance->fontSpacing;
 	auto textSize = MeasureTextEx(Gui::instance->font, title.c_str(), totalFontSize, spacing);
 
-	// button->setText(title);
 	auto titleTranslationId = std::string(translationId.c_str()) + '.' + title;
 	button->setText(getTranslation(titleTranslationId, title));
 	button->setSize({0, static_cast<int>(textSize.x + 4)}, {1, 0});
@@ -90,9 +89,9 @@ void MenuBar::addItem(const std::string &title, std::vector<std::string> items) 
 				context->addItem(getTranslation(itemTranslationId, item));
 			}
 
-			context->onItemClicked.connect([this, title](const std::string &eventItem, size_t index) {
+			context->onItemClicked.connect([this, title, curr](const std::string &eventItem, size_t index) {
 				onItemClicked.invoke(title, eventItem);
-				onItemClickedInt.invoke(size - 1, index);
+				onItemClickedInt.invoke(curr, index);
 			});
 
 			this->currentContextMenu = context;

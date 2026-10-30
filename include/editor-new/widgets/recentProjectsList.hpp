@@ -8,9 +8,14 @@
 namespace editor {
 struct RecentProjectsList : public edui::VerticalContainer {
 	RecentProjectsList();
+	void update();
 
 private:
 	void addItem(const std::string &file);
+	void queueOpen(const std::string &file);
+
+	bool queued = false;
+	std::string path = "";
 };
 }  // namespace editor
 

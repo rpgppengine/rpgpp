@@ -42,6 +42,8 @@ struct TextEdit : public Widget {
 	void applyTheme(const mINI::INIStructure &struc) override;
 
 	virtual void setText(const std::string &newText);
+	void scrollToBottom();
+	void setEditable(bool val);
 
 	void update() override;
 	void draw() override;
@@ -61,6 +63,8 @@ struct TextEdit : public Widget {
 	void unload();
 
 protected:
+	bool editable = true;
+
 	short debounce = 0;
 
 	Rectangle scissorContentRect;

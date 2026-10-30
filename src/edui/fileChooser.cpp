@@ -26,6 +26,8 @@ FileChooser::FileChooser() : ConfirmDialog() {
 	setText("");
 	setTitle("Choose file");
 
+	setSize({0, FILE_CHOOSER_WIDTH}, {0, FILE_CHOOSER_HEIGHT});
+
 	initTopContainer();
 	initListContainer();
 
@@ -133,6 +135,7 @@ void FileChooser::draw() {
 
 void FileChooser::onAdded() {
 	ConfirmDialog::onAdded();
+	filterBox->layerId = layerId;
 	filterBox->render->font = this->render->font;
 
 	updateFileFilter();

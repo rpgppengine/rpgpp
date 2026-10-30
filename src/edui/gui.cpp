@@ -43,6 +43,8 @@ void Gui::processWidget(std::shared_ptr<Widget> &widget) {
 		}
 	}
 
+	if (deferFlag) return;
+
 	if (widget->deleteFlag) return;
 
 	widget->calcRect(screenRect);
@@ -57,9 +59,12 @@ void Gui::processWidget(std::shared_ptr<Widget> &widget) {
 
 void Gui::processVector(std::vector<std::shared_ptr<Widget>> &vec) {
 	for (auto it = vec.begin(); it != vec.end();) {
+		if (deferFlag) return;
+
 		auto &widget = *it;
 
 		if (widget == nullptr || widget->deleteFlag) {
+			deferFlag = true;
 			widget->onDeleted.invoke();
 			if (widget->isContainer) {
 				widget->as<Container>().deleteChildren();
@@ -72,8 +77,12 @@ void Gui::processVector(std::vector<std::shared_ptr<Widget>> &vec) {
 				continue;
 			}
 
-			if (!widget->deleteFlag) {
+			if (!widget->deleteFlag && !deferFlag) {
 				processWidget(widget);
+			}
+
+			if (deferFlag) {
+				return;
 			}
 
 			it++;
@@ -99,6 +108,9 @@ void Gui::update() {
 	notified = false;
 	for (int i = (EDUI_MAX_LAYERS - 1); i >= 0; i--) {
 		processVector(arr[i]);
+	}
+	if (deferFlag) {
+		deferFlag = false;
 	}
 
 	if (auto sharedCurrent = current.lock()) {

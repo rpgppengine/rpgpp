@@ -44,7 +44,10 @@ void Editor::run() {
 	CloseWindow();
 }
 
-void Editor::update() { interface->update(); }
+void Editor::update() {
+	resources->update();
+	interface->update();
+}
 
 void Editor::draw() { interface->draw(); }
 

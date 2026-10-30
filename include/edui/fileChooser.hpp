@@ -14,6 +14,8 @@
 #include "edui/verticalContainer.hpp"
 namespace edui {
 const size_t FILE_CATEGORY_MAX_EXTENSIONS = 5;
+const int FILE_CHOOSER_WIDTH = 600;
+const int FILE_CHOOSER_HEIGHT = 400;
 
 struct FileCategory {
 	std::string title;

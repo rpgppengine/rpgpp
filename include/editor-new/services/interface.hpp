@@ -2,6 +2,7 @@
 #define _EDITOR_SERVICES_INTERFACE_H
 
 #include <memory>
+#include <string>
 
 #include "edui/container.hpp"
 #include "edui/gui.hpp"
@@ -19,6 +20,8 @@ public:
 
 	edui::Gui &getEdui();
 	void showProjectScreen();
+
+	void showErrorMessage(const std::string &message);
 
 private:
 	edui::Gui gui;

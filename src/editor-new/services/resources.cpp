@@ -2,12 +2,18 @@
 
 #include <stdexcept>
 
+#include "editor.hpp"
+#include "edui/fileChooser.hpp"
+#include "edui/gui.hpp"
 #include "raylib.h"
 #include "utils/recentProjects.hpp"
+#include "widgets/windows/newProjectWindow.hpp"
 
 using namespace editor;
 
 Resources::Resources() { loadResources(); }
+
+void Resources::update() { openedProject.update(); }
 
 void Resources::unload() {
 	for (auto &[title, font] : fonts) {
@@ -56,4 +62,27 @@ Texture Resources::getTexture(const std::string &title) {
 
 Font Resources::getFont(const std::string &title) { return fonts.at(title); }
 
+Project &Resources::getProject() { return openedProject; }
+
 RecentProjects &Resources::getRecentProjects() { return recentProjects; }
+
+void Resources::onNewProject() {
+	auto window = std::make_shared<NewProjectWindow>();
+	Editor::getInstance().getInterface().getEdui().add(window, edui::EDUI_MAX_LAYERS - 2);
+	Editor::getInstance().getInterface().getEdui().deferFlag = true;
+}
+
+void Resources::onOpenProject() {
+	auto fileDialog = std::make_shared<edui::FileChooser>();
+	fileDialog->centerLayout();
+	fileDialog->addCategory("RPG++ Project", {".rpgpp"}, ICON_PRIORITY);
+
+	fileDialog->onFileChosen.connect([](std::string filePath) {
+		if (FileExists(filePath.c_str())) {
+			Editor::getInstance().getResources().getProject().openFromPath(filePath);
+		}
+	});
+
+	Editor::getInstance().getInterface().getEdui().add(fileDialog, edui::EDUI_MAX_LAYERS - 1);
+	Editor::getInstance().getInterface().getEdui().deferFlag = true;
+}

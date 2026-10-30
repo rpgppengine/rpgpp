@@ -90,6 +90,14 @@ void TextEdit::setText(const std::string &newText) {
 	reloadLines();
 }
 
+void TextEdit::scrollToBottom() {
+	if (!overflownY) return;
+	scissorY = scrollMax;
+	scrollbar->setValue(scissorY);
+}
+
+void TextEdit::setEditable(bool val) { this->editable = val; }
+
 void TextEdit::update() {
 	if (debounce > 0) {
 		debounce--;
@@ -552,6 +560,7 @@ void TextEdit::handleDeletionKeys(KeyboardKey key) {
 
 void TextEdit::handleEnterTab(KeyboardKey key) {
 	if (key == KEY_ENTER) {
+		if (!editable) return;
 		if (hasSelection()) {
 			eraseSelection();
 		}
@@ -570,6 +579,7 @@ void TextEdit::handleEnterTab(KeyboardKey key) {
 	}
 
 	if (key == KEY_TAB) {
+		if (!editable) return;
 		if (hasSelection()) {
 			eraseSelection();
 		}
@@ -597,6 +607,7 @@ void TextEdit::handleSelectionKeys(KeyboardKey key, KeyModifier mod) {
 		}
 	}
 	if (key == KEY_V && mod.ctrl) {
+		if (!editable) return;
 		if (GetClipboardText() == NULL) return;
 
 		if (hasSelection()) {
@@ -621,6 +632,7 @@ void TextEdit::handleSelectionKeys(KeyboardKey key, KeyModifier mod) {
 		setCursorRect();
 	}
 	if (key == KEY_X && mod.ctrl) {
+		if (!editable) return;
 		if (hasSelection()) {
 			SetClipboardText(selectionText.c_str());
 
@@ -672,6 +684,8 @@ void TextEdit::keyPressed(KeyboardKey key, KeyModifier mod, bool held) {
 }
 
 void TextEdit::charEntered(int codepoint, std::string_view str) {
+	if (!editable) return;
+
 	if (hasSelection()) {
 		eraseSelection();
 	}

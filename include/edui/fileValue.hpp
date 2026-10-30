@@ -18,9 +18,6 @@ struct FileOption {
 struct FileValueRender : public ContainerRender {};
 
 struct FileValue : public Container, public ValueWidgetT<FileOption> {
-	const int FILE_CHOOSER_WIDTH = 600;
-	const int FILE_CHOOSER_HEIGHT = 400;
-
 	Signal fileValueEmptied;
 
 	void setValue(const FileOption &newValue) override;
