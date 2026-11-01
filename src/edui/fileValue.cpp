@@ -8,7 +8,7 @@
 #include "edui/gui.hpp"
 #include "edui/iconButton.hpp"
 #include "edui/label.hpp"
-#include "edui/rliconsarr.hpp"
+#include "edui/raygui_subset.hpp"
 #include "raylib.h"
 
 using namespace edui;

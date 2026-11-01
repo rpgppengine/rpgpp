@@ -6,11 +6,11 @@
 
 #include "editor-new/widgets/gameOutputArea.hpp"
 #include "edui/childWindow.hpp"
-#include "edui/textArea.hpp"
 
 namespace editor {
 struct GameOutput : public edui::ChildWindow {
 	GameOutput();
+	void update() override;
 
 	void appendLine(const std::string &line);
 	void clear();

@@ -1,3 +1,6 @@
+#ifndef _EDITOR_ICONS_H
+#define _EDITOR_ICONS_H
+
 //////////////////////////////////////////////////////////////////////////////////
 //                                                                              //
 // raygui Icons exporter v1.1 - Icons data exported as a values array           //
@@ -8,9 +11,6 @@
 // Copyright (c) 2019-2026 raylib technologies (@raylibtech)                    //
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
-
-#ifndef _EDUI_RLICONSARR_H
-#define _EDUI_RLICONSARR_H
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -286,8 +286,8 @@ typedef enum {
 	ICON_FILETYPE_CODE_PYTHON = 254,
 	ICON_FILETYPE_CODE_JS = 255,
 	ICON_FILETYPE_ICON = 256,
-	ICON_257 = 257,
-	ICON_258 = 258,
+	ICON_UP_DOWN = 257,
+	ICON_HAMMER = 258,
 	ICON_259 = 259,
 	ICON_260 = 260,
 	ICON_261 = 261,
@@ -1061,10 +1061,10 @@ static unsigned int guiIcons[RAYGUI_ICON_MAX_ICONS * RAYGUI_ICON_DATA_ELEMENTS] 
 	0x22842ee4, 0x28a42e84, 0x20042e64, 0x00003ffc,	 // ICON_FILETYPE_CODE_JS
 	0x3ff00000, 0x241c2010, 0x2a8c3104, 0x28242454,
 	0x2ed42004, 0x2a542a54, 0x20042ed4, 0x00003ffc,	 // ICON_FILETYPE_ICON
-	0x03c00180, 0x0ff007e0, 0x00001ff8, 0x00000000,
-	0x00000000, 0x1ff80000, 0x07e00ff0, 0x018003c0,	 // ICON_257
-	0x00000000, 0x00000000, 0x00000000, 0x00000000,
-	0x00000000, 0x00000000, 0x00000000, 0x00000000,	 // ICON_258
+	0x03c00180, 0x0ff007e0, 0x3ffc1ff8, 0x00000000,
+	0x00000000, 0x1ff83ffc, 0x07e00ff0, 0x018003c0,	 // ICON_UP_DOWN
+	0x00000000, 0x1ff80ff8, 0x01801ff8, 0x01800180,
+	0x01800180, 0x01800180, 0x01800180, 0x00000000,	 // ICON_HAMMER
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,	 // ICON_259
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
@@ -1575,7 +1575,5 @@ static unsigned int guiIcons[RAYGUI_ICON_MAX_ICONS * RAYGUI_ICON_DATA_ELEMENTS] 
 
 // NOTE: A pointer to the current icons array should be defined
 static unsigned int *guiIconsPtr = guiIcons;
-
-const int ICON_UP_DOWN = ICON_257;
 
 #endif

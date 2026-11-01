@@ -2,7 +2,6 @@
 #define _EDITOR_UTILS_SUBPROCESS_H
 
 #include <string>
-#include <vector>
 
 #include "edui/signal.hpp"
 #include "subprocess.h"
@@ -17,8 +16,12 @@ public:
 
 	int spawn(const char *commandLine[]);
 	bool isRunning();
+	std::string readOut();
+	bool hasData();
 
 private:
+	std::string buffer = "";
+	bool dataAvailable = false;
 	bool running = false;
 	int procReturn;
 	struct subprocess_s process;

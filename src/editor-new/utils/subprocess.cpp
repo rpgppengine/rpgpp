@@ -33,8 +33,15 @@ void Subprocess::update() {
 
 		char buf[4096] = {0};
 		int res = subprocess_read_stdout(&process, buf, sizeof(buf));
-		if (res > 0) {
-			out.invoke(buf);
+		dataAvailable = res > 0;
+		buffer = buf;
+		if (dataAvailable) {
+			buffer = buf;
+			out.invoke(buffer);
 		}
 	}
 }
+
+std::string Subprocess::readOut() { return buffer; }
+
+bool Subprocess::hasData() { return dataAvailable; }

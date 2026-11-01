@@ -4,7 +4,7 @@
 
 #include "edui/gui.hpp"
 #include "edui/label.hpp"
-#include "edui/rlicons.hpp"
+#include "edui/raygui_subset.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
 

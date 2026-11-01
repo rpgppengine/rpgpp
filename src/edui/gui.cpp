@@ -6,6 +6,7 @@
 
 #include "edui/container.hpp"
 #include "edui/helper.hpp"
+#include "edui/raygui_subset.hpp"
 #include "edui/widget.hpp"
 #include "ini.h"
 #include "raylib.h"
@@ -363,6 +364,8 @@ void Gui::loadThemesDir(const std::string &dirPath) {
 		UnloadDirectoryFiles(pathList);
 	}
 }
+
+void Gui::loadIconsFile(const std::string &path) { GuiLoadIcons(path.c_str(), false); }
 
 void Gui::unload() {
 	if (IsFontValid(font)) {

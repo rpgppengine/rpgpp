@@ -101,6 +101,9 @@ struct Gui {
 	/* Load a directory with theme ini files. */
 	void loadThemesDir(const std::string &dirPath);
 
+	/* Load an .rgi file for icons. */
+	void loadIconsFile(const std::string &path);
+
 	void unload();
 };
 

@@ -1,5 +1,4 @@
 #define STR_IMPLEMENTATION
-
 #include "editor.hpp"
 
 int main() {

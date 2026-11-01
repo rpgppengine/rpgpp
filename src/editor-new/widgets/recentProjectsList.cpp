@@ -5,7 +5,6 @@
 #include "editor.hpp"
 #include "edui/gui.hpp"
 #include "edui/iconTextButton.hpp"
-#include "edui/rliconsarr.hpp"
 #include "edui/verticalContainer.hpp"
 #include "raylib.h"
 

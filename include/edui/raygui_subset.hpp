@@ -1,5 +1,8 @@
 /*
- *
+ * This is only a subset of the raygui library header file, just enough to load and draw icons.
+ * Original project: https://github.com/raysan5/raygui
+ */
+/*******************************************************************************************
  *   LICENSE: zlib/libpng
  *
  *   Copyright (c) 2014-2026 Ramon Santamaria (@raysan5)
@@ -21,17 +24,32 @@
  *
  **********************************************************************************************/
 
-#ifndef _EDUI_RLICONS_H
-#define _EDUI_RLICONS_H
+#ifndef _RAYGUI_SUBSET_H
+#define _RAYGUI_SUBSET_H
 
 #include <raylib.h>
 
-#define RAYGUI_ICON_SIZE 16				  // Size of icons in pixels (squared)
-#define RAYGUI_ICON_MAX_FONT_BACKED 257	  // Maximum number of icons to back in font atlas
-#define RAYGUI_ICON_MAX_NAME_LENGTH 32	  // Maximum length of icon name id
-#define RAYGUI_ICON_FONT_ATLAS_PADDING 1  // Padding between backed icons in font atlas
+#ifndef RAYGUIAPI
+#define RAYGUIAPI  // Functions defined as 'extern' by default (implicit specifiers)
+#endif
 
-static float guiAlpha = 1.0f;			  // Gui controls transparency
+#define RAYGUI_MALLOC(sz) malloc(sz)
+#define RAYGUI_CALLOC(n, sz) calloc(n, sz)
+#define RAYGUI_FREE(p) free(p)
+
+#include "editor-new/icons.hpp"
+
+// Load icons from memory
+// GLOBAL: Updates global variable: guiIconsPtr
+char **GuiLoadIconsFromMemory(const unsigned char *fileData, int dataSize, bool loadIconsName);
+
+// Load raygui icons file (.rgi)
+// WARNING: guiIconsName[]][] memory should be manually freed!
+char **GuiLoadIcons(const char *fileName, bool loadIconsName);
+
+void GuiDrawIcon(int iconId, int posX, int posY, int pixelSize, Color color);
+
+static float guiAlpha = 1.0f;  // Gui controls transparency
 
 static void GuiDrawRectangle(Rectangle rec, int borderWidth, Color borderColor, Color color) {
 	if (color.a > 0) {
@@ -50,7 +68,5 @@ static void GuiDrawRectangle(Rectangle rec, int borderWidth, Color borderColor, 
 					  Fade(borderColor, guiAlpha));
 	}
 }
-
-void GuiDrawIcon(int iconId, int posX, int posY, int pixelSize, Color color);
 
 #endif

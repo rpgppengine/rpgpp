@@ -5,17 +5,13 @@
 #include "editor.hpp"
 #include "edui/button.hpp"
 #include "edui/container.hpp"
-#include "edui/fileChooser.hpp"
-#include "edui/fileValue.hpp"
 #include "edui/gui.hpp"
 #include "edui/imageRect.hpp"
 #include "edui/label.hpp"
-#include "edui/rliconsarr.hpp"
 #include "edui/verticalContainer.hpp"
 #include "raylib.h"
 #include "services/interface.hpp"
 #include "widgets/recentProjectsList.hpp"
-#include "widgets/windows/newProjectWindow.hpp"
 
 using namespace editor;
 

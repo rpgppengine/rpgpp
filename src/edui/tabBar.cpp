@@ -7,7 +7,7 @@
 #include "edui/gui.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/iconButton.hpp"
-#include "edui/rliconsarr.hpp"
+#include "edui/raygui_subset.hpp"
 #include "edui/scrollableContainer.hpp"
 #include "edui/tab.hpp"
 #include "edui/widget.hpp"

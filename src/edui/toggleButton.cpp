@@ -2,9 +2,7 @@
 
 #include <memory>
 
-#include "edui/gui.hpp"
 #include "edui/iconTextButton.hpp"
-#include "edui/rlicons.hpp"
 
 using namespace edui;
 

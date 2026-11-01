@@ -36,6 +36,8 @@ void Interface::initEduiSettings() {
 	gui.loadTranslation("resources/en.ini");
 
 	gui.setFont("resources/TerminusTTF-4.49.3.ttf", 96, 18, 0);
+
+	gui.loadIconsFile("resources/iconset.rgi");
 }
 
 void Interface::initMenuBar() {

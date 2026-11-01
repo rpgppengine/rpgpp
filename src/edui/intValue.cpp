@@ -7,9 +7,7 @@
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/intValueTextBox.hpp"
-#include "edui/label.hpp"
-#include "edui/rlicons.hpp"
-#include "edui/rliconsarr.hpp"
+#include "edui/raygui_subset.hpp"
 #include "edui/widget.hpp"
 
 using namespace edui;

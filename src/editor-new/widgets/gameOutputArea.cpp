@@ -12,6 +12,6 @@ void GameOutputArea::appendLine(const std::string &line) {
 }
 
 void GameOutputArea::clear() {
-	text = "Game Started..";
+	text = "Game Started..\n";
 	reloadLines();
 }

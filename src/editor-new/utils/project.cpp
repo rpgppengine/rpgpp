@@ -8,11 +8,20 @@
 #include "edui/gui.hpp"
 #include "ini.h"
 #include "raylib.h"
+#include "utils/subprocess.hpp"
 #include "widgets/windows/gameOutput.hpp"
 
 using namespace editor;
 
-Project::Project() {}
+Project::Project() {
+	/*
+	process.out.connect([this](std::string line) {
+		if (this->outputWindow != nullptr && outputOpen) {
+			outputWindow->appendLine(line);
+		}
+	});
+	*/
+}
 
 void Project::update() { process.update(); }
 
@@ -81,15 +90,6 @@ void Project::spawnGame() {
 	if (!outputOpen) {
 		outputWindow = std::make_shared<GameOutput>();
 		outputOpen = true;
-
-		process.out.disconnectAll();
-
-		std::weak_ptr<GameOutput> weakWindow = outputWindow;
-		process.out.connect([weakWindow](std::string line) {
-			if (auto sharedWindow = weakWindow.lock()) {
-				sharedWindow->appendLine(line);
-			}
-		});
 	}
 	outputWindow->clear();
 
@@ -101,3 +101,5 @@ void Project::spawnGame() {
 std::string Project::getTitle() { return title; }
 
 void Project::setTitle(const std::string &title) { this->title = title; }
+
+Subprocess &Project::getProcess() { return process; }

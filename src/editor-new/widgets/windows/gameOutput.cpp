@@ -2,7 +2,8 @@
 
 #include <memory>
 
-#include "edui/textArea.hpp"
+#include "editor.hpp"
+#include "edui/childWindow.hpp"
 #include "widgets/gameOutputArea.hpp"
 
 using namespace editor;
@@ -15,6 +16,16 @@ GameOutput::GameOutput() {
 
 	this->area = textArea;
 	add(textArea);
+}
+
+void GameOutput::update() {
+	edui::ChildWindow::update();
+
+	auto &process = Editor::getInstance().getResources().getProject().getProcess();
+	if (process.isRunning() && process.hasData()) {
+		auto read = process.readOut();
+		appendLine(read);
+	}
 }
 
 void GameOutput::appendLine(const std::string &line) {

@@ -8,10 +8,11 @@
 
 #include "edui/confirmDialog.hpp"
 #include "edui/dropdown.hpp"
-#include "edui/rliconsarr.hpp"
+#include "edui/raygui_subset.hpp"
 #include "edui/textBox.hpp"
 #include "edui/toggleButton.hpp"
 #include "edui/verticalContainer.hpp"
+
 namespace edui {
 const size_t FILE_CATEGORY_MAX_EXTENSIONS = 5;
 const int FILE_CHOOSER_WIDTH = 600;

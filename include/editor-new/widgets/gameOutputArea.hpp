@@ -3,7 +3,6 @@
 
 #include <string>
 
-#include "edui/textArea.hpp"
 #include "edui/textEdit.hpp"
 namespace editor {
 struct GameOutputArea : public edui::TextEdit {

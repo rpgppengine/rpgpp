@@ -1,8 +1,9 @@
 #ifndef _EDITOR_EDITOR_H
 #define _EDITOR_EDITOR_H
-
+#define RAYGUI_CUSTOM_ICONS
 #include <memory>
 
+#include "icons.hpp"
 #include "services/interface.hpp"
 #include "services/resources.hpp"
 

@@ -1,0 +1,4 @@
+#ifndef _EDITOR_UTILS_EDITORICONS_H
+#define _EDITOR_UTILS_EDITORICONS_H
+
+#endif
