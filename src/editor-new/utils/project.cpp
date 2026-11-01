@@ -13,15 +13,7 @@
 
 using namespace editor;
 
-Project::Project() {
-	/*
-	process.out.connect([this](std::string line) {
-		if (this->outputWindow != nullptr && outputOpen) {
-			outputWindow->appendLine(line);
-		}
-	});
-	*/
-}
+Project::Project() {}
 
 void Project::update() { process.update(); }
 
@@ -73,6 +65,16 @@ void Project::create(const std::string &title, const std::string &dirPath) {
 
 	file.write(struc);
 
+	std::filesystem::path defaultsDir = GetWorkingDirectory();
+	defaultsDir /= "resources";
+	defaultsDir /= "defaults";
+	for (auto dirEntry : std::filesystem::recursive_directory_iterator(defaultsDir)) {
+		if (std::filesystem::is_directory(dirEntry)) {
+			std::filesystem::copy(dirEntry, stdPath / GetFileName(dirEntry.path().c_str()),
+								  std::filesystem::copy_options::recursive);
+		}
+	}
+
 	openFromPath(iniPath);
 }
 
@@ -101,5 +103,7 @@ void Project::spawnGame() {
 std::string Project::getTitle() { return title; }
 
 void Project::setTitle(const std::string &title) { this->title = title; }
+
+std::string Project::getBasePath() { return basePath; }
 
 Subprocess &Project::getProcess() { return process; }

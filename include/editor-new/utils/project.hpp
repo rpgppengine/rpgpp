@@ -24,6 +24,7 @@ public:
 
 	void setTitle(const std::string &title);
 	std::string getTitle();
+	std::string getBasePath();
 
 private:
 	std::string title = "";

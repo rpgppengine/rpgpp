@@ -99,8 +99,6 @@ char **GuiLoadIcons(const char *fileName, bool loadIconsName) {
 void GuiDrawIcon(int iconId, int posX, int posY, int pixelSize, Color color) {
 #define BIT_CHECK(a, b) ((a) & (1u << (b)))
 
-	printf("%i \n", iconId);
-
 	for (int i = 0, y = 0; i < RAYGUI_ICON_SIZE * RAYGUI_ICON_SIZE / 32; i++) {
 		for (int k = 0; k < 32; k++) {
 			if (BIT_CHECK(guiIcons[iconId * RAYGUI_ICON_DATA_ELEMENTS + i], k)) {

@@ -32,6 +32,8 @@ struct ChildWindow : public Container {
 	/* Set the title of the window. */
 	void setTitle(const std::string &title);
 
+	void hideCloseButton();
+
 	void update() override;
 	void draw() override;
 

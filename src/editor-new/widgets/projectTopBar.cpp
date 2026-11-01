@@ -12,7 +12,7 @@ ProjectTopBar::ProjectTopBar() : edui::HorizontalContainer() {
 
 	projectTitleLabel = std::make_shared<edui::Label>();
 	projectTitleLabel->render->border = 0;
-	projectTitleLabel->setSize({0, 240}, {1, 0});
+	projectTitleLabel->setSize({0, TOPBAR_LABEL_SIZE}, {1, 0});
 	projectTitleLabel->setText(Editor::getInstance().getResources().getProject().getTitle());
 	this->add(projectTitleLabel);
 

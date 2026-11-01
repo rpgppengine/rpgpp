@@ -69,6 +69,8 @@ void ChildWindow::setTitle(const std::string &title) {
 	drawOverflownText(padding, rend.font, totalFontSize, spacing, title, &shownText);
 }
 
+void ChildWindow::hideCloseButton() { closeButtonPtr->visible = false; }
+
 void ChildWindow::update() {
 	if (dragging) {
 		auto delta = GetMouseDelta();
@@ -80,10 +82,10 @@ void ChildWindow::update() {
 
 	Container::update();
 
-	closeButtonPtr->update();
-
 	auto barRect = getBarRect();
 	closeButtonPtr->calcRect(barRect);
+
+	closeButtonPtr->update();
 
 	processPseudoChild(gui, closeButtonPtr);
 }
@@ -101,7 +103,9 @@ void ChildWindow::draw() {
 
 	// title bar
 	DrawRectangleRec(barRect, rend.secondaryColor);
-	closeButtonPtr->draw();
+	if (closeButtonPtr->visible) {
+		closeButtonPtr->draw();
+	}
 	DrawRectangleLinesEx(barRect, rend.border, rend.currentBorderColor);
 
 	// title
