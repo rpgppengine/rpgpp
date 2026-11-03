@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include "edui/childWindow.hpp"
 #include "edui/container.hpp"
 #include "edui/gui.hpp"
 
@@ -21,11 +22,13 @@ public:
 	edui::Gui &getEdui();
 	void showProjectScreen();
 
+	void showTopWindow(std::shared_ptr<edui::ChildWindow> widget);
 	void showErrorMessage(const std::string &message);
 
 private:
 	edui::Gui gui;
 	std::shared_ptr<edui::Container> mainContainer;
+	bool hasTopWindow = false;
 
 	void initEduiSettings();
 	void initMenuBar();

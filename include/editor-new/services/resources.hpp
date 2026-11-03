@@ -24,6 +24,10 @@ public:
 	Project &getProject();
 	RecentProjects &getRecentProjects();
 
+	bool fileClipboardAvailable();
+	void setFileClipboard(const std::string &filePath);
+	std::string getFileClipboard();
+
 	void onNewProject();
 	void onOpenProject();
 
@@ -31,6 +35,9 @@ private:
 	void loadResources();
 	std::map<std::string, Texture> textures;
 	std::map<std::string, Font> fonts;
+
+	bool hasFileClipboard = false;
+	std::string filePathClipboard = "";
 
 	Project openedProject;
 	RecentProjects recentProjects;

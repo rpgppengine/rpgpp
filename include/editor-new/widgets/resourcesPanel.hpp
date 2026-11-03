@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <memory>
+#include <string>
 
 #include "edui/childWindow.hpp"
 #include "edui/textBox.hpp"
@@ -10,7 +11,15 @@
 #include "services/interface.hpp"
 
 namespace editor {
-const int RESOURCESPANEL_FILESLIST_OFFSET = edui::EDUI_SECONDARY_HEIGHT + INTERFACE_SPACING;
+const int RESOURCESPANEL_OFFSET = edui::EDUI_SECONDARY_HEIGHT + INTERFACE_SPACING;
+
+enum ResourceContextMenuItem {
+	RESOURCE_PASTE = -1,
+	RESOURCE_COPY,
+	RESOURCE_COPY_PATH,
+	RESOURCE_RENAME,
+	RESOURCE_DELETE
+};
 
 struct ResourcesPanel : public edui::ChildWindow {
 	ResourcesPanel();
@@ -23,6 +32,11 @@ private:
 	void changePath(std::filesystem::path newPath);
 	void refresh();
 	void addItem(const std::string &path);
+	void showContextMenu(const std::string &filePath);
+	void addDirectory(const std::string &title);
+	void pasteItem();
+	void renameItem(const std::string &fullPath, const std::string &newName);
+	void deleteItem(const std::string &fullPath);
 };
 }  // namespace editor
 

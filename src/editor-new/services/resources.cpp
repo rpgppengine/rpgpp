@@ -86,3 +86,12 @@ void Resources::onOpenProject() {
 	Editor::getInstance().getInterface().getEdui().add(fileDialog, edui::EDUI_MAX_LAYERS - 1);
 	Editor::getInstance().getInterface().getEdui().deferFlag = true;
 }
+
+bool Resources::fileClipboardAvailable() { return hasFileClipboard; }
+
+void Resources::setFileClipboard(const std::string &filePath) {
+	this->filePathClipboard = filePath;
+	this->hasFileClipboard = true;
+}
+
+std::string Resources::getFileClipboard() { return filePathClipboard; }

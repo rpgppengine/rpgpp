@@ -2,14 +2,8 @@
 
 #include <memory>
 
-#include "editor.hpp"
 #include "edui/container.hpp"
-#include "edui/gui.hpp"
-#include "edui/horizontalContainer.hpp"
-#include "edui/iconButton.hpp"
-#include "edui/label.hpp"
 #include "services/interface.hpp"
-#include "utils/editorIcons.hpp"
 #include "widgets/projectTopBar.hpp"
 #include "widgets/resourcesPanel.hpp"
 
@@ -20,8 +14,11 @@ ProjectScreen::ProjectScreen() : edui::Container() {
 	topBar->setSize({1, 0}, {0, TOPBAR_HEIGHT});
 	add(topBar);
 
+	const int RESOURCES_WIDTH = TOPBAR_LABEL_SIZE + 36;
+	const int BASE_Y = TOPBAR_HEIGHT + INTERFACE_SPACING;
+	const int LEFT_HEIGHT = TOPBAR_HEIGHT + (INTERFACE_SPACING * 2);
 	auto resourcesPanel = std::make_shared<ResourcesPanel>();
-	resourcesPanel->setPosition({0, 0}, {0, TOPBAR_HEIGHT});
-	resourcesPanel->setSize({0, TOPBAR_LABEL_SIZE}, {1, -TOPBAR_HEIGHT});
+	resourcesPanel->setPosition({0, INTERFACE_SPACING}, {0, BASE_Y});
+	resourcesPanel->setSize({0, RESOURCES_WIDTH}, {1, -LEFT_HEIGHT});
 	add(resourcesPanel);
 }

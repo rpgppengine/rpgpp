@@ -7,6 +7,7 @@
 #include "edui/menuBar.hpp"
 #include "edui/messageBox.hpp"
 #include "raylib.h"
+#include "utils/editorConsts.hpp"
 #include "widgets/screens/mainMenuScreen.hpp"
 #include "widgets/screens/projectScreen.hpp"
 
@@ -73,8 +74,17 @@ void Interface::initMainScreen() {
 	gui.add(mainScreen);
 }
 
+void Interface::showTopWindow(std::shared_ptr<edui::ChildWindow> widget) {
+	if (hasTopWindow) return;
+	this->hasTopWindow = true;
+	gui.add(widget, edui::EDUI_MAX_LAYERS - 1);
+	widget->onDeleted.connect([this] { this->hasTopWindow = false; });
+}
+
 void Interface::showErrorMessage(const std::string &message) {
 	auto messageBox = std::make_shared<edui::MessageBox>();
+	messageBox->setSize({0, EDITOR_CHILD_WINDOW_WIDTH}, {0, EDITOR_CHILD_WINDOW_HEIGHT});
+	messageBox->centerLayout();
 	messageBox->setText(message);
 	gui.add(messageBox, edui::EDUI_MAX_LAYERS - 1);
 }

@@ -15,11 +15,12 @@
 #include "edui/verticalContainer.hpp"
 #include "raylib.h"
 #include "services/interface.hpp"
+#include "utils/editorConsts.hpp"
 
 using namespace editor;
 
 NewProjectWindow::NewProjectWindow() : edui::ConfirmDialog() {
-	setSize({0, 300}, {0, 250});
+	setSize({0, EDITOR_CHILD_WINDOW_WIDTH}, {0, EDITOR_CHILD_WINDOW_HEIGHT});
 	centerLayout();
 	translationId = "MainMenu.NewProject";
 
