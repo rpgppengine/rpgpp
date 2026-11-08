@@ -24,24 +24,7 @@ TileSet::TileSet(const Texture &texture, Vector2 tileSize) {
 	this->tileSize = tileSize;
 }
 
-TileSet::TileSet(const std::string &fileName) {
-	// Get text from JSON file
-	this->source = fileName;
-	char *jsonContent = LoadFileText(fileName.c_str());
-	json j = json::parse(jsonContent);
-
-	// Load Texture
-	std::string sourcePath = j.at("source");
-	this->textureSource = sourcePath;
-	this->texture = LoadTexture(sourcePath.c_str());
-
-	int tileWidth = j.at("tileWidth");
-	int tileHeight = j.at("tileHeight");
-	this->tileSize = Vector2{static_cast<float>(tileWidth), static_cast<float>(tileHeight)};
-
-	// Unload file's text
-	UnloadFileText(jsonContent);
-}
+TileSet::TileSet(const std::string &fileName) { loadFile(fileName); }
 
 TileSet::TileSet(TileSetBin bin) {
 	this->tileSize = Vector2{static_cast<float>(bin.tileSize.x), static_cast<float>(bin.tileSize.y)};
@@ -56,16 +39,18 @@ TileSet::~TileSet() {
 	// UnloadTexture(texture);
 }
 
+/*
 json TileSet::dumpJson() {
 	json tileSetJson = {
 		{"source", textureSource}, {"tileSize", tileSize.x}, {"tileWidth", tileSize.x}, {"tileHeight", tileSize.y}};
 
 	return tileSetJson;
 }
+*/
 
 void TileSet::unload() const { UnloadTexture(texture); }
 
-Vector2 TileSet::getTileSize() const { return this->tileSize; }
+Vector2 TileSet::getTileSize() const { return this->tileSize.toFloat(); }
 
 void TileSet::setTileSize(int size) { this->tileSize = Vector2{static_cast<float>(size), static_cast<float>(size)}; }
 

@@ -8,7 +8,6 @@
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 
-#include "actor.hpp"
 #include "game.hpp"
 #include "gamedata.hpp"
 #include "interfaceService.hpp"
@@ -54,7 +53,8 @@ Interactable::Interactable(InteractableInRoomBin bin) {
 	this->type = bin.type;
 	this->props = std::make_unique<nlohmann::json>(json::from_cbor(bin.propsCbor));
 
-	Vector2 tilePos = {static_cast<float>(bin.x), static_cast<float>(bin.y)};
+	// Vector2 tilePos = {static_cast<float>(bin.x), static_cast<float>(bin.y)};
+	Vector2 tilePos = {0, 0};
 
 	this->valid = true;
 	this->onTouch = bin.onTouch;
@@ -66,6 +66,7 @@ Interactable::Interactable(InteractableInRoomBin bin) {
 					 static_cast<float>(tileSize)};
 }
 
+/*
 json Interactable::dumpJson() {
 	json j = json::object();
 	j.push_back({"name", displayTitle});
@@ -75,6 +76,7 @@ json Interactable::dumpJson() {
 
 	return j;
 }
+*/
 
 bool Interactable::isValid() const { return this->valid; }
 

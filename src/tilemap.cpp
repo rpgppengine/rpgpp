@@ -12,6 +12,8 @@
 
 using json = nlohmann::json;
 
+TileMap::TileMap() {}
+
 TileMap::TileMap(const std::string &fileName) {
 	this->basePos = Vector2{0.0f, 0.0f};
 
@@ -172,6 +174,7 @@ TileMap::TileMap(const RoomBin &bin) {
 	}
 }
 
+/*
 json TileMap::dumpJson() {
 	// Make a vector for the tiles
 	auto tilesVector = std::vector<std::vector<std::vector<int>>>();
@@ -182,7 +185,7 @@ json TileMap::dumpJson() {
 			std::vector<int> atlasPosVector;
 			if (tile.isPlaced()) {
 				AtlasTile atlasTile = tile.getAtlasTile();
-				Vector2 atlasCoords = atlasTile.getAtlasCoords();
+				Vector2 atlasCoords = atlasTile.getAtlasCoords().toFloat();
 				atlasPosVector.push_back(static_cast<int>(atlasCoords.x));
 				atlasPosVector.push_back(static_cast<int>(atlasCoords.y));
 			} else {
@@ -202,6 +205,7 @@ json TileMap::dumpJson() {
 
 	return tileMapJson;
 }
+*/
 
 void TileMap::unload() const { tileSet->unload(); }
 
@@ -313,7 +317,7 @@ void TileMap::drawTile(Vector2 worldPos, AtlasTile tile) const {
 	Texture texture = this->tileSet->getTexture();
 
 	// actual coordinates
-	Vector2 atlasCoords = tile.getAtlasCoords();
+	Vector2 atlasCoords = tile.getAtlasCoords().toFloat();
 	Vector2 worldCoords = {this->basePos.x + (worldPos.x * static_cast<float>(worldTileSize)),
 						   this->basePos.y + (worldPos.y * static_cast<float>(worldTileSize))};
 

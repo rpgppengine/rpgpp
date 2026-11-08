@@ -89,7 +89,7 @@ InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView() {
 		scriptFlag = false;
 	}
 }
-
+/*
 nlohmann::json InterfaceView::dumpJson() {
 	auto j = json::object();
 
@@ -118,6 +118,7 @@ nlohmann::json InterfaceView::dumpJson() {
 
 	return j;
 }
+*/
 //
 const std::string &InterfaceView::getEntityName(int index) { return elementNames[index]; }
 

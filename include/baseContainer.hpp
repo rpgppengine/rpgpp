@@ -38,6 +38,11 @@ public:
 	}
 	/** Get a reference to the whole object map. */
 	std::map<IVector, T> &getObjects() { return this->objects; }
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(objects);
+	}
 };
 
 #endif	// !_RPGPP_BASECONTAINER_H

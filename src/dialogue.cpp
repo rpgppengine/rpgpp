@@ -40,6 +40,7 @@ Dialogue::Dialogue(const std::string &filePath) {
 	UnloadFileText(fileTxt);
 }
 
+/*
 nlohmann::json Dialogue::dumpJson() {
 	std::vector<nlohmann::json> diagVec;
 	for (DialogueLine line : dialogueBin.lines) {
@@ -67,6 +68,7 @@ nlohmann::json Dialogue::dumpJson() {
 
 	return result;
 }
+*/
 
 DialogueBin &Dialogue::getData() { return dialogueBin; }
 

@@ -12,43 +12,13 @@
 #include "dialogueBalloon.hpp"
 
 template <class Archive>
-void serialize(Archive &a, IRect &b) {
-	a(b.x, b.y, b.width, b.height);
-}
-
-template <class Archive>
-void serialize(Archive &a, IVector &b) {
-	a(b.x, b.y);
-}
-
-template <class Archive>
 void serialize(Archive &a, ActorBin &b) {
 	a(b.name, b.tileSetName, b.collision, b.animations);
 }
 
 template <class Archive>
-void serialize(Archive &a, ActorInRoomBin &b) {
-	a(b.name, b.source, b.tilePos, b.intType, b.propsCbor);
-}
-
-template <class Archive>
-void serialize(Archive &a, TileBin &b) {
-	a(b.atlasPos, b.worldPos);
-}
-
-template <class Archive>
 void serialize(Archive &a, InteractableBin &b) {
 	a(b.typeName, b.scriptPath, b.props);
-}
-
-template <class Archive>
-void serialize(Archive &a, InteractableInRoomBin &b) {
-	a(b.x, b.y, b.onTouch, b.propsCbor, b.type);
-}
-
-template <class Archive>
-void serialize(Archive &a, PropInRoomBin &b) {
-	a(b.name, b.tilePos, b.onTouch, b.propsCbor);
 }
 
 template <class Archive>
@@ -83,26 +53,6 @@ void serialize(Archive &a, RoomBin &b) {
 }
 
 template <class Archive>
-void serialize(Archive &a, DialogueTextSection &b) {
-	a(b.key, b.text, b.textColor, b.textSize, b.font, b.delay, b.padding, b.paddingMode, b.sound, b.newline);
-}
-
-template <class Archive>
-void serialize(Archive &a, DialogueOption &b) {
-	a(b.title, b.nextDialogue);
-}
-
-template <class Archive>
-void serialize(Archive &a, DialogueLine &b) {
-	a(b.text, b.sections, b.imageId, b.hasPortrait, b.characterName, b.hasOptions, b.options);
-}
-
-template <class Archive>
-void serialize(Archive &a, DialogueBin &b) {
-	a(b.title, b.lines);
-}
-
-template <class Archive>
 void serialize(Archive &a, ScriptBin &b) {
 	a(b.bytecode);
 }
@@ -122,7 +72,8 @@ void serialize(Archive &a, ProjectProgramSettings &b) {
 
 template <class Archive>
 void serialize(Archive &a, ProjectGameSettings &b) {
-	a(b.defaultLoadingPath, b.isLoadUi, b.playerActorPath, b.tileSize, b.debugDraw, b.exportImageScales, b.exportFontSizes);
+	a(b.defaultLoadingPath, b.isLoadUi, b.playerActorPath, b.tileSize, b.debugDraw, b.exportImageScales,
+	  b.exportFontSizes);
 }
 
 template <class Archive>

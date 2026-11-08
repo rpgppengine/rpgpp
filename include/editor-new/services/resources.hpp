@@ -7,6 +7,7 @@
 #include "raylib.h"
 #include "utils/project.hpp"
 #include "utils/recentProjects.hpp"
+#include "utils/resourceTypeManager.hpp"
 namespace editor {
 class Resources {
 public:
@@ -23,6 +24,7 @@ public:
 
 	Project &getProject();
 	RecentProjects &getRecentProjects();
+	ResourceTypeManager &getTypes();
 
 	bool fileClipboardAvailable();
 	void setFileClipboard(const std::string &filePath);
@@ -41,6 +43,7 @@ private:
 
 	Project openedProject;
 	RecentProjects recentProjects;
+	ResourceTypeManager typeManager;
 };
 }  // namespace editor
 

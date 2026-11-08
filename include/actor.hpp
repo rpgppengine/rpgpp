@@ -4,14 +4,20 @@
 #include <raylib.h>
 
 #include <array>
+#include <fstream>
 #include <functional>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <vector>
 
 #include "atlasTile.hpp"
+#include "basicTypes.hpp"
+#include "cereal/access.hpp"
+#include "cereal/archives/json.hpp"
+#include "cereal/cereal.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"
+#include "resource.hpp"
 #include "saveable.hpp"
 #include "tileset.hpp"
 
@@ -33,7 +39,7 @@ enum Direction : short {
 /** The Actor class represents an Actor in the game's world.
  * @see [Direction](Direction.md)
  */
-class Actor : public ISaveable {
+class Actor : public Resource {
 private:
 	std::string sourcePath;
 	/** The used TileSet for this Actor's sprites. */
@@ -43,29 +49,31 @@ private:
 	/** The currently shown tile from the TileSet. */
 	AtlasTile tile;
 	/** Current position in the world of this Actor. */
-	Vector2 position{};
+	Vector2 position = {0, 0};
 	/** Current tile position of this Actor if such is set. */
-	Vector2 tilePosition{};
-	int frameCounter{};
-	int frameSpeed{};
-	int currentFrame{};
+	Vector2 tilePosition = {-1, -1};
+	int frameCounter = 0;
+	int frameSpeed = 2;
+	int currentFrame = 0;
 	/** Rectangle, representing the collision of this Actor. */
-	Rectangle collisionRect{};
+	Rectangle collisionRect = {0, 0, 0, 0};
 	/** An array of the animations. Each std::vector<Vector2> represents the
 	 * frames of an animation. */
-	std::array<std::vector<Vector2>, 8> animations;
+	std::array<std::vector<IVector>, 8> animations;
 	/** A Direction enum, showing the current animation that is being played. */
-	Direction currentAnimation;
-	Direction lastAnimation;
+	Direction currentAnimation = RPGPP_DOWN_IDLE;
+	Direction lastAnimation = RPGPP_DOWN_IDLE;
 	bool tempAnimIsPlayed = false;
 	/** Whether this Actor has an Interactable. */
 	bool ownsInteractable = false;
 	/** A smart pointer, owning an Interactable. */
-	std::unique_ptr<Interactable> interactable;
+	std::unique_ptr<Interactable> interactable = nullptr;
+
+	friend class cereal::access;
 
 public:
-	/** Empty constructor. */
-	Actor() = default;
+	/** Default constructor. */
+	Actor();
 	/** Constructor that takes a path to the .ractor file. */
 	Actor(const std::string &fileName);
 	/** Constructor that takes a TileSet, the atlas position of the tile to use,
@@ -74,7 +82,7 @@ public:
 	/** Constructor that takes an ActorBin binary structure */
 	Actor(const ActorBin &bin);
 	/** Dump this Actor's data to a nlohmann::json object. */
-	json dumpJson() override;
+	// json dumpJson() override;
 	/** Unload routine. The UnloadTexture function will called here. */
 	void unload() const;
 	/** Update routine. */
@@ -104,11 +112,11 @@ public:
 	/** Get the current direction of this actor. */
 	Direction getAnimationDirection() const;
 	/** Get the current animation atlas of this actor. */
-	Vector2 getCurrentAnimationAtlas() const;
+	IVector getCurrentAnimationAtlas() const;
 	/** Get the current animation rectangle of this actor. */
 	Rectangle getCurrentAnimationRectangle() const;
 	/** Get an atlas of this actor by frame index. */
-	Vector2 getAnimationAtlasByIdx(int frameIndex) const;
+	IVector getAnimationAtlasByIdx(int frameIndex) const;
 	/** Set the current frame. */
 	void setAnimationFrame(int frameIndex);
 	/** Get the current size of the animation in the direction. */
@@ -143,9 +151,9 @@ public:
 	/** Get the path of the used TileSet. */
 	std::string getTileSetSource() const;
 	/** Get an array of this Actor's animations */
-	std::array<std::vector<Vector2>, 8> getAnimationsRaw() const;
+	std::array<std::vector<IVector>, 8> getAnimationsRaw() const;
 	/** Get a specific animation */
-	std::vector<Vector2> getAnimationRaw(Direction id) const;
+	std::vector<IVector> getAnimationRaw(Direction id) const;
 	/** Set the Actor's collision Rectangle */
 	void setCollisionRect(Rectangle rect);
 	/** Whether this Actor has an Interactable. */
@@ -156,8 +164,26 @@ public:
 	Interactable *getInteractable();
 	/** Add an Interactable using an interactable file. */
 	void setInteractableFromPath(const std::string &interPath);
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(sourcePath), CEREAL_NVP(tileSetSource), CEREAL_NVP(animations), CEREAL_NVP(collisionRect));
+	}
+
+	void loadFile(std::filesystem::path filePath) override;
+	void saveFile(std::filesystem::path filePath) override {
+		/*
+		std::ofstream stream(filePath);
+		cereal::JSONOutputArchive ar(stream);
+		ar(*this);
+		*/
+	}
 };
 
 Vector2 calcActorTilePos(Vector2 newPosition, Vector2 worldTileSize, TileSet *tileSet);
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(Actor)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Resource, Actor)
 
 #endif

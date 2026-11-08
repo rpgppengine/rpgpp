@@ -32,7 +32,9 @@ Interactable *InteractablesContainer::add(IVector pos, const std::string &type) 
 }
 
 void InteractablesContainer::addBin(InteractableInRoomBin bin) {
-	IVector pos = {bin.x, bin.y};
+	// IVector pos = {bin.x, bin.y};
+	//
+	IVector pos = {0, 0};
 	if (this->objectExistsAtPosition(pos)) {
 		return;
 	}
@@ -44,8 +46,9 @@ void InteractablesContainer::addBinFromTypename(Vector2 pos, const std::string &
 	if (Game::getBin().interactables.count(type) > 0) {
 		auto interactable = Game::getBin().interactables[type];
 		InteractableInRoomBin intBin;
-		intBin.x = static_cast<int>(pos.x);
-		intBin.y = static_cast<int>(pos.y);
+
+		// intBin.x = static_cast<int>(pos.x);
+		// intBin.y = static_cast<int>(pos.y);
 		intBin.type = type;
 		intBin.onTouch = false;
 

@@ -3,6 +3,8 @@
 
 #include <raylib.h>
 
+#include "basicTypes.hpp"
+
 /**
  * Represents a source atlas tile from a TileSet.
  */
@@ -11,7 +13,7 @@ private:
 	/** Pointer to the used Texture */
 	Texture *texture;
 	/** The atlas (source) coordinates from the TileSet. */
-	Vector2 atlasCoords;
+	IVector atlasCoords;
 
 public:
 	/**
@@ -23,13 +25,13 @@ public:
 	 * Constructor that takes in a texture and coordinates on the atlas (the
 	 * tileset)
 	 */
-	AtlasTile(Texture *texture, Vector2 atlasCoords);
+	AtlasTile(Texture *texture, IVector atlasCoords);
 
 	/**
 	 * Get the atlas coordinates
-	 * @returns A Vector2 which represents the atlas coordinates
+	 * @returns An IVector which represents the atlas coordinates
 	 */
-	Vector2 getAtlasCoords() const;
+	IVector getAtlasCoords() const;
 };
 
 #endif

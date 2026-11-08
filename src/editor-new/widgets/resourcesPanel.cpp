@@ -15,8 +15,10 @@
 #include "icons.hpp"
 #include "raylib.h"
 #include "services/interface.hpp"
+#include "services/resources.hpp"
 #include "widgets/windows/deleteConfirmWindow.hpp"
 #include "widgets/windows/newFolderWindow.hpp"
+#include "widgets/windows/newResourceWindow.hpp"
 #include "widgets/windows/renameResourceWindow.hpp"
 
 using namespace editor;
@@ -73,12 +75,30 @@ ResourcesPanel::ResourcesPanel() : edui::ChildWindow() {
 	newResourceButton->setText("New Resource");
 	newResourceButton->setPosition({0, RESOURCESPANEL_OFFSET}, {0, RESOURCESPANEL_OFFSET});
 	newResourceButton->setSize({1, -RESOURCESPANEL_OFFSET}, {0, edui::EDUI_SECONDARY_HEIGHT});
+
+	newResourceButton->onClicked.connect([this] {
+		std::filesystem::path finalPath = Editor::getInstance().getResources().getProject().getBasePath();
+		finalPath.append(path.c_str());
+
+		auto window = std::make_shared<NewResourceWindow>(ptr, finalPath);
+		window->onConfirmed.connect([this](std::string typeStr) {
+			printf("%s \n", typeStr.c_str());
+			refresh();
+		});
+		Editor::getInstance().getInterface().showTopWindow(window);
+	});
+
 	add(newResourceButton);
 
 	refresh();
 };
 
 void ResourcesPanel::changePath(std::filesystem::path newPath) {
+	if (newPath.is_absolute()) {
+		pathBox->setText(path.c_str());
+		return;
+	}
+
 	std::filesystem::path finalPath = Editor::getInstance().getResources().getProject().getBasePath();
 	finalPath.append(newPath.c_str());
 
@@ -130,7 +150,9 @@ void ResourcesPanel::addItem(const std::string &path) {
 			changePath(this->path.append(dirName));
 		});
 	} else {
-		button->iconId = ICON_FILE;
+		std::string ext = GetFileExtension(path.c_str());
+		int iconId = Editor::getInstance().getResources().getTypes().getIconByExtension(ext);
+		button->iconId = iconId;
 	}
 	button->onRightClicked.connect([this, path] { showContextMenu(path); });
 
@@ -140,13 +162,14 @@ void ResourcesPanel::addItem(const std::string &path) {
 void ResourcesPanel::showContextMenu(const std::string &filePath) {
 	bool fileClipAvailable = Editor::getInstance().getResources().fileClipboardAvailable();
 	auto contextMenu = std::make_shared<edui::ContextMenu>();
+	contextMenu->translationId = "Project.Resources";
 
 	if (fileClipAvailable) {
 		contextMenu->addItem("Paste");
 	}
 
 	contextMenu->addItem("Copy");
-	contextMenu->addItem("Copy full path");
+	contextMenu->addItem("CopyPath");
 	contextMenu->addItem("Rename");
 	contextMenu->addItem("Delete");
 	contextMenu->moveToMouse();

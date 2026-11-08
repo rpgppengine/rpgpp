@@ -81,6 +81,7 @@ Prop::Prop(PropBin bin) {
 	}
 }
 
+/*
 json Prop::dumpJson() {
 	std::vector<int> atlasRectVec = {static_cast<int>(atlasRect.x), static_cast<int>(atlasRect.y),
 									 static_cast<int>(atlasRect.width), static_cast<int>(atlasRect.height)};
@@ -94,6 +95,7 @@ json Prop::dumpJson() {
 		   {"interactable_type", interactable->getType()}};
 	return j;
 }
+*/
 
 std::string Prop::getSourcePath() const { return sourcePath; }
 

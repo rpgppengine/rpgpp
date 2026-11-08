@@ -6,7 +6,9 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+#include "basicTypes.hpp"
 #include "gamedata.hpp"
+#include "resource.hpp"
 #include "saveable.hpp"
 using json = nlohmann::json;
 #include "atlasTile.hpp"
@@ -15,13 +17,13 @@ using json = nlohmann::json;
  * TileMap or another object
  * @see [TileMap](TileMap.md)
  */
-class TileSet : public ISaveable {
+class TileSet : public Resource {
 private:
 	/** The used Texture for this TileSet. A raylib Texture is used. */
 	Texture texture;
-	/** The size of a single file. TIles can have different widths and heights,
+	/** The size of a single file. Tiles can have different widths and heights,
 	 * thus a Vector2 is used. */
-	Vector2 tileSize;
+	IVector tileSize;
 	/** The path to the used texture. May be a .png file or other image format.
 	 */
 	std::string textureSource;
@@ -44,7 +46,7 @@ public:
 	TileSet(TileSetBin bin);
 	~TileSet();
 	/** Dump the TileSet's data into a nlohmann::json object */
-	json dumpJson() override;
+	// json dumpJson() override;
 	/** Unload routine */
 	void unload() const;
 	/** Get the size of a tile. Since a tile may have different width and
@@ -78,6 +80,36 @@ public:
 	bool areAtlasCoordsValid(Vector2 atlasCoords) const;
 	/** Get a tile from this TileSet as an AtlasTile. */
 	AtlasTile getTile(Vector2 atlasCoords);
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(textureSource), CEREAL_NVP(tileSize));
+	}
+
+	void loadFile(std::filesystem::path filePath) override {
+		// Get text from JSON file
+		this->source = filePath;
+		char *jsonContent = LoadFileText(filePath.c_str());
+		json j = json::parse(jsonContent);
+
+		// Load Texture
+		std::string sourcePath = j.at("source");
+		this->textureSource = sourcePath;
+		this->texture = LoadTexture(sourcePath.c_str());
+
+		int tileWidth = j.at("tileWidth");
+		int tileHeight = j.at("tileHeight");
+		this->tileSize = Vector2{static_cast<float>(tileWidth), static_cast<float>(tileHeight)};
+
+		// Unload file's text
+		UnloadFileText(jsonContent);
+	}
+
+	void saveFile(std::filesystem::path filePath) override {}
 };
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(TileSet)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Resource, TileSet)
 
 #endif

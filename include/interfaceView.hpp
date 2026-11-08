@@ -10,8 +10,12 @@
 #include <string>
 #include <vector>
 
+#include "cereal/archives/json.hpp"
 #include "gamedata.hpp"
 #include "lua.hpp"
+#include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
+#include "resource.hpp"
 #include "saveable.hpp"
 #include "sol/forward.hpp"
 #include "sol/state_view.hpp"
@@ -20,7 +24,7 @@
 #include "ui_elements/uiElement.hpp"
 
 /** An InterfaceView represents a collection of UI elements drawn on the screen to make up a user interface. */
-class InterfaceView : public ISaveable {
+class InterfaceView : public Resource {
 private:
 	Rectangle rect;
 
@@ -65,7 +69,7 @@ public:
 	InterfaceView(InterfaceViewBin &bin);
 
 	/** Dump json data. */
-	nlohmann::json dumpJson();
+	// nlohmann::json dumpJson();
 
 	/** Get name of an element by index. */
 	const std::string &getEntityName(int index);
@@ -130,6 +134,40 @@ public:
 
 	/** Abandon the Lua environment. Should always be done before the end of the program. */
 	void abandonLua();
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(scriptSource), CEREAL_NVP(elements));
+	}
+
+	void loadFile(std::filesystem::path filePath) override {
+		/*
+		std::string fileText = LoadFileText(filePath.c_str());
+
+		auto j = nlohmann::json::parse(fileText);
+		this->rect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+
+		InterfaceViewBin bin;
+
+		{
+			std::stringstream stream;
+			stream << fileText;
+			cereal::JSONInputArchive cerealJson(stream);
+			cerealJson(bin);
+		}
+
+		this->scriptSource = bin.scriptSource;
+		for (auto &[title, elementBin] : bin.elements) {
+			auto element = addElement(title, elementBin.type);
+			elements[element]->props = elementBin.props;
+			elements[element]->config();
+		}
+		*/
+	};
+
+	void saveFile(std::filesystem::path filePath) override {
+
+	};
 };
 
 #endif

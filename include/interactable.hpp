@@ -6,17 +6,21 @@
 #include <array>
 #include <map>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <vector>
 
+#include "cereal/cereal.hpp"
 #include "gamedata.hpp"
+#include "resource.hpp"
 #include "saveable.hpp"
 
+using json = nlohmann::json;
 enum PropType { PROP_INT, PROP_STRING, PROP_BOOLEAN, PROP_DIALOGUE };
 
 /** Defines an object that is interactable in-game by a player's action */
-class Interactable : public ISaveable {
+class Interactable : public Resource {
 private:
 	/** Whether this Interactable is valid */
 	bool valid;
@@ -50,7 +54,7 @@ public:
 	Interactable(InteractableInRoomBin bin);
 	virtual ~Interactable() = default;
 	/** Dump JSON data. */
-	nlohmann::json dumpJson();
+	// nlohmann::json dumpJson();
 	/** Whether this Interactable is valid */
 	bool isValid() const;
 	/** Get the Rectangle of this Interactable */
@@ -86,6 +90,30 @@ public:
 	void setDisplayTitle(const std::string &newTitle);
 	/** Get the Interactable's display title. */
 	std::string &getDisplayTitle();
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(displayTitle), CEREAL_NVP(scriptPath), CEREAL_NVP(onTouch),
+		  cereal::make_nvp("props", props->dump()));
+	}
+
+	void loadFile(std::filesystem::path filePath) override {
+		char *jsonString = LoadFileText(filePath.c_str());
+		nlohmann::json intJson = json::parse(jsonString);
+		UnloadFileText(jsonString);
+
+		type = GetFileNameWithoutExt(filePath.c_str());
+		displayTitle = intJson.at("name");
+		props = std::make_unique<nlohmann::json>(intJson.at("props"));
+		scriptPath = intJson.at("script");
+		onTouch = intJson.at("onTouch");
+	}
+
+	void saveFile(std::filesystem::path filePath) override {}
 };
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(Interactable)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Resource, Interactable)
 
 #endif

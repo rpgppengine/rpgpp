@@ -209,7 +209,7 @@ Room::Room(const RoomBin &bin) : Room() {
 		Game::getSounds().unload();
 	}
 }
-
+/*
 json Room::dumpJson() {
 	json roomJson = this->tileMap->dumpJson();
 
@@ -272,7 +272,7 @@ json Room::dumpJson() {
 
 	return roomJson;
 }
-
+*/
 void Room::unload() const {
 	tileMap->unload();
 

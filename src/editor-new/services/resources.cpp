@@ -7,6 +7,7 @@
 #include "edui/gui.hpp"
 #include "raylib.h"
 #include "utils/recentProjects.hpp"
+#include "utils/resourceTypeManager.hpp"
 #include "widgets/windows/newProjectWindow.hpp"
 
 using namespace editor;
@@ -65,6 +66,8 @@ Font Resources::getFont(const std::string &title) { return fonts.at(title); }
 Project &Resources::getProject() { return openedProject; }
 
 RecentProjects &Resources::getRecentProjects() { return recentProjects; }
+
+ResourceTypeManager &Resources::getTypes() { return typeManager; }
 
 void Resources::onNewProject() {
 	auto window = std::make_shared<NewProjectWindow>();

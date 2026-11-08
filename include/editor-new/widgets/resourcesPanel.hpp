@@ -8,6 +8,7 @@
 #include "edui/childWindow.hpp"
 #include "edui/textBox.hpp"
 #include "edui/verticalContainer.hpp"
+#include "resource.hpp"
 #include "services/interface.hpp"
 
 namespace editor {
@@ -25,6 +26,8 @@ struct ResourcesPanel : public edui::ChildWindow {
 	ResourcesPanel();
 
 private:
+	std::unique_ptr<Resource> ptr = nullptr;
+
 	std::string relativeDir = "";
 	std::filesystem::path path = "";
 	std::shared_ptr<edui::VerticalContainer> filesList = nullptr;

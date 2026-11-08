@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "atlasTile.hpp"
+#include "cereal/cereal.hpp"
 #include "gamedata.hpp"
 #include "tile.hpp"
 #include "tileset.hpp"
@@ -21,23 +22,24 @@ using json = nlohmann::json;
 class TileMap {
 private:
 	/** Base position of this TileMap. */
-	Vector2 basePos{};
+	Vector2 basePos = {0, 0};
 	/** File path to the source of the used TileSet. */
-	std::string tileSetSource;
+	std::string tileSetSource = "";
 	/** A unique_ptr to the used TileSet. */
-	std::unique_ptr<TileSet> tileSet;
-	int atlasTileSize;
-	int worldTileSize;
+	std::unique_ptr<TileSet> tileSet = nullptr;
+	int atlasTileSize = 16;
+	int worldTileSize = 16 * RPGPP_DRAW_MULTIPLIER;
 	/** Width of the TileMap in tiles */
-	int width;
+	int width = 8;
 	/** Height of the TileMap in height */
-	int height;
+	int height = 8;
 	int maxAtlasWidth;
 	int maxAtlasHeight;
 	/** A collection representing the tiles in this map */
 	std::vector<std::vector<Tile>> tiles;
 
 public:
+	TileMap();
 	/** Construct from a file name/path */
 	TileMap(const std::string &fileName);
 	/** Construct using a TileSet path, width, height */
@@ -87,6 +89,11 @@ public:
 	 * ocmponent will be the new width; the y component will be the new height.
 	 */
 	void setWorldSize(Vector2 size);
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(tileSetSource), CEREAL_NVP(worldTileSize), CEREAL_NVP(width), CEREAL_NVP(height));
+	}
 };
 
 #endif

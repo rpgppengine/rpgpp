@@ -12,145 +12,19 @@
 #include <map>
 #include <string>
 #include <unordered_map>
-#include <variant>
 #include <vector>
 
+#include "basicTypes.hpp"
 #include "dialogueBalloon.hpp"
+#include "roomtypes.hpp"
 
 #define RPGPP_DRAW_MULTIPLIER (3)
-
-struct IVector {
-	int x;
-	int y;
-
-	bool operator==(const IVector &other) const { return x == other.x && y == other.y; }
-
-	bool operator<(const IVector &other) const { return x < other.x || (x == other.x && y < other.y); }
-
-	IVector() = default;
-	IVector(int x, int y) {
-		this->x = x;
-		this->y = y;
-	}
-	IVector(const Vector2 &from) {
-		x = static_cast<int>(from.x);
-		y = static_cast<int>(from.y);
-	}
-};
-
-struct IRect {
-	int x;
-	int y;
-	int width;
-	int height;
-};
-
-struct UIElementRef {
-	std::string title = "";
-	uint8_t entityId = 255;
-};
-
-struct FontRef {
-	std::string path = "";
-	Font font;
-	int fontSize = 13;
-};
-
-struct ImageRef {
-	std::string path = "";
-	Texture texture;
-	int scale = 1;
-	void scaleImage(int newScale) {
-		this->scale = newScale;
-		auto loadedImage = LoadImage(TextFormat("images/%s", path.c_str()));
-		ImageResizeNN(&loadedImage, loadedImage.width * scale, loadedImage.height * scale);
-		texture = LoadTextureFromImage(loadedImage);
-		UnloadImage(loadedImage);
-	}
-};
-
-const std::string CALLBACK_TRIGGER = "callback_trigger";
-const std::string CALLBACK_FOCUSED = "callback_focused";
-const std::string CALLBACK_UNFOCUSED = "callback_unfocused";
-
-#define RPGPP_CALLBACK_MAX (3)
-
-struct CallbacksArray {
-	std::unordered_map<std::string, std::string> funcNames = {
-		{CALLBACK_TRIGGER, ""},
-		{CALLBACK_UNFOCUSED, ""},
-		{CALLBACK_FOCUSED, ""}
-	};
-};
-
-struct InputC {
-	UIElementRef upButton;
-	UIElementRef downButton;
-	UIElementRef leftButton;
-	UIElementRef rightButton;
-
-	CallbacksArray funcNames;
-};
-
-enum TextAlignment {
-	TEXT_ALIGN_LEFT = 0,
-	TEXT_ALIGN_TOP = 0,
-	TEXT_ALIGN_CENTRE = 1,
-	TEXT_ALIGN_MIDDLE = 1,
-	TEXT_ALIGN_RIGHT = 2,
-	TEXT_ALIGN_BOTTOM = 2
-};
-
-struct VerticalAlignment {
-	TextAlignment val = TEXT_ALIGN_TOP;
-};
-
-struct HorizontalAlignment {
-	TextAlignment val = TEXT_ALIGN_LEFT;
-};
-
-enum ElementPropertyType {
-	UI_PROP_INT,
-	UI_PROP_BOOL,
-	UI_PROP_STRING,
-	UI_PROP_RECT,
-	UI_PROP_COLOR,
-	UI_PROP_FONT,
-	UI_PROP_IMAGE,
-	UI_PROP_REF,
-	UI_PROP_NPATCHINFO,
-	UI_PROP_INPUT
-};
-
-typedef std::vector<std::string> StringVector;
-
-typedef std::variant<int, bool, std::string, Rectangle, Color, FontRef, ImageRef, VerticalAlignment,
-					 HorizontalAlignment, UIElementRef, NPatchInfo, InputC, StringVector>
-	ElementProperty;
-
-struct Event {
-	KeyboardKey key;
-	bool hold = false;
-};
 
 struct ActorBin {
 	std::string name;
 	std::string tileSetName;
 	IRect collision;
 	std::array<std::vector<IVector>, 8> animations;
-};
-
-struct ActorInRoomBin {
-	std::string name;
-	std::string source;
-	IVector tilePos;
-	std::string intType;
-	std::vector<std::uint8_t> propsCbor;
-};
-
-struct TileBin {
-	IVector atlasPos;
-	IVector worldPos;
 };
 
 struct InteractableBin {
@@ -161,21 +35,6 @@ struct InteractableBin {
 
 struct ScriptBin {
 	std::string bytecode;
-};
-
-struct InteractableInRoomBin {
-	int x;
-	int y;
-	bool onTouch;
-	std::string type;
-	std::vector<std::uint8_t> propsCbor;
-};
-
-struct PropInRoomBin {
-	std::string name;
-	IVector tilePos;
-	bool onTouch;
-	std::vector<std::uint8_t> propsCbor;
 };
 
 struct TileSetBin {
@@ -283,56 +142,6 @@ struct DataSerialization {
 
 void serializeDataToFile(std::string fileName, GameData data);
 GameData deserializeFile(std::string fileName);
-
-template <class Archive>
-void serialize(Archive &a, Rectangle &b) {
-	a(b.x, b.y, b.width, b.height);
-}
-
-template <class Archive>
-void serialize(Archive &a, Color &b) {
-	a(b.a, b.r, b.g, b.b);
-}
-
-template <class Archive>
-void serialize(Archive &a, UIElementRef &b) {
-	a(b.title);
-}
-
-template <class Archive>
-void serialize(Archive &a, ImageRef &b) {
-	a(b.path, b.scale);
-}
-
-template <class Archive>
-void serialize(Archive &a, FontRef &b) {
-	a(b.path, b.fontSize);
-}
-
-template <class Archive>
-void serialize(Archive &a, HorizontalAlignment &b) {
-	a(b.val);
-}
-
-template <class Archive>
-void serialize(Archive &a, VerticalAlignment &b) {
-	a(b.val);
-}
-
-template <class Archive>
-void serialize(Archive &a, NPatchInfo &b) {
-	a(b.top, b.bottom, b.left, b.right, b.layout);
-}
-
-template <class Archive>
-void serialize(Archive &a, InputC &b) {
-	a(b.upButton, b.downButton, b.leftButton, b.rightButton, b.funcNames);
-}
-
-template <class Archive>
-void serialize(Archive &a, CallbacksArray &b) {
-	a(b.funcNames);
-}
 
 template <class Archive>
 void serialize(Archive &a, UIElementBin &b) {
