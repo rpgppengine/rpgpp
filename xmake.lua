@@ -1,3 +1,39 @@
+package("raylib")
+add_urls("https://github.com/raysan5/raylib.git")
+add_versions("6.0", "38d0eded78d38cd5db7fd75bde0001a648c22207")
+add_deps("cmake")
+set_license("Zlib")
+
+if is_plat("mingw", "linux", "macosx") then
+	add_syslinks("raylib")
+end
+if is_plat("macosx") then
+    add_frameworks("CoreVideo", "CoreGraphics", "AppKit", "IOKit", "CoreFoundation", "Foundation")
+elseif is_plat("mingw", "windows") then
+	add_syslinks("gdi32", "opengl32", "winmm", "shell32", "user32")
+end
+
+on_install("linux", "macosx", "mingw", "windows", function (package)
+	local configs = {
+		"-DBUILD_EXAMPLES=OFF",
+		"-DCMAKE_BUILD_TYPE=" .. (package:is_debug() and "Debug" or "Release")
+	}
+
+	print("TheTotallyMakeThisWorkOnMacPatcher: Patching context file in " .. os.curdir())
+	local files = os.files("**/nsgl_context.m")
+	if #files > 0 then
+		local context_file = files[1]
+
+		print("Patched OpenGL Acceleration flag, Check file: " .. context_file)
+		os.cp("$(projectdir)/libs/nsgl_context_custom/nsgl_context.m", context_file)
+	else
+		print("Could not find ngsl_context file. If you are using a macOS System with virtualized graphics, this could lead to issues!")
+	end
+
+	import("package.tools.cmake").install(package, configs)
+end)
+package_end()
+
 includes("toolchain/*.lua")
 includes("packages/*.lua")
 if is_plat("switch") then
