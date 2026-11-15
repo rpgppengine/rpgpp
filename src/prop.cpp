@@ -151,7 +151,10 @@ Interactable *Prop::getInteractable() const {
 	}
 }
 
-std::string Prop::getInteractableType() const { return interactable->getType(); }
+std::string Prop::getInteractableType() const {
+	if (interactable) return interactable->getType();
+	return "";
+}
 
 void Prop::setInteractableType(const std::string &type) {
 	if (hasInteractable && interactable->getType() == type) {

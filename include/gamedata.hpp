@@ -10,93 +10,20 @@
 #include <cereal/types/vector.hpp>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "actor.hpp"
 #include "basicTypes.hpp"
+#include "cereal/cereal.hpp"
 #include "dialogueBalloon.hpp"
+#include "drawHelper.hpp"
+#include "prop.hpp"
+#include "resource.hpp"
 #include "roomtypes.hpp"
-
-#define RPGPP_DRAW_MULTIPLIER (3)
-
-struct ActorBin {
-	std::string name;
-	std::string tileSetName;
-	IRect collision;
-	std::array<std::vector<IVector>, 8> animations;
-};
-
-struct InteractableBin {
-	std::string typeName;
-	std::string scriptPath;
-	std::vector<std::uint8_t> props;
-};
-
-struct ScriptBin {
-	std::string bytecode;
-};
-
-struct TileSetBin {
-	std::string name;
-	std::string extension;
-	IVector tileSize;
-	std::vector<unsigned char> image;
-	int dataSize;
-};
-
-struct FontBin {
-	std::vector<unsigned char> data;
-	int dataSize;
-	std::string ext;
-};
-
-struct ImageBin {
-	std::vector<unsigned char> data;
-	int dataSize;
-	std::string ext;
-};
-
-struct MusicBin {
-	std::string relativePath;
-	bool isSound;
-	std::vector<unsigned char> fileData;
-	std::string fileExt;
-};
-
-struct PropBin {
-	std::string name;
-	IRect atlasRect;
-	IRect collisionRect;
-	std::string imagePath;
-	bool hasInteractable;
-	std::string intType;
-};
-
-struct RoomBin {
-	std::string name;
-	std::string tileSetName;
-	int width;
-	int height;
-	IVector startPoint;
-	std::vector<IVector> collisions;
-	std::vector<InteractableInRoomBin> interactables;
-	std::vector<PropInRoomBin> props;
-	std::vector<ActorInRoomBin> actors;
-	std::vector<std::vector<TileBin>> tiles;
-	std::string musicSource;
-};
-
-struct UIElementBin {
-	std::string type = "";
-	std::unordered_map<std::string, ElementProperty> props;
-};
-
-struct InterfaceViewBin {
-	std::string scriptSource = "";
-	std::unordered_map<std::string, std::vector<std::uint8_t>> entites;
-	std::unordered_map<std::string, UIElementBin> elements = {};
-};
+#include "tileset.hpp"
 
 struct ProjectProgramSettings {
 	std::string projectTitle;
@@ -106,6 +33,12 @@ struct ProjectProgramSettings {
 	bool windowResizeableFlag = false;
 	int targetFPS = 60;
 	int windowStateFlag = 0;
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(projectTitle), CEREAL_NVP(projectVersion), CEREAL_NVP(windowSize), CEREAL_NVP(programIconPath),
+		  CEREAL_NVP(windowResizeableFlag), CEREAL_NVP(targetFPS), CEREAL_NVP(windowStateFlag));
+	}
 };
 
 struct ProjectGameSettings {
@@ -116,23 +49,53 @@ struct ProjectGameSettings {
 	bool debugDraw = false;
 	std::vector<int> exportImageScales = {1};
 	std::vector<int> exportFontSizes = {13};
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(defaultLoadingPath), CEREAL_NVP(isLoadUi), CEREAL_NVP(playerActorPath), CEREAL_NVP(tileSize),
+		  CEREAL_NVP(debugDraw), CEREAL_NVP(exportImageScales), CEREAL_NVP(exportFontSizes));
+	}
 };
 
 struct GameData {
 	std::string title;
 	ProjectProgramSettings programSet;
 	ProjectGameSettings gameSet;
+
 	std::map<std::string, FontBin> fonts;
 	std::map<std::string, ImageBin> images;
-	std::map<std::string, TileSetBin> tilesets;
+
+	// std::map<std::string, TileSetBin> tilesets;
+	std::map<std::string, TileSet> tilesets;
+
 	std::map<std::string, InteractableBin> interactables;
 	std::vector<RoomBin> rooms;
 	std::map<std::string, ActorBin> actors;
+	// std::map<std::string, Actor> actors;
 	std::vector<PropBin> props;
+	// std::vector<Prop> props;
 	std::map<std::string, InterfaceViewBin> interfaceViews;
 	std::map<std::string, DialogueBin> dialogues;
 	std::map<std::string, MusicBin> music;
 	std::map<std::string, ScriptBin> scripts;
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(title), CEREAL_NVP(programSet), CEREAL_NVP(gameSet), CEREAL_NVP(fonts), CEREAL_NVP(images),
+		  CEREAL_NVP(tilesets), CEREAL_NVP(interactables), CEREAL_NVP(rooms), CEREAL_NVP(actors), CEREAL_NVP(props),
+		  CEREAL_NVP(interfaceViews), CEREAL_NVP(dialogues), CEREAL_NVP(music), CEREAL_NVP(scripts));
+	}
+};
+
+struct MinData {
+	std::string title;
+	ProjectProgramSettings programSet;
+	ProjectGameSettings gameSet;
+
+	template <typename Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(title), CEREAL_NVP(programSet), CEREAL_NVP(gameSet));
+	}
 };
 
 struct DataSerialization {
@@ -142,15 +105,5 @@ struct DataSerialization {
 
 void serializeDataToFile(std::string fileName, GameData data);
 GameData deserializeFile(std::string fileName);
-
-template <class Archive>
-void serialize(Archive &a, UIElementBin &b) {
-	a(b.type, b.props);
-}
-
-template <class Archive>
-void serialize(Archive &a, InterfaceViewBin &b) {
-	a(b.scriptSource, b.entites, b.elements);
-}
 
 #endif

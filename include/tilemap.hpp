@@ -10,7 +10,7 @@
 
 #include "atlasTile.hpp"
 #include "cereal/cereal.hpp"
-#include "gamedata.hpp"
+#include "drawHelper.hpp"
 #include "tile.hpp"
 #include "tileset.hpp"
 

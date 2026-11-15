@@ -12,8 +12,8 @@
 #include <vector>
 
 #include "cereal/cereal.hpp"
-#include "gamedata.hpp"
 #include "resource.hpp"
+#include "roomtypes.hpp"
 #include "saveable.hpp"
 
 using json = nlohmann::json;

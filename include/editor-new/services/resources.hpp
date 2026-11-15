@@ -22,6 +22,8 @@ public:
 	Texture getTexture(const std::string &title);
 	Font getFont(const std::string &title);
 
+	std::string getInterpreterPath();
+
 	Project &getProject();
 	RecentProjects &getRecentProjects();
 	ResourceTypeManager &getTypes();
@@ -41,6 +43,7 @@ private:
 	bool hasFileClipboard = false;
 	std::string filePathClipboard = "";
 
+	std::string interpreterPath;
 	Project openedProject;
 	RecentProjects recentProjects;
 	ResourceTypeManager typeManager;

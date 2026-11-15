@@ -7,7 +7,7 @@
 #include <string>
 
 #include "basicTypes.hpp"
-#include "gamedata.hpp"
+#include "bins.hpp"
 #include "resource.hpp"
 #include "saveable.hpp"
 using json = nlohmann::json;

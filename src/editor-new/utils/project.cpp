@@ -1,13 +1,30 @@
 #include "utils/project.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <filesystem>
+#include <fstream>
 #include <memory>
+#include <ostream>
+#include <sstream>
+#include <system_error>
 
+#include "bins.hpp"
+#include "cereal/archives/json.hpp"
+#include "cereal/archives/portable_binary.hpp"
+#include "cereal/details/helpers.hpp"
 #include "editor.hpp"
 #include "edui/gui.hpp"
-#include "ini.h"
+#include "gamedata.hpp"
+#include "packHelper.hpp"
 #include "raylib.h"
+#include "resource.hpp"
+#include "rres.h"
+#include "tileset.hpp"
+#include "utils/resourcePacker.hpp"
+#include "utils/resourceTypeManager.hpp"
 #include "utils/subprocess.hpp"
 #include "widgets/windows/gameOutput.hpp"
 
@@ -23,17 +40,13 @@ void Project::openFromPath(const std::string &path) {
 		return;
 	}
 
-	mINI::INIFile file(path);
-	mINI::INIStructure struc;
-
-	bool readResult = file.read(struc);
-	if (!readResult) {
-		Editor::getInstance().getInterface().showErrorMessage("Cannot read this file");
-		return;
+	std::ifstream inStream(path);
+	{
+		cereal::JSONInputArchive ar(inStream);
+		ar(*this);
 	}
 
-	this->title = struc.get("Project").get("Title");
-
+	fileName = GetFileName(path.c_str());
 	basePath = GetDirectoryPath(path.c_str());
 	auto recent = Editor::getInstance().getResources().getRecentProjects();
 	recent.enqueue(path);
@@ -44,6 +57,8 @@ void Project::openFromPath(const std::string &path) {
 }
 
 void Project::create(const std::string &title, const std::string &dirPath) {
+	this->title = title;
+
 	std::filesystem::path stdPath = dirPath;
 	stdPath /= title;
 
@@ -56,14 +71,12 @@ void Project::create(const std::string &title, const std::string &dirPath) {
 	basePath = stdPath;
 
 	std::filesystem::path iniPath = stdPath / "proj.rpgpp";
+	std::ofstream outStream(iniPath);
 
-	mINI::INIFile file(iniPath);
-	mINI::INIStructure struc;
-
-	auto &section = struc["Project"];
-	section["Title"] = title;
-
-	file.write(struc);
+	{
+		cereal::JSONOutputArchive ar(outStream);
+		ar(*this);
+	}
 
 	std::filesystem::path defaultsDir = GetWorkingDirectory();
 	defaultsDir /= "resources";
@@ -76,6 +89,74 @@ void Project::create(const std::string &title, const std::string &dirPath) {
 	}
 
 	openFromPath(iniPath);
+}
+
+void Project::saveProject() {
+	std::filesystem::path fullPath = basePath;
+	fullPath /= fileName;
+
+	std::ofstream outStream(fullPath);
+	{
+		cereal::JSONOutputArchive ar(outStream);
+		ar(*this);
+	}
+}
+
+#include <cstdio>
+
+void Project::exportBin() {
+	std::filesystem::path binPath = basePath;
+	binPath /= "game.bin";
+
+	GameData data;
+	data.title = title;
+	data.gameSet = gameSet;
+	data.programSet = programSet;
+
+	MinData inData;
+	inData.title = title;
+	inData.gameSet = gameSet;
+	inData.programSet = programSet;
+
+	// pack
+	ResourcePacker packer;
+	packer.setBasePath(basePath);
+	packer.setMinData(inData);
+	packer.pack(binPath);
+
+	// copy over interpreter executable
+	auto interpreterPath = Editor::getInstance().getResources().getInterpreterPath();
+
+	std::filesystem::path destInterpreter = basePath;
+	destInterpreter /= title;
+
+	std::error_code ec;
+	std::filesystem::copy(interpreterPath, destInterpreter, std::filesystem::copy_options::overwrite_existing, ec);
+	if (ec.value() != 0) {
+		Editor::getInstance().getInterface().showErrorMessage(ec.message());
+	}
+
+	//
+	std::string search = "@GAMEDATA";
+	uint32_t testId =
+		rresComputeCRC32(reinterpret_cast<const unsigned char *>(search.data()), static_cast<int>(search.size()));
+	auto chunk = rresLoadResourceChunk("game.rres", testId);
+
+	size_t size = chunk.data.props[0];
+	auto dataRaw = chunk.data.raw;
+
+	std::string bytes = static_cast<char *>(dataRaw);
+	MinData gameData;
+	std::stringstream in;
+	in.write(static_cast<const char *>(dataRaw), size);
+	{
+		cereal::PortableBinaryInputArchive ar(in);
+		ar(gameData);
+	}
+
+	printf("%s \n", gameData.title.c_str());
+
+	rresUnloadResourceChunk(chunk);
 }
 
 void Project::spawnGame() {

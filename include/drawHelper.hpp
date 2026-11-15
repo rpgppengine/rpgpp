@@ -3,6 +3,8 @@
 
 #include "raylib.h"
 
+#define RPGPP_DRAW_MULTIPLIER (3)
+
 void DrawRectangleLinesPro(Rectangle rect, Color color);
 
 #endif

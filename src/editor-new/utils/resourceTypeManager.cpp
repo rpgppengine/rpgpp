@@ -1,6 +1,8 @@
 #include "utils/resourceTypeManager.hpp"
 
 #include <algorithm>
+#include <cstddef>
+#include <filesystem>
 #include <vector>
 
 #include "actor.hpp"
@@ -9,6 +11,7 @@
 #include "icons.hpp"
 #include "interfaceView.hpp"
 #include "prop.hpp"
+#include "raylib.h"
 #include "room.hpp"
 #include "tileset.hpp"
 
@@ -18,8 +21,8 @@ ResourceTypeManager::ResourceTypeManager() { addDefaults(); }
 
 void ResourceTypeManager::addDefaults() {
 	// common file types
-	addCategory("Images", {".png", ".jpg"}, ICON_FILETYPE_IMAGE);
-	addCategory("Text file", {".txt"}, ICON_FILETYPE_TEXT);
+	addCategory("Image", {".png", ".jpg"}, ICON_FILETYPE_IMAGE);
+	addCategory("Text", {".txt"}, ICON_FILETYPE_TEXT);
 	addCategory("Audio", {".wav", ".mp4", ".ogg"}, ICON_FILETYPE_AUDIO);
 	addCategory("Font", {".ttf"}, ICON_FILETYPE_FONT);
 	// RPG++ project file
@@ -71,6 +74,19 @@ const edui::FileCategory &ResourceTypeManager::getCategoryBYExtension(const std:
 	return types.front();
 }
 
+bool ResourceTypeManager::getTypeTitleByExtension(const std::string &ext, std::string *title) {
+	bool result = false;
+
+	for (auto &item : types) {
+		if (std::find(item.extensions.begin(), item.extensions.end(), ext) != item.extensions.end()) {
+			*title = item.title;
+			result = true;
+		}
+	}
+
+	return result;
+}
+
 void ResourceTypeManager::addCategory(const std::string &title, std::vector<std::string> extensions, int iconId) {
 	edui::FileCategory category;
 	category.title = title;
@@ -87,3 +103,42 @@ void ResourceTypeManager::addCategory(const std::string &title, std::vector<std:
 bool ResourceTypeManager::hasFactory(const std::string &title) { return factories.count(title) > 0; }
 
 ResourceFactory &ResourceTypeManager::getFactory(const std::string &title) { return factories[title]; }
+
+ResourceType ResourceTypeManager::getEnum(const std::string &title) {
+	for (int i = 0; i < enums.size(); i++) {
+		auto &item = enums[i];
+		if (item == title) {
+			return static_cast<ResourceType>(i);
+		};
+	}
+	return RESOURCE_INVALID;
+}
+
+std::vector<std::filesystem::path> ResourceTypeManager::findAllOfType(const std::filesystem::path &base,
+																	  const std::string &title) {
+	auto cat = getCategory(title);
+	std::string filter = "";
+	for (auto &item : cat.extensions) {
+		filter = filter.append(item.c_str());
+		filter = filter.append(";");
+	}
+
+	std::vector<std::filesystem::path> res = {};
+	auto list = LoadDirectoryFilesEx(base.c_str(), filter.c_str(), true);
+	for (int i = 0; i < list.count; i++) {
+		res.push_back(list.paths[i]);
+	}
+	UnloadDirectoryFiles(list);
+
+	return res;
+}
+
+size_t ResourceTypeManager::totalResourceCount(const std::filesystem::path &base) {
+	size_t result = 0;
+	for (auto &cat : types) {
+		auto vec = findAllOfType(base, cat.title);
+		size_t count = vec.size();
+		result += count;
+	}
+	return result;
+}

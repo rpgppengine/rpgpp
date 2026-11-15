@@ -1,5 +1,6 @@
 #include "services/resources.hpp"
 
+#include <filesystem>
 #include <stdexcept>
 
 #include "editor.hpp"
@@ -30,6 +31,10 @@ void Resources::unload() {
 }
 
 void Resources::loadResources() {
+	std::filesystem::path editorBase = GetWorkingDirectory();
+	editorBase /= "game";
+	interpreterPath = editorBase.c_str();
+
 	auto files = LoadDirectoryFilesEx("resources", ".ttf;.otf;.png;.jpg", false);
 	for (int i = 0; i < files.count; i++) {
 		std::string title = GetFileName(files.paths[i]);
@@ -62,6 +67,8 @@ Texture Resources::getTexture(const std::string &title) {
 }
 
 Font Resources::getFont(const std::string &title) { return fonts.at(title); }
+
+std::string Resources::getInterpreterPath() { return interpreterPath; }
 
 Project &Resources::getProject() { return openedProject; }
 

@@ -1,6 +1,7 @@
 #include "utils/subprocess.hpp"
 
 #include "editor.hpp"
+#include "raylib.h"
 #include "subprocess.h"
 
 using namespace editor;
@@ -16,7 +17,7 @@ int Subprocess::spawn(const char *commandLine[]) {
 	if (result == 0) {
 		running = true;
 	} else {
-		Editor::getInstance().getInterface().showErrorMessage("Spawning process failed.");
+		Editor::getInstance().getInterface().showErrorMessage(TextFormat("Spawning process failed: %i", result));
 	}
 
 	return result;

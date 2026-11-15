@@ -17,8 +17,6 @@ class TileMap;
 #include <string>
 #include <vector>
 
-#include "gamedata.hpp"
-
 using json = nlohmann::json;
 #include "actor.hpp"
 #include "actorContainer.hpp"

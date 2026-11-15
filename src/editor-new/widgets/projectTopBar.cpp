@@ -21,6 +21,9 @@ ProjectTopBar::ProjectTopBar() : edui::HorizontalContainer() {
 	buildButton->translationId = "Project.Build";
 	buildButton->setTooltip();
 	buildButton->setSize({0, edui::EDUI_SECONDARY_HEIGHT}, {1, 0});
+
+	buildButton->onClicked.connect([] { Editor::getInstance().getResources().getProject().exportBin(); });
+
 	this->add(buildButton);
 
 	auto playButton = std::make_shared<edui::IconButton>();

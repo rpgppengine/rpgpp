@@ -150,9 +150,27 @@ void ResourcesPanel::addItem(const std::string &path) {
 			changePath(this->path.append(dirName));
 		});
 	} else {
-		std::string ext = GetFileExtension(path.c_str());
-		int iconId = Editor::getInstance().getResources().getTypes().getIconByExtension(ext);
-		button->iconId = iconId;
+		auto extC = GetFileExtension(path.c_str());
+		if (extC != nullptr) {
+			std::string ext = extC;
+			int iconId = Editor::getInstance().getResources().getTypes().getIconByExtension(ext);
+			button->iconId = iconId;
+		} else {
+			button->iconId = ICON_FILE;
+		}
+
+		button->onClicked.connect([path] {
+			std::string title;
+			Editor::getInstance().getResources().getTypes().getTypeTitleByExtension(GetFileExtension(path.c_str()),
+																					&title);
+
+			auto &factory = Editor::getInstance().getResources().getTypes().getFactory(title);
+
+			std::unique_ptr<Resource> ptr;
+			factory.load(path, ptr);
+
+			factory.save(path, ptr);
+		});
 	}
 	button->onRightClicked.connect([this, path] { showContextMenu(path); });
 

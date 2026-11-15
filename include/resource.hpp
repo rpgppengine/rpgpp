@@ -2,6 +2,7 @@
 #define _RESOURCE_H
 
 #include <filesystem>
+
 class Resource {
 public:
 	virtual void loadFile(std::filesystem::path filePath) = 0;

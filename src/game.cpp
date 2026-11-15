@@ -95,7 +95,8 @@ void Game::useBin(const std::string &filePath) {
 
 	// Thefirey33:
 	// Decided on a very hybrid system that allows the user to load a Room or an UIElement at first.
-	// Had an idea where some games might want the player to immediately start without a main menu, as some RPG games do want to do that.
+	// Had an idea where some games might want the player to immediately start without a main menu, as some RPG games do
+	// want to do that.
 	if (gameData->gameSet.isLoadUi) {
 		ui->showInterface(GetFileNameWithoutExt(gameData->gameSet.defaultLoadingPath.c_str()));
 	}
@@ -150,10 +151,6 @@ void Game::unload() {
 
 void Game::setLua(sol::state_view lua) { scripts->setLua(lua); }
 
-void Game::closeGame() {
-	willClose = true;
-}
+void Game::closeGame() { willClose = true; }
 
-bool Game::windowWillClose() {
-	return willClose;
-}
+bool Game::windowWillClose() { return willClose; }

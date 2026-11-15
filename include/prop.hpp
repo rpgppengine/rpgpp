@@ -9,7 +9,6 @@
 
 #include "cereal/access.hpp"
 #include "cereal/cereal.hpp"
-#include "gamedata.hpp"
 #include "interactable.hpp"
 #include "resource.hpp"
 #include "saveable.hpp"
