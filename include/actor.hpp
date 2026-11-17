@@ -42,7 +42,7 @@ class Actor : public Resource {
 private:
 	std::string sourcePath;
 	/** The used TileSet for this Actor's sprites. */
-	std::unique_ptr<TileSet> tileSet;
+	TileSet tileSet;
 	/** The path to the TileSet file. */
 	std::string tileSetSource;
 	/** The currently shown tile from the TileSet. */
@@ -80,8 +80,6 @@ public:
 	Actor(std::unique_ptr<TileSet> tileSet, Vector2 atlasPos, std::string tileSetSource);
 	/** Constructor that takes an ActorBin binary structure */
 	Actor(const ActorBin &bin);
-	/** Dump this Actor's data to a nlohmann::json object. */
-	// json dumpJson() override;
 	/** Unload routine. The UnloadTexture function will called here. */
 	void unload() const;
 	/** Update routine. */
@@ -103,7 +101,7 @@ public:
 	/** Get the bounding box of this Actor. */
 	Rectangle getRect() const;
 	/** Get a reference to this Actor's TileSet. */
-	TileSet &getTileSet() const;
+	TileSet &getTileSet();
 	/** Get the current frame of this actor. */
 	int getCurrentFrame() const;
 	/** Reset the animation back to frame 0. */
@@ -113,7 +111,7 @@ public:
 	/** Get the current animation atlas of this actor. */
 	IVector getCurrentAnimationAtlas() const;
 	/** Get the current animation rectangle of this actor. */
-	Rectangle getCurrentAnimationRectangle() const;
+	Rectangle getCurrentAnimationRectangle();
 	/** Get an atlas of this actor by frame index. */
 	IVector getAnimationAtlasByIdx(int frameIndex) const;
 	/** Set the current frame. */
@@ -169,14 +167,12 @@ public:
 		a(CEREAL_NVP(sourcePath), CEREAL_NVP(tileSetSource), CEREAL_NVP(animations), CEREAL_NVP(collisionRect));
 	}
 
-	void loadFile(std::filesystem::path filePath) override;
-	void saveFile(std::filesystem::path filePath) override {
-		/*
-		std::ofstream stream(filePath);
-		cereal::JSONOutputArchive ar(stream);
-		ar(*this);
-		*/
-	}
+	void afterLoad() override;
+};
+
+struct ActorEntry {
+	std::string name;
+	Actor actor;
 };
 
 Vector2 calcActorTilePos(Vector2 newPosition, Vector2 worldTileSize, TileSet *tileSet);

@@ -5,6 +5,7 @@
 
 #include "game.hpp"
 #include "room.hpp"
+#include "tinyfiledialogs.h"
 
 WorldService::WorldService() {
 	this->lock = false;
@@ -22,6 +23,7 @@ void WorldService::setRoom(const std::string_view &filePath) {
 void WorldService::setRoomBin(RoomBin bin) { this->room = std::make_unique<Room>(bin); }
 
 void WorldService::setRoomBin(const std::string &roomBin) {
+	/*
 	for (RoomBin bin : Game::getBin().rooms) {
 		if (bin.name == roomBin) {
 			deferRoomChange = true;
@@ -30,10 +32,20 @@ void WorldService::setRoomBin(const std::string &roomBin) {
 			break;
 		}
 	}
+	*/
+	printf("%s \n", roomBin.c_str());
+	bool res;
+	auto room = Game::getResources().getUnpacker().loadT<Room>(roomBin, res);
+	printf("%i \n", res);
+
+	deferRoomChange = true;
+	deferredRoomId = roomBin;
+	doFadeTransition();
 }
 
 void WorldService::doFadeTransition() {
 	Game::getUi().setTransitionPointCallback([this] {
+		/*
 		for (RoomBin bin : Game::getBin().rooms) {
 			if (bin.name == deferredRoomId) {
 				setRoomBin(bin);
@@ -41,6 +53,16 @@ void WorldService::doFadeTransition() {
 				break;
 			}
 		}
+		*/
+		printf("%s \n", deferredRoomId.c_str());
+		bool res = false;
+		auto room = Game::getResources().getUnpacker().loadT<Room>(deferredRoomId, res);
+		if (!res) {
+			tinyfd_messageBox("Error!", "Could not load the requested Room!", "ok", "error", 1);
+			Game::closeGame();
+		}
+		this->room = std::make_unique<Room>(std::move(room));
+		this->room->afterLoad();
 	});
 	Game::getUi().doFadeTransition();
 }

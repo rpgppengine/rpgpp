@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "baseContainer.hpp"
-#include "gamedata.hpp"
 #include "interactable.hpp"
+#include "roomtypes.hpp"
 using json = nlohmann::json;
 
 /** Container of Interactables that is to be used by a [Room](Room.md) */
@@ -15,6 +15,8 @@ class InteractablesContainer : public BaseContainer<std::unique_ptr<Interactable
 public:
 	/** Empty constructor */
 	InteractablesContainer();
+
+	void init(std::vector<InteractableInRoomBin> &vec);
 	/** Add a new Interactable with tile position and type */
 	Interactable *add(IVector pos, const std::string &type);
 	/** Add a new Interactable using a bin structure */

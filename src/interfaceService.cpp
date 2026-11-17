@@ -2,6 +2,7 @@
 
 #include <raylib.h>
 
+#include <cstdint>
 #include <memory>
 #include <stdexcept>
 
@@ -10,6 +11,8 @@
 #include "game.hpp"
 #include "gamedata.hpp"
 #include "interfaceView.hpp"
+#include "resource.hpp"
+#include "resourceUnpacker.hpp"
 #include "sol/forward.hpp"
 #include "sol/types.hpp"
 
@@ -26,16 +29,20 @@ InterfaceService::InterfaceService() {
 
 	TweenProvider::setupTweenFuncs();
 
-	this->font = Game::getResources().getFont("LanaPixel");
+	this->font = Game::getResources().getFont("fonts/LanaPixel.ttf");
 
 	Rectangle destRec = Rectangle{0, 0, static_cast<float>(GetScreenWidth() - 20), 140};
 	destRec.x = (GetScreenWidth() - destRec.width) / 2;
 	destRec.y = (GetScreenHeight() - destRec.height) - 20;
 
-	this->views = std::map<std::string, std::unique_ptr<InterfaceView>>{};
+	this->views = std::map<uint32_t, std::unique_ptr<InterfaceView>>{};
+
+	std::string diagTitle = "dialogue";
+	uint32_t diagId =
+		rresComputeCRC32(reinterpret_cast<const unsigned char *>(diagTitle.data()), static_cast<int>(diagTitle.size()));
 
 	auto diagView = std::make_unique<DialogueInterfaceView>();
-	views["dialogue"] = std::move(diagView);
+	views.emplace(std::make_pair(diagId, std::move(diagView)));
 }
 
 InterfaceService::~InterfaceService() {
@@ -43,17 +50,15 @@ InterfaceService::~InterfaceService() {
 	// UnloadTexture(this->uiTexture);
 }
 
-void InterfaceService::initBin(GameData &bin) {
-	if (bin.interfaceViews.count("dialogue") > 0) {
-		auto diagView = std::make_unique<DialogueInterfaceView>(bin.interfaceViews["dialogue"]);
-		views["dialogue"] = std::move(diagView);
-	}
+void InterfaceService::init() {
+	auto vec = Game::getResources().getUnpacker().loadAllOfType<InterfaceView>(RPGPP_RESOURCE_UI);
+	for (auto &pair : vec) {
+		auto &item = pair.second;
+		item.afterLoad();
+		auto ptr = std::make_unique<InterfaceView>(item.getBin());
+		views.emplace(std::make_pair(pair.first, std::move(ptr)));
 
-	for (auto &[title, viewBin] : bin.interfaceViews) {
-		if (title != "dialogue") {
-			auto view = std::make_unique<InterfaceView>(viewBin);
-			views.emplace(title, std::move(view));
-		}
+		TraceLog(TraceLogLevel::LOG_INFO, "Loaded UI View with id %x", pair.first);
 	}
 }
 
@@ -70,23 +75,28 @@ void InterfaceService::showDialogue(const std::string &id, bool runScript) {
 
 void InterfaceService::showDialogue(const DialogueBin &dialogue, bool runScript) {
 	if (currentViewName != "dialogue") {
-		showInterface("dialogue", runScript);
-		DialogueInterfaceView *diagView = static_cast<DialogueInterfaceView *>(views.at("dialogue").get());
+		auto ptr = showInterface("dialogue", runScript);
+
+		DialogueInterfaceView *diagView = static_cast<DialogueInterfaceView *>(ptr);
 		diagView->setDialogue(dialogue);
 	}
 }
 
 InterfaceView *InterfaceService::getCurrentView() {
-	if (views.count(currentViewName) > 0) {
-		return views.at(currentViewName).get();
+	if (views.count(currentId) > 0) {
+		return views.at(currentId).get();
 	} else {
 		return nullptr;
 	}
 }
 
-void InterfaceService::showInterface(const std::string &title, bool runScript) {
-	if (views.count(title) > 0) {
+InterfaceView *InterfaceService::showInterface(const std::string &title, bool runScript) {
+	uint32_t id =
+		rresComputeCRC32(reinterpret_cast<const unsigned char *>(title.data()), static_cast<int>(title.size()));
+
+	if (views.count(id) > 0) {
 		currentViewName = title;
+		currentId = id;
 		notifyLock = true;
 
 		auto &worldServiceRef = Game::getWorld();
@@ -95,21 +105,25 @@ void InterfaceService::showInterface(const std::string &title, bool runScript) {
 			worldServiceRef.getPlayer().setMovementLock(true);
 		}
 
-		views[title]->runScript = runScript;
+		views[id]->runScript = runScript;
 
-		auto &env = views[title]->getLuaEnvironment();
-		if (views[title]->hasScript()) {
+		auto &env = views[id]->getLuaEnvironment();
+		if (views[id]->hasScript()) {
 			if (env["open"].is<sol::function>() && runScript) {
 				env["open"]();
 			}
 		}
+
+		return views[id].get();
 	}
+
+	return nullptr;
 }
 
 void InterfaceService::hideInterface(bool runScript) {
-	if (views.count(currentViewName) > 0) {
-		auto &env = views[currentViewName]->getLuaEnvironment();
-		if (views[currentViewName]->hasScript()) {
+	if (views.count(currentId) > 0) {
+		auto &env = views[currentId]->getLuaEnvironment();
+		if (views[currentId]->hasScript()) {
 			if (env["close"].is<sol::function>() && runScript) {
 				env["close"]();
 			}
@@ -176,21 +190,21 @@ void InterfaceService::update() {
 		fpsVisible = !fpsVisible;
 	}
 
-	if (views.count(currentViewName) > 0) {
+	if (views.count(currentId) > 0) {
 		if (!notifyLock) {
 			auto key = GetKeyPressed();
 			if (key != KEY_NULL) {
 				lastKey = static_cast<KeyboardKey>(key);
-				views.at(currentViewName)->onNotify({static_cast<KeyboardKey>(key)});
+				views.at(currentId)->onNotify({static_cast<KeyboardKey>(key)});
 			}
 
 			if (lastKey != KEY_NULL) {
 				if (IsKeyDown(lastKey)) {
-					views.at(currentViewName)->onNotify({static_cast<KeyboardKey>(lastKey), true});
+					views.at(currentId)->onNotify({static_cast<KeyboardKey>(lastKey), true});
 				}
 			}
 		}
-		views.at(currentViewName)->update();
+		views.at(currentId)->update();
 	}
 
 	for (auto &&item : views) {
@@ -208,8 +222,8 @@ void InterfaceService::draw() {
 		DrawTextEx(font, "rpgpp", Vector2{10, 36}, static_cast<float>(font.baseSize), 2, RED);
 	}
 
-	if (views.count(currentViewName) > 0) {
-		views.at(currentViewName)->draw();
+	if (views.count(currentId) > 0) {
+		views.at(currentId)->draw();
 	}
 
 	if (transitionActive) {

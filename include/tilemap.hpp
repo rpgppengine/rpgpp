@@ -11,6 +11,7 @@
 #include "atlasTile.hpp"
 #include "cereal/cereal.hpp"
 #include "drawHelper.hpp"
+#include "roomtypes.hpp"
 #include "tile.hpp"
 #include "tileset.hpp"
 
@@ -26,7 +27,7 @@ private:
 	/** File path to the source of the used TileSet. */
 	std::string tileSetSource = "";
 	/** A unique_ptr to the used TileSet. */
-	std::unique_ptr<TileSet> tileSet = nullptr;
+	TileSet tileSet;
 	int atlasTileSize = 16;
 	int worldTileSize = 16 * RPGPP_DRAW_MULTIPLIER;
 	/** Width of the TileMap in tiles */
@@ -46,8 +47,6 @@ public:
 	TileMap(const std::string &tileSetSource, int width, int height, int atlasTileSize, int worldTileSize);
 	/** Constructor using a TileSet object */
 	TileMap(const TileSet &tileSet, int width, int height, int atlasTileSize, int worldTileSize);
-	/** Constructor using a unique_ptr of a TileSet */
-	TileMap(std::unique_ptr<TileSet> tileSetPtr, int width, int height, int atlasTileSize, int worldTileSize);
 	/** Constructor using a RoomBin binary structure */
 	TileMap(const RoomBin &bin);
 	/** Dump the TileMap's data into a nlohmann::json object */
@@ -61,9 +60,11 @@ public:
 	/** Get the path of the TileSet resource */
 	std::string getTileSetSource() const;
 	/** Get a pointer to the used TileSet */
-	TileSet *getTileSet() const;
+	TileSet *getTileSet();
+	void setTileSet(const TileSet &tileSet);
 	/** Set a new TileSet for this TileMap using a path for the new TileSet */
 	void setTileSet(const std::string &tileSetSource);
+	void setTiles(const std::vector<std::vector<TileBin>> &binVec);
 	int getAtlasTileSize() const;
 	int getWorldTileSize() const;
 	bool atlasPosIsValid(Vector2 atlasPos) const;

@@ -44,7 +44,7 @@ public:
 	static SoundService &getSounds();
 	static ScriptService &getScripts();
 
-	static void init(bool useBin = false);
+	static void init();
 
 	static void update();
 	static void draw();

@@ -9,13 +9,15 @@
 #include "game.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"
+#include "resource.hpp"
 #include "tilemap.hpp"
 
 using json = nlohmann::json;
 
-Prop::Prop() : worldPos(Vector2{}), tilePos(Vector2{}), atlasRect(), texture(), collisionRect() {}
+Prop::Prop()
+	: Resource(RPGPP_RESOURCE_PROP), worldPos(Vector2{}), tilePos(Vector2{}), atlasRect(), texture(), collisionRect() {}
 
-Prop::Prop(const std::string &filePath) {
+Prop::Prop(const std::string &filePath) : Prop() {
 	this->sourcePath = filePath;
 	this->worldPos = Vector2{0, 0};
 	this->tilePos = Vector2{0, 0};
@@ -49,7 +51,7 @@ Prop::Prop(const std::string &filePath) {
 	UnloadFileText(jsonString);
 }
 
-Prop::Prop(Rectangle atlasRect, Vector2 worldPos) : texture() {
+Prop::Prop(Rectangle atlasRect, Vector2 worldPos) : Prop() {
 	this->sourcePath = "";
 	this->atlasRect = atlasRect;
 	this->worldPos = worldPos;
@@ -59,7 +61,7 @@ Prop::Prop(Rectangle atlasRect, Vector2 worldPos) : texture() {
 	this->interactable = std::make_unique<Interactable>();
 }
 
-Prop::Prop(PropBin bin) {
+Prop::Prop(PropBin bin) : Prop() {
 	this->sourcePath = bin.name;
 	this->worldPos = Vector2{0, 0};
 	this->tilePos = Vector2{0, 0};
@@ -80,22 +82,6 @@ Prop::Prop(PropBin bin) {
 		this->interactable = std::make_unique<Interactable>(bin.intType, tilePos, _RPGPP_TILESIZE);
 	}
 }
-
-/*
-json Prop::dumpJson() {
-	std::vector<int> atlasRectVec = {static_cast<int>(atlasRect.x), static_cast<int>(atlasRect.y),
-									 static_cast<int>(atlasRect.width), static_cast<int>(atlasRect.height)};
-	std::vector<int> collisionRectVec = {static_cast<int>(collisionRect.x), static_cast<int>(collisionRect.y),
-										 static_cast<int>(collisionRect.width), static_cast<int>(collisionRect.height)};
-
-	json j{{"atlas_rect", atlasRectVec},
-		   {"collision_rect", collisionRectVec},
-		   {"image", imagePath},
-		   {"has_interactable", hasInteractable},
-		   {"interactable_type", interactable->getType()}};
-	return j;
-}
-*/
 
 std::string Prop::getSourcePath() const { return sourcePath; }
 

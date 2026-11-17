@@ -18,6 +18,16 @@
 
 InteractablesContainer::InteractablesContainer() {}
 
+void InteractablesContainer::init(std::vector<InteractableInRoomBin> &vec) {
+	for (auto &bin : vec) {
+		bool valid = false;
+		Interactable interactable = Game::getResources().getUnpacker().loadT<Interactable>(bin.type, valid);
+		interactable.afterLoad();
+		auto ptr = std::make_unique<Interactable>(interactable);
+		pushObject({1, 1}, std::move(ptr));
+	}
+}
+
 Interactable *InteractablesContainer::add(IVector pos, const std::string &type) {
 	if (this->objectExistsAtPosition(pos)) {
 		return nullptr;

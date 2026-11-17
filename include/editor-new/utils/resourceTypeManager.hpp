@@ -16,8 +16,8 @@
 #include "cereal/archives/json.hpp"
 #include "cereal/archives/portable_binary.hpp"
 #include "edui/fileChooser.hpp"
-#include "gamedata.hpp"
 #include "resource.hpp"
+
 namespace editor {
 enum ResourceType {
 	RESOURCE_TILESET,
@@ -30,6 +30,7 @@ enum ResourceType {
 };
 
 struct ResourceFactory {
+	RPGPP_RESOURCE typeId;
 	std::function<std::unique_ptr<Resource>(std::string)> instantiate;
 	std::function<void(std::filesystem::path, std::unique_ptr<Resource> &)> load;
 	std::function<void(std::filesystem::path, std::unique_ptr<Resource> &)> save;
@@ -47,11 +48,12 @@ public:
 	size_t totalResourceCount(const std::filesystem::path &base);
 
 	template <typename T>
-	void addT(const std::string &title) {
+	void addT(const std::string &title, RPGPP_RESOURCE typeId) {
 		if (std::is_base_of_v<Resource, T>) {
 			enums.push_back(title);
 
 			ResourceFactory data;
+			data.typeId = typeId;
 			data.instantiate = [](std::string) {
 				std::unique_ptr<Resource> ptr = std::make_unique<T>();
 				return std::move(ptr);
@@ -72,12 +74,14 @@ public:
 			data.save = [](std::filesystem::path fpath, std::unique_ptr<Resource> &ptr) {
 				std::ofstream stream(fpath);
 
+				ptr->beforeSave();
 				T &res = ptr->as<T>();
 				cereal::JSONOutputArchive ar(stream);
 				ar(res);
 			};
 			data.saveBin = [](std::filesystem::path fpath) {
 				std::shared_ptr<Resource> resource = std::make_shared<T>();
+				resource->beforeSave();
 
 				std::ifstream stream(fpath);
 				T &res = resource->as<T>();
@@ -96,7 +100,7 @@ public:
 
 	bool hasFactory(const std::string &title);
 	ResourceFactory &getFactory(const std::string &title);
-	ResourceType getEnum(const std::string &title);
+	RPGPP_RESOURCE getEnum(const std::string &title);
 	std::vector<std::filesystem::path> findAllOfType(const std::filesystem::path &base, const std::string &title);
 
 private:

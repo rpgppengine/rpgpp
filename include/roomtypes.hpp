@@ -1,6 +1,8 @@
 #ifndef ROOMTYPES_H
 #define ROOMTYPES_H
 
+#include <vector>
+
 #include "basicTypes.hpp"
 struct TileBin {
 	IVector worldPos;
@@ -49,7 +51,8 @@ struct InteractableInRoomBin {
 };
 
 struct RoomData {
-	std::vector<TileBin> tiles;
+	std::string tileSet = "";
+	std::vector<std::vector<TileBin>> tiles;
 	std::vector<ActorInRoomBin> actors;
 	std::vector<InteractableInRoomBin> interactables;
 	std::vector<PropInRoomBin> props;

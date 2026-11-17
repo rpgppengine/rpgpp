@@ -5,6 +5,7 @@
 #include <cstdio>
 
 #include "game.hpp"
+#include "resourceUnpacker.hpp"
 
 ResourceService::ResourceService() { init(); }
 
@@ -53,6 +54,8 @@ void ResourceService::init() {
 
 ResourceService::~ResourceService() = default;
 
+ResourceUnpacker &ResourceService::getUnpacker() { return unpacker; }
+
 void ResourceService::addTexture(const std::string &id, Texture2D texture) {
 	printf("%s was added \n", id.c_str());
 	textures[id] = texture;
@@ -75,11 +78,11 @@ void ResourceService::addFontFromFile(const std::string &filePath, int fontSize)
 	addFont(GetFileNameWithoutExt(filePath.c_str()), font);
 }
 
-Font ResourceService::getFont(const std::string &id) { return fonts.at(id); }
+Font ResourceService::getFont(const std::string &id) { return unpacker.loadFont(id); }
 
 bool ResourceService::fontExists(const std::string &id) { return fonts.count(id) > 0; }
 
-void ResourceService::unload() const {
+void ResourceService::unload() {
 	for (const auto &[name, texture] : textures) {
 		if (IsTextureValid(texture)) {
 			UnloadTexture(texture);
@@ -91,4 +94,6 @@ void ResourceService::unload() const {
 			UnloadFont(font);
 		}
 	}
+
+	unpacker.close();
 }

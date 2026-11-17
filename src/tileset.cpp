@@ -6,11 +6,21 @@
 #include <nlohmann/json.hpp>
 
 #include "atlasTile.hpp"
+#include "game.hpp"
+#include "resource.hpp"
 using json = nlohmann::json;
 
-TileSet::TileSet() : texture(), tileSize(Vector2{16, 16}) {}
+TileSet::TileSet() : Resource(RPGPP_RESOURCE_TILESET), texture(), tileSize(Vector2{16, 16}) {}
 
-TileSet::TileSet(const std::string &textureSource, Vector2 tileSize) {
+void TileSet::afterLoad() {
+	auto img = Game::getResources().getUnpacker().loadImage(textureSource);
+	if (!IsImageValid(img)) {
+		TraceLog(TraceLogLevel::LOG_WARNING, "Loaded Image %s is invalid", textureSource.c_str());
+	}
+	texture = LoadTextureFromImage(img);
+}
+
+TileSet::TileSet(const std::string &textureSource, Vector2 tileSize) : TileSet() {
 	this->textureSource = textureSource;
 	this->texture = LoadTexture(textureSource.c_str());
 	this->tileSize = tileSize;
@@ -19,14 +29,14 @@ TileSet::TileSet(const std::string &textureSource, Vector2 tileSize) {
 TileSet::TileSet(const std::string &textureSource, int tileSizeInt)
 	: TileSet(textureSource, Vector2{static_cast<float>(tileSizeInt), static_cast<float>(tileSizeInt)}) {}
 
-TileSet::TileSet(const Texture &texture, Vector2 tileSize) {
+TileSet::TileSet(const Texture &texture, Vector2 tileSize) : TileSet() {
 	this->texture = texture;
 	this->tileSize = tileSize;
 }
 
-TileSet::TileSet(const std::string &fileName) { loadFile(fileName); }
+TileSet::TileSet(const std::string &fileName) : TileSet() {}
 
-TileSet::TileSet(TileSetBin bin) {
+TileSet::TileSet(TileSetBin bin) : TileSet() {
 	this->tileSize = Vector2{static_cast<float>(bin.tileSize.x), static_cast<float>(bin.tileSize.y)};
 
 	unsigned char *imageData = bin.image.data();
@@ -39,24 +49,15 @@ TileSet::~TileSet() {
 	// UnloadTexture(texture);
 }
 
-/*
-json TileSet::dumpJson() {
-	json tileSetJson = {
-		{"source", textureSource}, {"tileSize", tileSize.x}, {"tileWidth", tileSize.x}, {"tileHeight", tileSize.y}};
-
-	return tileSetJson;
-}
-*/
-
 void TileSet::unload() const { UnloadTexture(texture); }
 
 Vector2 TileSet::getTileSize() const { return this->tileSize.toFloat(); }
 
 void TileSet::setTileSize(int size) { this->tileSize = Vector2{static_cast<float>(size), static_cast<float>(size)}; }
 
-int TileSet::getTileWidth() { return static_cast<int>(tileSize.x); }
+int TileSet::getTileWidth() const { return static_cast<int>(tileSize.x); }
 
-int TileSet::getTileHeight() { return static_cast<int>(tileSize.y); }
+int TileSet::getTileHeight() const { return static_cast<int>(tileSize.y); }
 
 void TileSet::setTileWidth(int value) { tileSize.x = static_cast<float>(value); }
 
@@ -68,7 +69,7 @@ Texture TileSet::getTexture() const { return this->texture; }
 
 std::string TileSet::getTextureSource() { return this->textureSource; }
 
-std::string TileSet::getSource() { return this->source; }
+std::string TileSet::getSource() const { return this->source; }
 
 void TileSet::setTextureSource(const std::string &source) {
 	this->textureSource = source;
@@ -91,8 +92,8 @@ bool TileSet::areAtlasCoordsValid(Vector2 atlasCoords) const {
 	return posValid;
 }
 
-AtlasTile TileSet::getTile(Vector2 atlasCoords) {
-	AtlasTile tile(&this->texture, atlasCoords);
+AtlasTile TileSet::getTile(Vector2 atlasCoords) const {
+	AtlasTile tile(this->texture, IVector(atlasCoords));
 
 	return tile;
 }

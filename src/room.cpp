@@ -18,11 +18,13 @@
 #include "interactablesContainer.hpp"
 #include "prop.hpp"
 #include "propsContainer.hpp"
+#include "resource.hpp"
 #include "tilemap.hpp"
+#include "tileset.hpp"
 
 using json = nlohmann::json;
 
-Room::Room() {
+Room::Room() : Resource(RPGPP_RESOURCE_ROOM) {
 	this->lock = false;
 
 	Camera2D initialCamera;
@@ -37,12 +39,27 @@ Room::Room() {
 	this->interactables = std::make_unique<InteractablesContainer>();
 	this->collisions = std::make_unique<CollisionsContainer>();
 	this->props = std::make_unique<PropsContainer>();
-	this->tileMap = std::unique_ptr<TileMap>{};
+	this->tileMap = std::make_unique<TileMap>();
 	this->actors = std::make_unique<ActorContainer>();
-	this->player = std::unique_ptr<Player>{};
+	this->player = std::make_unique<Player>();
 }
 
-Room::Room(const std::string &fileName, int tileSize, bool createPlayer) {
+void Room::afterLoad() {
+	bool tileSetValid = false;
+	auto ts = Game::getResources().getUnpacker().loadT<TileSet>(binData.tileSet, tileSetValid);
+	ts.afterLoad();
+
+	tileMap->setTileSet(ts);
+	tileMap->setTiles(binData.tiles);
+
+	collisions->init(binData.collisions);
+	props->init(binData.props);
+	interactables->init(binData.interactables);
+
+	player->setFromBin(Game::getResources().getUnpacker().getMinData().gameSet.playerActorPath);
+}
+
+Room::Room(const std::string &fileName, int tileSize, bool createPlayer) : Resource(RPGPP_RESOURCE_ROOM) {
 	this->lock = false;
 
 	Camera2D initialCamera;
@@ -71,7 +88,7 @@ Room::Room(const std::string &fileName, int tileSize, bool createPlayer) {
 	if (createPlayer) {
 		auto actor = std::make_unique<Actor>(DEFAULT_PLAYER_PATH);
 		actor->setTilePosition(Vector2{startTile.x, startTile.y}, tileMap->getTileSet()->getTileSize());
-		auto initialPlayer = std::make_unique<Player>(std::move(actor), *this);
+		auto initialPlayer = std::make_unique<Player>(std::move(actor));
 
 		this->addPlayer(std::move(initialPlayer));
 	}
@@ -122,7 +139,7 @@ Room::Room(const std::string &fileName, int tileSize, bool createPlayer) {
 			a->getInteractable()->setProps(value.at("props"));
 		}
 
-		actors->getActors()[value.at("name")] = std::move(a);
+		// actors->getActors()[value.at("name")] = std::move(a);
 	}
 
 	interactables->addJsonData(roomJson.at("interactables"));
@@ -155,7 +172,7 @@ Room::Room(const RoomBin &bin) : Room() {
 	actor->setTilePosition(Vector2{static_cast<float>(bin.startPoint.x), static_cast<float>(bin.startPoint.y)},
 						   tileMap->getTileSet()->getTileSize());
 	printf("%s \n", actor->getSourcePath().c_str());
-	auto initialPlayer = std::make_unique<Player>(std::move(actor), *this);
+	auto initialPlayer = std::make_unique<Player>(std::move(actor));
 
 	this->addPlayer(std::move(initialPlayer));
 
@@ -194,7 +211,7 @@ Room::Room(const RoomBin &bin) : Room() {
 					a->getInteractable()->setType(actorSource.intType);
 					a->getInteractable()->setProps(nlohmann::json::from_cbor(actorSource.propsCbor));
 				}
-				actors->getActors()[actorSource.name] = std::move(a);
+				// actors->getActors()[actorSource.name] = std::move(a);
 				break;
 			}
 		}
@@ -209,83 +226,20 @@ Room::Room(const RoomBin &bin) : Room() {
 		Game::getSounds().unload();
 	}
 }
-/*
-json Room::dumpJson() {
-	json roomJson = this->tileMap->dumpJson();
 
-	// Vector for collisions
-	auto collisionsVector = std::vector<std::vector<int>>();
-	for (auto &[vect, value] : collisions->getObjects()) {
-		std::vector<int> collision;
-		collision.push_back(static_cast<int>(vect.x));
-		collision.push_back(static_cast<int>(vect.y));
-
-		collisionsVector.push_back(collision);
-	}
-	roomJson.push_back({"collision", collisionsVector});
-
-	// Vector for interactables
-	auto interactableProps = interactables->dumpJson();
-
-	auto propsMap = std::map<std::string, nlohmann::json>{};
-
-	for (auto &[pos, prop] : props->getObjects()) {
-		std::string key = TextFormat("%i;%i", static_cast<int>(prop->getWorldTilePos().x),
-									 static_cast<int>(prop->getWorldTilePos().y));
-
-		auto propJson = json::object();
-		propJson["src"] = TextFormat("props/%s", GetFileName(prop->getSourcePath().c_str()));
-
-		if (prop->getHasInteractable()) {
-			propJson["props"] = prop->getInteractable()->getProps();
-		} else {
-			propJson["props"] = json::object();
-		}
-
-		propsMap[key] = propJson;
-	}
-
-	auto actorsMap = std::map<std::string, nlohmann::json>{};
-	for (auto &[name, obj] : actors->getActors()) {
-		std::string key =
-			TextFormat("%i;%i", static_cast<int>(obj->getTilePosition().x), static_cast<int>(obj->getTilePosition().y));
-
-		auto actorInfo = std::map<std::string, nlohmann::json>{};
-		actorInfo["source"] = TextFormat("actors/%s", GetFileName(obj->getSourcePath().c_str()));
-		actorInfo["name"] = name;
-		if (obj->hasInteractable()) {
-			actorInfo["intType"] = obj->getInteractable()->getType();
-			actorInfo["props"] = obj->getInteractable()->getProps();
-		} else {
-			actorInfo["intType"] = "";
-			actorInfo["props"] = json::object();
-		}
-
-		actorsMap[key] = actorInfo;
-	}
-
-	roomJson.push_back({"interactables", interactableProps});
-	roomJson.push_back({"props", propsMap});
-	roomJson.push_back({"actors", actorsMap});
-	roomJson.push_back({"music_source", musicSource});
-	roomJson.push_back({"start_pos", {static_cast<int>(startTile.x), static_cast<int>(startTile.y)}});
-
-	return roomJson;
-}
-*/
 void Room::unload() const {
 	tileMap->unload();
 
-	for (auto &[vect, actor] : actors->getActors()) {
-		actor->unload();
+	for (auto &[vect, actor] : actors->getObjects()) {
+		actor.actor.unload();
 	}
 
 	player->unload();
 }
 
 void Room::update() {
-	for (auto &[vect, actor] : actors->getActors()) {
-		actor->update();
+	for (auto &[vect, actor] : actors->getObjects()) {
+		actor.actor.update();
 	}
 	player->update();
 	if (!lock) updateCamera();
@@ -339,9 +293,10 @@ void Room::draw() const {
 			prop->draw();
 		}
 	}
-	for (auto &[name, actor] : actors->getActors()) {
-		if (actor->getCollisionCenter().y <= player->getCollisionCenterPos().y) {
-			actor->draw();
+	for (auto &[name, entry] : actors->getObjects()) {
+		auto &actor = entry.actor;
+		if (actor.getCollisionCenter().y <= player->getCollisionCenterPos().y) {
+			actor.draw();
 		}
 	}
 
@@ -352,9 +307,10 @@ void Room::draw() const {
 			prop->draw();
 		}
 	}
-	for (auto &[name, actor] : actors->getActors()) {
-		if (actor->getCollisionCenter().y > player->getCollisionCenterPos().y) {
-			actor->draw();
+	for (auto &[name, entry] : actors->getObjects()) {
+		auto &actor = entry.actor;
+		if (actor.getCollisionCenter().y > player->getCollisionCenterPos().y) {
+			actor.draw();
 		}
 	}
 

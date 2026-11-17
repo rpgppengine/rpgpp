@@ -8,7 +8,6 @@
 #include "cereal/types/common.hpp"
 #include "raylib.h"
 #define STR_IMPLEMENTATION
-#define RRES_IMPLEMENTATION
 #include "editor.hpp"
 
 int main() {

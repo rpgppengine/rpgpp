@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -22,9 +23,11 @@ private:
 	/** Helper for instantiating element types. */
 	static ElementFactory factory;
 	/** Available UI Views. */
-	std::map<std::string, std::unique_ptr<InterfaceView>> views;
+	std::map<uint32_t, std::unique_ptr<InterfaceView>> views;
+	InterfaceView *currentView = nullptr;
 	/** Current active view. */
 	std::string currentViewName;
+	uint32_t currentId = 0;
 	/** Last KeyboardKey. */
 	KeyboardKey lastKey = KEY_NULL;
 
@@ -40,8 +43,7 @@ public:
 	/** Empty constructor. */
 	InterfaceService();
 	~InterfaceService();
-	/** Initialize this service with a GameBin. */
-	void initBin(GameData &bin);
+	void init();
 	/** Get the font used for the game's UI. */
 	Font getFont() const;
 	/** Open a dialogue with a certain title. */
@@ -51,7 +53,7 @@ public:
 	/** Get the current active view. */
 	InterfaceView *getCurrentView();
 	/** Set this view as the current one and show it. */
-	void showInterface(const std::string &title, bool runScript = true);
+	InterfaceView *showInterface(const std::string &title, bool runScript = true);
 	/** Hide the current view (no current view). */
 	void hideInterface(bool runScript = true);
 	void setNotifyLock();

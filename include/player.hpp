@@ -5,18 +5,18 @@ class Room;
 
 #include <raylib.h>
 
+#include <string>
+
 #include "actor.hpp"
 #include "room.hpp"
 
-/** THe Player class represents the player character that the player controls.
+/** The Player class represents the player character that the player controls.
  */
 class Player {
 private:
 	bool lock;
-	/** Reference to the Room that the Player is currently in. */
-	Room &room;
 	/** The Actor that this Player controls. */
-	std::unique_ptr<Actor> actor;
+	std::unique_ptr<Actor> actor = nullptr;
 	/** The absolute position of this Player. */
 	Vector2 position;
 	float size;
@@ -32,9 +32,11 @@ private:
 	void handleInteraction();
 
 public:
+	Player();
 	/** Construct from an Actor and the Room where the Player shall be
 	 * contained. */
-	Player(std::unique_ptr<Actor> actor, Room &room);
+	Player(std::unique_ptr<Actor> actor);
+	void setFromBin(const std::string &title);
 	/** Unload routine. */
 	void unload() const;
 	/** Update routine. */

@@ -10,9 +10,8 @@ int main() {
 	InitAudioDevice();
 
 	Game game;
-	game.init(true);
-
-	game.useBin("game.bin");
+	game.init();
+	game.useBin("game.rres");
 
 	SetTargetFPS(60);
 

@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "cereal/archives/json.hpp"
-#include "gamedata.hpp"
 #include "lua.hpp"
 #include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
@@ -22,6 +21,7 @@
 #include "tween.hpp"
 #include "tweenContainer.hpp"
 #include "ui_elements/uiElement.hpp"
+#include "uitypes.hpp"
 
 /** An InterfaceView represents a collection of UI elements drawn on the screen to make up a user interface. */
 class InterfaceView : public Resource {
@@ -31,6 +31,9 @@ private:
 protected:
 	/** The structure which was used to construct this InterfaceView. */
 	InterfaceViewBin bin;
+
+	/* Title */
+	std::string title;
 
 	/** The title of the currently focused element. */
 	std::string focusedElementName = "";
@@ -67,6 +70,8 @@ public:
 	InterfaceView(const std::string &filePath);
 	/** Construct from binary data. */
 	InterfaceView(InterfaceViewBin &bin);
+
+	InterfaceViewBin &getBin();
 
 	/** Dump json data. */
 	// nlohmann::json dumpJson();
@@ -137,37 +142,11 @@ public:
 
 	template <typename Archive>
 	void serialize(Archive &a) {
-		a(CEREAL_NVP(scriptSource), CEREAL_NVP(elements));
+		a(CEREAL_NVP(scriptSource), cereal::make_nvp("elements", bin.elements));
 	}
 
-	void loadFile(std::filesystem::path filePath) override {
-		/*
-		std::string fileText = LoadFileText(filePath.c_str());
-
-		auto j = nlohmann::json::parse(fileText);
-		this->rect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
-
-		InterfaceViewBin bin;
-
-		{
-			std::stringstream stream;
-			stream << fileText;
-			cereal::JSONInputArchive cerealJson(stream);
-			cerealJson(bin);
-		}
-
-		this->scriptSource = bin.scriptSource;
-		for (auto &[title, elementBin] : bin.elements) {
-			auto element = addElement(title, elementBin.type);
-			elements[element]->props = elementBin.props;
-			elements[element]->config();
-		}
-		*/
-	};
-
-	void saveFile(std::filesystem::path filePath) override {
-
-	};
+	void afterLoad() override;
+	void beforeSave() override;
 };
 
 #endif

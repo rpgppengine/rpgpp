@@ -7,8 +7,11 @@
 #include "dialogueBalloon.hpp"
 #include "dialogueParser.hpp"
 #include "raylib.h"
+#include "resource.hpp"
 
-Dialogue::Dialogue(const std::string &filePath) {
+Dialogue::Dialogue() : Resource(RPGPP_RESOURCE_DIALOGUE) {}
+
+Dialogue::Dialogue(const std::string &filePath) : Dialogue() {
 	DialogueBin result;
 	char *fileTxt = LoadFileText(filePath.c_str());
 
@@ -39,36 +42,6 @@ Dialogue::Dialogue(const std::string &filePath) {
 	}
 	UnloadFileText(fileTxt);
 }
-
-/*
-nlohmann::json Dialogue::dumpJson() {
-	std::vector<nlohmann::json> diagVec;
-	for (DialogueLine line : dialogueBin.lines) {
-		auto lineVec = nlohmann::json::object();
-		lineVec.push_back({"characterName", line.characterName});
-		lineVec.push_back({"text", line.text});
-		lineVec.push_back({"hasPortrait", line.hasPortrait});
-		lineVec.push_back({"imageId", line.imageId});
-		lineVec.push_back({"hasOptions", line.hasOptions});
-
-		auto optionsVec = std::vector<nlohmann::json>{};
-
-		for (auto &option : line.options) {
-			auto optionsObj = nlohmann::json::object();
-			optionsObj["name"] = option.title;
-			optionsObj["nextDialogue"] = option.nextDialogue;
-			optionsVec.push_back(optionsObj);
-		}
-		lineVec.push_back({"options", optionsVec});
-
-		diagVec.push_back(lineVec);
-	}
-
-	json result = {{"diag", diagVec}};
-
-	return result;
-}
-*/
 
 DialogueBin &Dialogue::getData() { return dialogueBin; }
 

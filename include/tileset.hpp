@@ -23,12 +23,12 @@ private:
 	Texture texture;
 	/** The size of a single file. Tiles can have different widths and heights,
 	 * thus a Vector2 is used. */
-	IVector tileSize;
+	IVector tileSize = {16, 16};
 	/** The path to the used texture. May be a .png file or other image format.
 	 */
-	std::string textureSource;
+	std::string textureSource = "@INVALID";
 	/** The path to the file that represents this TileSet. */
-	std::string source;
+	std::string source = "@INVALID";
 
 public:
 	/** Empty constructor. */
@@ -59,9 +59,9 @@ public:
 	 * width; the y component is taken for height. */
 	void setTileSizeVector(Vector2 vec);
 	/** Get the height of a tile unit in this TileSet. */
-	int getTileHeight();
+	int getTileHeight() const;
 	/** Get the width of a tile unit in this TileSet. */
-	int getTileWidth();
+	int getTileWidth() const;
 	/** Set a tile unit height. */
 	void setTileHeight(int value);
 	/** Set a tile unit width. */
@@ -75,37 +75,18 @@ public:
 	/** Set the TileSet's texture source image. */
 	void setTextureSource(const std::string &source);
 	/** Get the path to the file that represents this TileSet. */
-	std::string getSource();
+	std::string getSource() const;
 	/** Check whether the given coordinates are valid */
 	bool areAtlasCoordsValid(Vector2 atlasCoords) const;
 	/** Get a tile from this TileSet as an AtlasTile. */
-	AtlasTile getTile(Vector2 atlasCoords);
+	AtlasTile getTile(Vector2 atlasCoords) const;
 
 	template <typename Archive>
 	void serialize(Archive &a) {
 		a(CEREAL_NVP(textureSource), CEREAL_NVP(tileSize));
 	}
 
-	void loadFile(std::filesystem::path filePath) override {
-		// Get text from JSON file
-		this->source = filePath;
-		char *jsonContent = LoadFileText(filePath.c_str());
-		json j = json::parse(jsonContent);
-
-		// Load Texture
-		std::string sourcePath = j.at("source");
-		this->textureSource = sourcePath;
-		this->texture = LoadTexture(sourcePath.c_str());
-
-		int tileWidth = j.at("tileWidth");
-		int tileHeight = j.at("tileHeight");
-		this->tileSize = Vector2{static_cast<float>(tileWidth), static_cast<float>(tileHeight)};
-
-		// Unload file's text
-		UnloadFileText(jsonContent);
-	}
-
-	void saveFile(std::filesystem::path filePath) override {}
+	void afterLoad() override;
 };
 
 #include <cereal/types/polymorphic.hpp>

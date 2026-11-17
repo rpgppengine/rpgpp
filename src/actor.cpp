@@ -16,70 +16,34 @@
 #include "game.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"
+#include "resource.hpp"
 #include "tileset.hpp"
 using json = nlohmann::json;
 
-Actor::Actor() {
+Actor::Actor() : Resource(RPGPP_RESOURCE_ACTOR) {
 	for (int i = 0; i < 8; i++) {
 		animations[i] = std::vector<IVector>();
 	}
 }
 
-Actor::Actor(const std::string &fileName) { loadFile(fileName); }
-
-void Actor::loadFile(std::filesystem::path filePath) {
-	char *jsonContent = LoadFileText(filePath.c_str());
-	json j = json::parse(jsonContent);
-	UnloadFileText(jsonContent);
-
-	std::vector<int> collisionInfo = j.at("collision");
-	int x = collisionInfo.at(0);
-	int y = collisionInfo.at(1);
-	int width = collisionInfo.at(2);
-	int height = collisionInfo.at(3);
-
-	this->collisionRect =
-		Rectangle{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)};
-
-	this->tileSetSource = j.at("tileset");
-	this->tileSet = std::make_unique<TileSet>(tileSetSource);
-
-	this->interactable = std::make_unique<Interactable>();
-
-	std::vector<std::vector<int>> down = j.at("animations").at("down");
-	addAnimationFrames(RPGPP_DOWN, down);
-
-	std::vector<std::vector<int>> downIdle = j.at("animations").at("down-idle");
-	addAnimationFrames(RPGPP_DOWN_IDLE, downIdle);
-
-	std::vector<std::vector<int>> up = j.at("animations").at("up");
-	addAnimationFrames(RPGPP_UP, up);
-
-	std::vector<std::vector<int>> upIdle = j.at("animations").at("up-idle");
-	addAnimationFrames(RPGPP_UP_IDLE, upIdle);
-
-	std::vector<std::vector<int>> left = j.at("animations").at("left");
-	addAnimationFrames(RPGPP_LEFT, left);
-
-	std::vector<std::vector<int>> leftIdle = j.at("animations").at("left-idle");
-	addAnimationFrames(RPGPP_LEFT_IDLE, leftIdle);
-
-	std::vector<std::vector<int>> right = j.at("animations").at("right");
-	addAnimationFrames(RPGPP_RIGHT, right);
-
-	std::vector<std::vector<int>> rightIdle = j.at("animations").at("right-idle");
-	addAnimationFrames(RPGPP_RIGHT_IDLE, rightIdle);
-
-	IVector defaultTileAtlasPos = animations[currentAnimation].at(0);
-	this->tile = tileSet->getTile(defaultTileAtlasPos.toFloat());
+void Actor::afterLoad() {
+	bool tileSetValid = false;
+	auto ts = Game::getResources().getUnpacker().loadT<TileSet>(tileSetSource, tileSetValid);
+	if (tileSetValid) {
+		ts.afterLoad();
+		this->tileSet = ts;
+		this->tile = tileSet.getTile({0, 0});
+	}
 }
 
-Actor::Actor(std::unique_ptr<TileSet> tileSet, Vector2 atlasPos, std::string tileSetSource) {
+Actor::Actor(const std::string &fileName) : Actor() {}
+
+Actor::Actor(std::unique_ptr<TileSet> tileSet, Vector2 atlasPos, std::string tileSetSource) : Actor() {
 	this->sourcePath = "";
 	this->tilePosition = Vector2{-1, -1};
 	this->position = Vector2{0, 0};
 
-	this->tileSet = std::move(tileSet);
+	// this->tileSet = std::move(tileSet);
 	this->tile = tileSet->getTile(atlasPos);
 	this->tileSetSource = std::move(tileSetSource);
 
@@ -115,13 +79,13 @@ Actor::Actor(std::unique_ptr<TileSet> tileSet, Vector2 atlasPos, std::string til
 	this->tile = tileSet->getTile(defaultTileAtlasPos.toFloat());
 
 	// Default collision box..
-	Vector2 atlasTileSize = this->tileSet->getTileSize();
+	Vector2 atlasTileSize = this->tileSet.getTileSize();
 	this->collisionRect =
 		Rectangle{0, (atlasTileSize.y * RPGPP_DRAW_MULTIPLIER) / 2, (atlasTileSize.x * RPGPP_DRAW_MULTIPLIER),
 				  (atlasTileSize.y * RPGPP_DRAW_MULTIPLIER) / 2};
 }
 
-Actor::Actor(const ActorBin &bin) {
+Actor::Actor(const ActorBin &bin) : Actor() {
 	this->sourcePath = bin.name;
 	this->position = Vector2{0, 0};
 
@@ -131,7 +95,7 @@ Actor::Actor(const ActorBin &bin) {
 	this->currentAnimation = RPGPP_DOWN_IDLE;
 
 	// tileset
-	this->tileSet = std::make_unique<TileSet>(Game::getBin().tilesets.at(bin.tileSetName));
+	// this->tileSet = std::make_unique<TileSet>(Game::getBin().tilesets.at(bin.tileSetName));
 
 	// collision
 	this->collisionRect = Rectangle{static_cast<float>(bin.collision.x), static_cast<float>(bin.collision.y),
@@ -155,66 +119,7 @@ Actor::Actor(const ActorBin &bin) {
 	}
 }
 
-/*
-json Actor::dumpJson() {
-	std::vector<int> collisionVec;
-	collisionVec.push_back(static_cast<int>(collisionRect.x));
-	collisionVec.push_back(static_cast<int>(collisionRect.y));
-	collisionVec.push_back(static_cast<int>(collisionRect.width));
-	collisionVec.push_back(static_cast<int>(collisionRect.height));
-
-	std::map<std::string, std::vector<std::vector<int>>, std::less<>> animsVec;
-
-	for (int i = 0; i < 8; i++) {
-		std::vector<std::vector<int>> framesVec;
-		std::vector<Vector2> animFrames = animations[i];
-
-		for (Vector2 frameVector : animFrames) {
-			std::vector<int> outFrame;
-			outFrame.push_back(static_cast<int>(frameVector.x));
-			outFrame.push_back(static_cast<int>(frameVector.y));
-			framesVec.push_back(outFrame);
-		}
-
-		auto direction = static_cast<Direction>(i);
-		std::string keyName = "untitled";
-		switch (direction) {
-			case RPGPP_DOWN_IDLE:
-				keyName = "down-idle";
-				break;
-			case RPGPP_DOWN:
-				keyName = "down";
-				break;
-			case RPGPP_UP_IDLE:
-				keyName = "up-idle";
-				break;
-			case RPGPP_UP:
-				keyName = "up";
-				break;
-			case RPGPP_LEFT_IDLE:
-				keyName = "left-idle";
-				break;
-			case RPGPP_LEFT:
-				keyName = "left";
-				break;
-			case RPGPP_RIGHT_IDLE:
-				keyName = "right-idle";
-				break;
-			case RPGPP_RIGHT:
-				keyName = "right";
-				break;
-		}
-
-		animsVec[keyName] = framesVec;
-	}
-
-	json j = {{"tileset", tileSetSource}, {"collision", collisionVec}, {"animations", animsVec}};
-
-	return j;
-}
-*/
-
-void Actor::unload() const { tileSet->unload(); }
+void Actor::unload() const { tileSet.unload(); }
 
 int Actor::getCurrentFrame() const { return this->currentFrame; }
 
@@ -233,16 +138,16 @@ IVector Actor::getAnimationAtlasByIdx(int frameIndex) const {
 void Actor::setAnimationFrame(int frameIndex) {
 	this->currentFrame = frameIndex;
 
-	Vector2 atlasTileSize = tileSet->getTileSize();
+	Vector2 atlasTileSize = tileSet.getTileSize();
 	IVector atlasPos = animations[currentAnimation].at(currentFrame);
 	atlasPos = Vector2{atlasPos.x * atlasTileSize.x, atlasPos.y * atlasTileSize.y};
 
 	if (this->onFrameChanged != nullptr) this->onFrameChanged(this->currentFrame);
 
-	this->tile = tileSet->getTile(atlasPos.toFloat());
+	this->tile = tileSet.getTile(atlasPos.toFloat());
 }
 
-Rectangle Actor::getCurrentAnimationRectangle() const {
+Rectangle Actor::getCurrentAnimationRectangle() {
 	const auto &atlasPos = this->getCurrentAnimationAtlas();
 	const auto &atlasSize = this->getTileSet().getTileSize();
 	return {atlasPos.x * atlasSize.x, atlasPos.y * atlasSize.y, atlasSize.x, atlasSize.y};
@@ -277,11 +182,12 @@ void Actor::draw() const {
 	// defaults..
 	constexpr auto origin = Vector2{0.0f, 0.0f};
 	constexpr float rotation = 0.0f;
-	const Vector2 atlasTileSize = tileSet->getTileSize();
+	const Vector2 atlasTileSize = tileSet.getTileSize();
 	auto worldTileSize = Vector2{atlasTileSize.x * RPGPP_DRAW_MULTIPLIER, atlasTileSize.y * RPGPP_DRAW_MULTIPLIER};
 
 	// texture
-	Texture texture = this->tileSet->getTexture();
+	Texture texture = this->tileSet.getTexture();
+	if (!IsTextureValid(texture)) return;
 
 	// actual coordinates
 	Vector2 atlasCoords = this->tile.getAtlasCoords().toFloat();
@@ -314,18 +220,18 @@ void Actor::draw() const {
 std::string Actor::getSourcePath() const { return sourcePath; }
 
 Rectangle Actor::getRect() const {
-	if (tileSet == nullptr) return Rectangle{0, 0, 0, 0};
+	// if (tileSet == nullptr) return Rectangle{0, 0, 0, 0};
 
-	Vector2 atlasTileSize = tileSet->getTileSize();
+	Vector2 atlasTileSize = tileSet.getTileSize();
 	auto result = Rectangle{position.x, position.y, atlasTileSize.x * RPGPP_DRAW_MULTIPLIER,
 							atlasTileSize.y * RPGPP_DRAW_MULTIPLIER};
 	return result;
 }
 
-TileSet &Actor::getTileSet() const { return *tileSet; }
+TileSet &Actor::getTileSet() { return tileSet; }
 
 void Actor::setTileSet(const std::string &newTileSetSource) {
-	tileSet = std::make_unique<TileSet>(newTileSetSource);
+	// tileSet = std::make_unique<TileSet>(newTileSetSource);
 	this->tileSetSource = newTileSetSource;
 }
 
@@ -334,13 +240,13 @@ void Actor::setPosition(Vector2 newPosition) { this->position = newPosition; }
 Vector2 Actor::getPosition() const { return position; }
 
 void Actor::setTilePosition(Vector2 newPosition, Vector2 tileSize) {
-	Vector2 actorTileSize = tileSet->getTileSize();
+	Vector2 actorTileSize = tileSet.getTileSize();
 	auto absolutePos =
 		Vector2{newPosition.x * tileSize.x * RPGPP_DRAW_MULTIPLIER, newPosition.y * tileSize.y * RPGPP_DRAW_MULTIPLIER};
 
 	float xDiff = 0;
-	if ((tileSet->getTileWidth() * RPGPP_DRAW_MULTIPLIER) > (tileSize.x * RPGPP_DRAW_MULTIPLIER)) {
-		xDiff = ((tileSet->getTileWidth() * RPGPP_DRAW_MULTIPLIER) - (tileSize.x * RPGPP_DRAW_MULTIPLIER)) / 2;
+	if ((tileSet.getTileWidth() * RPGPP_DRAW_MULTIPLIER) > (tileSize.x * RPGPP_DRAW_MULTIPLIER)) {
+		xDiff = ((tileSet.getTileWidth() * RPGPP_DRAW_MULTIPLIER) - (tileSize.x * RPGPP_DRAW_MULTIPLIER)) / 2;
 	}
 
 	auto resultVector = Vector2{absolutePos.x - xDiff, absolutePos.y - ((actorTileSize.y * RPGPP_DRAW_MULTIPLIER) -

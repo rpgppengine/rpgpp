@@ -39,7 +39,8 @@ private:
 	/** Whether this interactable will be interacted with on touch. */
 	bool onTouch;
 	/** A json object describing the properties of an interactable. */
-	std::unique_ptr<nlohmann::json> props;
+	// std::unique_ptr<nlohmann::json> props;
+	nlohmann::json props;
 	/** Script file path */
 	std::string scriptPath;
 
@@ -94,22 +95,8 @@ public:
 	template <typename Archive>
 	void serialize(Archive &a) {
 		a(CEREAL_NVP(displayTitle), CEREAL_NVP(scriptPath), CEREAL_NVP(onTouch),
-		  cereal::make_nvp("props", props->dump()));
+		  cereal::make_nvp("props", props.dump()));
 	}
-
-	void loadFile(std::filesystem::path filePath) override {
-		char *jsonString = LoadFileText(filePath.c_str());
-		nlohmann::json intJson = json::parse(jsonString);
-		UnloadFileText(jsonString);
-
-		type = GetFileNameWithoutExt(filePath.c_str());
-		displayTitle = intJson.at("name");
-		props = std::make_unique<nlohmann::json>(intJson.at("props"));
-		scriptPath = intJson.at("script");
-		onTouch = intJson.at("onTouch");
-	}
-
-	void saveFile(std::filesystem::path filePath) override {}
 };
 
 #include <cereal/types/polymorphic.hpp>

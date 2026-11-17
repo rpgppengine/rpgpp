@@ -4,8 +4,8 @@
 #include <map>
 #include <stdexcept>
 
+#include "basicTypes.hpp"
 #include "conversion.hpp"
-#include "gamedata.hpp"
 #include "raylib.h"
 
 template <typename T>
@@ -20,6 +20,7 @@ public:
 	/** Pushes an object to the map. */
 	void pushObject(IVector pos, T obj) { this->objects.try_emplace(pos, std::move(obj)); }
 	void pushObjectVec2(Vector2 pos, T obj) { pushObject(fromVector2(pos), obj); }
+	virtual void pushObjectArg(IVector pos, const std::string &arg) {}
 	/** Remove an object existing at a position. */
 	void removeObject(IVector pos) {
 		auto key = this->objects.find(pos);

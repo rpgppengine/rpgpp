@@ -3,32 +3,50 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include <memory>
 #include <stdexcept>
 
+#include "actor.hpp"
 #include "conversion.hpp"
 #include "game.hpp"
 #include "interactable.hpp"
 
-Player::Player(std::unique_ptr<Actor> actor, Room &room) : room(room) {
+Player::Player() {
 	this->lock = false;
 	this->position = Vector2{0, 0};
 	this->velocity = Vector2{0, 0};
 	this->size = 48;
+}
 
+Player::Player(std::unique_ptr<Actor> actor) {
+	this->actor = std::move(actor);
 	Rectangle collisionRect = actor->getCollisionRect(Vector2{0, 0});
 	this->interactableArea =
 		Rectangle{collisionRect.x - 6, collisionRect.y - 6, collisionRect.width + 12, collisionRect.height + 12};
 
-	this->actor = std::move(actor);
 	this->idleDirection = RPGPP_DOWN_IDLE;
 	this->currentDirection = RPGPP_DOWN;
 
 	this->position = this->actor->getPosition();
 }
 
-void Player::unload() const { actor->unload(); }
+void Player::setFromBin(const std::string &title) {
+	bool actorValid = false;
+	auto actor = Game::getResources().getUnpacker().loadT<Actor>(title, actorValid);
+
+	if (actorValid) {
+		this->actor = std::make_unique<Actor>(std::move(actor));
+		this->actor->afterLoad();
+	}
+}
+
+void Player::unload() const {
+	if (actor != nullptr) actor->unload();
+}
 
 void Player::update() {
+	if (actor == nullptr) return;
+
 	Rectangle collisionRect = actor->getCollisionRect(Vector2{0, 0});
 	this->interactableArea =
 		Rectangle{collisionRect.x - 6, collisionRect.y - 6, collisionRect.width + 12, collisionRect.height + 12};
@@ -78,6 +96,8 @@ void Player::update() {
 }
 
 void Player::draw() const {
+	if (actor == nullptr) return;
+
 	actor->draw();
 
 	bool debugDraw = true;
@@ -100,6 +120,7 @@ void Player::handleCollision() {
 
 	Rectangle playerRect = actor->getCollisionRect(velocity);
 
+	auto &room = Game::getWorld().getRoom();
 	TileMap *tileMap = room.getTileMap();
 	int worldTileSize = tileMap->getWorldTileSize();
 
@@ -124,15 +145,15 @@ void Player::handleCollision() {
 	}
 
 	// actors
-	for (auto &[name, actor] : room.getActors().getActors()) {
-		if (CheckCollisionRecs(playerRect, actor->getCollisionRect(Vector2{0, 0}))) {
+	for (auto &[name, entry] : room.getActors().getObjects()) {
+		if (CheckCollisionRecs(playerRect, entry.actor.getCollisionRect(Vector2{0, 0}))) {
 			velocity = Vector2{0, 0};
 			break;
 		}
 	}
 
 	// interactable tiles
-	std::vector<Interactable *> interactableTiles = this->room.getInteractables().getList();
+	std::vector<Interactable *> interactableTiles = room.getInteractables().getList();
 	for (Interactable *interactable : interactableTiles) {
 		Rectangle tileRect =
 			Rectangle{interactable->getWorldPos().x * room.getWorldTileSize(),
@@ -156,7 +177,9 @@ void Player::handleCollision() {
 }
 
 void Player::handleInteraction() {
-	std::vector<Interactable *> interactableTiles = this->room.getInteractables().getList();
+	auto &room = Game::getWorld().getRoom();
+
+	std::vector<Interactable *> interactableTiles = room.getInteractables().getList();
 	for (Interactable *interactable : interactableTiles) {
 		Rectangle tileRect =
 			Rectangle{interactable->getWorldPos().x * room.getWorldTileSize(),
@@ -184,10 +207,11 @@ void Player::handleInteraction() {
 		}
 	}
 
-	for (auto &[name, actor] : room.getActors().getActors()) {
-		if (actor->hasInteractable()) {
-			if (CheckCollisionRecs(interactableArea, actor->getCollisionRect(Vector2{0, 0}))) {
-				actor->getInteractable()->interact();
+	for (auto &[name, entry] : room.getActors().getObjects()) {
+		auto &actor = entry.actor;
+		if (actor.hasInteractable()) {
+			if (CheckCollisionRecs(interactableArea, actor.getCollisionRect(Vector2{0, 0}))) {
+				actor.getInteractable()->interact();
 				break;
 			}
 		}
@@ -228,6 +252,8 @@ Vector2 Player::getCenterPosition() const {
 Vector2 Player::getTilePosition() const { return actor->getTilePosition(); }
 
 void Player::setTilePosition(Vector2 tilePos) {
+	auto &room = Game::getWorld().getRoom();
+
 	if (!room.getTileMap()->worldPosIsValid(tilePos)) {
 		throw std::runtime_error(TextFormat("This world tile position does not exist: %i, %i",
 											static_cast<int>(tilePos.x), static_cast<int>(tilePos.y)));

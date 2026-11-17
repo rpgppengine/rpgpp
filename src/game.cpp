@@ -1,14 +1,17 @@
 #include "game.hpp"
 
 #include <raylib.h>
+#include <tinyfiledialogs.h>
 
 #include <memory>
 #include <sol/forward.hpp>
-#include <sol/sol.hpp>	// FIXME : lua.h not found
+#include <sol/sol.hpp>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 
 #include "gamedata.hpp"
+#include "resourceUnpacker.hpp"
 #include "scriptService.hpp"
 #include "soundService.hpp"
 
@@ -41,15 +44,8 @@ Game &Game::instance() {
 
 Game *Game::instancePtr() { return instance_; }
 
-void Game::init(bool usesBin) {
+void Game::init() {
 	gameData = std::make_unique<GameData>();
-	Game::usesBin = false;
-
-	if (usesBin) {
-		std::string filePath = "game.bin";
-		gameData = std::make_unique<GameData>(deserializeFile(filePath));
-		Game::usesBin = true;
-	}
 
 	resources = std::make_unique<ResourceService>();
 	state = std::make_unique<StateService>();
@@ -62,54 +58,43 @@ void Game::init(bool usesBin) {
 bool Game::isUsingBin() { return usesBin; }
 
 void Game::useBin(const std::string &filePath) {
-	gameData = std::make_unique<GameData>(deserializeFile(filePath));
+	if (!FileExists(filePath.c_str())) {
+		tinyfd_messageBox("Error!", "The packed resources (game.rres) does not exist!", "ok", "error", 1);
+		return;
+	}
+
 	usesBin = true;
 
-	// resources
-	// resources->init();
+	auto &unpacker = resources->getUnpacker();
+	std::error_code ec;
+	unpacker.mapFile(filePath, ec);
+	auto gameData = unpacker.getMinData();
 
-	/// Setup program
-	SetWindowTitle(gameData->title.c_str());
-	SetWindowSize(gameData->programSet.windowSize.x, gameData->programSet.windowSize.y);
-	if (gameData->programSet.windowResizeableFlag) {
+	SetWindowTitle(gameData.title.c_str());
+	SetWindowSize(gameData.programSet.windowSize.x, gameData.programSet.windowSize.y);
+	if (gameData.programSet.windowResizeableFlag) {
 		SetWindowState(FLAG_WINDOW_RESIZABLE);
 	} else {
 		ClearWindowState(FLAG_WINDOW_RESIZABLE);
 	}
-	SetWindowState(gameData->programSet.windowStateFlag);
-	if (gameData->programSet.targetFPS > 0) {
-		SetTargetFPS(gameData->programSet.targetFPS);
+	SetWindowState(gameData.programSet.windowStateFlag);
+	if (gameData.programSet.targetFPS > 0) {
+		SetTargetFPS(gameData.programSet.targetFPS);
 	}
 
-	auto iconTexture = resources->getTexture(GetFileName(gameData->programSet.programIconPath.c_str()));
-	Image iconImage = LoadImageFromTexture(iconTexture);
-
-	SetWindowIcon(iconImage);
-
-	UnloadImage(iconImage);
-
-	/// Setup Interfaces
-	ui->initBin(*gameData);
-
-	/// Select the default room from the settings
-
-	// Thefirey33:
-	// Decided on a very hybrid system that allows the user to load a Room or an UIElement at first.
-	// Had an idea where some games might want the player to immediately start without a main menu, as some RPG games do
-	// want to do that.
-	if (gameData->gameSet.isLoadUi) {
-		ui->showInterface(GetFileNameWithoutExt(gameData->gameSet.defaultLoadingPath.c_str()));
+	auto iconImg = unpacker.loadImage(gameData.programSet.programIconPath);
+	if (IsImageValid(iconImg)) {
+		SetWindowIcon(iconImg);
+		UnloadImage(iconImg);
 	}
 
-	if (gameData->gameSet.defaultLoadingPath.empty()) {
-		world->setRoomBin(gameData->rooms.at(0));
-	} else {
-		std::string chosenName = GetFileNameWithoutExt(gameData->gameSet.defaultLoadingPath.c_str());
-		for (auto &room : gameData->rooms) {
-			if (room.name == chosenName) {
-				world->setRoomBin(room);
-				break;
-			}
+	ui->init();
+
+	if (!gameData.gameSet.defaultLoadingPath.empty()) {
+		if (!gameData.gameSet.isLoadUi) {
+			world->setRoomBin(gameData.gameSet.defaultLoadingPath);
+		} else {
+			ui->showInterface(gameData.gameSet.defaultLoadingPath);
 		}
 	}
 }
@@ -147,6 +132,8 @@ void Game::unload() {
 	ui->unload();
 	// NOTE: Without this, we might get segfaults... beware!
 	state.reset();
+
+	resources->unload();
 }
 
 void Game::setLua(sol::state_view lua) { scripts->setLua(lua); }

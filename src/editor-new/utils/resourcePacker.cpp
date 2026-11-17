@@ -7,6 +7,7 @@
 #include "editor.hpp"
 #include "packHelper.hpp"
 #include "raylib.h"
+#include "resource.hpp"
 #include "rres.h"
 
 using namespace editor;
@@ -130,13 +131,14 @@ void ResourcePacker::packResource(std::ofstream &out, const std::filesystem::pat
 
 void ResourcePacker::packEngineResource(std::ofstream &out, const std::filesystem::path &filePath) {
 	std::string id = std::filesystem::relative(filePath, basePath);
+	printf("%s \n", id.c_str());
 
 	std::string ext = GetFileExtension(filePath.c_str());
 	auto &typesManager = Editor::getInstance().getResources().getTypes();
 	std::string title;
 	bool result = typesManager.getTypeTitleByExtension(ext, &title);
 
-	ResourceType rType = typesManager.getEnum(title);
+	RPGPP_RESOURCE rType = typesManager.getEnum(title);
 	auto &factory = typesManager.getFactory(title);
 	auto bytes = factory.saveBin(filePath);
 
@@ -199,7 +201,6 @@ void ResourcePacker::packImage(std::ofstream &out, const std::filesystem::path &
 	chunkData.raw = img.data;
 
 	uint32_t totalSize = sizeof(uint32_t) + sizeof(props) + dataSize;
-	UnloadImage(img);
 
 	// info
 	rresResourceChunkInfo chunkInfo;
@@ -227,6 +228,8 @@ void ResourcePacker::packImage(std::ofstream &out, const std::filesystem::path &
 	out.write(reinterpret_cast<const char *>(buffer), chunkInfo.packedSize);
 
 	UnloadDataBuffer(buffer);
+
+	UnloadImage(img);
 }
 
 void ResourcePacker::packText(std::ofstream &out, const std::filesystem::path &filePath) {
@@ -328,6 +331,7 @@ void ResourcePacker::packWave(std::ofstream &out, const std::filesystem::path &f
 	out.write(reinterpret_cast<const char *>(buffer), chunkInfo.packedSize);
 
 	UnloadDataBuffer(buffer);
+	UnloadWave(wave);
 }
 
 void ResourcePacker::packMusic(std::ofstream &out, const std::filesystem::path &filePath) {
@@ -393,6 +397,7 @@ void ResourcePacker::packMusic(std::ofstream &out, const std::filesystem::path &
 
 void ResourcePacker::packFont(std::ofstream &out, const std::filesystem::path &filePath) {
 	std::string id = std::filesystem::relative(filePath, basePath);
+	printf("%s \n", id.c_str());
 
 	FontBin bin;
 	auto fileData = LoadFileData(filePath.c_str(), &bin.dataSize);

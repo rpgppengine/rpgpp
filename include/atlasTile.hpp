@@ -11,7 +11,7 @@
 class AtlasTile {
 private:
 	/** Pointer to the used Texture */
-	Texture *texture;
+	Texture texture;
 	/** The atlas (source) coordinates from the TileSet. */
 	IVector atlasCoords;
 
@@ -25,7 +25,7 @@ public:
 	 * Constructor that takes in a texture and coordinates on the atlas (the
 	 * tileset)
 	 */
-	AtlasTile(Texture *texture, IVector atlasCoords);
+	AtlasTile(Texture texture, IVector atlasCoords);
 
 	/**
 	 * Get the atlas coordinates

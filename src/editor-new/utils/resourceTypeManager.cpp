@@ -12,6 +12,7 @@
 #include "interfaceView.hpp"
 #include "prop.hpp"
 #include "raylib.h"
+#include "resource.hpp"
 #include "room.hpp"
 #include "tileset.hpp"
 
@@ -37,12 +38,12 @@ void ResourceTypeManager::addDefaults() {
 	addCategory("Script", {".lua"}, ICON_FILETYPE_CODE_XML);
 
 	// factories
-	addT<TileSet>("TileSet");
-	addT<Room>("Room");
-	addT<Actor>("Actor");
-	addT<Prop>("Prop");
-	addT<Dialogue>("Dialogue");
-	addT<InterfaceView>("UI View");
+	addT<TileSet>("TileSet", RPGPP_RESOURCE_TILESET);
+	addT<Room>("Room", RPGPP_RESOURCE_ROOM);
+	addT<Actor>("Actor", RPGPP_RESOURCE_ACTOR);
+	addT<Prop>("Prop", RPGPP_RESOURCE_PROP);
+	addT<Dialogue>("Dialogue", RPGPP_RESOURCE_DIALOGUE);
+	addT<InterfaceView>("UI View", RPGPP_RESOURCE_UI);
 }
 
 const std::vector<edui::FileCategory> &ResourceTypeManager::getCategories() { return types; }
@@ -104,14 +105,9 @@ bool ResourceTypeManager::hasFactory(const std::string &title) { return factorie
 
 ResourceFactory &ResourceTypeManager::getFactory(const std::string &title) { return factories[title]; }
 
-ResourceType ResourceTypeManager::getEnum(const std::string &title) {
-	for (int i = 0; i < enums.size(); i++) {
-		auto &item = enums[i];
-		if (item == title) {
-			return static_cast<ResourceType>(i);
-		};
-	}
-	return RESOURCE_INVALID;
+RPGPP_RESOURCE ResourceTypeManager::getEnum(const std::string &title) {
+	auto factory = getFactory(title);
+	return factory.typeId;
 }
 
 std::vector<std::filesystem::path> ResourceTypeManager::findAllOfType(const std::filesystem::path &base,

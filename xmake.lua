@@ -5,7 +5,7 @@ if is_plat("switch") then
 	set_arch("arm64")
 end
 
-add_requires("raylib", "nlohmann_json", "luajit", "pugixml", "tree-sitter", "tree-sitter-lua")
+add_requires("raylib", "nlohmann_json", "luajit", "pugixml", "tree-sitter", "tree-sitter-lua", "tinyfiledialogs")
 add_rules("mode.debug", "mode.release")
 set_defaultmode("debug")
 
@@ -19,7 +19,7 @@ end
 
 target("rpgpp")
 set_kind("static")
-add_packages("raylib", "nlohmann_json", "luajit", "pugixml", { public = true })
+add_packages("raylib", "nlohmann_json", "luajit", "pugixml", "tinyfiledialogs", { public = true })
 set_languages("cxx17")
 add_includedirs("include/", "include/lua/", "include/ui_elements/")
 add_files("src/*.cpp", "src/lua/*.cpp", "src/ui_elements/*.cpp")

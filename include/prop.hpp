@@ -100,43 +100,6 @@ public:
 		a(CEREAL_NVP(atlasRect), CEREAL_NVP(collisionRect), CEREAL_NVP(imagePath), CEREAL_NVP(hasInteractable),
 		  cereal::make_nvp("interactableType", getInteractableType()));
 	}
-
-	void loadFile(std::filesystem::path filePath) override {
-		this->sourcePath = filePath;
-		this->worldPos = Vector2{0, 0};
-		this->tilePos = Vector2{0, 0};
-
-		char *jsonString = LoadFileText(filePath.c_str());
-		json json = json::parse(jsonString);
-		std::vector<int> atlasRectVec = json.at("atlas_rect");
-		if (atlasRectVec.size() != 4) {
-			throw std::runtime_error("Not enough items in atlas_rect.");
-		}
-		this->atlasRect = Rectangle{static_cast<float>(atlasRectVec[0]), static_cast<float>(atlasRectVec[1]),
-									static_cast<float>(atlasRectVec[2]), static_cast<float>(atlasRectVec[3])};
-
-		std::vector<int> collisionRectVec = json.at("collision_rect");
-		if (collisionRectVec.size() != 4) {
-			throw std::runtime_error("Not enough items in collision_rect.");
-		}
-		this->collisionRect =
-			Rectangle{static_cast<float>(collisionRectVec[0]), static_cast<float>(collisionRectVec[1]),
-					  static_cast<float>(collisionRectVec[2]), static_cast<float>(collisionRectVec[3])};
-
-		this->imagePath = json.at("image");
-		this->texture = LoadTexture(imagePath.c_str());
-
-		this->hasInteractable = static_cast<bool>(json.at("has_interactable"));
-
-		this->interactable = std::make_unique<Interactable>();
-		if (hasInteractable) {
-			std::string intType = json.at("interactable_type");
-			this->interactable = std::make_unique<Interactable>(intType, tilePos, _RPGPP_TILESIZE);
-		}
-		UnloadFileText(jsonString);
-	}
-
-	void saveFile(std::filesystem::path filePath) override {}
 };
 
 #include <cereal/types/polymorphic.hpp>

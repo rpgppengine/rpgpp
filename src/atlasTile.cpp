@@ -4,12 +4,9 @@
 
 #include "basicTypes.hpp"
 
-AtlasTile::AtlasTile() {
-	this->texture = nullptr;
-	this->atlasCoords = Vector2{-1, -1};
-}
+AtlasTile::AtlasTile() { this->atlasCoords = Vector2{-1, -1}; }
 
-AtlasTile::AtlasTile(Texture *texture, IVector atlasCoords) {
+AtlasTile::AtlasTile(Texture texture, IVector atlasCoords) {
 	this->texture = texture;
 	this->atlasCoords = atlasCoords;
 }

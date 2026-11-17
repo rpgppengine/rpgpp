@@ -13,10 +13,10 @@
 	},
 	{
 		"label": "Debug RPG++ Game (Linux)",
-		"program": "/home/nikodev/Documents/Projects/rpgpp-test-proj/TestProj",
+		"program": "${ZED_WORKTREE_ROOT}/build/linux/x86_64/debug/neww/neww",
 		"request": "launch",
 		"adapter": "CodeLLDB",
-		"cwd": "/home/nikodev/Documents/Projects/rpgpp-test-proj",
+		"cwd": "${ZED_WORKTREE_ROOT}/build/linux/x86_64/debug/neww",
 	},
 	{
 		"label": "Debug RPG++ Editor (Windows)",

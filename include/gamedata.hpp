@@ -24,12 +24,13 @@
 #include "resource.hpp"
 #include "roomtypes.hpp"
 #include "tileset.hpp"
+#include "uitypes.hpp"
 
 struct ProjectProgramSettings {
-	std::string projectTitle;
-	std::string projectVersion;
+	std::string projectTitle = "";
+	std::string projectVersion = "";
 	IVector windowSize = {640, 480};
-	std::string programIconPath = "";
+	std::string programIconPath = "images/logo-sq.png";
 	bool windowResizeableFlag = false;
 	int targetFPS = 60;
 	int windowStateFlag = 0;
@@ -42,9 +43,9 @@ struct ProjectProgramSettings {
 };
 
 struct ProjectGameSettings {
-	std::string defaultLoadingPath;
+	std::string defaultLoadingPath = "";
 	bool isLoadUi;
-	std::string playerActorPath;
+	std::string playerActorPath = "";
 	int tileSize = 16;
 	bool debugDraw = false;
 	std::vector<int> exportImageScales = {1};
@@ -88,7 +89,7 @@ struct GameData {
 };
 
 struct MinData {
-	std::string title;
+	std::string title = "@INVALID";
 	ProjectProgramSettings programSet;
 	ProjectGameSettings gameSet;
 

@@ -15,6 +15,7 @@
 #include "gamedata.hpp"
 #include "lua.hpp"
 #include "raylib.h"
+#include "resource.hpp"
 #include "scriptService.hpp"
 #include "sol/environment.hpp"
 #include "sol/forward.hpp"
@@ -22,10 +23,59 @@
 #include "sol/types.hpp"
 #include "tween.hpp"
 #include "uiTypesApi.hpp"
+#include "uitypes.hpp"
 
-InterfaceView::InterfaceView() {
+InterfaceView::InterfaceView() : Resource(RPGPP_RESOURCE_UI) {
 	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
 		availableIds.push(i);
+	}
+}
+
+InterfaceViewBin &InterfaceView::getBin() { return bin; }
+
+void InterfaceView::afterLoad() {
+	for (auto &[title, elementBin] : bin.elements) {
+		auto element = addElement(title, elementBin.type);
+		elements[element]->props = elementBin.props;
+		elements[element]->config();
+	}
+
+	this->scriptSource = bin.scriptSource;
+	if (!scriptSource.empty() && Game::isUsingBin()) {
+		scriptFlag = true;
+
+		std::string luaCode = Game::getResources().getUnpacker().loadText(scriptSource);
+		;
+
+		auto env = sol::environment(Game::getScripts().getState(), Game::getScripts().getState().globals());
+		lua_basic_types_set(env);
+		lua_ui_types_set(env);
+		this->env = env;
+
+		env["self"] = this;
+		env["view"] = this;
+
+		Game::getScripts().getState().do_string(luaCode, this->env);
+
+		// run init function if it exists
+		if (this->env["init"].is<sol::function>()) {
+			this->env["init"]();
+		}
+	} else {
+		scriptFlag = false;
+	}
+}
+
+void InterfaceView::beforeSave() {
+	bin.elements.clear();
+	bin.scriptSource = scriptSource;
+	for (int i = 0; i < size; i++) {
+		auto element = getElement(i);
+
+		UIElementBin bin;
+		bin.type = element->typeName;
+		bin.props = element->props;
+		this->bin.elements.emplace(std::make_pair(getEntityName(i), bin));
 	}
 }
 
@@ -54,72 +104,9 @@ InterfaceView::InterfaceView(const std::string &filePath) : InterfaceView() {
 
 InterfaceView::InterfaceView(InterfaceViewBin &bin) : InterfaceView() {
 	this->bin = bin;
-
-	for (auto &[title, elementBin] : bin.elements) {
-		auto element = addElement(title, elementBin.type);
-		elements[element]->props = elementBin.props;
-		elements[element]->config();
-	}
-
-	scriptSource = bin.scriptSource;
-
-	if (!scriptSource.empty() && Game::isUsingBin()) {
-		std::string key = TextFormat("scripts/%s", scriptSource.c_str());
-		if (Game::getBin().scripts.count(key) > 0) {
-			scriptFlag = true;
-
-			std::string luaCode = Game::getBin().scripts[key].bytecode;
-
-			auto env = sol::environment(Game::getScripts().getState(), Game::getScripts().getState().globals());
-			lua_basic_types_set(env);
-			lua_ui_types_set(env);
-			this->env = env;
-
-			env["self"] = this;
-			env["view"] = this;
-
-			Game::getScripts().getState().do_string(luaCode, this->env);
-
-			// run init function if it exists
-			if (this->env["init"].is<sol::function>()) {
-				this->env["init"]();
-			}
-		}
-	} else {
-		scriptFlag = false;
-	}
+	afterLoad();
 }
-/*
-nlohmann::json InterfaceView::dumpJson() {
-	auto j = json::object();
 
-	InterfaceViewBin bin;
-	bin.scriptSource = scriptSource;
-
-	for (ElementIndex i = 0; i < MAX_ELEMENTS; i++) {
-		auto element = elements[i].get();
-
-		if (element != nullptr) {
-			UIElementBin elementBin;
-			elementBin.type = element->typeName;
-			elementBin.props = element->props;
-
-			bin.elements[elementNames[i]] = elementBin;
-		}
-	}
-
-	std::stringstream stream;
-	{
-		cereal::JSONOutputArchive cerealJson(stream);
-		cerealJson(CEREAL_NVP(bin));
-	}
-
-	j = json::parse(stream.str());
-
-	return j;
-}
-*/
-//
 const std::string &InterfaceView::getEntityName(int index) { return elementNames[index]; }
 
 ElementIndex InterfaceView::findByName(const std::string &title) {
@@ -132,7 +119,7 @@ ElementIndex InterfaceView::findByName(const std::string &title) {
 	}
 	return res;
 }
-//
+
 bool InterfaceView::elementExists(const std::string &title) { return findByName(title) < MAX_ELEMENTS; }
 
 ElementIndex InterfaceView::addElement(const std::string &title, const std::string &type) {
