@@ -1,6 +1,9 @@
 #include <raylib.h>
 
+#include <system_error>
+
 #include "game.hpp"
+#include "sysDialogs.hpp"
 
 int main() {
 	const int width = 640;
@@ -11,7 +14,13 @@ int main() {
 
 	Game game;
 	game.init();
-	game.useBin("game.rres");
+
+	std::error_code ec;
+	game.useBin("game.rres", ec);
+
+	if (ec.value() != 0) {
+		MessageBox("Error!", ec.message(), MessageType::OK, MessageIconType::ERROR, MessageDefaultButton::OK);
+	}
 
 	SetTargetFPS(60);
 

@@ -14,9 +14,10 @@
 #include "resourceUnpacker.hpp"
 #include "scriptService.hpp"
 #include "soundService.hpp"
+#include "sysDialogs.hpp"
 
 Game *Game::instance_ = nullptr;
-std::unique_ptr<GameData> Game::gameData = std::unique_ptr<GameData>{};
+std::unique_ptr<MinData> Game::gameData = std::unique_ptr<MinData>{};
 bool Game::usesBin = false;
 bool Game::willClose = false;
 std::unique_ptr<StateService> Game::state = std::unique_ptr<StateService>{};
@@ -45,7 +46,7 @@ Game &Game::instance() {
 Game *Game::instancePtr() { return instance_; }
 
 void Game::init() {
-	gameData = std::make_unique<GameData>();
+	gameData = std::make_unique<MinData>();
 
 	resources = std::make_unique<ResourceService>();
 	state = std::make_unique<StateService>();
@@ -57,18 +58,24 @@ void Game::init() {
 
 bool Game::isUsingBin() { return usesBin; }
 
-void Game::useBin(const std::string &filePath) {
+void Game::useBin(const std::string &filePath, std::error_code &ec) {
 	if (!FileExists(filePath.c_str())) {
-		tinyfd_messageBox("Error!", "The packed resources (game.rres) does not exist!", "ok", "error", 1);
+		MessageBox("Error!", "The packed resources (game.rres) does not exist!", MessageType::OK,
+				   MessageIconType::ERROR, MessageDefaultButton::OK);
 		return;
 	}
 
 	usesBin = true;
 
 	auto &unpacker = resources->getUnpacker();
-	std::error_code ec;
 	unpacker.mapFile(filePath, ec);
+
+	if (ec.value() != 0) {
+		return;
+	}
+
 	auto gameData = unpacker.getMinData();
+	Game::gameData = std::make_unique<MinData>(gameData);
 
 	SetWindowTitle(gameData.title.c_str());
 	SetWindowSize(gameData.programSet.windowSize.x, gameData.programSet.windowSize.y);
@@ -99,7 +106,7 @@ void Game::useBin(const std::string &filePath) {
 	}
 }
 
-GameData &Game::getBin() { return *gameData; }
+MinData &Game::getBin() { return *gameData; }
 
 ResourceService &Game::getResources() { return *resources; }
 

@@ -7,6 +7,7 @@
 #include "edui/childWindow.hpp"
 #include "edui/container.hpp"
 #include "edui/gui.hpp"
+#include "widgets/viewerPanel.hpp"
 
 namespace editor {
 const int INTERFACE_SPACING = 4;
@@ -25,10 +26,13 @@ public:
 	void showTopWindow(std::shared_ptr<edui::ChildWindow> widget);
 	void showErrorMessage(const std::string &message);
 
+	std::shared_ptr<ViewerPanel> getViewerPanel();
+
 private:
 	edui::Gui gui;
 	std::shared_ptr<edui::Container> mainContainer;
 	bool hasTopWindow = false;
+	bool isInProjectScreen = false;
 
 	void initEduiSettings();
 	void initMenuBar();

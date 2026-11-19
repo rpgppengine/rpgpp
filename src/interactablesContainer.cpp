@@ -53,12 +53,11 @@ void InteractablesContainer::addBin(InteractableInRoomBin bin) {
 }
 
 void InteractablesContainer::addBinFromTypename(Vector2 pos, const std::string &type) {
+	/*
 	if (Game::getBin().interactables.count(type) > 0) {
 		auto interactable = Game::getBin().interactables[type];
 		InteractableInRoomBin intBin;
 
-		// intBin.x = static_cast<int>(pos.x);
-		// intBin.y = static_cast<int>(pos.y);
 		intBin.type = type;
 		intBin.onTouch = false;
 
@@ -68,6 +67,7 @@ void InteractablesContainer::addBinFromTypename(Vector2 pos, const std::string &
 	} else {
 		throw std::runtime_error(TextFormat("This Interactable type does not exist: %s", type.c_str()));
 	}
+	*/
 }
 
 Interactable *InteractablesContainer::getInt(IVector pos) {

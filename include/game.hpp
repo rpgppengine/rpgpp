@@ -1,6 +1,8 @@
 #ifndef _RPGPP_GAME_H
 #define _RPGPP_GAME_H
 
+#include <system_error>
+
 #include "scriptService.hpp"
 #include "sol/state_view.hpp"
 class WorldService;
@@ -20,7 +22,7 @@ class WorldService;
 class Game {
 private:
 	static Game *instance_;
-	static std::unique_ptr<GameData> gameData;
+	static std::unique_ptr<MinData> gameData;
 	static bool usesBin;
 	static bool willClose;
 	static std::unique_ptr<StateService> state;
@@ -35,8 +37,8 @@ public:
 	static Game &instance();
 	static Game *instancePtr();
 	static bool isUsingBin();
-	static void useBin(const std::string &filePath);
-	static GameData &getBin();
+	static void useBin(const std::string &filePath, std::error_code &ec);
+	static MinData &getBin();
 	static StateService &getState();
 	static WorldService &getWorld();
 	static InterfaceService &getUi();

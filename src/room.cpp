@@ -150,6 +150,7 @@ Room::Room(const std::string &fileName, int tileSize, bool createPlayer) : Resou
 Room::Room(std::unique_ptr<TileMap> tileMap) : Room() { this->tileMap = std::move(tileMap); }
 
 Room::Room(const RoomBin &bin) : Room() {
+	/*
 	this->worldTileSize = 48;
 
 	this->interactables = std::make_unique<InteractablesContainer>();
@@ -225,6 +226,7 @@ Room::Room(const RoomBin &bin) : Room() {
 	} else {
 		Game::getSounds().unload();
 	}
+	*/
 }
 
 void Room::unload() const {

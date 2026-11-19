@@ -15,8 +15,10 @@
 
 #include "cereal/archives/json.hpp"
 #include "cereal/archives/portable_binary.hpp"
+#include "edui/container.hpp"
 #include "edui/fileChooser.hpp"
 #include "resource.hpp"
+#include "widgets/filePanels/filePanel.hpp"
 
 namespace editor {
 enum ResourceType {
@@ -35,6 +37,7 @@ struct ResourceFactory {
 	std::function<void(std::filesystem::path, std::unique_ptr<Resource> &)> load;
 	std::function<void(std::filesystem::path, std::unique_ptr<Resource> &)> save;
 	std::function<std::string(std::filesystem::path)> saveBin;
+	std::function<std::shared_ptr<FilePanel>()> createPanel;
 };
 
 class ResourceTypeManager {
@@ -47,16 +50,18 @@ public:
 	bool getTypeTitleByExtension(const std::string &ext, std::string *title);
 	size_t totalResourceCount(const std::filesystem::path &base);
 
-	template <typename T>
+	template <typename T, typename TPanel>
 	void addT(const std::string &title, RPGPP_RESOURCE typeId) {
-		if (std::is_base_of_v<Resource, T>) {
-			enums.push_back(title);
-
+		if (std::is_base_of_v<Resource, T> && std::is_base_of_v<FilePanel, TPanel>) {
 			ResourceFactory data;
 			data.typeId = typeId;
 			data.instantiate = [](std::string) {
 				std::unique_ptr<Resource> ptr = std::make_unique<T>();
 				return std::move(ptr);
+			};
+			data.createPanel = [] {
+				std::shared_ptr<FilePanel> ptr = std::make_unique<TPanel>();
+				return ptr;
 			};
 			data.load = [](std::filesystem::path fpath, std::unique_ptr<Resource> &out) {
 				printf("fpath: %s \n", fpath.c_str());
@@ -104,7 +109,6 @@ public:
 	std::vector<std::filesystem::path> findAllOfType(const std::filesystem::path &base, const std::string &title);
 
 private:
-	std::vector<std::string> enums = {};
 	std::vector<edui::FileCategory> types = {};
 	std::map<std::string, ResourceFactory> factories = {};
 	void addCategory(const std::string &title, std::vector<std::string> extensions, int iconId = ICON_FILE);

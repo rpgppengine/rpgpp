@@ -160,6 +160,7 @@ void ResourcesPanel::addItem(const std::string &path) {
 		}
 
 		button->onClicked.connect([path] {
+			/*
 			std::string title;
 			Editor::getInstance().getResources().getTypes().getTypeTitleByExtension(GetFileExtension(path.c_str()),
 																					&title);
@@ -170,6 +171,9 @@ void ResourcesPanel::addItem(const std::string &path) {
 			factory.load(path, ptr);
 
 			factory.save(path, ptr);
+			*/
+			auto viewer = Editor::getInstance().getInterface().getViewerPanel();
+			viewer->openFile(path);
 		});
 	}
 	button->onRightClicked.connect([this, path] { showContextMenu(path); });

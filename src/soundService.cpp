@@ -15,26 +15,15 @@ SoundService::SoundService() {
 }
 
 bool SoundService::loadMusic(const std::string &id) {
-	GameData &gameData = Game::getBin();
+	auto music = Game::getResources().getUnpacker().loadMusic(id);
+	if (IsMusicValid(music)) {
+		unload();
+		this->music = music;
+		musicLoaded = true;
 
-	if (lastId == id) return true;
-
-	if (gameData.music.count(id) != 0) {
-		if (gameData.music[id].isSound) return musicLoaded;
-
-		auto &musicBin = gameData.music[id];
-
-		Music newMusic =
-			LoadMusicStreamFromMemory(musicBin.fileExt.c_str(), musicBin.fileData.data(), musicBin.fileData.size());
-
-		if (IsMusicValid(newMusic)) {
-			unload();
-
-			this->music = newMusic;
-			musicLoaded = true;
-		}
+		TraceLog(TraceLogLevel::LOG_INFO, "Loaded packed music with id %s", id.c_str());
 	} else {
-		printf("Music with such id does not exist: %s \n", id.c_str());
+		TraceLog(TraceLogLevel::LOG_WARNING, "Unable to load packed music with id %s", id.c_str());
 	}
 
 	return musicLoaded;
@@ -47,23 +36,13 @@ void SoundService::playMusic() const {
 }
 
 void SoundService::playSound(const std::string &id) const {
-	GameData &gameData = Game::getBin();
-
-	if (gameData.music.count(id) != 0) {
-		if (gameData.music[id].isSound) {
-			MusicBin soundBin = gameData.music[id];
-			Wave soundWave =
-				LoadWaveFromMemory(soundBin.fileExt.c_str(), soundBin.fileData.data(), soundBin.fileData.size());
-			Sound sound = LoadSoundFromWave(soundWave);
-
-			PlaySound(sound);
-
-			UnloadWave(soundWave);
-
-			// UnloadSound(sound);
-		}
+	Wave wave = Game::getResources().getUnpacker().loadWave(id);
+	if (IsWaveValid(wave)) {
+		Sound sound = LoadSoundFromWave(wave);
+		PlaySound(sound);
+		TraceLog(TraceLogLevel::LOG_INFO, "Loaded packed Wave with id %s", id.c_str());
 	} else {
-		throw std::runtime_error(TextFormat("This Sound does not exist: %s", id.c_str()));
+		TraceLog(TraceLogLevel::LOG_WARNING, "Unable to load packed Wave with id %s", id.c_str());
 	}
 }
 

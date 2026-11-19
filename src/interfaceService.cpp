@@ -65,12 +65,14 @@ void InterfaceService::init() {
 Font InterfaceService::getFont() const { return font; }
 
 void InterfaceService::showDialogue(const std::string &id, bool runScript) {
+	/*
 	if (Game::getBin().dialogues.count(id) > 0) {
 		auto diag = Game::getBin().dialogues[id];
 		showDialogue(diag, runScript);
 	} else {
 		throw std::runtime_error(TextFormat("This Dialogue does not exist: %s", id.c_str()));
 	}
+	*/
 }
 
 void InterfaceService::showDialogue(const DialogueBin &dialogue, bool runScript) {

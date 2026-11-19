@@ -7,6 +7,7 @@
 #include "prop.hpp"
 
 void PropsContainer::addProp(Vector2 pos, const std::string &type) {
+	/*
 	for (auto const &propBin : Game::getBin().props) {
 		if (propBin.name == type) {
 			printf("c \n");
@@ -18,6 +19,7 @@ void PropsContainer::addProp(Vector2 pos, const std::string &type) {
 			break;
 		}
 	}
+	*/
 }
 
 Prop *PropsContainer::getPropAt(Vector2 pos) { return objects[fromVector2(pos)].get(); }

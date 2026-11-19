@@ -131,6 +131,7 @@ void Interactable::interact() {
 	state["this"] = this;
 	state["self"] = this;
 
+	/*
 	auto intBin = Game::getBin().interactables.at(type);
 	if (Game::getBin().scripts.count(intBin.scriptPath) != 0) {
 		auto bc = Game::getBin().scripts[intBin.scriptPath].bytecode;
@@ -153,4 +154,5 @@ void Interactable::interact() {
 			}
 		}
 	}
+	*/
 }

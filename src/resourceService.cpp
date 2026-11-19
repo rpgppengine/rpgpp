@@ -12,6 +12,7 @@ ResourceService::ResourceService() { init(); }
 void ResourceService::init() {
 	unload();
 
+	/*
 	if (Game::isUsingBin()) {
 		for (auto &[id, fontBin] : Game::getBin().fonts) {
 			Font font = LoadFontFromMemory(fontBin.ext.c_str(), fontBin.data.data(), fontBin.dataSize, 13, nullptr, 0);
@@ -50,6 +51,7 @@ void ResourceService::init() {
 			addFontFromFile(path, 13);
 		}
 	}
+	*/
 }
 
 ResourceService::~ResourceService() = default;

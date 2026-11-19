@@ -10,6 +10,12 @@ using namespace edui;
 
 FileTabBar::FileTabBar() : TabBar() { render = std::make_unique<FileTabBarRender>(); }
 
+void FileTabBar::unfocused() {
+	for (auto &widget : widgets) {
+		widget->unfocused();
+	}
+}
+
 void FileTabBar::update() {
 	for (auto &widget : widgets) {
 		widget->as<FileTab>().closeEnabled = mouseIsInContent();
@@ -127,6 +133,8 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 
 	size++;
 
+	button->unfocused();
+
 	return content;
 }
 
@@ -167,6 +175,9 @@ void FileTabBar::onFileTabBarMouseRelease() {
 	if (res >= widgets.size()) {
 		res = widgets.size() - 1;
 	}
+
+	// return if there are no tabs
+	if (res < 0) return;
 
 	// reorder widgets
 	if (res < heldIndex) {

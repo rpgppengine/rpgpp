@@ -10,6 +10,7 @@
 #include "utils/editorConsts.hpp"
 #include "widgets/screens/mainMenuScreen.hpp"
 #include "widgets/screens/projectScreen.hpp"
+#include "widgets/viewerPanel.hpp"
 
 using namespace editor;
 
@@ -100,4 +101,15 @@ void Interface::showProjectScreen() {
 
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
 	MaximizeWindow();
+	std::string windowTitle = "Editor - " + Editor::getInstance().getResources().getProject().getTitle();
+	SetWindowTitle(windowTitle.c_str());
+
+	this->isInProjectScreen = true;
+}
+
+std::shared_ptr<ViewerPanel> Interface::getViewerPanel() {
+	if (!isInProjectScreen) return nullptr;
+
+	auto &projectScreen = mainContainer->as<ProjectScreen>();
+	return projectScreen.getViewer();
 }

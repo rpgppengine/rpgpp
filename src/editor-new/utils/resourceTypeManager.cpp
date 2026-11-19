@@ -15,6 +15,7 @@
 #include "resource.hpp"
 #include "room.hpp"
 #include "tileset.hpp"
+#include "widgets/filePanels/emptyPanel.hpp"
 
 using namespace editor;
 
@@ -38,12 +39,12 @@ void ResourceTypeManager::addDefaults() {
 	addCategory("Script", {".lua"}, ICON_FILETYPE_CODE_XML);
 
 	// factories
-	addT<TileSet>("TileSet", RPGPP_RESOURCE_TILESET);
-	addT<Room>("Room", RPGPP_RESOURCE_ROOM);
-	addT<Actor>("Actor", RPGPP_RESOURCE_ACTOR);
-	addT<Prop>("Prop", RPGPP_RESOURCE_PROP);
-	addT<Dialogue>("Dialogue", RPGPP_RESOURCE_DIALOGUE);
-	addT<InterfaceView>("UI View", RPGPP_RESOURCE_UI);
+	addT<TileSet, EmptyPanel>("TileSet", RPGPP_RESOURCE_TILESET);
+	addT<Room, EmptyPanel>("Room", RPGPP_RESOURCE_ROOM);
+	addT<Actor, EmptyPanel>("Actor", RPGPP_RESOURCE_ACTOR);
+	addT<Prop, EmptyPanel>("Prop", RPGPP_RESOURCE_PROP);
+	addT<Dialogue, EmptyPanel>("Dialogue", RPGPP_RESOURCE_DIALOGUE);
+	addT<InterfaceView, EmptyPanel>("UI View", RPGPP_RESOURCE_UI);
 }
 
 const std::vector<edui::FileCategory> &ResourceTypeManager::getCategories() { return types; }

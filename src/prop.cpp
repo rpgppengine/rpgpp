@@ -62,6 +62,7 @@ Prop::Prop(Rectangle atlasRect, Vector2 worldPos) : Prop() {
 }
 
 Prop::Prop(PropBin bin) : Prop() {
+	/*
 	this->sourcePath = bin.name;
 	this->worldPos = Vector2{0, 0};
 	this->tilePos = Vector2{0, 0};
@@ -81,6 +82,7 @@ Prop::Prop(PropBin bin) : Prop() {
 	if (hasInteractable) {
 		this->interactable = std::make_unique<Interactable>(bin.intType, tilePos, _RPGPP_TILESIZE);
 	}
+	*/
 }
 
 std::string Prop::getSourcePath() const { return sourcePath; }

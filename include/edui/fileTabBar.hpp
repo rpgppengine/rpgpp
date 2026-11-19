@@ -17,6 +17,8 @@ struct FileTabBar : public TabBar {
 	std::shared_ptr<Container> addItem(const std::string &item, int iconId) override;
 	void showActiveTab(int index);
 
+	void unfocused() override;
+
 private:
 	bool holdingMouse = false;
 	bool notifiedMouseRelease = true;
