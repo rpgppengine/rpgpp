@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstddef>
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -39,17 +40,22 @@ struct FileChooser : public ConfirmDialog {
 
 	void onAdded() override;
 
-	void setDirectory(std::string fullPath);
+	void setDirectory(std::filesystem::path path);
+	void goUp();
 	void addCategory(const std::string &title, std::vector<std::string> extensions, int iconId = ICON_FILE);
 	void addCategory(FileCategory &category);
 	void clearCategories();
 	void setDirSelection(bool val = true);
+	void lockBasePath(const std::filesystem::path &basePath);
 
 private:
 	bool dirSelection = false;
 	std::vector<FileCategory> categories = {};
 
-	std::string dirPath = "";
+	std::filesystem::path dirPath = "";
+	std::filesystem::path relativePath = "";
+	std::filesystem::path basePath;
+	bool useBasePath = false;
 	std::shared_ptr<edui::VerticalContainer> listContainer = nullptr;
 	std::shared_ptr<edui::TextBox> pathBox = nullptr;
 	std::shared_ptr<edui::Dropdown> filterBox = nullptr;

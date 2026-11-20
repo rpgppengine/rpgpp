@@ -26,6 +26,12 @@ struct FileTab : public Tab {
 
 	void setActive() override;
 	void setInactive() override;
+
+	void setDirty(bool dirty);
+
+private:
+	bool dirty = false;
+	float textWidth = 0;
 };
 }  // namespace edui
 

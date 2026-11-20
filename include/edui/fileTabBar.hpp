@@ -16,6 +16,7 @@ struct FileTabBar : public TabBar {
 
 	std::shared_ptr<Container> addItem(const std::string &item, int iconId) override;
 	void showActiveTab(int index);
+	void setDirty(int id, bool dirty);
 
 	void unfocused() override;
 

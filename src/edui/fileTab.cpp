@@ -9,6 +9,7 @@
 #include "edui/tab.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
+#include "raymath.h"
 
 using namespace edui;
 
@@ -63,6 +64,16 @@ void FileTab::draw() {
 
 	auto &rend = render->as<FileTabRender>();
 
+	if (dirty) {
+		auto paddingRect = getPaddingRect();
+		Vector2 dirtyPos = {textWidth + (paddingRect.height / 2), paddingRect.height / 2};
+		dirtyPos = Vector2Add(dirtyPos, {paddingRect.x, paddingRect.y});
+
+		float radius = 0.25f * paddingRect.height;
+
+		DrawCircleV(dirtyPos, radius, rend.borderColor);
+	}
+
 	DrawRectangleLinesEx(rect, 1.0f, rend.currentBorderColor);
 }
 
@@ -81,6 +92,12 @@ void FileTab::resizeToFit() {
 	}
 
 	totalWidth += (iconRectSize) + rend.padding;
+
+	if (dirty) {
+		auto paddingRect = getPaddingRect();
+		totalWidth += paddingRect.height;
+	}
+	textWidth = textSize.x;
 
 	layout.width.offset = totalWidth;
 	layout.width.scale = 0;
@@ -116,4 +133,9 @@ void FileTab::setInactive() {
 	closeButtonPtr->render->bgColor = rend.inactiveColor;
 	closeButtonPtr->render->focusBgColor = rend.inactiveFocusColor;
 	closeButtonPtr->unfocused();
+}
+
+void FileTab::setDirty(bool dirty) {
+	this->dirty = dirty;
+	resizeToFit();
 }

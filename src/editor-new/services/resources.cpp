@@ -9,6 +9,7 @@
 #include "raylib.h"
 #include "utils/recentProjects.hpp"
 #include "utils/resourceTypeManager.hpp"
+#include "utils/variantPropertyFactory.hpp"
 #include "widgets/windows/newProjectWindow.hpp"
 
 using namespace editor;
@@ -75,6 +76,8 @@ Project &Resources::getProject() { return openedProject; }
 RecentProjects &Resources::getRecentProjects() { return recentProjects; }
 
 ResourceTypeManager &Resources::getTypes() { return typeManager; }
+
+VariantPropertyFactory &Resources::getVariantFactory() { return variantFactory; }
 
 void Resources::onNewProject() {
 	auto window = std::make_shared<NewProjectWindow>();

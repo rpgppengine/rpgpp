@@ -8,6 +8,7 @@
 #include "utils/project.hpp"
 #include "utils/recentProjects.hpp"
 #include "utils/resourceTypeManager.hpp"
+#include "utils/variantPropertyFactory.hpp"
 namespace editor {
 class Resources {
 public:
@@ -27,6 +28,7 @@ public:
 	Project &getProject();
 	RecentProjects &getRecentProjects();
 	ResourceTypeManager &getTypes();
+	VariantPropertyFactory &getVariantFactory();
 
 	bool fileClipboardAvailable();
 	void setFileClipboard(const std::string &filePath);
@@ -47,6 +49,7 @@ private:
 	Project openedProject;
 	RecentProjects recentProjects;
 	ResourceTypeManager typeManager;
+	VariantPropertyFactory variantFactory;
 };
 }  // namespace editor
 

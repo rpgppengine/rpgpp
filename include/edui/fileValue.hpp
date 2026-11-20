@@ -1,6 +1,7 @@
 #ifndef _EDUI_FILEVALUE_H
 #define _EDUI_FILEVALUE_H
 
+#include <filesystem>
 #include <memory>
 
 #include "edui/button.hpp"
@@ -37,10 +38,13 @@ struct FileValue : public Container, public ValueWidgetT<FileOption> {
 	void addFontCategory();
 
 	void setDirSelection(bool val = true);
+	void lockBasePath(const std::filesystem::path &basePath);
 
 private:
 	bool dirSelection = false;
 	std::vector<FileCategory> categories = {};
+	std::filesystem::path basePath = "";
+	bool useBasePath = false;
 
 	FileOption file;
 

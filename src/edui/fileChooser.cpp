@@ -1,5 +1,6 @@
 #include "edui/fileChooser.hpp"
 
+#include <filesystem>
 #include <memory>
 
 #include "edui/confirmDialog.hpp"
@@ -80,7 +81,7 @@ void FileChooser::initTopContainer() {
 	auto goUpButton = std::make_shared<edui::IconButton>();
 	goUpButton->iconId = ICON_ARROW_UP;
 	goUpButton->setSize({0, topHeight}, {1, 0});
-	goUpButton->onClicked.connect([this] { setDirectory(GetPrevDirectoryPath(dirPath.c_str())); });
+	goUpButton->onClicked.connect([this] { setDirectory(dirPath.parent_path()); });
 	topContainer->add(goUpButton);
 
 	pathBox = std::make_shared<edui::TextBox>();
@@ -140,8 +141,12 @@ void FileChooser::onAdded() {
 
 	updateFileFilter();
 
-	dirPath = GetApplicationDirectory();
-	setDirectory(dirPath);
+	if (useBasePath) {
+		setDirectory(basePath);
+	} else {
+		dirPath = GetApplicationDirectory();
+		setDirectory(dirPath);
+	}
 }
 
 void FileChooser::addCategory(const std::string &title, std::vector<std::string> extensions, int iconId) {
@@ -174,24 +179,35 @@ void FileChooser::setDirSelection(bool val) {
 	filterBox->visible = !val;
 }
 
-void FileChooser::setDirectory(std::string fullPath) {
-	if (!DirectoryExists(fullPath.c_str())) {
-		pathBox->setText(dirPath);
-		return;
-	}
+void FileChooser::lockBasePath(const std::filesystem::path &basePath) {
+	setDirectory(basePath);
+	this->basePath = basePath;
+	this->dirPath = basePath;
+	useBasePath = true;
+}
 
-	if (fullPath.back() == '/') {
-		fullPath.pop_back();
-	}
-
+void FileChooser::setDirectory(std::filesystem::path path) {
+	path = path.lexically_normal();
 	getOkButton().disabled = !dirSelection;
 
-	dirPath = fullPath;
-	pathBox->setText(fullPath);
+	if (useBasePath) {
+		if (!std::filesystem::exists(path)) {
+			return;
+		}
+		dirPath = path;
+		relativePath = std::filesystem::relative(path, basePath);
+		pathBox->setText(relativePath);
+	} else {
+		dirPath = path;
+		if (!std::filesystem::exists(dirPath)) {
+			return;
+		}
+		pathBox->setText(dirPath);
+	}
 
 	listContainer->deleteChildren();
 
-	auto dirFiles = LoadDirectoryFilesEx(fullPath.c_str(), fileFilter.c_str(), false);
+	auto dirFiles = LoadDirectoryFilesEx(dirPath.c_str(), fileFilter.c_str(), false);
 
 	for (auto i = 0; i < dirFiles.count; i++) {
 		std::string filePath = dirFiles.paths[i];

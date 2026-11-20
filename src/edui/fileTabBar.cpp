@@ -149,6 +149,15 @@ void FileTabBar::showActiveTab(int index) {
 	}
 }
 
+void FileTabBar::setDirty(int id, bool dirty) {
+	for (auto &widget : widgets) {
+		if (widget->referId == id) {
+			widget->as<FileTab>().setDirty(dirty);
+		}
+	}
+	updateWidgets();
+}
+
 void FileTabBar::onFileTabBarMouseRelease() {
 	Vector2 barPos = {contentRect.x, contentRect.y};
 	Vector2 mousePos = GetMousePosition();
@@ -180,6 +189,8 @@ void FileTabBar::onFileTabBarMouseRelease() {
 	if (res < 0) return;
 
 	// reorder widgets
+	if (heldIndex >= widgets.size()) heldIndex = widgets.size() - 1;
+
 	if (res < heldIndex) {
 		std::shared_ptr<edui::Widget> next = widgets[res];
 		for (int i = res + 1; i <= heldIndex; i++) {

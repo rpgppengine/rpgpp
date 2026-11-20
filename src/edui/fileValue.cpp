@@ -94,12 +94,20 @@ void FileValue::setDirSelection(bool val) {
 	translate();
 }
 
+void FileValue::lockBasePath(const std::filesystem::path &basePath) {
+	this->basePath = basePath;
+	useBasePath = true;
+}
+
 void FileValue::onButtonClicked() {
 	auto fileDialog = std::make_shared<FileChooser>();
 	fileDialog->setSize({0, FILE_CHOOSER_WIDTH}, {0, FILE_CHOOSER_HEIGHT});
 	fileDialog->onFileChosen.connect([this](std::string fullPath) { setFromPath(fullPath); });
 	fileDialog->clearCategories();
 	fileDialog->setDirSelection(dirSelection);
+	if (useBasePath) {
+		fileDialog->lockBasePath(basePath);
+	}
 	for (auto &category : categories) {
 		fileDialog->addCategory(category);
 	}
