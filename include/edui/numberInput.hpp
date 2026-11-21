@@ -1,25 +1,26 @@
-#ifndef _EDUI_INTVALUE_H
-#define _EDUI_INTVALUE_H
+#ifndef _EDUI_NUMBERINPUT_H
+#define _EDUI_NUMBERINPUT_H
 
 #include "edui/button.hpp"
 #include "edui/container.hpp"
 #include "edui/intValueTextBox.hpp"
-#include "edui/valuewidget.hpp"
 
 namespace edui {
 struct IntValueRender : public ContainerRender {
 	Color btnColor;
 };
 
-struct IntValue : public Container, public ValueWidgetT<int> {
+struct NumberInput : public Container {
+	SignalT2<int, int> onValueChanged;
+
 	IntValueTextBox::Ptr intval;
 	Button::Ptr incButton;
 	Button::Ptr decButton;
 
-	void setValue(const int &val) override;
-	int getValue() override;
+	void setValue(const int &val);
+	int getValue();
 
-	IntValue();
+	NumberInput();
 
 	void draw() override;
 };

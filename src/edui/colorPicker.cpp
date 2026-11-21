@@ -1,4 +1,4 @@
-#include "edui/colorValue.hpp"
+#include "edui/colorPicker.hpp"
 
 #include <memory>
 
@@ -9,8 +9,8 @@
 
 using namespace edui;
 
-ColorValue::ColorValue() : Widget() {
-	render = std::make_unique<ColorValueRender>();
+ColorPicker::ColorPicker() : Widget() {
+	render = std::make_unique<ColorPickerRender>();
 	onClicked.connect([this] {
 		if (colorDialog != nullptr) {
 			colorDialog->markDelete();
@@ -30,12 +30,12 @@ ColorValue::ColorValue() : Widget() {
 	});
 }
 
-void ColorValue::setValue(const Color &val) { this->color = val; }
+void ColorPicker::setValue(const Color &val) { this->color = val; }
 
-Color ColorValue::getValue() { return color; }
+Color ColorPicker::getValue() { return color; }
 
-void ColorValue::draw() {
-	auto &rend = render->as<ColorValueRender>();
+void ColorPicker::draw() {
+	auto &rend = render->as<ColorPickerRender>();
 
 	DrawRectangleRec(rect, color);
 	DrawRectangleLinesEx(rect, rend.border, rend.currentBorderColor);

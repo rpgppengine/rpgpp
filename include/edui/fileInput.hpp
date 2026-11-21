@@ -1,5 +1,5 @@
-#ifndef _EDUI_FILEVALUE_H
-#define _EDUI_FILEVALUE_H
+#ifndef _EDUI_FILEINPUT_H
+#define _EDUI_FILEINPUT_H
 
 #include <filesystem>
 #include <memory>
@@ -7,24 +7,34 @@
 #include "edui/button.hpp"
 #include "edui/container.hpp"
 #include "edui/fileChooser.hpp"
-#include "edui/valuewidget.hpp"
 namespace edui {
 struct FileOption {
 	std::string fullPath;
 	bool filled = false;
 
+	FileOption() {}
+	FileOption(const std::string &path) {
+		filled = !fullPath.empty();
+		fullPath = path;
+	}
+	FileOption(const std::string &path, bool filled) {
+		fullPath = path;
+		this->filled = filled;
+	}
+
 	operator bool() { return filled; }
 };
 
-struct FileValueRender : public ContainerRender {};
+struct FileInputRender : public ContainerRender {};
 
-struct FileValue : public Container, public ValueWidgetT<FileOption> {
+struct FileInput : public Container {
+	SignalT2<FileOption, FileOption> onValueChanged;
 	Signal fileValueEmptied;
 
-	void setValue(const FileOption &newValue) override;
-	FileOption getValue() override;
+	void setValue(const FileOption &newValue);
+	FileOption getValue();
 
-	FileValue();
+	FileInput();
 	void translate() override;
 
 	void setEmpty();

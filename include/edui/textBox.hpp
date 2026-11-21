@@ -5,7 +5,6 @@
 #include <string_view>
 
 #include "edui/label.hpp"
-#include "edui/valuewidget.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
 
@@ -19,12 +18,14 @@ struct SelectionResult {
 struct TextBoxRender : public LabelRender {};
 
 /* A widget which displays text and allows input. */
-struct TextBox : public Widget, public ValueWidgetT<std::string> {
+struct TextBox : public Widget {
+	SignalT2<std::string, std::string> onValueChanged;
+
 	const float CursorWidth = 4.0f;
 	const short DebounceFrames = 5;
 
-	void setValue(const std::string &text) override;
-	std::string getValue() override;
+	void setValue(const std::string &text);
+	std::string getValue();
 
 	TextBox();
 	void update() override;

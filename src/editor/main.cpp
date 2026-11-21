@@ -13,8 +13,8 @@
 #include "edui/childWindow.hpp"
 #include "edui/codeEdit.hpp"
 #include "edui/colorPanel.hpp"
+#include "edui/colorPicker.hpp"
 #include "edui/colorRect.hpp"
-#include "edui/colorValue.hpp"
 #include "edui/colorWheel.hpp"
 #include "edui/confirmDialog.hpp"
 #include "edui/container.hpp"
@@ -22,21 +22,21 @@
 #include "edui/dropdown.hpp"
 #include "edui/dropdownList.hpp"
 #include "edui/fileChooser.hpp"
+#include "edui/fileInput.hpp"
 #include "edui/fileTabBar.hpp"
-#include "edui/fileValue.hpp"
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/horizontalContainer.hpp"
 #include "edui/horizontalScrollbar.hpp"
 #include "edui/iconTextButton.hpp"
 #include "edui/imageRect.hpp"
-#include "edui/intValue.hpp"
 #include "edui/intValueTextBox.hpp"
 #include "edui/label.hpp"
 #include "edui/languageDropdown.hpp"
 #include "edui/listView.hpp"
 #include "edui/menuBar.hpp"
 #include "edui/messageBox.hpp"
+#include "edui/numberInput.hpp"
 #include "edui/raygui_subset.hpp"
 #include "edui/slider.hpp"
 #include "edui/tabBar.hpp"
@@ -45,7 +45,7 @@
 #include "edui/textEdit.hpp"
 #include "edui/toggleButton.hpp"
 #include "edui/toggleGroup.hpp"
-#include "edui/vector2Value.hpp"
+#include "edui/vector2Input.hpp"
 #include "edui/verticalContainer.hpp"
 #include "edui/verticalScrollbar.hpp"
 #include "edui/widget.hpp"
@@ -145,7 +145,7 @@ int main() {
 	// gui.add(textEdit);
 	textEdit->setText("print('hello')");
 
-	auto colorValue = std::make_shared<edui::ColorValue>();
+	auto colorValue = std::make_shared<edui::ColorPicker>();
 	colorValue->setPosition({0, 350}, {0, 300});
 	colorValue->setSize({0, 50}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
 	colorValue->onValueChanged([](Color old, Color newColor) {
@@ -269,7 +269,7 @@ int main() {
 	fileChooser->onFileChosen.connect([](std::string chosenPath) { printf("%s \n", chosenPath.c_str()); });
 	// gui.add(fileChooser);
 
-	auto fileValue = std::make_shared<edui::FileValue>();
+	auto fileValue = std::make_shared<edui::FileInput>();
 	fileValue->setSize({0, 150}, {0, static_cast<int>(edui::EDUI_SECONDARY_HEIGHT)});
 	fileValue->addImagesCategory();
 	fileValue->addFontCategory();

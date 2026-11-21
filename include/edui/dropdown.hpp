@@ -5,7 +5,6 @@
 
 #include "edui/dropdownList.hpp"
 #include "edui/label.hpp"
-#include "edui/valuewidget.hpp"
 #include "edui/widget.hpp"
 
 namespace edui {
@@ -17,7 +16,9 @@ struct DropdownValue {
 struct DropdownRender : public LabelRender {};
 
 /* A widget which displays a dropdown element. */
-struct Dropdown : public Widget, public ValueWidgetT<DropdownValue> {
+struct Dropdown : public Widget {
+	SignalT2<DropdownValue, DropdownValue> onValueChanged;
+
 	static const int EDUI_DROPDOWN_MAX = 20;
 
 	std::weak_ptr<edui::DropdownList> listPtr = {};
@@ -25,8 +26,8 @@ struct Dropdown : public Widget, public ValueWidgetT<DropdownValue> {
 	Dropdown();
 	void applyTheme(const mINI::INIStructure &struc) override;
 
-	virtual void setValue(const DropdownValue &val) override;
-	virtual DropdownValue getValue() override;
+	virtual void setValue(const DropdownValue &val);
+	virtual DropdownValue getValue();
 
 	int currentItem = 0;
 	int lastItem = 0;

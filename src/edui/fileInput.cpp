@@ -1,4 +1,4 @@
-#include "edui/fileValue.hpp"
+#include "edui/fileInput.hpp"
 
 #include <memory>
 
@@ -8,15 +8,14 @@
 #include "edui/gui.hpp"
 #include "edui/iconButton.hpp"
 #include "edui/label.hpp"
-#include "edui/raygui_subset.hpp"
 #include "raylib.h"
 
 using namespace edui;
 
 static const std::string builtinTranslation = "Widgets.FileChooser";
 
-FileValue::FileValue() : Container() {
-	render = std::make_unique<FileValueRender>();
+FileInput::FileInput() : Container() {
+	render = std::make_unique<FileInputRender>();
 	button = std::make_shared<Button>();
 	button->setSize({1, static_cast<int>(-EDUI_SECONDARY_HEIGHT)}, {1, 0});
 	button->render->as<LabelRender>().vertAlign = VerticalAlignment::TEXT_CENTER;
@@ -33,7 +32,7 @@ FileValue::FileValue() : Container() {
 	setEmpty();
 }
 
-void FileValue::translate() {
+void FileInput::translate() {
 	Container::translate();
 	if (!file.filled) {
 		if (!dirSelection) {
@@ -44,17 +43,17 @@ void FileValue::translate() {
 	}
 }
 
-void FileValue::setValue(const FileOption &newValue) { this->file = newValue; }
+void FileInput::setValue(const FileOption &newValue) { this->file = newValue; }
 
-FileOption FileValue::getValue() { return file; }
+FileOption FileInput::getValue() { return file; }
 
-void FileValue::setEmpty() {
+void FileInput::setEmpty() {
 	file.filled = false;
 	translate();
 	fileValueEmptied.invoke();
 }
 
-void FileValue::setFromPath(const std::string &fullPath) {
+void FileInput::setFromPath(const std::string &fullPath) {
 	bool isFile = IsPathFile(fullPath.c_str()) && !dirSelection;
 	bool isDirectory = DirectoryExists(fullPath.c_str()) && dirSelection;
 	if (isFile || isDirectory) {
@@ -68,7 +67,7 @@ void FileValue::setFromPath(const std::string &fullPath) {
 	}
 }
 
-void FileValue::addCategory(const std::string &title, std::vector<std::string> extensions, int iconId) {
+void FileInput::addCategory(const std::string &title, std::vector<std::string> extensions, int iconId) {
 	FileCategory category;
 	category.title = title;
 	for (int i = 0;
@@ -81,25 +80,25 @@ void FileValue::addCategory(const std::string &title, std::vector<std::string> e
 	categories.push_back(category);
 }
 
-void FileValue::addImagesCategory() { addCategory("Images", {".png", ".jpg"}, ICON_FILETYPE_IMAGE); }
+void FileInput::addImagesCategory() { addCategory("Images", {".png", ".jpg"}, ICON_FILETYPE_IMAGE); }
 
-void FileValue::addTextCategory() { addCategory("Text file", {".txt"}, ICON_FILETYPE_TEXT); }
+void FileInput::addTextCategory() { addCategory("Text file", {".txt"}, ICON_FILETYPE_TEXT); }
 
-void FileValue::addAudioCategory() { addCategory("Audio", {".wav", ".mp4", ".ogg"}, ICON_FILETYPE_AUDIO); }
+void FileInput::addAudioCategory() { addCategory("Audio", {".wav", ".mp4", ".ogg"}, ICON_FILETYPE_AUDIO); }
 
-void FileValue::addFontCategory() { addCategory("Font", {".ttf", ".otf"}, ICON_FILETYPE_FONT); }
+void FileInput::addFontCategory() { addCategory("Font", {".ttf", ".otf"}, ICON_FILETYPE_FONT); }
 
-void FileValue::setDirSelection(bool val) {
+void FileInput::setDirSelection(bool val) {
 	this->dirSelection = val;
 	translate();
 }
 
-void FileValue::lockBasePath(const std::filesystem::path &basePath) {
+void FileInput::lockBasePath(const std::filesystem::path &basePath) {
 	this->basePath = basePath;
 	useBasePath = true;
 }
 
-void FileValue::onButtonClicked() {
+void FileInput::onButtonClicked() {
 	auto fileDialog = std::make_shared<FileChooser>();
 	fileDialog->setSize({0, FILE_CHOOSER_WIDTH}, {0, FILE_CHOOSER_HEIGHT});
 	fileDialog->onFileChosen.connect([this](std::string fullPath) { setFromPath(fullPath); });

@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "edui/confirmDialog.hpp"
-#include "edui/fileValue.hpp"
+#include "edui/fileInput.hpp"
 #include "edui/textBox.hpp"
 
 namespace editor {
@@ -13,7 +13,7 @@ struct NewProjectWindow : public edui::ConfirmDialog {
 
 private:
 	std::shared_ptr<edui::TextBox> titleBox = nullptr;
-	std::shared_ptr<edui::FileValue> dirValue = nullptr;
+	std::shared_ptr<edui::FileInput> dirValue = nullptr;
 	bool isValid();
 	void onOkButton();
 };

@@ -8,9 +8,9 @@
 #include "edui/colorWheel.hpp"
 #include "edui/confirmDialog.hpp"
 #include "edui/contextMenu.hpp"
-#include "edui/intValue.hpp"
 #include "edui/label.hpp"
 #include "edui/messageBox.hpp"
+#include "edui/numberInput.hpp"
 #include "edui/signal.hpp"
 #include "edui/slider.hpp"
 
@@ -27,13 +27,13 @@ struct ColorPanel : public ConfirmDialog {
 	std::shared_ptr<edui::Label> hexLabel = nullptr;
 
 	std::shared_ptr<edui::Slider> redSlider = nullptr;
-	std::shared_ptr<edui::IntValue> redValue = nullptr;
+	std::shared_ptr<edui::NumberInput> redValue = nullptr;
 
 	std::shared_ptr<edui::Slider> greenSlider = nullptr;
-	std::shared_ptr<edui::IntValue> greenValue = nullptr;
+	std::shared_ptr<edui::NumberInput> greenValue = nullptr;
 
 	std::shared_ptr<edui::Slider> blueSlider = nullptr;
-	std::shared_ptr<edui::IntValue> blueValue = nullptr;
+	std::shared_ptr<edui::NumberInput> blueValue = nullptr;
 
 	std::shared_ptr<edui::ColorRect> colorRect = nullptr;
 

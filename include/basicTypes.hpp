@@ -62,6 +62,10 @@ struct FontRef {
 	std::string path = "";
 	Font font;
 	int fontSize = 13;
+
+	FontRef() {}
+	FontRef(const std::string &path) { this->path = path; }
+
 	template <class Archive>
 	void serialize(Archive &a) {
 		a(CEREAL_NVP(path), CEREAL_NVP(fontSize));
@@ -72,6 +76,10 @@ struct ImageRef {
 	std::string path = "";
 	Texture texture;
 	int scale = 1;
+
+	ImageRef() {}
+	ImageRef(const std::string &path) { this->path = path; }
+
 	void scaleImage(int newScale) {
 		this->scale = newScale;
 		auto loadedImage = LoadImage(TextFormat("images/%s", path.c_str()));
@@ -131,6 +139,10 @@ enum TextAlignment {
 struct VerticalAlignment {
 	TextAlignment val = TEXT_ALIGN_TOP;
 
+	VerticalAlignment() {};
+
+	VerticalAlignment(int i) { val = static_cast<TextAlignment>(i); }
+
 	template <class Archive>
 	void serialize(Archive &a) {
 		a(val);
@@ -139,6 +151,10 @@ struct VerticalAlignment {
 
 struct HorizontalAlignment {
 	TextAlignment val = TEXT_ALIGN_LEFT;
+
+	HorizontalAlignment() {};
+
+	HorizontalAlignment(int i) { val = static_cast<TextAlignment>(i); }
 
 	template <class Archive>
 	void serialize(Archive &a) {
@@ -162,7 +178,7 @@ enum ElementPropertyType {
 typedef std::vector<std::string> StringVector;
 
 typedef std::variant<int, bool, std::string, Rectangle, Color, FontRef, ImageRef, VerticalAlignment,
-					 HorizontalAlignment, UIElementRef, NPatchInfo, InputC, StringVector>
+					 HorizontalAlignment, UIElementRef, NPatchInfo, InputC, StringVector, Vector2>
 	ElementProperty;
 
 struct Event {

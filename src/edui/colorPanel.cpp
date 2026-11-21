@@ -10,7 +10,7 @@
 #include "edui/contextMenu.hpp"
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
-#include "edui/intValue.hpp"
+#include "edui/numberInput.hpp"
 #include "edui/label.hpp"
 #include "edui/messageBox.hpp"
 #include "edui/slider.hpp"
@@ -113,7 +113,7 @@ void ColorPanel::initValueWidgets() {
 	});
 	add(redSlider);
 
-	redValue = std::make_shared<edui::IntValue>();
+	redValue = std::make_shared<edui::NumberInput>();
 	redValue->intval->max = 255;
 	redValue->setPosition({1, -75}, {0, 2});
 	redValue->setSize({0, 75}, {0, static_cast<int>(EDUI_SECONDARY_HEIGHT)});
@@ -140,7 +140,7 @@ void ColorPanel::initValueWidgets() {
 	});
 	add(greenSlider);
 
-	greenValue = std::make_shared<edui::IntValue>();
+	greenValue = std::make_shared<edui::NumberInput>();
 	greenValue->intval->max = 255;
 	greenValue->setPosition({1, -75}, {0, static_cast<int>(2 + EDUI_SECONDARY_HEIGHT + 4)});
 	greenValue->setSize({0, 75}, {0, static_cast<int>(EDUI_SECONDARY_HEIGHT)});
@@ -167,7 +167,7 @@ void ColorPanel::initValueWidgets() {
 	});
 	add(blueSlider);
 
-	blueValue = std::make_shared<edui::IntValue>();
+	blueValue = std::make_shared<edui::NumberInput>();
 	blueValue->intval->max = 255;
 	blueValue->setPosition({1, -75}, {0, static_cast<int>(2 + EDUI_SECONDARY_HEIGHT * 2) + 8});
 	blueValue->setSize({0, 75}, {0, static_cast<int>(EDUI_SECONDARY_HEIGHT)});

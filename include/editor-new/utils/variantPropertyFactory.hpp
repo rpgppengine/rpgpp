@@ -10,9 +10,10 @@
 #include "basicTypes.hpp"
 #include "edui/container.hpp"
 #include "edui/widget.hpp"
+#include "widgets/values/valuewidget.hpp"
 namespace editor {
 struct VarFactoryData {
-	std::function<std::shared_ptr<edui::Widget>()> instantiate;
+	std::function<std::shared_ptr<ValueWidget>()> instantiate;
 };
 
 class VariantPropertyFactory {

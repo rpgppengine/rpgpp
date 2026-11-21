@@ -1,4 +1,4 @@
-#include "edui/intValue.hpp"
+#include "edui/numberInput.hpp"
 
 #include <memory>
 
@@ -12,7 +12,7 @@
 
 using namespace edui;
 
-IntValue::IntValue() : Container() {
+NumberInput::NumberInput() : Container() {
 	render = std::make_unique<IntValueRender>();
 
 	intval = std::make_shared<edui::IntValueTextBox>();
@@ -46,11 +46,11 @@ IntValue::IntValue() : Container() {
 	add(decButton);
 }
 
-void IntValue::setValue(const int &val) { intval->setInt(val); }
+void NumberInput::setValue(const int &val) { intval->setInt(val); }
 
-int IntValue::getValue() { return intval->getInt(); }
+int NumberInput::getValue() { return intval->getInt(); }
 
-void IntValue::draw() {
+void NumberInput::draw() {
 	auto &rend = render->as<ContainerRender>();
 
 	Container::draw();

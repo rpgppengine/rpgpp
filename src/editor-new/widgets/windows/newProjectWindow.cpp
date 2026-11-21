@@ -6,7 +6,7 @@
 #include "Str.h"
 #include "editor.hpp"
 #include "edui/confirmDialog.hpp"
-#include "edui/fileValue.hpp"
+#include "edui/fileInput.hpp"
 #include "edui/gui.hpp"
 #include "edui/helper.hpp"
 #include "edui/label.hpp"
@@ -52,7 +52,7 @@ NewProjectWindow::NewProjectWindow() : edui::ConfirmDialog() {
 	dirLabel->setText("Folder");
 	vertLayout->add(dirLabel);
 
-	dirValue = std::make_shared<edui::FileValue>();
+	dirValue = std::make_shared<edui::FileInput>();
 	dirValue->setSize({1, 0}, {0, edui::EDUI_SECONDARY_HEIGHT});
 	dirValue->setDirSelection();
 	vertLayout->add(dirValue);

@@ -1,37 +1,37 @@
-#include "edui/vector2Value.hpp"
+#include "edui/vector2Input.hpp"
 
 #include <memory>
 
 #include "edui/container.hpp"
-#include "edui/intValue.hpp"
+#include "edui/numberInput.hpp"
 #include "raylib.h"
 
 using namespace edui;
 
-Vector2Value::Vector2Value() : Container() {
-	render = std::make_unique<Vector2ValueRender>();
+Vector2Input::Vector2Input() : Container() {
+	render = std::make_unique<Vector2InputRender>();
 	render->border = 0;
 
-	valX = std::make_shared<IntValue>();
+	valX = std::make_shared<NumberInput>();
 	valX->setSize({0.5f, -2}, {1, 0});
 
 	add(valX);
 
-	valY = std::make_shared<IntValue>();
+	valY = std::make_shared<NumberInput>();
 	valY->setPosition({0.5f, 2}, {0, 0});
 	valY->setSize({0.5f, -2}, {1, 0});
 
 	add(valY);
 
-	std::weak_ptr<IntValue> weakX = valX;
-	std::weak_ptr<IntValue> weakY = valY;
+	std::weak_ptr<NumberInput> weakX = valX;
+	std::weak_ptr<NumberInput> weakY = valY;
 
 	valX->onValueChanged.connect([this, weakY](int oldX, int newX) {
 		if (auto sharedY = weakY.lock()) {
 			int y = sharedY->getValue();
 
 			this->onValueChanged.invoke({static_cast<float>(oldX), static_cast<float>(y)},
-										 {static_cast<float>(newX), static_cast<float>(y)});
+										{static_cast<float>(newX), static_cast<float>(y)});
 		}
 	});
 
@@ -40,17 +40,17 @@ Vector2Value::Vector2Value() : Container() {
 			int x = sharedX->getValue();
 
 			this->onValueChanged.invoke({static_cast<float>(x), static_cast<float>(oldY)},
-										 {static_cast<float>(x), static_cast<float>(newY)});
+										{static_cast<float>(x), static_cast<float>(newY)});
 		}
 	});
 }
 
-void Vector2Value::setValue(const Vector2 &val) {
+void Vector2Input::setValue(const Vector2 &val) {
 	valX->setValue(val.x);
 	valY->setValue(val.y);
 }
 
-Vector2 Vector2Value::getValue() {
+Vector2 Vector2Input::getValue() {
 	float x = valX->getValue();
 	float y = valY->getValue();
 

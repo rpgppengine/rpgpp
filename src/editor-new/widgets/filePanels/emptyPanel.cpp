@@ -4,7 +4,7 @@
 
 #include "basicTypes.hpp"
 #include "editor.hpp"
-#include "edui/fileValue.hpp"
+#include "edui/fileInput.hpp"
 #include "edui/gui.hpp"
 #include "edui/label.hpp"
 #include "widgets/filePanels/filePanel.hpp"
@@ -20,7 +20,7 @@ EmptyPanel::EmptyPanel() : FilePanel() {
 	label->render->as<edui::LabelRender>().vertAlign = edui::VerticalAlignment::TEXT_CENTER;
 	add(label);
 
-	auto fileValue = std::make_shared<edui::FileValue>();
+	auto fileValue = std::make_shared<edui::FileInput>();
 	fileValue->setSize({0, 100}, {0, edui::EDUI_SECONDARY_HEIGHT});
 	fileValue->addImagesCategory();
 	fileValue->lockBasePath(Editor::getInstance().getResources().getProject().getBasePath());
@@ -31,5 +31,8 @@ EmptyPanel::EmptyPanel() : FilePanel() {
 	add(propertyList);
 
 	ElementProperty prop = 1;
-	propertyList->addProperty(prop);
+	propertyList->addProperty("property", prop);
+
+	ElementProperty prop2 = false;
+	propertyList->addProperty("check", prop2);
 }
