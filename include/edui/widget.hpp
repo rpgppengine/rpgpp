@@ -208,14 +208,14 @@ struct Widget {
 
 	/* Called when the widget has been clicked with the left mouse button. */
 	virtual void leftMouseClicked() {
-		if (!disabled) {
+		if (!disabled && visible) {
 			onClicked.invoke();
 		}
 	}
 
 	/* Called when the widget has been clicked with the right mouse button. */
 	virtual void rightMouseClicked() {
-		if (!disabled) {
+		if (!disabled && visible) {
 			onRightClicked.invoke();
 		}
 	}

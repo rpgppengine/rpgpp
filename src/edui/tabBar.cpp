@@ -235,3 +235,12 @@ void TabBar::showLastTab() {
 	int referId = it->get()->referId;
 	showTabContent(referId);
 }
+
+std::shared_ptr<TabPage> TabBar::getPage() {
+	std::shared_ptr<TabPage> res = nullptr;
+	if (auto sharedBase = contentBase.lock()) {
+		auto widget = sharedBase->getWidgetById(currentPage);
+		res = std::dynamic_pointer_cast<TabPage>(widget);
+	}
+	return res;
+}

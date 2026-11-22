@@ -1,5 +1,6 @@
 #include "services/interface.hpp"
 
+#include <cstddef>
 #include <memory>
 
 #include "editor.hpp"
@@ -45,25 +46,43 @@ void Interface::initEduiSettings() {
 void Interface::initMenuBar() {
 	auto menuBar = std::make_shared<edui::MenuBar>();
 	menuBar->translationId = "Menu";
-	menuBar->addItem("file", {"open", "new"});
-	menuBar->addItem("edit", {"one, two"});
+	menuBar->addItem("file", {"open", "new", "save file"});
+	menuBar->addItem("edit", {"undo", "redo"});
 	menuBar->onItemClicked.connect(
 		[](const std::string &title, const std::string &option) { printf("%s %s \n", title.c_str(), option.c_str()); });
-	menuBar->onItemClickedInt.connect([](size_t a, size_t b) {
+	menuBar->onItemClickedInt.connect([this](size_t a, size_t b) {
 		printf("%zu %zu \n", a, b);
 		if (a == 0) {
-			switch (b) {
-				case 0: {
-					Editor::getInstance().getResources().onOpenProject();
-				} break;
-				case 1: {
-					Editor::getInstance().getResources().onNewProject();
-				} break;
-			}
+			handleFileMenu(b);
+		}
+		if (a == 1) {
+			handleEditMenu(b);
 		}
 	});
 
 	gui.addMenuBar(menuBar);
+}
+
+void Interface::handleFileMenu(size_t option) {
+	switch (option) {
+		case 0: {
+			Editor::getInstance().getResources().onOpenProject();
+		} break;
+		case 1: {
+			Editor::getInstance().getResources().onNewProject();
+		} break;
+		case 2: {
+			getViewerPanel()->getCurrent()->saveFile();
+		} break;
+	}
+}
+
+void Interface::handleEditMenu(size_t option) {
+	switch (option) {
+		case 0: {
+			getViewerPanel()->getCurrent()->undo();
+		} break;
+	}
 }
 
 void Interface::initMainScreen() {

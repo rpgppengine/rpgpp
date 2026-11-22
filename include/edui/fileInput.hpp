@@ -38,7 +38,7 @@ struct FileInput : public Container {
 	void translate() override;
 
 	void setEmpty();
-	void setFromPath(const std::string &fullPath);
+	void setFromPath(const std::string &fullPath, bool signal = true);
 
 	void addCategory(const std::string &title, std::vector<std::string> extensions, int iconId);
 

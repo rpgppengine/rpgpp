@@ -4,9 +4,9 @@
 
 #include "editor.hpp"
 #include "edui/container.hpp"
+#include "edui/fileTab.hpp"
 #include "edui/fileTabBar.hpp"
 #include "edui/gui.hpp"
-#include "edui/tabPage.hpp"
 #include "raylib.h"
 #include "resource.hpp"
 #include "services/interface.hpp"
@@ -27,18 +27,6 @@ ViewerPanel::ViewerPanel() : edui::Container() {
 	tabsBar->contentBase = content;
 	tabsBar->setSize({1, 0}, {0, edui::EDUI_SECONDARY_HEIGHT});
 
-	tabsBar->onActiveTabChanged.connect([this](int previous, int newId) {
-		/*
-		auto containerPrevious = tabsBar->getWidgetById(previous);
-		FilePanel &panelPrevious = containerPrevious->as<edui::Container>().getWidgetById(1)->as<FilePanel>();
-		panelPrevious.onClose();
-
-		auto container = tabsBar->getWidgetById(newId);
-		FilePanel &panel = container->as<edui::Container>().getWidgetById(1)->as<FilePanel>();
-		panel.onOpen();
-		*/
-	});
-
 	add(tabsBar);
 }
 
@@ -58,6 +46,7 @@ void ViewerPanel::openFile(const std::string &fullPath) {
 		std::string fileName = GetFileName(fullPath.c_str());
 		auto fileContent = tabsBar->addItem(fileName, category.iconId);
 		fileContent->render->border = 0;
+		int refer = fileContent->referId;
 
 		auto panel = factory.createPanel();
 		panel->referId = 1;
@@ -67,14 +56,21 @@ void ViewerPanel::openFile(const std::string &fullPath) {
 		panel->setSourcePath(fullPath);
 		panel->setResource(std::move(ptr));
 		panel->init();
-
-		std::weak_ptr<FilePanel> weakPanel = panel;
-		fileContent->onClose.connect([weakPanel] {
-			if (auto sharedPanel = weakPanel.lock()) {
-				sharedPanel->onClose();
-			}
+		panel->dirty.connect([this, refer](bool dirty) {
+			auto &tab = tabsBar->getWidgetById(refer)->as<edui::FileTab>();
+			tab.setDirty(dirty);
+			tabsBar->updateWidgets();
 		});
 
 		tabsBar->unfocused();
 	}
+}
+
+std::shared_ptr<FilePanel> ViewerPanel::getCurrent() {
+	std::shared_ptr<FilePanel> res = nullptr;
+	auto ptr = tabsBar->getPage();
+	if (ptr != nullptr) {
+		res = std::dynamic_pointer_cast<FilePanel>(ptr->getWidgetById(1));
+	}
+	return res;
 }

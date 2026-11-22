@@ -45,7 +45,7 @@ void FileInput::translate() {
 
 void FileInput::setValue(const FileOption &newValue) {
 	this->file = newValue;
-	setFromPath(file.fullPath);
+	setFromPath(file.fullPath, false);
 }
 
 FileOption FileInput::getValue() { return file; }
@@ -56,7 +56,7 @@ void FileInput::setEmpty() {
 	fileValueEmptied.invoke();
 }
 
-void FileInput::setFromPath(const std::string &fullPath) {
+void FileInput::setFromPath(const std::string &fullPath, bool signal) {
 	bool isFile = IsPathFile(fullPath.c_str()) && !dirSelection;
 	bool isDirectory = DirectoryExists(fullPath.c_str()) && dirSelection;
 	if (isFile || isDirectory) {
@@ -66,7 +66,9 @@ void FileInput::setFromPath(const std::string &fullPath) {
 		file.filled = true;
 		button->setText(GetFileName(fullPath.c_str()));
 
-		onValueChanged.invoke(oldFile, file);
+		if (signal) {
+			onValueChanged.invoke(oldFile, file);
+		}
 	}
 }
 

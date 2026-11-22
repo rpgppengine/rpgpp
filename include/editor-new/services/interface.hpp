@@ -1,6 +1,7 @@
 #ifndef _EDITOR_SERVICES_INTERFACE_H
 #define _EDITOR_SERVICES_INTERFACE_H
 
+#include <cstddef>
 #include <memory>
 #include <string>
 
@@ -37,6 +38,9 @@ private:
 	void initEduiSettings();
 	void initMenuBar();
 	void initMainScreen();
+
+	void handleFileMenu(size_t option);
+	void handleEditMenu(size_t option);
 };
 }  // namespace editor
 

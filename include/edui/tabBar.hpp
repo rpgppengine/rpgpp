@@ -46,6 +46,8 @@ struct TabBar : public HorizontalContainer {
 	void showFirstTab();
 	void showLastTab();
 
+	std::shared_ptr<TabPage> getPage();
+
 protected:
 	int currentPage = 0;
 };

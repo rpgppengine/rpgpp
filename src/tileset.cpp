@@ -22,6 +22,10 @@ void TileSet::afterLoad() {
 }
 
 void TileSet::loadFile() {
+	if (IsTextureValid(texture)) {
+		UnloadTexture(texture);
+	}
+
 	auto img = LoadImage(textureSource.c_str());
 	if (!IsImageValid(img)) {
 		TraceLog(TraceLogLevel::LOG_WARNING, "Loaded Image %s is invalid", textureSource.c_str());
@@ -83,7 +87,7 @@ std::string TileSet::getSource() const { return this->source; }
 
 void TileSet::setTextureSource(const std::string &source) {
 	this->textureSource = source;
-	this->texture = LoadTexture(source.c_str());
+	// this->texture = LoadTexture(source.c_str());
 }
 
 bool TileSet::areAtlasCoordsValid(Vector2 atlasCoords) const {

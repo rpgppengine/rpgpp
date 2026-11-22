@@ -117,6 +117,7 @@ std::shared_ptr<TabPage> FileTabBar::addItem(const std::string &item, int iconId
 	add(button);
 	showActiveTab(newReferId);
 	showTabContent(newReferId);
+	currentPage = newReferId;
 
 	if (auto sharedContentBase = contentBase.lock()) {
 		tabPages.push_back(content);

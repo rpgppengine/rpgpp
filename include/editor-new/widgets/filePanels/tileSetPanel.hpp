@@ -13,13 +13,14 @@ class TileSetPanel : public FilePanel {
 public:
 	TileSetPanel();
 	void init() override;
-	virtual void onOpen() override;
-	virtual void onClose() override;
+	void refresh() override;
 
 private:
 	const int PROPERTIES_WIDTH = 350;
 	std::shared_ptr<PropertyList> properties;
 	std::shared_ptr<TileSetCanvas> canvas;
+
+	void initTexture();
 };
 }  // namespace editor
 
