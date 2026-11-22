@@ -43,7 +43,10 @@ void FileInput::translate() {
 	}
 }
 
-void FileInput::setValue(const FileOption &newValue) { this->file = newValue; }
+void FileInput::setValue(const FileOption &newValue) {
+	this->file = newValue;
+	setFromPath(file.fullPath);
+}
 
 FileOption FileInput::getValue() { return file; }
 

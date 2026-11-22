@@ -2,7 +2,6 @@
 #define _RESOURCE_H
 
 #include <filesystem>
-
 class Resource {
 public:
 	int typeId = 0;
@@ -11,6 +10,8 @@ public:
 
 	virtual void afterLoad() {};
 	virtual void beforeSave() {};
+
+	virtual void loadFile() {};
 
 	template <typename T>
 	T &as() {

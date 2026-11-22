@@ -10,12 +10,13 @@
 #include "edui/horizontalContainer.hpp"
 #include "edui/iconButton.hpp"
 #include "edui/signal.hpp"
+#include "edui/tabPage.hpp"
 
 namespace edui {
 struct TabBarRender : public HorizontalContainerRender {};
 
 struct TabBar : public HorizontalContainer {
-	SignalT<int> onActiveTabChanged;
+	SignalT2<int, int> onActiveTabChanged;
 	Signal onEmptied;
 
 	std::weak_ptr<Container> contentBase;
@@ -39,7 +40,7 @@ struct TabBar : public HorizontalContainer {
 	void leftMouseClicked() override;
 	void leftMouseReleased() override;
 
-	virtual std::shared_ptr<Container> addItem(const std::string &item, int iconId);
+	virtual std::shared_ptr<TabPage> addItem(const std::string &item, int iconId);
 	void removeItem(int index);
 	void showTabContent(int index);
 	void showFirstTab();

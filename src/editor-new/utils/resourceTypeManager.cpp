@@ -16,6 +16,7 @@
 #include "room.hpp"
 #include "tileset.hpp"
 #include "widgets/filePanels/emptyPanel.hpp"
+#include "widgets/filePanels/tileSetPanel.hpp"
 
 using namespace editor;
 
@@ -39,7 +40,7 @@ void ResourceTypeManager::addDefaults() {
 	addCategory("Script", {".lua"}, ICON_FILETYPE_CODE_XML);
 
 	// factories
-	addT<TileSet, EmptyPanel>("TileSet", RPGPP_RESOURCE_TILESET);
+	addT<TileSet, TileSetPanel>("TileSet", RPGPP_RESOURCE_TILESET);
 	addT<Room, EmptyPanel>("Room", RPGPP_RESOURCE_ROOM);
 	addT<Actor, EmptyPanel>("Actor", RPGPP_RESOURCE_ACTOR);
 	addT<Prop, EmptyPanel>("Prop", RPGPP_RESOURCE_PROP);

@@ -13,7 +13,7 @@
 using namespace editor;
 
 EmptyPanel::EmptyPanel() : FilePanel() {
-	auto label = std::make_shared<edui::Label>();
+	label = std::make_shared<edui::Label>();
 	label->setText("EmptyPanel");
 	label->setSize({1, 0}, {1, 0});
 	label->render->as<edui::LabelRender>().horiAlign = edui::HorizontalAlignment::TEXT_MIDDLE;
@@ -31,8 +31,10 @@ EmptyPanel::EmptyPanel() : FilePanel() {
 	add(propertyList);
 
 	ElementProperty prop = 1;
-	propertyList->addProperty("property", prop);
+	propertyList->addPropertyVar("property", prop);
 
 	ElementProperty prop2 = false;
-	propertyList->addProperty("check", prop2);
+	propertyList->addPropertyVar("check", prop2);
 }
+
+void EmptyPanel::init() { label->setText(sourcePath); }

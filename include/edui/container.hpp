@@ -49,6 +49,7 @@ struct Container : public Widget {
 	void deleteChildren();
 
 	void setLayerId(int layerId);
+	void setVisible(bool visible);
 
 protected:
 	void drawChildren();

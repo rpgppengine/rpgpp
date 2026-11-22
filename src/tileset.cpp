@@ -18,6 +18,16 @@ void TileSet::afterLoad() {
 		TraceLog(TraceLogLevel::LOG_WARNING, "Loaded Image %s is invalid", textureSource.c_str());
 	}
 	texture = LoadTextureFromImage(img);
+	UnloadImage(img);
+}
+
+void TileSet::loadFile() {
+	auto img = LoadImage(textureSource.c_str());
+	if (!IsImageValid(img)) {
+		TraceLog(TraceLogLevel::LOG_WARNING, "Loaded Image %s is invalid", textureSource.c_str());
+	}
+	texture = LoadTextureFromImage(img);
+	UnloadImage(img);
 }
 
 TileSet::TileSet(const std::string &textureSource, Vector2 tileSize) : TileSet() {

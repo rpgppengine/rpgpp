@@ -64,11 +64,6 @@ public:
 				return ptr;
 			};
 			data.load = [](std::filesystem::path fpath, std::unique_ptr<Resource> &out) {
-				printf("fpath: %s \n", fpath.c_str());
-				/*
-				out = std::make_unique<T>();
-				out->loadFile(fpath);
-				*/
 				std::ifstream stream(fpath);
 
 				out = std::make_unique<T>();

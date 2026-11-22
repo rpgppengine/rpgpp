@@ -30,6 +30,8 @@ struct IVector {
 
 	Vector2 toFloat() const { return {static_cast<float>(x), static_cast<float>(y)}; }
 
+	bool valid() const { return (x >= 0) && (y >= 0); }
+
 	template <class Archive>
 	void serialize(Archive &a) {
 		a(CEREAL_NVP(x), CEREAL_NVP(y));

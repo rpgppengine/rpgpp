@@ -14,7 +14,7 @@ struct FileTabBar : public TabBar {
 	void update() override;
 	void draw() override;
 
-	std::shared_ptr<Container> addItem(const std::string &item, int iconId) override;
+	std::shared_ptr<TabPage> addItem(const std::string &item, int iconId) override;
 	void showActiveTab(int index);
 	void setDirty(int id, bool dirty);
 

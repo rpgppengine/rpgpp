@@ -166,10 +166,10 @@ void Gui::update() {
 		}
 	}
 
-	if (auto middlePtr = leftClickedWidget.lock()) {
+	if (auto middlePtr = middleClickedWidget.lock()) {
 		if (!middlePtr->deleteFlag) {
 			if (IsMouseButtonReleased(MOUSE_MIDDLE_BUTTON)) {
-				middlePtr->leftMouseReleased();
+				middlePtr->middleMouseReleased();
 			}
 		}
 	}

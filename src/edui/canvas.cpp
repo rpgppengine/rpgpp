@@ -59,31 +59,39 @@ void Canvas::drawCanvas() {
 	DrawRectangleRec({0, 0, 50, 50}, GREEN);
 }
 
-void Canvas::drawOverlay() { DrawFPS(4, 4); }
+void Canvas::drawOverlay() {}
+
+void Canvas::drawFPS() { DrawFPS(4, 4); }
 
 void Canvas::mouseMoved(Vector2 mousePos, Vector2 relative) {
+	if (!visible) return;
+
 	auto widgetPos = {rect.x, rect.y};
 	Vector2 mouseDelta = GetMouseDelta();
 	Vector2 cameraMoveScale = Vector2Scale(mouseDelta, -1 / camera.zoom);
 
 	mouseWorldPos = GetScreenToWorld2D(relative, camera);
 
-	if (mouseMiddleButton) {
+	if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
 		camera.target = Vector2Add(camera.target, cameraMoveScale);
 	}
 }
 
 void Canvas::middleMouseClicked() {
+	if (!visible) return;
 	SetMouseCursor(MOUSE_CURSOR_RESIZE_ALL);
 	mouseMiddleButton = true;
 }
 
 void Canvas::middleMouseReleased() {
+	// if (!visible) return;
 	SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 	mouseMiddleButton = false;
 }
 
 void Canvas::scrolled(float wheelMove) {
+	if (!visible) return;
+
 	Vector2 widgetPos = {rect.x, rect.y};
 	Vector2 mousePos = Vector2Subtract(GetMousePosition(), widgetPos);
 
@@ -96,3 +104,5 @@ void Canvas::scrolled(float wheelMove) {
 
 	Widget::scrolled(wheelMove);
 }
+
+Vector2 Canvas::getMouseWorldPos() { return mouseWorldPos; }

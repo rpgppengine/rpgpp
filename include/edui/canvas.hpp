@@ -34,6 +34,8 @@ protected:
 	float cameraZoomSpeed = 0.2f;
 	float cameraMinZoom = 0.5f;
 	float cameraMaxZoom = 5;
+
+	void drawFPS();
 };
 }  // namespace edui
 

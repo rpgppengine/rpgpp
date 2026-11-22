@@ -114,7 +114,7 @@ void Container::notifyChildren(Gui *gui) {
 }
 
 std::shared_ptr<edui::Widget> Container::getWidgetById(int referId) {
-	std::shared_ptr<edui::Widget> result = widgets.front();
+	std::shared_ptr<edui::Widget> result = nullptr;
 	for (auto &widget : widgets) {
 		if (widget->referId == referId) {
 			result = widget;
@@ -148,6 +148,16 @@ void Container::setLayerId(int layerId) {
 		widget->layerId = layerId;
 		if (widget->isContainer) {
 			widget->as<Container>().setLayerId(layerId);
+		}
+	}
+}
+
+void Container::setVisible(bool visible) {
+	this->visible = visible;
+	for (auto &widget : widgets) {
+		widget->visible = visible;
+		if (widget->isContainer) {
+			widget->as<edui::Container>().setVisible(visible);
 		}
 	}
 }

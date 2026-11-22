@@ -160,18 +160,6 @@ void ResourcesPanel::addItem(const std::string &path) {
 		}
 
 		button->onClicked.connect([path] {
-			/*
-			std::string title;
-			Editor::getInstance().getResources().getTypes().getTypeTitleByExtension(GetFileExtension(path.c_str()),
-																					&title);
-
-			auto &factory = Editor::getInstance().getResources().getTypes().getFactory(title);
-
-			std::unique_ptr<Resource> ptr;
-			factory.load(path, ptr);
-
-			factory.save(path, ptr);
-			*/
 			auto viewer = Editor::getInstance().getInterface().getViewerPanel();
 			viewer->openFile(path);
 		});

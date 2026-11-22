@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 
+#include <filesystem>
 #include <nlohmann/json.hpp>
 #include <string>
 
@@ -87,6 +88,7 @@ public:
 	}
 
 	void afterLoad() override;
+	void loadFile() override;
 };
 
 #include <cereal/types/polymorphic.hpp>

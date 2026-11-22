@@ -12,6 +12,7 @@
 #include "edui/tab.hpp"
 #include "edui/widget.hpp"
 #include "raylib.h"
+#include "tabPage.hpp"
 
 using namespace edui;
 
@@ -117,12 +118,12 @@ void TabBar::leftMouseClicked() {}
 
 void TabBar::leftMouseReleased() {}
 
-std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) {
-	if (size >= 20) return std::make_shared<Container>();
+std::shared_ptr<TabPage> TabBar::addItem(const std::string &item, int iconId) {
+	if (size >= 20) return std::make_shared<TabPage>();
 
 	int newReferId = size;
 
-	auto content = std::make_shared<Container>();
+	auto content = std::make_shared<TabPage>();
 	content->referId = newReferId;
 
 	auto button = std::make_shared<Tab>();
@@ -134,8 +135,9 @@ std::shared_ptr<Container> TabBar::addItem(const std::string &item, int iconId) 
 	button->calcRect(rect);
 
 	button->onClicked.connect([this, newReferId] {
+		int previous = currentPage;
 		showTabContent(newReferId);
-		onActiveTabChanged.invoke(newReferId);
+		onActiveTabChanged.invoke(previous, newReferId);
 	});
 
 	button->resizeToFit();
@@ -214,14 +216,12 @@ void TabBar::showTabContent(int index) {
 		int referId = page->referId;
 
 		if (referId == index) {
-			page->visible = true;
+			page->setVisible(true);
 			currentPage = index;
 		} else {
-			page->visible = false;
+			page->setVisible(false);
 		}
 	}
-
-	onActiveTabChanged.invoke(index);
 }
 
 void TabBar::showFirstTab() {

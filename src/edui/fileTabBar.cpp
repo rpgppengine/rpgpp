@@ -5,6 +5,7 @@
 #include "edui/fileTab.hpp"
 #include "edui/tabBar.hpp"
 #include "raymath.h"
+#include "tabPage.hpp"
 
 using namespace edui;
 
@@ -66,12 +67,12 @@ void FileTabBar::draw() {
 	}
 }
 
-std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int iconId) {
-	if (size >= 20) return std::make_shared<Container>();
+std::shared_ptr<TabPage> FileTabBar::addItem(const std::string &item, int iconId) {
+	if (size >= 20) return std::make_shared<TabPage>();
 
 	int newReferId = size;
 
-	auto content = std::make_shared<Container>();
+	auto content = std::make_shared<TabPage>();
 	content->referId = newReferId;
 	content->setSize({1, 0}, {1, 0});
 
@@ -86,7 +87,12 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 	std::weak_ptr<edui::FileTab> weakButton = button;
 
 	button->onClicked.connect([this, newReferId, weakButton] {
+		int previous = currentPage;
+		TabPage &previousPage = getWidgetById(previous)->as<TabPage>();
+		// previousPage.onClose.invoke();
+
 		showTabContent(newReferId);
+		onActiveTabChanged.invoke(previous, newReferId);
 
 		holdingMouse = true;
 		notifiedMouseRelease = false;
@@ -110,6 +116,7 @@ std::shared_ptr<Container> FileTabBar::addItem(const std::string &item, int icon
 	button->resizeToFit();
 	add(button);
 	showActiveTab(newReferId);
+	showTabContent(newReferId);
 
 	if (auto sharedContentBase = contentBase.lock()) {
 		tabPages.push_back(content);
