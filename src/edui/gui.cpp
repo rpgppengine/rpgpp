@@ -114,21 +114,22 @@ void Gui::update() {
 		deferFlag = false;
 	}
 
+	// key event
+	KeyboardKey key = static_cast<KeyboardKey>(GetKeyPressed());
+	KeyModifier mod;
+	mod.alt = IsKeyDown(KEY_LEFT_ALT);
+	mod.ctrl = IsKeyDown(KEY_LEFT_CONTROL);
+	mod.shift = IsKeyDown(KEY_LEFT_SHIFT);
+	int codepoint = GetCharPressed();
+
+	if (key == KEY_KP_7 && codepoint == 0) {
+		mod.numlock = true;
+	}
+	if (key == KEY_KP_1 && codepoint == 0) {
+		mod.numlock = true;
+	}
+
 	if (auto sharedCurrent = current.lock()) {
-		KeyboardKey key = static_cast<KeyboardKey>(GetKeyPressed());
-		KeyModifier mod;
-		mod.alt = IsKeyDown(KEY_LEFT_ALT);
-		mod.ctrl = IsKeyDown(KEY_LEFT_CONTROL);
-		mod.shift = IsKeyDown(KEY_LEFT_SHIFT);
-		int codepoint = GetCharPressed();
-
-		if (key == KEY_KP_7 && codepoint == 0) {
-			mod.numlock = true;
-		}
-		if (key == KEY_KP_1 && codepoint == 0) {
-			mod.numlock = true;
-		}
-
 		if (key != KEY_NULL) {
 			lastKey = key;
 			sharedCurrent->keyPressed(key, mod, false);
@@ -155,6 +156,13 @@ void Gui::update() {
 		if (IsKeyReleased(KEY_ENTER) && sharedCurrent->unfocusOnEnter) {
 			sharedCurrent->unfocused();
 			current.reset();
+		}
+	}
+
+	// custom key events
+	for (auto &func : keyEvents) {
+		if (func) {
+			func(key, mod);
 		}
 	}
 
@@ -226,6 +234,8 @@ void Gui::addMenuBar(std::shared_ptr<Widget> widget) {
 	hasMenuBar = true;
 }
 
+void Gui::addKeyEvent(std::function<void(KeyboardKey, KeyModifier)> func) { keyEvents.push_back(func); }
+
 void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 	widget->get()->scrolled(GetMouseWheelMove());
 
@@ -261,6 +271,18 @@ void Gui::notifyChild(std::shared_ptr<Widget> *widget) {
 	if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
 		middleClickedWidget = *widget;
 		widget->get()->middleMouseClicked();
+	}
+}
+
+void Gui::focusWidget(std::shared_ptr<Widget> widget) {
+	if (widget->focusable) {
+		widget->leftMouseClicked();
+
+		if (!current.expired()) {
+			current.lock()->unfocused();
+		}
+		current = widget;
+		current.lock()->focused();
 	}
 }
 
@@ -388,3 +410,5 @@ void edui::processPseudoChild(Gui *gui, std::shared_ptr<edui::Widget> widget) {
 		}
 	}
 }
+
+KeyboardKey Gui::prepareKeyEvent() {}

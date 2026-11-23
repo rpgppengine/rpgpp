@@ -13,6 +13,7 @@ struct NewResourceWindow : public edui::ConfirmDialog {
 	edui::SignalT<std::string> onConfirmed;
 
 	NewResourceWindow(std::unique_ptr<Resource> &ref, std::filesystem::path dirFullPath);
+	void onAdded() override;
 
 private:
 	std::unique_ptr<Resource> &ptr;

@@ -7,6 +7,7 @@
 #include "edui/gui.hpp"
 #include "edui/menuBar.hpp"
 #include "edui/messageBox.hpp"
+#include "edui/widget.hpp"
 #include "raylib.h"
 #include "utils/editorConsts.hpp"
 #include "widgets/screens/mainMenuScreen.hpp"
@@ -21,6 +22,8 @@ Interface::Interface() {
 	initMainScreen();
 
 	Editor::getInstance().getResources().getProject().projectOpened.connect([this] { showProjectScreen(); });
+
+	gui.addKeyEvent([this](KeyboardKey key, edui::KeyModifier mod) { handleKeybinds(key, mod); });
 }
 
 void Interface::update() { gui.update(); }
@@ -46,7 +49,7 @@ void Interface::initEduiSettings() {
 void Interface::initMenuBar() {
 	auto menuBar = std::make_shared<edui::MenuBar>();
 	menuBar->translationId = "Menu";
-	menuBar->addItem("file", {"open", "new", "save file"});
+	menuBar->addItem("file", {"open", "new", "savefile"});
 	menuBar->addItem("edit", {"undo", "redo"});
 	menuBar->onItemClicked.connect(
 		[](const std::string &title, const std::string &option) { printf("%s %s \n", title.c_str(), option.c_str()); });
@@ -82,6 +85,23 @@ void Interface::handleEditMenu(size_t option) {
 		case 0: {
 			getViewerPanel()->getCurrent()->undo();
 		} break;
+		case 1: {
+			getViewerPanel()->getCurrent()->redo();
+		} break;
+	}
+}
+
+void Interface::handleKeybinds(KeyboardKey key, edui::KeyModifier mod) {
+	if (mod.ctrl) {
+		if (key == KEY_S) {
+			getViewerPanel()->getCurrent()->saveFile();
+		}
+		if (key == KEY_Z) {
+			getViewerPanel()->getCurrent()->undo();
+		}
+		if (key == KEY_X) {
+			getViewerPanel()->getCurrent()->redo();
+		}
 	}
 }
 

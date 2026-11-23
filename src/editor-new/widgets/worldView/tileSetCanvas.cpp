@@ -5,7 +5,10 @@
 
 using namespace editor;
 
-TileSetCanvas::TileSetCanvas() {}
+TileSetCanvas::TileSetCanvas() {
+	camera.zoom = 7.5f;
+	cameraMaxZoom = 7.5f;
+}
 
 void TileSetCanvas::setTexture(Texture texture) { this->texture = texture; }
 

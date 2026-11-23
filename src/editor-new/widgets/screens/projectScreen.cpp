@@ -15,7 +15,7 @@ ProjectScreen::ProjectScreen() : edui::Container() {
 	topBar->setSize({1, 0}, {0, TOPBAR_HEIGHT});
 	add(topBar);
 
-	const int RESOURCES_WIDTH = TOPBAR_LABEL_SIZE + 36;
+	const int RESOURCES_WIDTH = TOPBAR_LABEL_SIZE;
 	const int BASE_Y = TOPBAR_HEIGHT + INTERFACE_SPACING;
 	const int LEFT_HEIGHT = TOPBAR_HEIGHT + (INTERFACE_SPACING * 2);
 

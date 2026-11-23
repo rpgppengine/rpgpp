@@ -95,7 +95,7 @@ void Canvas::scrolled(float wheelMove) {
 	Vector2 widgetPos = {rect.x, rect.y};
 	Vector2 mousePos = Vector2Subtract(GetMousePosition(), widgetPos);
 
-	Vector2 mouseWorldPos = GetScreenToWorld2D(mousePos, camera);
+	mouseWorldPos = GetScreenToWorld2D(mousePos, camera);
 	camera.offset = mousePos;
 	camera.target = mouseWorldPos;
 

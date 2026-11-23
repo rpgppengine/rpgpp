@@ -11,7 +11,18 @@ void CommandHistory::exec(std::unique_ptr<Command> command) {
 
 void CommandHistory::undo() {
 	if (!vec.empty()) {
-		vec.back()->undo();
+		auto &last = vec.back();
+		last->undo();
+		redoVec.push_back(std::move(last));
 		vec.pop_back();
+	}
+}
+
+void CommandHistory::redo() {
+	if (!redoVec.empty()) {
+		auto &last = redoVec.back();
+		last->execute();
+		vec.push_back(std::move(last));
+		redoVec.pop_back();
 	}
 }

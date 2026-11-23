@@ -22,6 +22,7 @@ public:
 	virtual void refresh() {};
 	CommandHistory &getHistory();
 	void undo();
+	void redo();
 	void saveFile();
 
 protected:

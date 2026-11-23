@@ -8,6 +8,8 @@
 #include "edui/childWindow.hpp"
 #include "edui/container.hpp"
 #include "edui/gui.hpp"
+#include "edui/widget.hpp"
+#include "raylib.h"
 #include "widgets/viewerPanel.hpp"
 
 namespace editor {
@@ -35,12 +37,14 @@ private:
 	bool hasTopWindow = false;
 	bool isInProjectScreen = false;
 
+	void handleFileMenu(size_t option);
+	void handleEditMenu(size_t option);
+
+	void handleKeybinds(KeyboardKey key, edui::KeyModifier mod);
+
 	void initEduiSettings();
 	void initMenuBar();
 	void initMainScreen();
-
-	void handleFileMenu(size_t option);
-	void handleEditMenu(size_t option);
 };
 }  // namespace editor
 

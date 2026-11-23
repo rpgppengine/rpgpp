@@ -11,9 +11,11 @@ public:
 	CommandHistory();
 	void exec(std::unique_ptr<Command> command);
 	void undo();
+	void redo();
 
 private:
 	std::vector<std::unique_ptr<Command>> vec;
+	std::vector<std::unique_ptr<Command>> redoVec;
 };
 }  // namespace editor
 

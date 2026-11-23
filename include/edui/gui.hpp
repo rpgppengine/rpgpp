@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -56,6 +57,9 @@ struct Gui {
 	/** Last KeyboardKey. */
 	KeyboardKey lastKey = KEY_NULL;
 
+	/* Custom key events */
+	std::vector<std::function<void(KeyboardKey, KeyModifier)>> keyEvents;
+
 	mINI::INIStructure translationStruct;
 	std::array<LanguageName, EDUI_MAX_LANGUAGES> languageNames = {};
 	size_t languageNamesCount = 0;
@@ -84,12 +88,17 @@ struct Gui {
 
 	void notifyChild(std::shared_ptr<Widget> *widget);
 
+	void focusWidget(std::shared_ptr<Widget> widget);
+
 	Rectangle getScreenRect();
 	/* Set the font that will be used. */
 	void setFont(const char *fileName, int fontSize, int labelFontSize, int fontSpacing);
 
 	/* Add a MenuBar. */
 	void addMenuBar(std::shared_ptr<Widget> widget);
+
+	/* Add a custom key event */
+	void addKeyEvent(std::function<void(KeyboardKey, KeyModifier)>);
 
 	/* Load the names of the languages from an ini file. */
 	void loadTranslationNames(const std::string &filePath);
@@ -103,6 +112,8 @@ struct Gui {
 
 	/* Load an .rgi file for icons. */
 	void loadIconsFile(const std::string &path);
+
+	KeyboardKey prepareKeyEvent();
 
 	void unload();
 };

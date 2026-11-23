@@ -31,7 +31,7 @@ TileSetPanel::TileSetPanel() {
 		cmd->setter = [&tileset](int a) { tileset.setTileWidth(a); };
 
 		this->exec(std::move(cmd));
-		init();
+		// init();
 	});
 
 	auto height = properties->addPropertyDefault<int>("Height", TILESET_HEIGHT);
@@ -43,7 +43,7 @@ TileSetPanel::TileSetPanel() {
 		cmd->setter = [&tileset](int a) { tileset.setTileHeight(a); };
 
 		this->exec(std::move(cmd));
-		init();
+		// init();
 	});
 
 	auto textureSource = properties->addPropertyDefault<ImageRef>("Texture", TILESET_IMG);

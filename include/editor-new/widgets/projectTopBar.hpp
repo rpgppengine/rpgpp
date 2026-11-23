@@ -7,7 +7,7 @@
 #include "edui/label.hpp"
 #include "services/interface.hpp"
 namespace editor {
-const int TOPBAR_LABEL_SIZE = 240;
+const int TOPBAR_LABEL_SIZE = 276;
 const int TOPBAR_HEIGHT = edui::EDUI_SECONDARY_HEIGHT + (INTERFACE_SPACING * 2);
 
 struct ProjectTopBar : public edui::HorizontalContainer {
