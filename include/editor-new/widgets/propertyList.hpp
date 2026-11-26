@@ -18,6 +18,8 @@ struct PropertyList : public edui::ChildWindow {
 
 	template <typename T>
 	std::shared_ptr<ValueWidget> addProperty(const std::string &title, T &prop, int referId = 0) {
+		int heightMultiplier = 1;
+
 		auto container = std::make_shared<edui::Container>();
 		container->render->border = 0;
 		container->setSize({1, 0}, {0, edui::EDUI_SECONDARY_HEIGHT});
@@ -39,6 +41,9 @@ struct PropertyList : public edui::ChildWindow {
 		widget->setValue(prop);
 		container->add(widget);
 		widget->referId = referId;
+
+		heightMultiplier = widget->preferredSize;
+		container->setSize({1, 0}, {0, heightMultiplier * edui::EDUI_SECONDARY_HEIGHT});
 
 		return widget;
 	}

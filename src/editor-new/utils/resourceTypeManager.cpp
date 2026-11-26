@@ -15,6 +15,7 @@
 #include "resource.hpp"
 #include "room.hpp"
 #include "tileset.hpp"
+#include "widgets/filePanels/actorPanel.hpp"
 #include "widgets/filePanels/emptyPanel.hpp"
 #include "widgets/filePanels/tileSetPanel.hpp"
 
@@ -42,7 +43,7 @@ void ResourceTypeManager::addDefaults() {
 	// factories
 	addT<TileSet, TileSetPanel>("TileSet", RPGPP_RESOURCE_TILESET);
 	addT<Room, EmptyPanel>("Room", RPGPP_RESOURCE_ROOM);
-	addT<Actor, EmptyPanel>("Actor", RPGPP_RESOURCE_ACTOR);
+	addT<Actor, ActorPanel>("Actor", RPGPP_RESOURCE_ACTOR);
 	addT<Prop, EmptyPanel>("Prop", RPGPP_RESOURCE_PROP);
 	addT<Dialogue, EmptyPanel>("Dialogue", RPGPP_RESOURCE_DIALOGUE);
 	addT<InterfaceView, EmptyPanel>("UI View", RPGPP_RESOURCE_UI);

@@ -47,7 +47,7 @@ void FilePanel::saveFile() {
 
 void FilePanel::exec(std::unique_ptr<Command> cmd) {
 	history.exec(std::move(cmd));
-	init();
 	dirty.invoke(true);
 	resource->loadFile();
+	init();
 }

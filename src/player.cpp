@@ -20,7 +20,7 @@ Player::Player() {
 
 Player::Player(std::unique_ptr<Actor> actor) {
 	this->actor = std::move(actor);
-	Rectangle collisionRect = actor->getCollisionRect(Vector2{0, 0});
+	Rectangle collisionRect = actor->getCollisionRect();
 	this->interactableArea =
 		Rectangle{collisionRect.x - 6, collisionRect.y - 6, collisionRect.width + 12, collisionRect.height + 12};
 
@@ -47,7 +47,7 @@ void Player::unload() const {
 void Player::update() {
 	if (actor == nullptr) return;
 
-	Rectangle collisionRect = actor->getCollisionRect(Vector2{0, 0});
+	Rectangle collisionRect = actor->getCollisionRect();
 	this->interactableArea =
 		Rectangle{collisionRect.x - 6, collisionRect.y - 6, collisionRect.width + 12, collisionRect.height + 12};
 
@@ -118,7 +118,7 @@ void Player::draw() const {
 void Player::handleCollision() {
 	if (actor == nullptr) return;
 
-	Rectangle playerRect = actor->getCollisionRect(velocity);
+	Rectangle playerRect = actor->getCollisionRectWithVelocity(velocity);
 
 	auto &room = Game::getWorld().getRoom();
 	TileMap *tileMap = room.getTileMap();
@@ -146,7 +146,7 @@ void Player::handleCollision() {
 
 	// actors
 	for (auto &[name, entry] : room.getActors().getObjects()) {
-		if (CheckCollisionRecs(playerRect, entry.actor.getCollisionRect(Vector2{0, 0}))) {
+		if (CheckCollisionRecs(playerRect, entry.actor.getCollisionRect())) {
 			velocity = Vector2{0, 0};
 			break;
 		}
@@ -210,7 +210,7 @@ void Player::handleInteraction() {
 	for (auto &[name, entry] : room.getActors().getObjects()) {
 		auto &actor = entry.actor;
 		if (actor.hasInteractable()) {
-			if (CheckCollisionRecs(interactableArea, actor.getCollisionRect(Vector2{0, 0}))) {
+			if (CheckCollisionRecs(interactableArea, actor.getCollisionRect())) {
 				actor.getInteractable()->interact();
 				break;
 			}

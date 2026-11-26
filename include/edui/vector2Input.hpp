@@ -6,6 +6,7 @@
 #include "edui/container.hpp"
 #include "edui/numberInput.hpp"
 #include "raylib.h"
+
 namespace edui {
 struct Vector2InputRender : public ContainerRender {};
 

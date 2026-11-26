@@ -46,7 +46,6 @@ void Canvas::update() {
 void Canvas::draw() {
 	Rectangle sourceRect = {0.0f, 0.0f, static_cast<float>(texture.texture.width),
 							static_cast<float>(-texture.texture.height)};
-	// DrawTextureRec(texture.texture, rect, {rect.x, rect.y}, WHITE);
 	DrawTexturePro(texture.texture, sourceRect, rect, {0, 0}, 0.0f, WHITE);
 
 	auto &rend = render->as<CanvasRender>();

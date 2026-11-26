@@ -29,7 +29,10 @@ NewResourceWindow::NewResourceWindow(std::unique_ptr<Resource> &ref, std::filesy
 	getOkButton().onClicked.connect([this] { onOkClicked(); });
 }
 
-void NewResourceWindow::onAdded() { Editor::getInstance().getInterface().getEdui().focusWidget(titleBox); }
+void NewResourceWindow::onAdded() {
+	edui::ConfirmDialog::onAdded();
+	Editor::getInstance().getInterface().getEdui().focusWidget(titleBox);
+}
 
 void NewResourceWindow::initTypesList() {
 	int offset = EDITOR_CHILD_WINDOW_WIDTH - (INTERFACE_SPACING * 2);

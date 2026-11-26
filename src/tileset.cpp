@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 
 #include "atlasTile.hpp"
+#include "basicTypes.hpp"
 #include "game.hpp"
 #include "resource.hpp"
 using json = nlohmann::json;
@@ -83,12 +84,16 @@ Texture TileSet::getTexture() const { return this->texture; }
 
 std::string TileSet::getTextureSource() { return this->textureSource; }
 
-std::string TileSet::getSource() const { return this->source; }
+ImageRef TileSet::getTextureSourceRef() { return textureSource; }
 
 void TileSet::setTextureSource(const std::string &source) {
 	this->textureSource = source;
 	// this->texture = LoadTexture(source.c_str());
 }
+
+void TileSet::setTextureSourceRef(const ImageRef &source) { textureSource = source.path; }
+
+std::string TileSet::getSource() const { return this->source; }
 
 bool TileSet::areAtlasCoordsValid(Vector2 atlasCoords) const {
 	bool xValid = false;

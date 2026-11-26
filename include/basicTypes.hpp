@@ -96,6 +96,18 @@ struct ImageRef {
 	}
 };
 
+struct TileSetRef {
+	std::string path = "";
+
+	TileSetRef() {}
+	TileSetRef(const std::string &path) { this->path = path; }
+
+	template <class Archive>
+	void serialize(Archive &a) {
+		a(CEREAL_NVP(path));
+	}
+};
+
 const std::string CALLBACK_TRIGGER = "callback_trigger";
 const std::string CALLBACK_FOCUSED = "callback_focused";
 const std::string CALLBACK_UNFOCUSED = "callback_unfocused";
@@ -180,7 +192,7 @@ enum ElementPropertyType {
 typedef std::vector<std::string> StringVector;
 
 typedef std::variant<int, bool, std::string, Rectangle, Color, FontRef, ImageRef, VerticalAlignment,
-					 HorizontalAlignment, UIElementRef, NPatchInfo, InputC, StringVector, Vector2>
+					 HorizontalAlignment, UIElementRef, NPatchInfo, InputC, StringVector, Vector2, TileSetRef>
 	ElementProperty;
 
 struct Event {

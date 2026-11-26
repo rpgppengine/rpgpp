@@ -102,6 +102,8 @@ public:
 	Rectangle getRect() const;
 	/** Get a reference to this Actor's TileSet. */
 	TileSet &getTileSet();
+	TileSetRef getTileSetSource();
+	void setTileSetSource(const TileSetRef &source);
 	/** Get the current frame of this actor. */
 	int getCurrentFrame() const;
 	/** Reset the animation back to frame 0. */
@@ -124,9 +126,11 @@ public:
 	std::function<void(int)> onFrameChanged;
 	/** Get the collision rectangle of this Actor if it was moved by the
 	 * velocity vector */
-	Rectangle getCollisionRect(Vector2 velocity) const;
+	Rectangle getCollisionRectWithVelocity(Vector2 velocity) const;
 	/** Get the collision Rectangle of this Actor */
 	Rectangle getCollisionRect() const;
+	/** Set the Actor's collision Rectangle */
+	void setCollisionRect(const Rectangle &rect);
 	/** Get collision center point. */
 	Vector2 getCollisionCenter() const;
 	/** Add a frame in the chosen animation. The frame represents an atlas tile
@@ -146,13 +150,11 @@ public:
 	/** Change the Actor's current animation and play it. */
 	void changeAnimation(Direction id);
 	/** Get the path of the used TileSet. */
-	std::string getTileSetSource() const;
+	// std::string getTileSetSource() const;
 	/** Get an array of this Actor's animations */
 	std::array<std::vector<IVector>, 8> getAnimationsRaw() const;
 	/** Get a specific animation */
 	std::vector<IVector> getAnimationRaw(Direction id) const;
-	/** Set the Actor's collision Rectangle */
-	void setCollisionRect(Rectangle rect);
 	/** Whether this Actor has an Interactable. */
 	bool hasInteractable();
 	/** Set the 'ownsInteractable' flag. */

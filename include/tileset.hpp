@@ -73,8 +73,11 @@ public:
 	Texture getTexture() const;
 	/** Get the path to the texture image file. */
 	std::string getTextureSource();
+	ImageRef getTextureSourceRef();
 	/** Set the TileSet's texture source image. */
 	void setTextureSource(const std::string &source);
+	void setTextureSourceRef(const ImageRef &source);
+	// void setTextureSourceRef()
 	/** Get the path to the file that represents this TileSet. */
 	std::string getSource() const;
 	/** Check whether the given coordinates are valid */

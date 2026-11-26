@@ -10,7 +10,9 @@
 #include "widgets/values/horizontalAlignValue.hpp"
 #include "widgets/values/imageRefValue.hpp"
 #include "widgets/values/intValue.hpp"
+#include "widgets/values/rectangleValue.hpp"
 #include "widgets/values/stringValue.hpp"
+#include "widgets/values/tileSetRefValue.hpp"
 #include "widgets/values/vector2value.hpp"
 #include "widgets/values/verticalAlignValue.hpp"
 
@@ -26,4 +28,6 @@ VariantPropertyFactory::VariantPropertyFactory() {
 	addEntry<VerticalAlignment, VerticalAlignValue>();
 	addEntry<FontRef, FontRefValue>();
 	addEntry<ImageRef, ImageRefValue>();
+	addEntry<TileSetRef, TileSetRefValue>();
+	addEntry<Rectangle, RectangleValue>();
 }

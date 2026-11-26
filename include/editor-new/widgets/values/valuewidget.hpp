@@ -9,6 +9,8 @@
 
 namespace editor {
 struct ValueWidget : public edui::Container {
+	int preferredSize = 1;
+
 	ValueWidget() { this->render->border = 0; }
 
 	virtual void setValue(const ElementProperty &val) = 0;

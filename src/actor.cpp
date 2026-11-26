@@ -209,7 +209,7 @@ void Actor::draw() const {
 		auto collisionDebugColor = GRAY;
 		collisionDebugColor.a = (255 / 2);
 
-		Rectangle drawnCollisionRect = getCollisionRect(Vector2{0, 0});
+		Rectangle drawnCollisionRect = getCollisionRect();
 		DrawRectanglePro(drawnCollisionRect, origin, rotation, collisionDebugColor);
 
 		// let me draw the collision center
@@ -234,6 +234,10 @@ void Actor::setTileSet(const std::string &newTileSetSource) {
 	// tileSet = std::make_unique<TileSet>(newTileSetSource);
 	this->tileSetSource = newTileSetSource;
 }
+
+TileSetRef Actor::getTileSetSource() { return tileSetSource; }
+
+void Actor::setTileSetSource(const TileSetRef &source) { tileSetSource = source.path; }
 
 void Actor::setPosition(Vector2 newPosition) { this->position = newPosition; }
 
@@ -263,7 +267,7 @@ void Actor::moveByVelocity(Vector2 velocity) {
 	this->position = resultVector;
 }
 
-Rectangle Actor::getCollisionRect(Vector2 velocity) const {
+Rectangle Actor::getCollisionRectWithVelocity(Vector2 velocity) const {
 	Vector2 newPos = Vector2Add(position, velocity);
 	auto result =
 		Rectangle{newPos.x + collisionRect.x, newPos.y + collisionRect.y, collisionRect.width, collisionRect.height};
@@ -335,11 +339,11 @@ std::vector<IVector> Actor::getAnimationRaw(const Direction id) const {
 	return animFrames;
 }
 
-std::string Actor::getTileSetSource() const { return tileSetSource; }
+// std::string Actor::getTileSetSource() const { return tileSetSource; }
 
 Rectangle Actor::getCollisionRect() const { return collisionRect; }
 
-void Actor::setCollisionRect(Rectangle rect) { this->collisionRect = rect; }
+void Actor::setCollisionRect(const Rectangle &rect) { this->collisionRect = rect; }
 
 Vector2 calcActorTilePos(Vector2 newPosition, Vector2 worldTileSize, TileSet *tileSet) {
 	Vector2 actorTileSize = tileSet->getTileSize();
