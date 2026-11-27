@@ -6,5 +6,6 @@
 #define RPGPP_DRAW_MULTIPLIER (3)
 
 void DrawRectangleLinesPro(Rectangle rect, Color color);
+bool RectangleEquals(const Rectangle &a, const Rectangle &b);
 
 #endif

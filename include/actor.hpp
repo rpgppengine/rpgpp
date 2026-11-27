@@ -15,6 +15,8 @@
 #include "cereal/access.hpp"
 #include "cereal/archives/json.hpp"
 #include "cereal/cereal.hpp"
+#include "cereal/types/array.hpp"
+#include "cereal/types/vector.hpp"
 #include "interactable.hpp"
 #include "resource.hpp"
 #include "saveable.hpp"
@@ -102,7 +104,9 @@ public:
 	Rectangle getRect() const;
 	/** Get a reference to this Actor's TileSet. */
 	TileSet &getTileSet();
+	/* Get the path to the used TileSet. */
 	TileSetRef getTileSetSource();
+	/* Set a new TileSet using a path. */
 	void setTileSetSource(const TileSetRef &source);
 	/** Get the current frame of this actor. */
 	int getCurrentFrame() const;
@@ -170,6 +174,7 @@ public:
 	}
 
 	void afterLoad() override;
+	void loadFile() override;
 };
 
 struct ActorEntry {

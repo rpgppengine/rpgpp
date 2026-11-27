@@ -4,15 +4,15 @@
 #include <raymath.h>
 
 #include <cassert>
-#include <cstdint>
 #include <cstdio>
+#include <fstream>
 #include <functional>
 #include <memory>
 #include <nlohmann/json.hpp>
-#include <stdexcept>
 #include <utility>
 
 #include "basicTypes.hpp"
+#include "cereal/archives/json.hpp"
 #include "game.hpp"
 #include "gamedata.hpp"
 #include "interactable.hpp"
@@ -34,6 +34,16 @@ void Actor::afterLoad() {
 		this->tileSet = ts;
 		this->tile = tileSet.getTile({0, 0});
 	}
+}
+
+void Actor::loadFile() {
+	std::ifstream stream(tileSetSource);
+	{
+		cereal::JSONInputArchive ar(stream);
+		ar(tileSet);
+	}
+	tileSet.loadFile();
+	this->tile = tileSet.getTile({0, 0});
 }
 
 Actor::Actor(const std::string &fileName) : Actor() {}
@@ -182,23 +192,22 @@ void Actor::draw() const {
 	// defaults..
 	constexpr auto origin = Vector2{0.0f, 0.0f};
 	constexpr float rotation = 0.0f;
-	const Vector2 atlasTileSize = tileSet.getTileSize();
-	auto worldTileSize = Vector2{atlasTileSize.x * RPGPP_DRAW_MULTIPLIER, atlasTileSize.y * RPGPP_DRAW_MULTIPLIER};
 
 	// texture
 	Texture texture = this->tileSet.getTexture();
 	if (!IsTextureValid(texture)) return;
 
 	// actual coordinates
+	const Vector2 atlasTileSize = tileSet.getTileSize();
 	Vector2 atlasCoords = this->tile.getAtlasCoords().toFloat();
 
 	// build rects
 	auto atlasRect = Rectangle{atlasCoords.x, atlasCoords.y, atlasTileSize.x, atlasTileSize.y};
-	auto worldRect = Rectangle{position.x, position.y, worldTileSize.x, worldTileSize.y};
+	auto worldRect = getRect();
 	// draw it
 	DrawTexturePro(texture, atlasRect, worldRect, origin, rotation, WHITE);
 
-	bool debugDraw = true;
+	bool debugDraw = false;
 
 	if (Game::isUsingBin()) {
 		debugDraw = Game::getBin().gameSet.debugDraw;
@@ -206,22 +215,14 @@ void Actor::draw() const {
 
 	if (debugDraw) {
 		// draw collision rect..
-		auto collisionDebugColor = GRAY;
-		collisionDebugColor.a = (255 / 2);
-
 		Rectangle drawnCollisionRect = getCollisionRect();
-		DrawRectanglePro(drawnCollisionRect, origin, rotation, collisionDebugColor);
-
-		// let me draw the collision center
-		DrawCircleV(getCollisionCenter(), 2.5f, MAROON);
+		DrawRectanglePro(drawnCollisionRect, origin, rotation, Fade(MAROON, 0.5f));
 	}
 }
 
 std::string Actor::getSourcePath() const { return sourcePath; }
 
 Rectangle Actor::getRect() const {
-	// if (tileSet == nullptr) return Rectangle{0, 0, 0, 0};
-
 	Vector2 atlasTileSize = tileSet.getTileSize();
 	auto result = Rectangle{position.x, position.y, atlasTileSize.x * RPGPP_DRAW_MULTIPLIER,
 							atlasTileSize.y * RPGPP_DRAW_MULTIPLIER};
