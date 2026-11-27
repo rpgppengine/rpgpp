@@ -25,7 +25,17 @@ void Dropdown::applyTheme(const mINI::INIStructure &struc) {
 	render->applyTheme(struc);
 }
 
-void Dropdown::setValue(const DropdownValue &val) { currentItem = val.idx; };
+void Dropdown::setValue(const DropdownValue &val) {
+	currentItem = val.idx;
+	if (val.idx == 0) {
+		for (int i = 0; i < items.size(); i++) {
+			if (items[i] == val.val) {
+				currentItem = i;
+				break;
+			}
+		}
+	}
+};
 
 DropdownValue Dropdown::getValue() { return {currentItem, items[currentItem]}; };
 

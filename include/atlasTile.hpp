@@ -32,6 +32,8 @@ public:
 	 * @returns An IVector which represents the atlas coordinates
 	 */
 	IVector getAtlasCoords() const;
+
+	Texture getTexture() const;
 };
 
 #endif

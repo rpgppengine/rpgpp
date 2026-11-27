@@ -9,8 +9,10 @@
 #include <functional>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <string>
 #include <utility>
 
+#include "animation.hpp"
 #include "basicTypes.hpp"
 #include "cereal/archives/json.hpp"
 #include "game.hpp"
@@ -21,9 +23,15 @@
 using json = nlohmann::json;
 
 Actor::Actor() : Resource(RPGPP_RESOURCE_ACTOR) {
-	for (int i = 0; i < 8; i++) {
-		animations[i] = std::vector<IVector>();
-	}
+	// Some default animations
+	addAnimation(ANIM_DOWN, {{2, 0}, {3, 0}});
+	addAnimation(ANIM_DOWN_IDLE, {{0, 0}, {1, 0}});
+	addAnimation(ANIM_UP, {{2, 1}, {3, 1}});
+	addAnimation(ANIM_UP_IDLE, {{0, 1}, {1, 1}});
+	addAnimation(ANIM_LEFT, {{2, 2}, {3, 2}});
+	addAnimation(ANIM_LEFT_IDLE, {{0, 2}, {1, 2}});
+	addAnimation(ANIM_RIGHT, {{2, 3}, {3, 3}});
+	addAnimation(ANIM_RIGHT_IDLE, {{0, 3}, {1, 3}});
 }
 
 void Actor::afterLoad() {
@@ -49,6 +57,7 @@ void Actor::loadFile() {
 Actor::Actor(const std::string &fileName) : Actor() {}
 
 Actor::Actor(std::unique_ptr<TileSet> tileSet, Vector2 atlasPos, std::string tileSetSource) : Actor() {
+	/*
 	this->sourcePath = "";
 	this->tilePosition = Vector2{-1, -1};
 	this->position = Vector2{0, 0};
@@ -93,9 +102,11 @@ Actor::Actor(std::unique_ptr<TileSet> tileSet, Vector2 atlasPos, std::string til
 	this->collisionRect =
 		Rectangle{0, (atlasTileSize.y * RPGPP_DRAW_MULTIPLIER) / 2, (atlasTileSize.x * RPGPP_DRAW_MULTIPLIER),
 				  (atlasTileSize.y * RPGPP_DRAW_MULTIPLIER) / 2};
+						*/
 }
 
 Actor::Actor(const ActorBin &bin) : Actor() {
+	/*
 	this->sourcePath = bin.name;
 	this->position = Vector2{0, 0};
 
@@ -127,34 +138,42 @@ Actor::Actor(const ActorBin &bin) : Actor() {
 
 		addAnimationFrames(static_cast<Direction>(i), frames);
 	}
+	*/
 }
 
 void Actor::unload() const { tileSet.unload(); }
 
 int Actor::getCurrentFrame() const { return this->currentFrame; }
 
-int Actor::getAnimationCount() const { return this->getAnimationRaw(this->currentAnimation).size(); }
+int Actor::getAnimationCount() const { return this->getAnimationRaw(this->currentAnimation).getSize(); }
 
-Direction Actor::getAnimationDirection() const { return this->currentAnimation; }
+Direction Actor::getAnimationDirection() const {
+	if (dirMap.count(currentAnimation) > 0) {
+		return dirMap.at(currentAnimation);
+	} else {
+		return RPGPP_DOWN_IDLE;
+	}
+}
 
 IVector Actor::getCurrentAnimationAtlas() const {
-	return this->getAnimationRaw(this->currentAnimation).at(currentFrame);
+	return this->getAnimationRaw(this->currentAnimation).getFrame(currentFrame);
 }
 
 IVector Actor::getAnimationAtlasByIdx(int frameIndex) const {
-	return this->getAnimationRaw(this->currentAnimation).at(frameIndex);
+	return this->getAnimationRaw(this->currentAnimation).getFrame(frameIndex);
 }
 
-void Actor::setAnimationFrame(int frameIndex) {
+void Actor::setCurrentFrame(int frameIndex) {
 	this->currentFrame = frameIndex;
 
+	Animation anim = getAnimationRaw(currentAnimation);
+
 	Vector2 atlasTileSize = tileSet.getTileSize();
-	IVector atlasPos = animations[currentAnimation].at(currentFrame);
+	IVector atlasPos = anim.getFrame(currentFrame);
 	atlasPos = Vector2{atlasPos.x * atlasTileSize.x, atlasPos.y * atlasTileSize.y};
 
-	if (this->onFrameChanged != nullptr) this->onFrameChanged(this->currentFrame);
-
-	this->tile = tileSet.getTile(atlasPos.toFloat());
+	// this->tile = tileSet.getTile(atlasPos.toFloat());
+	this->tile = tileSet.getTile(getAnimationAtlasByIdx(currentFrame).toFloat());
 }
 
 Rectangle Actor::getCurrentAnimationRectangle() {
@@ -164,6 +183,8 @@ Rectangle Actor::getCurrentAnimationRectangle() {
 }
 
 void Actor::update() {
+	if (!isPlaying) return;
+
 	frameCounter++;
 
 	if (frameCounter >= (60 / frameSpeed)) {
@@ -184,7 +205,7 @@ void Actor::update() {
 			}
 		}
 
-		this->setAnimationFrame(currentFrame);
+		this->setCurrentFrame(currentFrame);
 	}
 }
 
@@ -202,7 +223,8 @@ void Actor::draw() const {
 	Vector2 atlasCoords = this->tile.getAtlasCoords().toFloat();
 
 	// build rects
-	auto atlasRect = Rectangle{atlasCoords.x, atlasCoords.y, atlasTileSize.x, atlasTileSize.y};
+	auto atlasRect =
+		Rectangle{atlasCoords.x * atlasTileSize.x, atlasCoords.y * atlasTileSize.y, atlasTileSize.x, atlasTileSize.y};
 	auto worldRect = getRect();
 	// draw it
 	DrawTexturePro(texture, atlasRect, worldRect, origin, rotation, WHITE);
@@ -219,6 +241,10 @@ void Actor::draw() const {
 		DrawRectanglePro(drawnCollisionRect, origin, rotation, Fade(MAROON, 0.5f));
 	}
 }
+
+void Actor::setIsPlaying(bool value) { isPlaying = value; }
+
+bool Actor::getIsPlaying() { return isPlaying; }
 
 std::string Actor::getSourcePath() const { return sourcePath; }
 
@@ -282,30 +308,6 @@ Vector2 Actor::getCollisionCenter() const {
 	return result;
 }
 
-void Actor::addAnimationFrame(Direction id, Vector2 atlasPos) { animations[id].push_back(atlasPos); }
-
-void Actor::removeAnimationFrame(Direction id, int frameIndex) {
-	if (currentFrame == frameIndex) {
-		currentFrame = 0;
-	}
-	if (frameIndex == 0) return;
-	// how do we know the frame was valid on index side?
-	assert(frameIndex < animations[id].size() && "requested animation index is invalid");
-	animations[id].erase(animations[id].begin() + frameIndex);
-}
-
-void Actor::setAnimationFrame(Direction id, int frameIndex, Vector2 atlasTile) {
-	animations[id][frameIndex] = atlasTile;
-}
-
-void Actor::addAnimationFrames(const Direction id, const std::vector<std::vector<int>> &frames) {
-	for (int i = 0; i < frames.size(); i++) {
-		int x = frames.at(i).at(0);
-		int y = frames.at(i).at(1);
-		animations[id].push_back(Vector2{static_cast<float>(x), static_cast<float>(y)});
-	}
-}
-
 void Actor::playAnimation(Direction id) {
 	printf("playing.. %i\n", static_cast<int>(id));
 
@@ -320,27 +322,47 @@ void Actor::playAnimation(Direction id) {
 
 bool Actor::isTempAnimationPlaying() { return tempAnimIsPlayed; }
 
-void Actor::changeAnimation(Direction id) {
-	if (this->currentAnimation != id) {
+void Actor::changeAnimation(const std::string &id) {
+	if (currentAnimation != id) {
 		this->currentFrame = 0;
 		this->currentAnimation = id;
 
 		// change to the first frame of the new animation immidiately
 		frameCounter = (60 / frameSpeed);
+		tile = tileSet.getTile(getAnimationRaw(id).getFrame(0).toFloat());
 	}
 }
 
-std::array<std::vector<IVector>, 8> Actor::getAnimationsRaw() const { return animations; }
-
-std::vector<IVector> Actor::getAnimationRaw(const Direction id) const {
-	if (animations[id].empty()) {
-		return {};
+void Actor::changeAnimationDir(Direction id) {
+	for (auto &pair : dirMap) {
+		if (pair.second == id) {
+			changeAnimation(pair.first);
+			break;
+		}
 	}
-	std::vector<IVector> animFrames = animations[id];
-	return animFrames;
 }
 
-// std::string Actor::getTileSetSource() const { return tileSetSource; }
+std::string Actor::getCurrentAnimationId() { return currentAnimation; }
+
+std::map<std::string, Animation> &Actor::getAnimationsRaw() { return animations; }
+
+Animation Actor::getAnimationRaw(const std::string &id) const {
+	if (animations.count(id) > 0) {
+		return animations.at(id);
+	} else {
+		return Animation{};
+	}
+}
+
+Animation &Actor::getAnimationRef(const std::string &id) { return animations.at(id); }
+
+void Actor::addAnimation(const std::string &id, std::vector<IVector> frames) {
+	Animation anim;
+	for (auto &item : frames) {
+		anim.addFrame(item);
+	}
+	animations.emplace(id, anim);
+}
 
 Rectangle Actor::getCollisionRect() const { return collisionRect; }
 

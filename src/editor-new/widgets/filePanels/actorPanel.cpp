@@ -6,6 +6,7 @@
 #include "basicTypes.hpp"
 #include "raylib.h"
 #include "services/interface.hpp"
+#include "widgets/actorAnimationsPanel.hpp"
 #include "widgets/values/valuewidget.hpp"
 #include "widgets/worldView/actorCanvas.hpp"
 
@@ -23,21 +24,32 @@ ActorPanel::ActorPanel() {
 	auto info = bindProp<Actor, Rectangle>("Collision", ACTOR_COLLISION_RECT, &Actor::getCollisionRect,
 										   &Actor::setCollisionRect);
 
+	// canvas
 	canvas = std::make_shared<ActorCanvas>();
-	canvas->setSize({1, -(PROPERTIES_WIDTH + INTERFACE_SPACING)}, {1, 0});
+	canvas->setSize({1, -(PROPERTIES_WIDTH + INTERFACE_SPACING)}, {1, -(ANIMATIONS_HEIGHT + INTERFACE_SPACING)});
 	add(canvas);
 
 	canvas->onCollisionChanged.connect([this, info](Rectangle a, Rectangle b) {
 		info.widget.as<ValueWidgetT<Rectangle>>().onValueChanged.invoke(a, b);
 	});
+
+	// animations panel
+	animationsPanel = std::make_shared<ActorAnimationsPanel>();
+	animationsPanel->setPosition({0, 0}, {1, -ANIMATIONS_HEIGHT});
+	animationsPanel->setSize({1, -(PROPERTIES_WIDTH + INTERFACE_SPACING)}, {0, ANIMATIONS_HEIGHT});
+	add(animationsPanel);
 }
 
 void ActorPanel::init() {
 	auto &actor = resource->as<Actor>();
+	actor.changeAnimation(ANIM_DOWN_IDLE);
+	actor.setIsPlaying(false);
 
 	properties->getProperty(ACTOR_TILESET)->setValue(actor.getTileSetSource());
 	properties->getProperty(ACTOR_COLLISION_RECT)->setValue(actor.getCollisionRect());
 
 	auto ptr = &actor;
 	canvas->setActor(ptr);
+
+	animationsPanel->init(ptr);
 }

@@ -6,16 +6,20 @@
 #include <array>
 #include <fstream>
 #include <functional>
+#include <map>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <string>
 #include <vector>
 
+#include "animation.hpp"
 #include "atlasTile.hpp"
 #include "basicTypes.hpp"
 #include "cereal/access.hpp"
 #include "cereal/archives/json.hpp"
 #include "cereal/cereal.hpp"
 #include "cereal/types/array.hpp"
+#include "cereal/types/map.hpp"
 #include "cereal/types/vector.hpp"
 #include "interactable.hpp"
 #include "resource.hpp"
@@ -37,6 +41,20 @@ enum Direction : short {
 	RPGPP_RIGHT = 7		   ///< Right state.
 };
 
+const std::string ANIM_DOWN_IDLE = "DownIdle";
+const std::string ANIM_DOWN = "Down";
+const std::string ANIM_UP_IDLE = "UpIdle";
+const std::string ANIM_UP = "Up";
+const std::string ANIM_LEFT_IDLE = "LeftIdle";
+const std::string ANIM_LEFT = "Left";
+const std::string ANIM_RIGHT_IDLE = "RightIdle";
+const std::string ANIM_RIGHT = "Right";
+
+const std::map<std::string, Direction> dirMap = {{ANIM_DOWN_IDLE, RPGPP_DOWN_IDLE},	  {ANIM_DOWN, RPGPP_DOWN},
+												 {ANIM_UP_IDLE, RPGPP_UP_IDLE},		  {ANIM_UP, RPGPP_UP},
+												 {ANIM_LEFT_IDLE, RPGPP_LEFT_IDLE},	  {ANIM_LEFT, RPGPP_LEFT},
+												 {ANIM_RIGHT_IDLE, RPGPP_RIGHT_IDLE}, {ANIM_RIGHT, RPGPP_RIGHT}};
+
 /** The Actor class represents an Actor in the game's world.
  * @see [Direction](Direction.md)
  */
@@ -56,14 +74,15 @@ private:
 	int frameCounter = 0;
 	int frameSpeed = 2;
 	int currentFrame = 0;
+	bool isPlaying = true;
 	/** Rectangle, representing the collision of this Actor. */
 	Rectangle collisionRect = {0, 0, 0, 0};
 	/** An array of the animations. Each std::vector<Vector2> represents the
 	 * frames of an animation. */
-	std::array<std::vector<IVector>, 8> animations;
+	std::map<std::string, Animation> animations;
 	/** A Direction enum, showing the current animation that is being played. */
-	Direction currentAnimation = RPGPP_DOWN_IDLE;
-	Direction lastAnimation = RPGPP_DOWN_IDLE;
+	std::string currentAnimation = ANIM_DOWN_IDLE;
+	std::string lastAnimation = ANIM_DOWN_IDLE;
 	bool tempAnimIsPlayed = false;
 	/** Whether this Actor has an Interactable. */
 	bool ownsInteractable = false;
@@ -88,6 +107,8 @@ public:
 	void update();
 	/** Draw routine. */
 	void draw() const;
+	void setIsPlaying(bool value);
+	bool getIsPlaying();
 	/** Get the source file's path for this Actor. */
 	std::string getSourcePath() const;
 	/** Get this actor's position in the world. */
@@ -111,7 +132,7 @@ public:
 	/** Get the current frame of this actor. */
 	int getCurrentFrame() const;
 	/** Reset the animation back to frame 0. */
-	void resetAnimation() { this->setAnimationFrame(0); }
+	void resetAnimation() { this->setCurrentFrame(0); }
 	/** Get the current direction of this actor. */
 	Direction getAnimationDirection() const;
 	/** Get the current animation atlas of this actor. */
@@ -121,7 +142,7 @@ public:
 	/** Get an atlas of this actor by frame index. */
 	IVector getAnimationAtlasByIdx(int frameIndex) const;
 	/** Set the current frame. */
-	void setAnimationFrame(int frameIndex);
+	void setCurrentFrame(int frameIndex);
 	/** Get the current size of the animation in the direction. */
 	int getAnimationCount() const;
 	/** Set this Actor's TileSet using a path to the tileset file. */
@@ -137,28 +158,23 @@ public:
 	void setCollisionRect(const Rectangle &rect);
 	/** Get collision center point. */
 	Vector2 getCollisionCenter() const;
-	/** Add a frame in the chosen animation. The frame represents an atlas tile
-	 * from this Actor's TileSet. */
-	void addAnimationFrame(Direction id, Vector2 atlasPos);
-	/** Remove a frame in the chosen animation, specified by an index. */
-	void removeAnimationFrame(Direction id, int frameIndex);
-	/** Change a frame in the chosen animation to another atlas tile from the
-	 * TileSet. */
-	void setAnimationFrame(Direction id, int frameIndex, Vector2 atlasTile);
-	/** Add multiple frames to the chosen animation. */
-	void addAnimationFrames(Direction id, const std::vector<std::vector<int>> &frames);
 	/** Temporarily play an animation */
 	void playAnimation(Direction id);
 	/** Check whether a temporary animation is playing */
 	bool isTempAnimationPlaying();
 	/** Change the Actor's current animation and play it. */
-	void changeAnimation(Direction id);
+	void changeAnimationDir(Direction id);
+	void changeAnimation(const std::string &id);
+	/* Get the id of the current animation. */
+	std::string getCurrentAnimationId();
 	/** Get the path of the used TileSet. */
 	// std::string getTileSetSource() const;
 	/** Get an array of this Actor's animations */
-	std::array<std::vector<IVector>, 8> getAnimationsRaw() const;
+	std::map<std::string, Animation> &getAnimationsRaw();
 	/** Get a specific animation */
-	std::vector<IVector> getAnimationRaw(Direction id) const;
+	Animation getAnimationRaw(const std::string &id) const;
+	Animation &getAnimationRef(const std::string &id);
+	void addAnimation(const std::string &id, std::vector<IVector> frames);
 	/** Whether this Actor has an Interactable. */
 	bool hasInteractable();
 	/** Set the 'ownsInteractable' flag. */

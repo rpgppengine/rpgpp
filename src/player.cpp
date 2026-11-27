@@ -84,9 +84,9 @@ void Player::update() {
 
 	if (!actor->isTempAnimationPlaying()) {
 		if (Vector2Equals(velocity, Vector2{0, 0})) {
-			actor->changeAnimation(idleDirection);
+			actor->changeAnimationDir(idleDirection);
 		} else {
-			actor->changeAnimation(currentDirection);
+			actor->changeAnimationDir(currentDirection);
 		}
 	}
 

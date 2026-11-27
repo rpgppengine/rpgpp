@@ -24,7 +24,7 @@ void ActorCanvas::update() {
 	if (actor != nullptr) {
 		box.setMousePos(mouseWorldPos);
 
-		// actor->update();
+		actor->update();
 		box.update();
 	}
 }

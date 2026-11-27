@@ -3,9 +3,10 @@
 
 #include <memory>
 
-#include "edui/signal.hpp"
+#include "widgets/actorAnimationsPanel.hpp"
 #include "widgets/filePanels/propertyFilePanel.hpp"
 #include "widgets/worldView/actorCanvas.hpp"
+
 namespace editor {
 enum ActorPropertyId { ACTOR_TILESET = 1, ACTOR_COLLISION_RECT };
 
@@ -16,8 +17,10 @@ public:
 
 private:
 	const int PROPERTIES_WIDTH = 350;
+	const int ANIMATIONS_HEIGHT = 220;
 
 	std::shared_ptr<ActorCanvas> canvas;
+	std::shared_ptr<ActorAnimationsPanel> animationsPanel;
 };
 }  // namespace editor
 
