@@ -71,6 +71,8 @@ private:
 	Vector2 position = {0, 0};
 	/** Current tile position of this Actor if such is set. */
 	Vector2 tilePosition = {-1, -1};
+	/** Atlas coordinates of the current tile. */
+	IVector atlasCoords = {0, 0};
 	int frameCounter = 0;
 	int frameSpeed = 2;
 	int currentFrame = 0;

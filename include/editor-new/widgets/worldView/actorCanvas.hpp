@@ -16,6 +16,7 @@ struct ActorCanvas : public edui::Canvas {
 	void drawCanvas() override;
 
 	void setActor(Actor *ptr);
+	void refresh();
 
 private:
 	Actor *actor = nullptr;

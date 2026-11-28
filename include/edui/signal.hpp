@@ -62,7 +62,7 @@ struct SignalT {
 	void invoke(T a) {
 		for (auto &func : funcs) {
 			if (func != nullptr) {
-				func(a);
+				func(std::move(a));
 			}
 		}
 	};

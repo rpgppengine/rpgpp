@@ -1,5 +1,7 @@
 #include "widgets/worldView/tileSetCanvas.hpp"
 
+#include "basicTypes.hpp"
+#include "edui/canvas.hpp"
 #include "raylib.h"
 #include "utils/gridDraw.hpp"
 
@@ -13,6 +15,33 @@ TileSetCanvas::TileSetCanvas() {
 void TileSetCanvas::setTexture(Texture texture) { this->texture = texture; }
 
 GridDraw &TileSetCanvas::getGrid() { return grid; }
+
+void TileSetCanvas::enableSelection() { selectionMode = true; }
+
+void TileSetCanvas::setSelectedTile(IVector &tile) { selectedTile = tile; }
+
+IVector TileSetCanvas::getSelectedTile() { return selectedTile; }
+
+void TileSetCanvas::init(TileSet &tileSet) {
+	auto texture = tileSet.getTexture();
+
+	grid.tileWidth = tileSet.getTileWidth();
+	grid.tileHeight = tileSet.getTileHeight();
+	grid.rows = (texture.width / grid.tileWidth);
+	grid.columns = (texture.height / grid.tileHeight);
+
+	this->texture = texture;
+}
+
+void TileSetCanvas::update() {
+	edui::Canvas::update();
+
+	if (mouseIsInRect()) {
+		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && selectionMode) {
+			selectedTile = grid.getTileAtPosition(getMouseWorldPos());
+		}
+	}
+}
 
 void TileSetCanvas::drawOverlay() {
 	auto vec = grid.getTileAtPosition(getMouseWorldPos());
@@ -31,9 +60,16 @@ void TileSetCanvas::drawCanvas() {
 
 	grid.draw();
 
-	auto vec = grid.getTileAtPosition(getMouseWorldPos());
-	if (vec.valid()) {
-		auto rect = grid.getTileRect(vec);
+	if (selectionMode) {
+		if (selectedTile.valid()) {
+			auto rect = grid.getTileRect(selectedTile);
+			DrawRectangleRec(rect, Fade(DARKBLUE, 0.25f));
+		}
+	}
+
+	auto mouseTile = grid.getTileAtPosition(getMouseWorldPos());
+	if (mouseTile.valid()) {
+		auto rect = grid.getTileRect(mouseTile);
 		DrawRectangleLinesEx(rect, 2.0f, Fade(DARKGRAY, 0.5f));
 	}
 }

@@ -13,4 +13,8 @@ AtlasTile::AtlasTile(Texture texture, IVector atlasCoords) {
 
 IVector AtlasTile::getAtlasCoords() const { return this->atlasCoords; }
 
+void AtlasTile::setAtlasCoords(IVector atlasCoords) { this->atlasCoords = atlasCoords; }
+
 Texture AtlasTile::getTexture() const { return texture; }
+
+void AtlasTile::setTexture(Texture texture) { this->texture = texture; }

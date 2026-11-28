@@ -14,6 +14,7 @@ class ActorPanel : public PropertyFilePanel {
 public:
 	ActorPanel();
 	void init() override;
+	void refresh() override;
 
 private:
 	const int PROPERTIES_WIDTH = 350;

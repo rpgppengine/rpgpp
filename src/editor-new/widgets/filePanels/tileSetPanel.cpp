@@ -46,13 +46,5 @@ void TileSetPanel::refresh() { initTexture(); }
 void TileSetPanel::initTexture() {
 	auto &tileset = resource->as<TileSet>();
 
-	auto texture = tileset.getTexture();
-
-	auto &canvasGrid = canvas->getGrid();
-	canvasGrid.tileWidth = tileset.getTileWidth();
-	canvasGrid.tileHeight = tileset.getTileHeight();
-	canvasGrid.rows = (texture.width / canvasGrid.tileWidth);
-	canvasGrid.columns = (texture.height / canvasGrid.tileHeight);
-
-	canvas->setTexture(texture);
+	canvas->init(tileset);
 }

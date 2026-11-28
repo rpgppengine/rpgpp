@@ -23,6 +23,7 @@
 using json = nlohmann::json;
 
 Actor::Actor() : Resource(RPGPP_RESOURCE_ACTOR) {
+	tile.setAtlasCoords({0, 0});
 	// Some default animations
 	addAnimation(ANIM_DOWN, {{2, 0}, {3, 0}});
 	addAnimation(ANIM_DOWN_IDLE, {{0, 0}, {1, 0}});
@@ -40,7 +41,6 @@ void Actor::afterLoad() {
 	if (tileSetValid) {
 		ts.afterLoad();
 		this->tileSet = ts;
-		this->tile = tileSet.getTile({0, 0});
 	}
 }
 
@@ -51,7 +51,6 @@ void Actor::loadFile() {
 		ar(tileSet);
 	}
 	tileSet.loadFile();
-	this->tile = tileSet.getTile({0, 0});
 }
 
 Actor::Actor(const std::string &fileName) : Actor() {}
@@ -167,13 +166,15 @@ void Actor::setCurrentFrame(int frameIndex) {
 	this->currentFrame = frameIndex;
 
 	Animation anim = getAnimationRaw(currentAnimation);
+	atlasCoords = anim.getFrame(currentFrame);
 
+	/*
 	Vector2 atlasTileSize = tileSet.getTileSize();
 	IVector atlasPos = anim.getFrame(currentFrame);
 	atlasPos = Vector2{atlasPos.x * atlasTileSize.x, atlasPos.y * atlasTileSize.y};
 
-	// this->tile = tileSet.getTile(atlasPos.toFloat());
 	this->tile = tileSet.getTile(getAnimationAtlasByIdx(currentFrame).toFloat());
+	*/
 }
 
 Rectangle Actor::getCurrentAnimationRectangle() {
@@ -183,6 +184,8 @@ Rectangle Actor::getCurrentAnimationRectangle() {
 }
 
 void Actor::update() {
+	tile = tileSet.getTile(atlasCoords.toFloat());
+
 	if (!isPlaying) return;
 
 	frameCounter++;
@@ -329,7 +332,8 @@ void Actor::changeAnimation(const std::string &id) {
 
 		// change to the first frame of the new animation immidiately
 		frameCounter = (60 / frameSpeed);
-		tile = tileSet.getTile(getAnimationRaw(id).getFrame(0).toFloat());
+		atlasCoords = getAnimationRaw(id).getFrame(0);
+		// tile = tileSet.getTile(getAnimationRaw(id).getFrame(0).toFloat());
 	}
 }
 

@@ -11,12 +11,25 @@ std::vector<IVector> &Animation::getFrames() { return frames; }
 
 void Animation::addFrame(IVector frame) { frames.push_back(frame); }
 
-void Animation::removeFrame(int index) { frames.erase(frames.begin() + index); }
+void Animation::removeFrame(int index) {
+	if (index < 0) return;
+	if (frames.size() <= 1) return;
+	frames.erase(frames.begin() + index);
+}
 
-void Animation::insertFrame(int index, IVector frame) { frames.insert(frames.begin() + index, frame); }
+void Animation::insertFrame(int index, IVector frame) {
+	if (index < 0) return;
+	frames.insert(frames.begin() + index, frame);
+}
 
 size_t Animation::getSize() { return frames.size(); }
 
-IVector Animation::getFrame(int index) { return frames.at(index); }
+IVector Animation::getFrame(int index) {
+	if (index < 0) return IVector{};
+	return frames.at(index);
+}
 
-void Animation::setFrame(int index, IVector frame) { frames[index] = frame; }
+void Animation::setFrame(int index, IVector frame) {
+	if (index < 0) return;
+	frames[index] = frame;
+}

@@ -22,9 +22,8 @@ ActorCanvas::ActorCanvas() {
 void ActorCanvas::update() {
 	edui::Canvas::update();
 	if (actor != nullptr) {
-		box.setMousePos(mouseWorldPos);
-
 		actor->update();
+		box.setMousePos(mouseWorldPos);
 		box.update();
 	}
 }
@@ -42,6 +41,10 @@ void ActorCanvas::drawCanvas() {
 
 void ActorCanvas::setActor(Actor *ptr) {
 	this->actor = ptr;
+	refresh();
+}
+
+void ActorCanvas::refresh() {
 	box.setRectangle(actor->getCollisionRect());
 
 	grid.rows = actor->getRect().width / grid.tileWidth;

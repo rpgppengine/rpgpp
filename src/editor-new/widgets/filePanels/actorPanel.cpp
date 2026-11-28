@@ -4,6 +4,7 @@
 
 #include "actor.hpp"
 #include "basicTypes.hpp"
+#include "commands/actorEditCommand.hpp"
 #include "raylib.h"
 #include "services/interface.hpp"
 #include "widgets/actorAnimationsPanel.hpp"
@@ -38,6 +39,8 @@ ActorPanel::ActorPanel() {
 	animationsPanel->setPosition({0, 0}, {1, -ANIMATIONS_HEIGHT});
 	animationsPanel->setSize({1, -(PROPERTIES_WIDTH + INTERFACE_SPACING)}, {0, ANIMATIONS_HEIGHT});
 	add(animationsPanel);
+
+	animationsPanel->onCommand.connect([this](std::unique_ptr<ActorEditCommand> cmd) { this->exec(std::move(cmd)); });
 }
 
 void ActorPanel::init() {
@@ -45,11 +48,20 @@ void ActorPanel::init() {
 	actor.changeAnimation(ANIM_DOWN_IDLE);
 	actor.setIsPlaying(false);
 
+	auto ptr = &actor;
+	canvas->setActor(ptr);
+
+	refresh();
+}
+
+void ActorPanel::refresh() {
+	auto &actor = resource->as<Actor>();
+
 	properties->getProperty(ACTOR_TILESET)->setValue(actor.getTileSetSource());
 	properties->getProperty(ACTOR_COLLISION_RECT)->setValue(actor.getCollisionRect());
 
 	auto ptr = &actor;
-	canvas->setActor(ptr);
+	canvas->refresh();
 
 	animationsPanel->init(ptr);
 }

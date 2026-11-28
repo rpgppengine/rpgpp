@@ -19,7 +19,7 @@ public:
 	std::filesystem::path getSourcePath();
 	void setResource(std::unique_ptr<Resource> ptr);
 	virtual void init() {};
-	virtual void refresh() {};
+	virtual void refresh() { init(); };
 	CommandHistory &getHistory();
 	void undo();
 	void redo();

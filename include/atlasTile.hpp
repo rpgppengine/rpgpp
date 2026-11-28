@@ -13,7 +13,7 @@ private:
 	/** Pointer to the used Texture */
 	Texture texture;
 	/** The atlas (source) coordinates from the TileSet. */
-	IVector atlasCoords;
+	IVector atlasCoords = {0, 0};
 
 public:
 	/**
@@ -32,8 +32,10 @@ public:
 	 * @returns An IVector which represents the atlas coordinates
 	 */
 	IVector getAtlasCoords() const;
+	void setAtlasCoords(IVector atlasCoords);
 
 	Texture getTexture() const;
+	void setTexture(Texture texture);
 };
 
 #endif
