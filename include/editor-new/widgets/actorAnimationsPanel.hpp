@@ -27,12 +27,19 @@ private:
 
 	std::shared_ptr<edui::Dropdown> animationsDrop;
 	std::shared_ptr<edui::IconButton> playButton;
+	std::shared_ptr<edui::HorizontalContainer> topLayout;
 	std::shared_ptr<edui::HorizontalContainer> framesList;
 
+	void addVerticalLine();
+	void initPlaybackButtons();
+	void initFrameButtons();
+	void initAnimationButtons();
+
 	void showAnimationFrames(const std::string &id);
-	void pushCommand(ActorCommandType type, IVector newFrame = {});
+	void pushCommand(ActorCommandType type, IVector newFrame = {}, const std::string &newAnimTitle = "");
 
 	void showTileSetDialog();
+	void showNewAnimationDialog();
 };
 }  // namespace editor
 

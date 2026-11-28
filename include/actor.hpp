@@ -177,6 +177,7 @@ public:
 	Animation getAnimationRaw(const std::string &id) const;
 	Animation &getAnimationRef(const std::string &id);
 	void addAnimation(const std::string &id, std::vector<IVector> frames);
+	void removeAnimation(const std::string &id);
 	/** Whether this Actor has an Interactable. */
 	bool hasInteractable();
 	/** Set the 'ownsInteractable' flag. */

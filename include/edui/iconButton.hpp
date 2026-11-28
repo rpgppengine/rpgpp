@@ -21,7 +21,7 @@ struct IconButton : public Widget {
 	void mouseLeft() override;
 
 	void setTooltip();
-	void setTooltip(const std::string &text);
+	void setTooltip(const std::string &text, const std::string &translationId = "");
 
 private:
 	bool hasTooltip = false;

@@ -8,6 +8,7 @@
 #include "commands/actorEditCommand.hpp"
 #include "editor.hpp"
 #include "edui/childWindow.hpp"
+#include "edui/colorRect.hpp"
 #include "edui/dropdown.hpp"
 #include "edui/gui.hpp"
 #include "edui/horizontalContainer.hpp"
@@ -16,6 +17,7 @@
 #include "icons.hpp"
 #include "services/interface.hpp"
 #include "widgets/animationFrameButton.hpp"
+#include "widgets/windows/newAnimationWindow.hpp"
 #include "widgets/windows/tileSetDialog.hpp"
 
 using namespace editor;
@@ -25,7 +27,7 @@ ActorAnimationsPanel::ActorAnimationsPanel() {
 	hideCloseButton();
 	draggable = false;
 
-	auto topLayout = std::make_shared<edui::HorizontalContainer>();
+	topLayout = std::make_shared<edui::HorizontalContainer>();
 	topLayout->render->border = 0;
 	topLayout->render->as<edui::HorizontalContainerRender>().space = INTERFACE_SPACING;
 	topLayout->setSize({1, 0}, {0, edui::EDUI_SECONDARY_HEIGHT});
@@ -40,7 +42,27 @@ ActorAnimationsPanel::ActorAnimationsPanel() {
 		showAnimationFrames(actor->getCurrentAnimationId());
 	});
 
+	initPlaybackButtons();
+	addVerticalLine();
+	initFrameButtons();
+	addVerticalLine();
+	initAnimationButtons();
+
+	framesList = std::make_shared<edui::HorizontalContainer>();
+	framesList->setPosition({0, 0}, {0, (edui::EDUI_SECONDARY_HEIGHT + INTERFACE_SPACING)});
+	framesList->setSize({1, 0}, {0, 64});
+	add(framesList);
+}
+
+void ActorAnimationsPanel::addVerticalLine() {
+	auto line = std::make_shared<edui::ColorRect>();
+	line->setSize({0, 1}, {1, 0});
+	topLayout->add(line);
+}
+
+void ActorAnimationsPanel::initPlaybackButtons() {
 	playButton = std::make_shared<edui::IconButton>();
+	playButton->setTooltip("Play", "Actor.Animations.Play");
 	playButton->iconId = ICON_PLAYER_PLAY;
 	playButton->setSize({0, edui::EDUI_SECONDARY_HEIGHT}, {1, 0});
 	topLayout->add(playButton);
@@ -50,7 +72,22 @@ ActorAnimationsPanel::ActorAnimationsPanel() {
 		playButton->iconId = actor->getIsPlaying() ? ICON_PLAYER_PAUSE : ICON_PLAYER_PLAY;
 	});
 
+	auto stopButton = std::make_shared<edui::IconButton>();
+	stopButton->setTooltip("Stop", "Actor.Animations.Stop");
+	stopButton->iconId = ICON_PLAYER_STOP;
+	stopButton->setSize({0, edui::EDUI_SECONDARY_HEIGHT}, {1, 0});
+	topLayout->add(stopButton);
+
+	stopButton->onClicked.connect([this] {
+		actor->setIsPlaying(false);
+		actor->setCurrentFrame(0);
+		playButton->iconId = ICON_PLAYER_PLAY;
+	});
+}
+
+void ActorAnimationsPanel::initFrameButtons() {
 	auto newFrameButton = std::make_shared<edui::IconButton>();
+	newFrameButton->setTooltip("New Frame", "Actor.Animations.NewFrame");
 	newFrameButton->iconId = ICON_FILE_ADD;
 	newFrameButton->setSize({0, edui::EDUI_SECONDARY_HEIGHT}, {1, 0});
 	topLayout->add(newFrameButton);
@@ -58,6 +95,7 @@ ActorAnimationsPanel::ActorAnimationsPanel() {
 	newFrameButton->onClicked.connect([this] { pushCommand(ACTOR_CMD_NEWFRAME); });
 
 	auto removeFrameButton = std::make_shared<edui::IconButton>();
+	removeFrameButton->setTooltip("Remove Frame", "Actor.Animations.RemoveFrame");
 	removeFrameButton->iconId = ICON_FILE_DELETE;
 	removeFrameButton->setSize({0, edui::EDUI_SECONDARY_HEIGHT}, {1, 0});
 	topLayout->add(removeFrameButton);
@@ -65,16 +103,30 @@ ActorAnimationsPanel::ActorAnimationsPanel() {
 	removeFrameButton->onClicked.connect([this] { pushCommand(ACTOR_CMD_REMOVEFRAME); });
 
 	auto editFrameButton = std::make_shared<edui::IconButton>();
+	editFrameButton->setTooltip("Edit Frame", "Actor.Animations.EditFrame");
 	editFrameButton->iconId = ICON_FILE_OPEN;
 	editFrameButton->setSize({0, edui::EDUI_SECONDARY_HEIGHT}, {1, 0});
 	topLayout->add(editFrameButton);
 
 	editFrameButton->onClicked.connect([this] { showTileSetDialog(); });
+}
 
-	framesList = std::make_shared<edui::HorizontalContainer>();
-	framesList->setPosition({0, 0}, {0, (edui::EDUI_SECONDARY_HEIGHT + INTERFACE_SPACING)});
-	framesList->setSize({1, 0}, {0, 64});
-	add(framesList);
+void ActorAnimationsPanel::initAnimationButtons() {
+	auto newAnimationButton = std::make_shared<edui::IconButton>();
+	newAnimationButton->setTooltip("New Animation", "Actor.Animations.NewAnimation");
+	newAnimationButton->iconId = ICON_FILETYPE_PLAY_ADD;
+	newAnimationButton->setSize({0, edui::EDUI_SECONDARY_HEIGHT}, {1, 0});
+	topLayout->add(newAnimationButton);
+
+	newAnimationButton->onClicked.connect([this] { showNewAnimationDialog(); });
+
+	auto removeAnimationButton = std::make_shared<edui::IconButton>();
+	removeAnimationButton->setTooltip("Remove Animation", "Actor.Animations.RemoveAnimation");
+	removeAnimationButton->iconId = ICON_FILETYPE_PLAY_DELETE;
+	removeAnimationButton->setSize({0, edui::EDUI_SECONDARY_HEIGHT}, {1, 0});
+	topLayout->add(removeAnimationButton);
+
+	removeAnimationButton->onClicked.connect([this] { pushCommand(ACTOR_CMD_REMOVEANIM); });
 }
 
 void ActorAnimationsPanel::update() {
@@ -129,12 +181,13 @@ void ActorAnimationsPanel::showAnimationFrames(const std::string &id) {
 	}
 }
 
-void ActorAnimationsPanel::pushCommand(ActorCommandType type, IVector newFrame) {
+void ActorAnimationsPanel::pushCommand(ActorCommandType type, IVector newFrame, const std::string &newAnimTitle) {
 	auto cmd = std::make_unique<ActorEditCommand>();
 	cmd->actor = actor;
 	cmd->animationId = actor->getCurrentAnimationId();
 	cmd->frameIndex = actor->getCurrentFrame();
 	cmd->newFrame = newFrame;
+	cmd->newAnimId = newAnimTitle;
 	cmd->commandType = type;
 
 	onCommand.invoke(std::move(cmd));
@@ -146,6 +199,13 @@ void ActorAnimationsPanel::showTileSetDialog() {
 	IVector frame = actor->getCurrentAnimationAtlas();
 	window->setSelectedTile(frame);
 	window->onConfirmed.connect([this](IVector tile) { pushCommand(ACTOR_CMD_EDITFRAME, tile); });
+
+	Editor::getInstance().getInterface().showTopWindow(window);
+}
+
+void ActorAnimationsPanel::showNewAnimationDialog() {
+	auto window = std::make_shared<NewAnimationWindow>();
+	window->onConfirmed.connect([this](std::string title) { pushCommand(ACTOR_CMD_NEWANIM, {}, title); });
 
 	Editor::getInstance().getInterface().showTopWindow(window);
 }

@@ -9,6 +9,7 @@ ActorEditCommand::ActorEditCommand() {}
 void ActorEditCommand::execute() {
 	Animation &anim = actor->getAnimationRef(animationId);
 	oldFrame = anim.getFrame(frameIndex);
+	oldAnim = anim;
 
 	switch (commandType) {
 		case ACTOR_CMD_NEWFRAME:
@@ -22,6 +23,13 @@ void ActorEditCommand::execute() {
 		case ACTOR_CMD_EDITFRAME:
 			anim.setFrame(frameIndex, newFrame);
 			break;
+		case ACTOR_CMD_NEWANIM:
+			actor->addAnimation(newAnimId, {{0, 0}});
+			actor->changeAnimation(newAnimId);
+			break;
+		case ACTOR_CMD_REMOVEANIM:
+			actor->removeAnimation(animationId);
+			break;
 	}
 }
 
@@ -33,10 +41,16 @@ void ActorEditCommand::undo() {
 			anim.removeFrame(frameIndex + 1);
 			break;
 		case ACTOR_CMD_REMOVEFRAME:
-			anim.removeFrame(frameIndex);
+			anim.insertFrame(frameIndex, oldFrame);
 			break;
 		case ACTOR_CMD_EDITFRAME:
 			anim.setFrame(frameIndex, oldFrame);
+			break;
+		case ACTOR_CMD_NEWANIM:
+			actor->removeAnimation(newAnimId);
+			break;
+		case ACTOR_CMD_REMOVEANIM:
+			actor->addAnimation(animationId, oldAnim.getFrames());
 			break;
 	}
 }

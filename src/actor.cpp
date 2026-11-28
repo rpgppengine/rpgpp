@@ -45,6 +45,8 @@ void Actor::afterLoad() {
 }
 
 void Actor::loadFile() {
+	if (!FileExists(tileSetSource.c_str())) return;
+
 	std::ifstream stream(tileSetSource);
 	{
 		cereal::JSONInputArchive ar(stream);
@@ -167,14 +169,6 @@ void Actor::setCurrentFrame(int frameIndex) {
 
 	Animation anim = getAnimationRaw(currentAnimation);
 	atlasCoords = anim.getFrame(currentFrame);
-
-	/*
-	Vector2 atlasTileSize = tileSet.getTileSize();
-	IVector atlasPos = anim.getFrame(currentFrame);
-	atlasPos = Vector2{atlasPos.x * atlasTileSize.x, atlasPos.y * atlasTileSize.y};
-
-	this->tile = tileSet.getTile(getAnimationAtlasByIdx(currentFrame).toFloat());
-	*/
 }
 
 Rectangle Actor::getCurrentAnimationRectangle() {
@@ -260,10 +254,7 @@ Rectangle Actor::getRect() const {
 
 TileSet &Actor::getTileSet() { return tileSet; }
 
-void Actor::setTileSet(const std::string &newTileSetSource) {
-	// tileSet = std::make_unique<TileSet>(newTileSetSource);
-	this->tileSetSource = newTileSetSource;
-}
+void Actor::setTileSet(const std::string &newTileSetSource) { this->tileSetSource = newTileSetSource; }
 
 TileSetRef Actor::getTileSetSource() { return tileSetSource; }
 
@@ -333,7 +324,6 @@ void Actor::changeAnimation(const std::string &id) {
 		// change to the first frame of the new animation immidiately
 		frameCounter = (60 / frameSpeed);
 		atlasCoords = getAnimationRaw(id).getFrame(0);
-		// tile = tileSet.getTile(getAnimationRaw(id).getFrame(0).toFloat());
 	}
 }
 
@@ -358,14 +348,29 @@ Animation Actor::getAnimationRaw(const std::string &id) const {
 	}
 }
 
-Animation &Actor::getAnimationRef(const std::string &id) { return animations.at(id); }
+Animation &Actor::getAnimationRef(const std::string &id) {
+	if (animations.count(id) == 0) return animations[ANIM_DOWN_IDLE];
+	return animations.at(id);
+}
 
 void Actor::addAnimation(const std::string &id, std::vector<IVector> frames) {
+	if (id.empty()) return;
+	if (animations.count(id) > 0) return;
+
 	Animation anim;
 	for (auto &item : frames) {
 		anim.addFrame(item);
 	}
 	animations.emplace(id, anim);
+}
+
+void Actor::removeAnimation(const std::string &id) {
+	if (dirMap.count(id) == 0 && animations.count(id) > 0) {
+		if (currentAnimation == id) {
+			currentAnimation = ANIM_DOWN_IDLE;
+		}
+		animations.erase(id);
+	}
 }
 
 Rectangle Actor::getCollisionRect() const { return collisionRect; }

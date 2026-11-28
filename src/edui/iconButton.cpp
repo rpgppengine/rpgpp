@@ -37,7 +37,8 @@ void IconButton::setTooltip() {
 	tooltipText = getTranslation(translationId.c_str(), tooltipText);
 }
 
-void IconButton::setTooltip(const std::string &text) {
+void IconButton::setTooltip(const std::string &text, const std::string &translationId) {
+	this->translationId = translationId.c_str();
 	tooltipText = text;
 	hasTooltip = true;
 }
